@@ -1,0 +1,1487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/activation.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/annotations-22.0.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/ant-1.5.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/antlr-2.7.5.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/apache-httpcomponents-httpclient.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/asm-2.2.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/avalon-framework-4.1.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/BarCode.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/classes12.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/classes111.zip!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils-1.5.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils-1.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils-bean-collections.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils-core.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-codec-1.12.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-collections-3.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-collections4-4.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-collections-testframework-3.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-compress-1.18.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-digester-1.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-fileupload-1.2.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-io-1.4.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-io-2.11.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-javaflow-20060411.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-lang-2.4-1.jar.zip!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-lang-2.6.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-1.0.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-1.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-adapters-1.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-api-1.0.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-api-1.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-math3-3.6.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-net-1.4.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-validator-1.4.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/core-2.2.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/core-3.3.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/core-3.4.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/curvesapi-1.06.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/dom4j-1.6.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/dom4j-1.6.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/encoder-1.2.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/encoder-jsp-1.2.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/ezmorph-1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/FinacleWebbFront.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/groovy-1.6.9.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/groovy-all-1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/gson-2.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/gson-2.8.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/hibernate3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/hostsdk.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/hsqldb-1.7.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/httpclient-4.5.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/httpcore-4.4.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/isocreation.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/iText-2.1.7.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/iTextAsian.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.json.bind-api-3.0.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.json-api-2.1.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.servlet.jsp.jstl-3.0.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.servlet.jsp-api-3.1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.servlet-api-6.0.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.ws.rs-api-3.1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.xml.bind-api-4.0.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta-bcel-20050813.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jasperreports-3.7.5.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/javase-2.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jaxen-1.1.4-sources.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jboss-logging-3.3.1.Final.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jboss-security-spi-5.1.0.Final.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jbosssx-client-4.0.0.Final.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcifs-krb5-1.2.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcommon-1.0.4.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcommon-1.0.4-junit.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcommon-1.0.9.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcommon-xml-1.0.4.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jdt-compiler-3.1.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jfreechart-1.0.9.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jfreechart-1.0.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jmailcomposer.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/joda-time-2.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jpa.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/json-lib-2.4-jdk15.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jsontoken-1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jstl-1.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jstl-standard.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/JTwain.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/junit.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jxl.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jxl-2.6.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/LinearBarCode.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/log4j-1.2.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/logback-core-1.0.13.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/logkit-1.0.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mail.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/metrics.serialization-all-1.0.3-jar-with-dependencies.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mindcomsecure.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mindcomsecure_30Jun1024.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mondrian-2.0.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/msbase.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mssql9-driver.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mssqlserver.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/msutil.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/okhttp-3.4.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/okio-1.9.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/ooxml-schemas-1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/openpdf-1.2.16.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/opens-library.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/openxml4j-1.0-beta.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/org.json.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/org.liveSense.fragment.com.sun.image.codec.jpeg-1.0.5.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/org-apache-commons-codec.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/picketbox-4.0.7.Final.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/picketbox-commons-1.0.0.final.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/picketbox-infinispan-4.0.7.Final.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/picketbox-spi-bare-5.1.0.Final.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/png-encoder-1.5.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/poi-4.1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/poi-ooxml-4.1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/poi-ooxml-schemas-4.1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/PostIso.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/protobuf-java-2.5.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/quartz-2.2.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/saaj-api-1.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/serializer-3.1.2 .jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/servlet.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/servlet-api-2.3.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/servlet-api-6.0.36.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/slf4j-api-1.7.21.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/smtp.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/sqljdbc.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/sqljdbc4.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/stax-api-1.0.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/struts.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/sun-jai_codec.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/uploadbean.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/utils-3.1.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xalan.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xalan-2.7.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xalan-serializer-2.7.2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xercesImpl.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xml-apis.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xml-apis-1.0.b2.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xmlbeans-3.1.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/zxing.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/zxing-javase.jar!/" />
+    <libelement value="jar://$USER_HOME$/Downloads/java-json.jar!/" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/src/java" expected_position="0" />
+    </src_description>
+  </component>
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/bin" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/java" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="activation.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/activation.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="annotations-22.0.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/annotations-22.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ant-1.5.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/ant-1.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="antlr-2.7.5.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/antlr-2.7.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="apache-httpcomponents-httpclient.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/apache-httpcomponents-httpclient.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="asm-2.2.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/asm-2.2.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="avalon-framework-4.1.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/avalon-framework-4.1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="BarCode.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/BarCode.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="classes12.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/classes12.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="classes111.zip">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/classes111.zip!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-beanutils.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-beanutils-1.5.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils-1.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-beanutils-1.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils-1.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-beanutils-bean-collections.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils-bean-collections.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-beanutils-core.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-beanutils-core.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-codec-1.12.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-codec-1.12.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-collections-3.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-collections-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-collections4-4.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-collections4-4.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-collections-testframework-3.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-collections-testframework-3.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-compress-1.18.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-compress-1.18.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-digester-1.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-digester-1.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-fileupload-1.2.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-fileupload-1.2.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-1.4.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-io-1.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-2.11.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-io-2.11.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-javaflow-20060411.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-javaflow-20060411.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-lang-2.4-1.jar.zip">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-lang-2.4-1.jar.zip!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-lang-2.6.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-lang-2.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-logging-1.0.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-1.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-logging-1.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-logging-adapters-1.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-adapters-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-logging-api-1.0.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-api-1.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-logging-api-1.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-logging-api-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-math3-3.6.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-math3-3.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-net-1.4.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-net-1.4.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-validator-1.4.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/commons-validator-1.4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="core-2.2.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/core-2.2.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="core-3.3.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/core-3.3.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="core-3.4.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/core-3.4.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="curvesapi-1.06.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/curvesapi-1.06.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="dom4j-1.6.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/dom4j-1.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="dom4j-1.6.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/dom4j-1.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="encoder-1.2.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/encoder-1.2.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="encoder-jsp-1.2.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/encoder-jsp-1.2.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ezmorph-1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/ezmorph-1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="FinacleWebbFront.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/FinacleWebbFront.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="groovy-1.6.9.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/groovy-1.6.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="groovy-all-1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/groovy-all-1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="gson-2.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/gson-2.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="gson-2.8.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/gson-2.8.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="hibernate3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/hibernate3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="hostsdk.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/hostsdk.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="hsqldb-1.7.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/hsqldb-1.7.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="httpclient-4.5.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/httpclient-4.5.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="httpcore-4.4.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/httpcore-4.4.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="isocreation.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/isocreation.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="iText-2.1.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/iText-2.1.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="iTextAsian.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/iTextAsian.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta.json.bind-api-3.0.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.json.bind-api-3.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta.json-api-2.1.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.json-api-2.1.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta.servlet.jsp.jstl-3.0.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.servlet.jsp.jstl-3.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta.servlet.jsp-api-3.1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.servlet.jsp-api-3.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta.servlet-api-6.0.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.servlet-api-6.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta.ws.rs-api-3.1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.ws.rs-api-3.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta.xml.bind-api-4.0.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta.xml.bind-api-4.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta-bcel-20050813.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jakarta-bcel-20050813.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jasperreports-3.7.5.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jasperreports-3.7.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="javase-2.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/javase-2.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jaxen-1.1.4-sources.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jaxen-1.1.4-sources.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jboss-logging-3.3.1.Final.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jboss-logging-3.3.1.Final.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jboss-security-spi-5.1.0.Final.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jboss-security-spi-5.1.0.Final.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jbosssx-client-4.0.0.Final.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jbosssx-client-4.0.0.Final.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jcifs-krb5-1.2.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcifs-krb5-1.2.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jcommon-1.0.4.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcommon-1.0.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jcommon-1.0.4-junit.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcommon-1.0.4-junit.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jcommon-1.0.9.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcommon-1.0.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jcommon-xml-1.0.4.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jcommon-xml-1.0.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jdt-compiler-3.1.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jdt-compiler-3.1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jfreechart-1.0.9.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jfreechart-1.0.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jfreechart-1.0.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jfreechart-1.0.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jmailcomposer.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jmailcomposer.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="joda-time-2.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/joda-time-2.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jpa.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jpa.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="json-lib-2.4-jdk15.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/json-lib-2.4-jdk15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jsontoken-1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jsontoken-1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jstl-1.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jstl-1.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jstl-standard.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jstl-standard.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="JTwain.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/JTwain.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="junit.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/junit.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jxl.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jxl.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jxl-2.6.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/jxl-2.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="LinearBarCode.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/LinearBarCode.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="log4j-1.2.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/log4j-1.2.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="logback-core-1.0.13.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/logback-core-1.0.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="logkit-1.0.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/logkit-1.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mail.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mail.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="metrics.serialization-all-1.0.3-jar-with-dependencies.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/metrics.serialization-all-1.0.3-jar-with-dependencies.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mindcomsecure.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mindcomsecure.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mindcomsecure_30Jun1024.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mindcomsecure_30Jun1024.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mondrian-2.0.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mondrian-2.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="msbase.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/msbase.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mssql9-driver.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mssql9-driver.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mssqlserver.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/mssqlserver.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="msutil.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/msutil.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="okhttp-3.4.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/okhttp-3.4.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="okio-1.9.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/okio-1.9.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ooxml-schemas-1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/ooxml-schemas-1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="openpdf-1.2.16.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/openpdf-1.2.16.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="opens-library.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/opens-library.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="openxml4j-1.0-beta.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/openxml4j-1.0-beta.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="org.json.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/org.json.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="org.liveSense.fragment.com.sun.image.codec.jpeg-1.0.5.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/org.liveSense.fragment.com.sun.image.codec.jpeg-1.0.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="org-apache-commons-codec.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/org-apache-commons-codec.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="picketbox-4.0.7.Final.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/picketbox-4.0.7.Final.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="picketbox-commons-1.0.0.final.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/picketbox-commons-1.0.0.final.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="picketbox-infinispan-4.0.7.Final.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/picketbox-infinispan-4.0.7.Final.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="picketbox-spi-bare-5.1.0.Final.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/picketbox-spi-bare-5.1.0.Final.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="png-encoder-1.5.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/png-encoder-1.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-4.1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/poi-4.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-ooxml-4.1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/poi-ooxml-4.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-ooxml-schemas-4.1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/poi-ooxml-schemas-4.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="PostIso.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/PostIso.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="protobuf-java-2.5.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/protobuf-java-2.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="quartz-2.2.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/quartz-2.2.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="saaj-api-1.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/saaj-api-1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="serializer-3.1.2 .jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/serializer-3.1.2 .jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="servlet.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/servlet.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="servlet-api-2.3.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/servlet-api-2.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="servlet-api-6.0.36.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/servlet-api-6.0.36.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="slf4j-api-1.7.21.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/slf4j-api-1.7.21.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="smtp.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/smtp.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="sqljdbc.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/sqljdbc.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="sqljdbc4.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/sqljdbc4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="stax-api-1.0.1.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/stax-api-1.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="struts.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/struts.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="sun-jai_codec.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/sun-jai_codec.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="uploadbean.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/uploadbean.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="utils-3.1.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/utils-3.1.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xalan.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xalan.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xalan-2.7.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xalan-2.7.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xalan-serializer-2.7.2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xalan-serializer-2.7.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xercesImpl.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xercesImpl.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xml-apis.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xml-apis.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xml-apis-1.0.b2.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xml-apis-1.0.b2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xmlbeans-3.1.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/xmlbeans-3.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="zxing.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/zxing.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="zxing-javase.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../wildfly-30.0.1.Final/standalone/deployments/legendDemo.war/WEB-INF/lib/zxing-javase.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="jdk" jdkName="jre7" jdkType="JavaSDK" />
+    <orderEntry type="module-library">
+      <library name="java-json.jar">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Downloads/java-json.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>

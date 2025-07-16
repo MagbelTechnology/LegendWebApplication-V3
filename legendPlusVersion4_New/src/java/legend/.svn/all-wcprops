@@ -1,0 +1,641 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend
+END
+BranAcqusBudgetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/BranAcqusBudgetBean.java
+END
+MaintenanceRepsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/MaintenanceRepsBean.java
+END
+GroupSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/GroupSetupBean.java
+END
+legend.jpx.local
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/legend.jpx.local
+END
+FuelingEntriesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/FuelingEntriesBean.java
+END
+MakeAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/MakeAuditServlet.java
+END
+UserAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/UserAuditServlet.java
+END
+AccountTypes.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AccountTypes.java
+END
+DateManipulations.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/DateManipulations.java
+END
+SystemConnectBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/SystemConnectBean.java
+END
+MakeSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/MakeSetupBean.java
+END
+StateSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/StateSetupBean.java
+END
+GroupAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/GroupAuditServlet.java
+END
+lib.library
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/lib.library
+END
+legend.oif
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/legend.oif
+END
+CompanyDriversBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CompanyDriversBean.java
+END
+UniqueBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/UniqueBean.java
+END
+VehicleLubricantsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/VehicleLubricantsBean.java
+END
+InsuranceSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/InsuranceSetupBean.java
+END
+ActiveUserBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ActiveUserBean.java
+END
+CompanyAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CompanyAuditServlet.java
+END
+AssetDisposalBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AssetDisposalBean.java
+END
+CClassAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CClassAuditServlet.java
+END
+InsuranceEntriesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/InsuranceEntriesBean.java
+END
+AssetReclassificationBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AssetReclassificationBean.java
+END
+ManageSbuDepartments.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ManageSbuDepartments.java
+END
+AssetTransferBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AssetTransferBean.java
+END
+AssetDetailsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AssetDetailsBean.java
+END
+DepartAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/DepartAuditServlet.java
+END
+EmployeeAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/EmployeeAuditServlet.java
+END
+UniqueServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/UniqueServlet.java
+END
+SectionSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/SectionSetupBean.java
+END
+StateAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/StateAuditServlet.java
+END
+ClassSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ClassSetupBean.java
+END
+RemoteScripting.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/RemoteScripting.java
+END
+RegionAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/RegionAuditServlet.java
+END
+AuditElement.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AuditElement.java
+END
+BarCodePrintServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/BarCodePrintServlet.java
+END
+CategorySetupBean_.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CategorySetupBean_.java
+END
+SClassAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/SClassAuditServlet.java
+END
+UserSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/UserSetupBean.java
+END
+ManageSectionsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ManageSectionsBean.java
+END
+DriverAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/DriverAuditServlet.java
+END
+ManageSecurities.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ManageSecurities.java
+END
+SystemFooterBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/SystemFooterBean.java
+END
+ApprovalServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/ApprovalServlet.java
+END
+ExportComponentBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ExportComponentBean.java
+END
+TechEmployeesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/TechEmployeesBean.java
+END
+SystemUsersBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/SystemUsersBean.java
+END
+DisposalReasonsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/DisposalReasonsBean.java
+END
+SectionAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/SectionAuditServlet.java
+END
+LicenseEntriesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/LicenseEntriesBean.java
+END
+MaintenanceBudgetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/MaintenanceBudgetBean.java
+END
+SystemDesktopBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/SystemDesktopBean.java
+END
+FuelTypesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/FuelTypesBean.java
+END
+CategoryAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CategoryAuditServlet.java
+END
+legend.jpx
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/legend.jpx
+END
+ManageGroupsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ManageGroupsBean.java
+END
+LicenseAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/LicenseAuditServlet.java
+END
+LocationSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/LocationSetupBean.java
+END
+RemoteMethods.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/RemoteMethods.java
+END
+AccidentRecordsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AccidentRecordsBean.java
+END
+SystemHeaderBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/SystemHeaderBean.java
+END
+InsuranceAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/InsuranceAuditServlet.java
+END
+CategorySetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CategorySetupBean.java
+END
+ManageBranchesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ManageBranchesBean.java
+END
+migrator.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/migrator.java
+END
+ConnectionClass.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ConnectionClass.java
+END
+AjaxServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/AjaxServlet.java
+END
+AssetRevalueBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AssetRevalueBean.java
+END
+BranchAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/BranchAuditServlet.java
+END
+VendorAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/VendorAuditServlet.java
+END
+AssetInfoManagerServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/AssetInfoManagerServlet.java
+END
+BranMaintBudgetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/BranMaintBudgetBean.java
+END
+GAssetRecordsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/GAssetRecordsBean.java
+END
+ManageUsersBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ManageUsersBean.java
+END
+ManageDepartsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ManageDepartsBean.java
+END
+AuditTrail.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AuditTrail.java
+END
+LocationAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/LocationAuditServlet.java
+END
+BarCodeServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/BarCodeServlet.java
+END
+BranchSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/BranchSetupBean.java
+END
+GroupSetupBean.jbx
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/GroupSetupBean.jbx
+END
+ManageRegionsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ManageRegionsBean.java
+END
+AutoIDSetup.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/AutoIDSetup.java
+END
+Servlet.library
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/Servlet.library
+END
+BarCodePrinterServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/BarCodePrinterServlet.java
+END
+AcquisitionBudgetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/AcquisitionBudgetBean.java
+END
+CategoryAuditServlet.jbx
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CategoryAuditServlet.jbx
+END
+CompanyDefBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CompanyDefBean.java
+END
+Utilities.java
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/Utilities.java
+END
+Servletx.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/Servletx.java
+END
+RecalculateDep.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/RecalculateDep.java
+END
+CategoryClassesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CategoryClassesBean.java
+END
+ProvinceAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ProvinceAuditServlet.java
+END
+legend.html
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/legend.html
+END
+ReasonAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ReasonAuditServlet.java
+END
+DepartSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/DepartSetupBean.java
+END
+FuelAuditServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/FuelAuditServlet.java
+END
+CurrencyHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CurrencyHandler.java
+END
+BarCodeDisplayServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/BarCodeDisplayServlet.java
+END
+RegionSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/RegionSetupBean.java
+END
+UserAuditServlet.java27_01_09
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/UserAuditServlet.java27_01_09
+END
+ExportLegacyBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ExportLegacyBean.java
+END
+ProvinceSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/ProvinceSetupBean.java
+END
+LicenseTypesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/LicenseTypesBean.java
+END
+CompanyVendorsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/CompanyVendorsBean.java
+END

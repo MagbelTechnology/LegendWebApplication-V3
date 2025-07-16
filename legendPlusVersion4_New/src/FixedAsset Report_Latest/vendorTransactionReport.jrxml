@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="vendorTransactionReport" language="groovy" pageWidth="1315" pageHeight="842" columnWidth="1295" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT
+     VENDOR_TRANSACTIONS."MTID" AS VENDOR_TRANSACTIONS_MTID,
+     VENDOR_TRANSACTIONS."TRANS_ID" AS VENDOR_TRANSACTIONS_TRANS_ID,
+     VENDOR_TRANSACTIONS."VENDOR_CODE" AS VENDOR_TRANSACTIONS_VENDOR_CODE,
+     VENDOR_TRANSACTIONS."DESCRIPTION" AS VENDOR_TRANSACTIONS_DESCRIPTION,
+     VENDOR_TRANSACTIONS."COST_PRICE" AS VENDOR_TRANSACTIONS_COST_PRICE,
+     VENDOR_TRANSACTIONS."TRANSACTION_DATE" AS VENDOR_TRANSACTIONS_TRANSACTION_DATE,
+     VENDOR_TRANSACTIONS."TRANSACTION_TYPE" AS VENDOR_TRANSACTIONS_TRANSACTION_TYPE,
+     VENDOR_TRANSACTIONS."LOCATION" AS VENDOR_TRANSACTIONS_LOCATION,
+     VENDOR_TRANSACTIONS."DRACCOUNT_NO" AS VENDOR_TRANSACTIONS_DRACCOUNT_NO,
+     VENDOR_TRANSACTIONS."CRACCOUNT_NO" AS VENDOR_TRANSACTIONS_CRACCOUNT_NO,
+     VENDOR_TRANSACTIONS."PROJECT_CODE" AS VENDOR_TRANSACTIONS_PROJECT_CODE,
+     VENDOR_TRANSACTIONS."USER_ID" AS VENDOR_TRANSACTIONS_USER_ID,
+     AM_GB_LOCATION."LOCATION" AS AM_GB_LOCATION_LOCATION,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     ST_GL_PROJECT."DESCRIPTION" AS ST_GL_PROJECT_DESCRIPTION
+FROM
+     "dbo"."AM_GB_LOCATION" AM_GB_LOCATION INNER JOIN "dbo"."VENDOR_TRANSACTIONS" VENDOR_TRANSACTIONS ON AM_GB_LOCATION.LOCATION_ID = VENDOR_TRANSACTIONS."LOCATION"
+     INNER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON VENDOR_TRANSACTIONS."VENDOR_CODE" = am_ad_vendor."Vendor_Id"
+     INNER JOIN "dbo"."ST_GL_PROJECT" ST_GL_PROJECT ON VENDOR_TRANSACTIONS."PROJECT_CODE" = ST_GL_PROJECT."CODE"
+]]>
+	</queryString>
+	<field name="VENDOR_TRANSACTIONS_MTID" class="java.lang.Integer"/>
+	<field name="VENDOR_TRANSACTIONS_TRANS_ID" class="java.lang.String"/>
+	<field name="VENDOR_TRANSACTIONS_VENDOR_CODE" class="java.lang.String"/>
+	<field name="VENDOR_TRANSACTIONS_DESCRIPTION" class="java.lang.String"/>
+	<field name="VENDOR_TRANSACTIONS_COST_PRICE" class="java.math.BigDecimal"/>
+	<field name="VENDOR_TRANSACTIONS_TRANSACTION_DATE" class="java.sql.Timestamp"/>
+	<field name="VENDOR_TRANSACTIONS_TRANSACTION_TYPE" class="java.lang.String"/>
+	<field name="VENDOR_TRANSACTIONS_LOCATION" class="java.lang.String"/>
+	<field name="VENDOR_TRANSACTIONS_DRACCOUNT_NO" class="java.lang.String"/>
+	<field name="VENDOR_TRANSACTIONS_CRACCOUNT_NO" class="java.lang.String"/>
+	<field name="VENDOR_TRANSACTIONS_PROJECT_CODE" class="java.lang.String"/>
+	<field name="VENDOR_TRANSACTIONS_USER_ID" class="java.lang.String"/>
+	<field name="AM_GB_LOCATION_LOCATION" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="ST_GL_PROJECT_DESCRIPTION" class="java.lang.String"/>
+	<group name="location">
+		<groupExpression><![CDATA[$F{VENDOR_TRANSACTIONS_LOCATION}]]></groupExpression>
+		<groupHeader>
+			<band height="32">
+				<textField isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="250" height="32"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{AM_GB_LOCATION_LOCATION}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="47" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[S/No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="262" y="0" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DEBIT ACCOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="389" y="0" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CREDIT ACCOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="511" y="0" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COST PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="647" y="0" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TRANSACTION DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="759" y="0" width="235" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PROJECT DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="107" y="0" width="143" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TRANSACTION  DESCRIPTION]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="47" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="262" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{VENDOR_TRANSACTIONS_DRACCOUNT_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="389" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{VENDOR_TRANSACTIONS_CRACCOUNT_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="511" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{VENDOR_TRANSACTIONS_COST_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="647" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{VENDOR_TRANSACTIONS_TRANSACTION_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="759" y="0" width="235" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ST_GL_PROJECT_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="107" y="0" width="143" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{VENDOR_TRANSACTIONS_DESCRIPTION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

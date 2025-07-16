@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Uncapitalised_asset"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="842"
+		 pageHeight="595"
+		 columnWidth="782"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="filterClause" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="BaseDir" isForPrompting="true" class="java.io.File"/>
+	<queryString><![CDATA[SELECT
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     AM_ASSET_UNCAPITALIZED."Asset_id" AS AM_ASSET_UNCAPITALIZED_Asset_id,
+     AM_ASSET_UNCAPITALIZED."Description" AS AM_ASSET_UNCAPITALIZED_Description,
+     am_ad_branch."BRANCH_NAME" AS am_ad_branch_BRANCH_NAME,
+     am_ad_category."category_name" AS am_ad_category_category_name,
+     AM_ASSET_UNCAPITALIZED."Accum_dep" AS AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Accum_dep,
+     AM_ASSET_UNCAPITALIZED."monthly_dep" AS AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_monthly_dep,
+     AM_ASSET_UNCAPITALIZED."Cost_Price" AS AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Cost_Price,
+     AM_ASSET_UNCAPITALIZED."NBV" AS AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_NBV,
+     AM_ASSET_UNCAPITALIZED."Date_purchased" AS AM_ASSET_UNCAPITALIZED_Date_purchased,
+     am_ad_category."Dep_rate" AS am_ad_category_Dep_rate,
+     am_ad_category."Accum_Dep_ledger" AS am_ad_category_Accum_Dep_ledger,
+     am_ad_category."Dep_ledger" AS am_ad_category_Dep_ledger,
+     am_ad_category."Asset_Ledger" AS am_ad_category_Asset_Ledger,
+     am_ad_category."gl_account" AS am_ad_category_gl_account,
+     AM_ASSET_UNCAPITALIZED."dep_end_date" AS AM_ASSET_UNCAPITALIZED_dep_end_date,
+     AM_ASSET_UNCAPITALIZED."effective_date" AS AM_ASSET_UNCAPITALIZED_effective_date,
+     AM_ASSET_UNCAPITALIZED."Posting_Date" AS AM_ASSET_UNCAPITALIZED_Posting_Date,
+     am_ad_department."Dept_name" AS am_ad_department_Dept_name
+FROM
+     "dbo"."am_ad_branch" am_ad_branch INNER JOIN "dbo"."AM_ASSET_UNCAPITALIZED" AM_ASSET_UNCAPITALIZED ON am_ad_branch."BRANCH_CODE" = AM_ASSET_UNCAPITALIZED."BRANCH_CODE"
+     INNER JOIN "dbo"."am_ad_category" am_ad_category ON AM_ASSET_UNCAPITALIZED."CATEGORY_CODE" = am_ad_category."category_code"
+     INNER JOIN "dbo"."am_ad_department" am_ad_department ON AM_ASSET_UNCAPITALIZED."BRANCH_CODE" = am_ad_department."Dept_code",
+     "dbo"."am_gb_company" am_gb_company
+WHERE
+     am_ad_branch."BRANCH_CODE" = AM_ASSET_UNCAPITALIZED."BRANCH_CODE" and AM_ASSET_UNCAPITALIZED."Asset_Status" = 'ACTIVE'   $P!{filterClause}
+]]></queryString>
+
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="AM_ASSET_UNCAPITALIZED_Asset_id" class="java.lang.String"/>
+	<field name="AM_ASSET_UNCAPITALIZED_Description" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_ad_category_category_name" class="java.lang.String"/>
+	<field name="AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Accum_dep" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_monthly_dep" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_NBV" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_UNCAPITALIZED_Date_purchased" class="java.sql.Timestamp"/>
+	<field name="am_ad_category_Dep_rate" class="java.math.BigDecimal"/>
+	<field name="am_ad_category_Accum_Dep_ledger" class="java.lang.String"/>
+	<field name="am_ad_category_Dep_ledger" class="java.lang.String"/>
+	<field name="am_ad_category_Asset_Ledger" class="java.lang.String"/>
+	<field name="am_ad_category_gl_account" class="java.lang.String"/>
+	<field name="AM_ASSET_UNCAPITALIZED_dep_end_date" class="java.sql.Timestamp"/>
+	<field name="AM_ASSET_UNCAPITALIZED_effective_date" class="java.sql.Timestamp"/>
+	<field name="AM_ASSET_UNCAPITALIZED_Posting_Date" class="java.sql.Timestamp"/>
+	<field name="am_ad_department_Dept_name" class="java.lang.String"/>
+
+	<sortField name="am_ad_branch_BRANCH_NAME" />
+	<sortField name="am_ad_category_category_name" />
+
+	<variable name="Total_Mon_Depr" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_monthly_dep}]]></variableExpression>
+	</variable>
+	<variable name="Total_Accum_Dep" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Accum_dep}]]></variableExpression>
+	</variable>
+	<variable name="Total_NBV" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_NBV}]]></variableExpression>
+	</variable>
+	<variable name="Total_Cost_Price" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Cost_Price}]]></variableExpression>
+	</variable>
+	<variable name="Record_Number" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Count">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_Asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Month_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_monthly_dep}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Cost_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Cost_Price}]]></variableExpression>
+	</variable>
+	<variable name="Branch_NBV_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_NBV}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Accum_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Accum_dep}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Record_No" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Count">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_Asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Total_Record" class="java.lang.Integer" resetType="Column" incrementType="Column" calculation="Count">
+		<variableExpression><![CDATA[$F{AM_ASSET_UNCAPITALIZED_Asset_id}]]></variableExpression>
+		<initialValueExpression><![CDATA[$V{Total_Record}]]></initialValueExpression>
+	</variable>
+
+		<group  name="am_ad_branch_BRANCH_NAME" >
+			<groupExpression><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></groupExpression>
+			<groupHeader>
+			<band height="1"  isSplitAllowed="true" >
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="38"  isSplitAllowed="false" >
+				<staticText>
+					<reportElement
+						x="9"
+						y="5"
+						width="95"
+						height="19"
+						key="staticText-12"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Branch Total]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_branch_BRANCH_NAME"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="145"
+						y="6"
+						width="82"
+						height="18"
+						key="textField-26"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$V{Branch_Record_No}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_branch_BRANCH_NAME"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="679"
+						y="5"
+						width="98"
+						height="17"
+						key="textField-29"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$V{Branch_Cost_Total}]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="am_ad_category_category_name" >
+			<groupExpression><![CDATA[$F{am_ad_category_category_name}]]></groupExpression>
+			<groupHeader>
+			<band height="59"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_category_category_name"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="137"
+						y="35"
+						width="80"
+						height="16"
+						key="textField-18"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_Asset_Ledger}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="593"
+						y="35"
+						width="80"
+						height="17"
+						key="staticText-8"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Deprec. Rate]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_category_category_name"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="679"
+						y="35"
+						width="62"
+						height="16"
+						key="textField-19"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{am_ad_category_Dep_rate}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_category_category_name"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="446"
+						y="35"
+						width="95"
+						height="16"
+						key="textField-20"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_Accum_Dep_ledger}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="260"
+						y="37"
+						width="155"
+						height="15"
+						key="staticText-9"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[CR Ledger]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="11"
+						y="35"
+						width="113"
+						height="16"
+						key="staticText-10"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[DR Ledger]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_category_category_name"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Transparent"
+						x="249"
+						y="7"
+						width="338"
+						height="23"
+						key="textField-24"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font size="18"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_category_name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_category_category_name"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="591"
+						y="7"
+						width="186"
+						height="20"
+						key="textField-34"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font size="14"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="36"  isSplitAllowed="false" >
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_category_category_name"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="145"
+						y="16"
+						width="82"
+						height="16"
+						key="textField-5"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$V{Record_Number}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="am_ad_category_category_name"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="679"
+						y="13"
+						width="98"
+						height="18"
+						key="textField-7"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$V{Total_Cost_Price}]]></textFieldExpression>
+				</textField>
+				<line direction="TopDown">
+					<reportElement
+						x="11"
+						y="9"
+						width="771"
+						height="0"
+						key="line-4"/>
+					<graphicElement stretchType="NoStretch"/>
+				</line>
+				<staticText>
+					<reportElement
+						x="9"
+						y="16"
+						width="115"
+						height="17"
+						key="staticText-11"
+						printWhenGroupChanges="am_ad_category_category_name"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Category Total]]></text>
+				</staticText>
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="16"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="140"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="162"
+						y="45"
+						width="358"
+						height="16"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="staticText"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[UNCAPITALISED ASSET REPORT]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="640"
+						y="7"
+						width="101"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Report" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="741"
+						y="7"
+						width="36"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="541"
+						y="7"
+						width="94"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+				</textField>
+				<line direction="TopDown">
+					<reportElement
+						x="584"
+						y="69"
+						width="0"
+						height="0"
+						key="line-1"/>
+					<graphicElement stretchType="NoStretch"/>
+				</line>
+				<staticText>
+					<reportElement
+						x="9"
+						y="74"
+						width="137"
+						height="19"
+						key="staticText-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Asset ID]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="151"
+						y="74"
+						width="152"
+						height="19"
+						key="staticText-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Asset Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="469"
+						y="74"
+						width="103"
+						height="19"
+						key="staticText-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Purchase Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="337"
+						y="74"
+						width="90"
+						height="18"
+						key="staticText-4"
+						isPrintWhenDetailOverflows="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Department]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="579"
+						y="74"
+						width="94"
+						height="19"
+						key="staticText-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Date Use]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="695"
+						y="75"
+						width="82"
+						height="18"
+						key="staticText-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Cost Price]]></text>
+				</staticText>
+				<line direction="BottomUp">
+					<reportElement
+						x="11"
+						y="97"
+						width="766"
+						height="1"
+						key="line-2"/>
+					<graphicElement stretchType="NoStretch"/>
+				</line>
+				<line direction="TopDown">
+					<reportElement
+						x="9"
+						y="69"
+						width="768"
+						height="2"
+						key="line-3"/>
+					<graphicElement stretchType="NoStretch"/>
+				</line>
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true" evaluationTime="Group" evaluationGroup="am_ad_category_category_name"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="526"
+						y="107"
+						width="176"
+						height="20"
+						key="textField-17"
+						isPrintRepeatedValues="false"
+						printWhenGroupChanges="am_ad_category_category_name"
+						isPrintWhenDetailOverflows="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font size="12" isPdfEmbedded ="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_category_name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Group" evaluationGroup="am_ad_branch_BRANCH_NAME"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="186"
+						y="103"
+						width="338"
+						height="34"
+						key="textField-23"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica" size="18" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="145"
+						y="6"
+						width="389"
+						height="30"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-25"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="18" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_gb_company_company_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="25"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="0"
+						width="151"
+						height="17"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_ASSET_UNCAPITALIZED_Asset_id}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="153"
+						y="0"
+						width="169"
+						height="17"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_ASSET_UNCAPITALIZED_Description}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="675"
+						y="0"
+						width="102"
+						height="17"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="12"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{AM_ASSET_UNCAPITALIZED_UNCAPITALIZED_Cost_Price}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="480"
+						y="0"
+						width="92"
+						height="17"
+						key="textField-31"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[$F{AM_ASSET_UNCAPITALIZED_Date_purchased}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="587"
+						y="0"
+						width="86"
+						height="17"
+						key="textField-32"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[$F{AM_ASSET_UNCAPITALIZED_effective_date}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="353"
+						y="0"
+						width="119"
+						height="17"
+						key="textField-33"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_department_Dept_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="7"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="3"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

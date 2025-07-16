@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Xls_Job_DoneBy_Vendor" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="ireport.scriptlethandling" value="2"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<queryString>
+		<![CDATA[SELECT
+     FM_WORK_ORDER."ASSET_ID" AS FM_WORK_ORDER_ASSET_ID,
+     FM_WORK_ORDER."Contract_Title" AS FM_WORK_ORDER_Contract_Title,
+     FM_WORK_ORDER."Contract_value" AS FM_WORK_ORDER_Contract_value,
+     FM_WORK_ORDER."Contract_Balance" AS FM_WORK_ORDER_Contract_Balance,
+     FM_WORK_ORDER."Total_Amount" AS FM_WORK_ORDER_Total_Amount,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     AM_ASSET."Description" AS AM_ASSET_Description,
+     am_gb_company."company_name" AS am_gb_company_company_name
+FROM
+     "dbo"."FM_WORK_ORDER" FM_WORK_ORDER INNER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON FM_WORK_ORDER."Vendor_Code" = am_ad_vendor."Vendor_Code"
+     INNER JOIN "dbo"."AM_ASSET" AM_ASSET ON FM_WORK_ORDER."ASSET_ID" = AM_ASSET."Asset_id",
+     "dbo"."am_gb_company" am_gb_company]]>
+	</queryString>
+	<field name="FM_WORK_ORDER_ASSET_ID" class="java.lang.String"/>
+	<field name="FM_WORK_ORDER_Contract_Title" class="java.lang.String"/>
+	<field name="FM_WORK_ORDER_Contract_value" class="java.math.BigDecimal"/>
+	<field name="FM_WORK_ORDER_Contract_Balance" class="java.math.BigDecimal"/>
+	<field name="FM_WORK_ORDER_Total_Amount" class="java.math.BigDecimal"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="AM_ASSET_Description" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<sortField name="am_ad_vendor_Vendor_Name"/>
+	<sortField name="FM_WORK_ORDER_ASSET_ID"/>
+	<variable name="Vendor_Total" class="java.math.BigDecimal"/>
+	<variable name="Vendor_Total_Contract_Value" class="java.math.BigDecimal" resetType="Group" resetGroup="Vendor_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{FM_WORK_ORDER_Contract_value}]]></variableExpression>
+	</variable>
+	<variable name="Vendor_Total_Contract_Balance" class="java.math.BigDecimal" resetType="Group" resetGroup="Vendor_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{FM_WORK_ORDER_Contract_Balance}]]></variableExpression>
+	</variable>
+	<variable name="Vendor_Contract_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="Vendor_Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{FM_WORK_ORDER_Total_Amount}]]></variableExpression>
+	</variable>
+	<group name="Vendor_Group">
+		<groupExpression><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></groupExpression>
+		<groupHeader>
+			<band height="23" splitType="Stretch">
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField-10" x="3" y="1" width="124" height="21"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="21" splitType="Stretch">
+				<textField isBlankWhenNull="false">
+					<reportElement key="textField-11" x="127" y="-1" width="124" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font size="12" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Vendor_Group_COUNT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement key="staticText-6" x="3" y="1" width="124" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font size="12" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique"/>
+					</textElement>
+					<text><![CDATA[Vendor Total]]></text>
+				</staticText>
+				<textField pattern="###0.00" isBlankWhenNull="true">
+					<reportElement key="textField-13" x="251" y="1" width="91" height="18"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{Vendor_Total_Contract_Value}]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0.00" isBlankWhenNull="true">
+					<reportElement key="textField-14" x="342" y="1" width="87" height="18"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{Vendor_Total_Contract_Balance}]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0.00" isBlankWhenNull="true">
+					<reportElement key="textField-15" x="429" y="1" width="101" height="18"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{Vendor_Contract_Total}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText-1" x="3" y="0" width="124" height="26"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Asset Id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-2" x="127" y="0" width="124" height="26"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Asset Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="251" y="0" width="91" height="26"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Contract Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="342" y="0" width="87" height="26"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Contract Balance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-5" x="429" y="0" width="101" height="26"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Contract Total]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-1" x="3" y="1" width="124" height="23"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{FM_WORK_ORDER_ASSET_ID}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField-2" x="251" y="1" width="91" height="23"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{FM_WORK_ORDER_Contract_value}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-3" x="127" y="1" width="124" height="23"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{FM_WORK_ORDER_Contract_Title}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField-4" x="342" y="1" width="87" height="23"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{FM_WORK_ORDER_Contract_Balance}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField-5" x="429" y="1" width="101" height="23"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{FM_WORK_ORDER_Total_Amount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="30" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="50" splitType="Stretch"/>
+	</lastPageFooter>
+	<summary>
+		<band height="24" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,979 @@
+package ng.com.justjava.ledendAPI.legend_api;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DataTruncation;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import sun.misc.BASE64Decoder;
+
+@Path("/legendAPI")
+public class LegendRESTServices {
+	
+	private String populator;
+	private String ipUserName,ipPassword,host,userName,password,databaseName="";
+
+	public LegendRESTServices() {
+		loadProperties();
+		populator=loadSelector();
+		
+	}
+	
+	private void loadProperties() {
+		Properties prop = new Properties();
+		InputStream setting = null;
+
+		try {
+
+			setting = new FileInputStream("setting.properties");
+
+			prop.load(setting);
+
+			host = prop.getProperty("host");
+			userName = prop.getProperty("userName");
+			password = prop.getProperty("password");
+			databaseName = prop.getProperty("databaseName");
+			ipUserName = prop.getProperty("IPuserName");
+			ipPassword = prop.getProperty("IPpassword");
+			
+			
+			System.out.println(" ipUserName=="+ipUserName+" ipPassword=="+ipPassword);
+			// get the property value and print it out
+			JDBC_URL = JDBC_URL.replace("@host", host);
+			JDBC_URL = JDBC_URL.replace("@userName", userName);
+			JDBC_URL = JDBC_URL.replace("@password", password);
+			JDBC_URL = JDBC_URL.replace("@databaseName", databaseName);
+
+			//System.out.println(" The JDBC_URL is now==" + JDBC_URL);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (setting != null) {
+				try {
+					setting.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	public static Connection conn;
+	//
+	public static String JDBC_URL = "jdbc:jtds:sqlserver://@host:1433;databaseName=@databaseName;user=@userName;password=@password";
+
+	@GET
+	@Path("/Updatetag")
+	@Produces({ "text/plain" })
+	public String processTag(@QueryParam("tagId") String epc, @QueryParam("location") String location) {
+		System.out.println(" Inside Here................");
+		Properties prop = new Properties();
+		InputStream setting = null;
+
+		try {
+
+			setting = new FileInputStream("setting.properties");
+			System.out.println(" The sent parameters ==" + epc + " and location ==" + location);
+			// load a properties file
+			prop.load(setting);
+
+			String host = prop.getProperty("host");
+			String userName = prop.getProperty("userName");
+			String password = prop.getProperty("password");
+			String databaseName = prop.getProperty("databaseName");
+			// get the property value and print it out
+			JDBC_URL = JDBC_URL.replace("@host", host);
+			JDBC_URL = JDBC_URL.replace("@userName", userName);
+			JDBC_URL = JDBC_URL.replace("@password", password);
+			JDBC_URL = JDBC_URL.replace("@databaseName", databaseName);
+
+			//System.out.println(" The JDBC_URL is now==" + JDBC_URL);
+			getDbConnection();
+			processSentTag(epc, location);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (setting != null) {
+				try {
+					setting.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return " hi";
+	}
+
+	public static void getDbConnection() {
+
+		try {
+			Properties prop = new Properties();
+			InputStream setting = null;
+			Class.forName("net.sourceforge.jtds.jdbc.Driver");
+			setting = new FileInputStream("setting.properties");
+			// load a properties file
+			prop.load(setting);
+
+			String host = prop.getProperty("host");
+			String userName = prop.getProperty("userName");
+			String password = prop.getProperty("password");
+			String databaseName = prop.getProperty("databaseName");
+			// get the property value and print it out
+			JDBC_URL = JDBC_URL.replace("@host", host);
+			JDBC_URL = JDBC_URL.replace("@userName", userName);
+			JDBC_URL = JDBC_URL.replace("@password", password);
+			JDBC_URL = JDBC_URL.replace("@databaseName", databaseName);
+
+			//System.out.println(" The JDBC_URL is now==" + JDBC_URL);
+			conn = DriverManager.getConnection(JDBC_URL);
+
+			//System.out.println(" conn==" + conn);
+			if (conn != null) {
+				DatabaseMetaData metaObj = (DatabaseMetaData) conn.getMetaData();
+
+/*				System.out.println("Driver Name?= " + metaObj.getDriverName() + ", Driver Version?= "
+						+ metaObj.getDriverVersion() + ", Product Name?= " + metaObj.getDatabaseProductName()
+						+ ", Product Version?= " + metaObj.getDatabaseProductVersion());*/
+
+			}
+
+		} catch (Exception sqlException) {
+			sqlException.printStackTrace();
+
+		}
+
+	}
+
+	public String processSentTag(String epc, String location) {
+
+		Date todayDate = null;
+		SimpleDateFormat dt1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		try {
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+			LocalDateTime now = LocalDateTime.now();
+			String strNow = dtf.format(now);
+			todayDate = dt1.parse(strNow);
+			//System.out.println(" 0 " + strNow); // 2016/11/16 12:08:43
+			//System.out.println("2 The Date Today ===" + todayDate);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String actualLocation = new TestTracker().getAddressByGpsCoordinates(location);
+		//System.out.println(" The Date Today ===" + todayDate);
+		String sqlSelect = "SELECT * FROM st_inventory_rfid_unused WHERE rfid_tag ='" + epc + "'";
+		String sqlUpdate = "UPDATE st_inventory_rfid_unused SET scann_status='I' WHERE rfid_tag ='" + epc + "'";
+		String sqlInsert = "INSERT INTO st_inventory_rfid_unused (rfid_tag,scann_type,location,scann_status,"
+				+ "create_date,create_datetime) VALUES ('" + epc + "', 'N','" + actualLocation + "', 'I',?,?)";
+
+		try {
+			getDbConnection();
+
+			Statement statement = conn.createStatement();
+			ResultSet resultSet = statement.executeQuery(sqlSelect);
+			if (resultSet.next()) {
+				int update = statement.executeUpdate(sqlUpdate);
+				//System.out.println(" Updated Records Here ===" + update);
+			} else {
+				PreparedStatement stmt = conn.prepareStatement(sqlInsert);
+				stmt.setDate(1, new java.sql.Date(new Date().getTime()));
+				stmt.setDate(2, new java.sql.Date(new Date().getTime()));
+				int insert = stmt.executeUpdate();
+				//System.out.println(" inserted Records Here ===" + insert);
+			}
+			// conn.close();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return epc;
+	}
+
+	@GET
+	@Path("/distributions")
+	@Produces({ "text/plain" })
+	public String getDistrutions() {
+
+		String query = "SELECT ST_DISTRIBUTION_ORDER.MTID,ST_DISTRIBUTION_ORDER.DORDER_CODE,REQN_DESCRIPTION,POSTED,STATUS,CUSTOMER_CODE,PORDER_CODE,"
+				+ "TRANS_DATE,SHIP_DATE,FREIGHT_CODE,CARRIER_CODE,REQ_PERS_IDENTITY,APPROVE_OFFICER,USERID,"
+				+ "PROJECT_CODE,ST_DISTRIBUTION_ORDER.REQNID,QUANTITY,WAREHOUSE_CODE FROM ST_DISTRIBUTION_ORDER JOIN ST_DISTRIBUTION_ITEM ON "
+				+ "(ST_DISTRIBUTION_ORDER.DORDER_CODE=ST_DISTRIBUTION_ITEM.DORDER_CODE) where STATUS='available'";
+
+		JSONArray dataList = new JSONArray();
+		try {
+
+			getDbConnection();
+			Statement statement = conn.createStatement();
+			ResultSet resultSet = statement.executeQuery(query);
+			while (resultSet.next()) {
+				JSONObject data = new JSONObject();
+				data.put("distNo", resultSet.getString("DORDER_CODE"));
+				data.put("itemRequested", resultSet.getString("REQNID"));
+				data.put("customer", resultSet.getString("CUSTOMER_CODE"));
+				data.put("quantityRequested", resultSet.getString("QUANTITY"));
+				data.put("reqDescription", resultSet.getString("REQN_DESCRIPTION"));
+				data.put("shipmentDate", resultSet.getString("SHIP_DATE"));
+				data.put("carrier", resultSet.getString("CARRIER_CODE"));
+				data.put("project", resultSet.getString("PROJECT_CODE"));
+				data.put("warehouse", resultSet.getString("WAREHOUSE_CODE"));
+				data.put("freight", resultSet.getString("FREIGHT_CODE"));
+				data.put("IdRequire", resultSet.getString("REQ_PERS_IDENTITY"));
+				data.put("quantityDistibuted", resultSet.getString("QUANTITY"));
+				dataList.put(data);
+			}
+			// conn.close();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//System.out.println(" REST API Returns this=" + dataList.toString());
+		return dataList.toString();
+	}
+
+	@GET
+	@Path("/accept")
+	@Produces({ "text/plain" })
+	public String accept(@QueryParam("distNo") String distNo, @QueryParam("rejectReason") String reason,
+			@QueryParam("quantity") long quantity,@QueryParam("warehouse") String warehouse, @QueryParam("flag") String flag) {
+/*		System.out.println(
+				" Thank you for sending rejectReason="+reason+" distNo="+distNo+" quantity="+quantity+
+				" warehouse="+warehouse + " flag==" + flag);*/
+		JSONObject response = new JSONObject();
+		
+		try {
+			getDbConnection();
+
+			String status = "ACCEPTED";
+			if("reject".equalsIgnoreCase(flag)) {
+				status = "REJECTED";
+			}
+			String selectItem = "SELECT STOCK_CODE,ITEM_CODE FROM ST_DISTRIBUTION_ITEM WHERE DORDER_CODE='"+distNo+"'";
+			Statement statement = conn.createStatement();
+			ResultSet resultSet = statement.executeQuery(selectItem);
+			String assetId="",itemCode ="";
+			if(resultSet.next()) {
+				assetId = resultSet.getString(1);
+				itemCode= resultSet.getString(1);
+			}
+			
+			//System.out.println(" AssetId ===" + assetId);
+			String sqlUpdate1 = "UPDATE ST_DISTRIBUTION_ITEM SET Accept_Reject =? WHERE DORDER_CODE=?";
+			PreparedStatement stmt = conn.prepareStatement(sqlUpdate1);
+			stmt.setString(1, status);
+			stmt.setString(2, distNo);
+			int update = stmt.executeUpdate();
+			//System.out.println("1 Updated Records Here ===" + update);
+			sqlUpdate1 = "UPDATE ST_STOCK SET ASSET_STATUS = ?  WHERE ASSET_ID=?";
+
+			stmt = conn.prepareStatement(sqlUpdate1);
+			stmt.setString(1, status);
+			stmt.setString(2, assetId);
+			update = stmt.executeUpdate();
+			//System.out.println("2 Updated Records Here ===" + update);
+			if(update>0) {
+				sqlUpdate1=  "UPDATE ST_DISTRIBUTION_ORDER SET STATUS = ? WHERE DORDER_CODE=? ";
+				stmt = conn.prepareStatement(sqlUpdate1);
+				stmt.setString(1, "ACCEPTED");
+				stmt.setString(2, distNo);
+				update = stmt.executeUpdate();
+				//System.out.println("3 Updated Records Here ===" + update);
+				
+				sqlUpdate1=  "UPDATE ST_INVENTORY_TOTALS SET TMP_BALANCE = coalesce(TMP_BALANCE,0)-? "
+						+ " WHERE ITEM_CODE=? AND WAREHOUSE_CODE=?";
+				stmt = conn.prepareStatement(sqlUpdate1);
+				stmt.setLong(1, quantity);
+				stmt.setString(2, itemCode);
+				stmt.setString(3, warehouse);
+				update = stmt.executeUpdate();
+				//System.out.println("4 Updated Records Here ===" + update);				
+			}
+			String operationResponse = "";
+			if ("reject".equalsIgnoreCase(flag))
+				operationResponse = "Request Successfully Rejected";
+			else if ("accept".equalsIgnoreCase(flag)) {
+				operationResponse = "Request Successfully Approved";
+			}
+			response.put("response", operationResponse);
+			//conn.close();
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
+
+		return response.toString();
+	}
+
+	@GET
+	@Path("/authenticate")
+	@Produces({ "text/plain" })
+	public String authenticate(@QueryParam("userName") String userName, @QueryParam("password") String password) {
+
+		JSONObject response = new JSONObject();
+		try {
+
+			getDbConnection();
+			Statement statement = conn.createStatement();
+			Cryptomanager crypto = new Cryptomanager();
+			String encryptedPassword = crypto.encrypt(crypto.Name(userName, password));
+			String query = "SELECT * FROM AM_GB_USER WHERE User_Name='" + userName + "' AND Password='"
+					+ encryptedPassword + "'";
+			ResultSet resultSet = statement.executeQuery(query);
+			if (resultSet.next()) {
+				response.put("response", "true");
+				//System.out.println(" Thank you for sending userName=" + userName + "  for password==" + password);
+				// return response.toString();
+			} else {
+
+				response.put("response", "Invalid Login Credentials");
+			}
+			// conn.close();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return response.toString();
+
+	}
+
+	@GET
+	@Path("/populator")
+	@Produces({ "text/plain" })
+	public String populator() {
+/*		JSONObject response = new JSONObject();
+
+		response.put("category", "My Category 1,My Category 2,Category 3,Category 4,Category 5,Category 6");
+		response.put("project", "My Project 1,My Project 2,Project 3,Project 4,Project 5,Project 6");
+		response.put("itemType", "My Item Type 1,My Item Type 2,Item Type 3,Item Type 4,Item Type 5,Item Type 6");
+		response.put("item", "My Item 1,My Item 2,Item 3,Item Type 4,Item 5,Item 6");
+		response.put("bu", "My BU 1,My BU 2,Item 3,BU Type 4,BU 5,BU 6");
+		response.put("department",
+				"My department 1,My department 2,department 3,department  4,department 5,department 6");
+		response.put("section", "My section 1,My section 2,section 3,section  4,section 5,section 6");
+		response.put("user", "My user 1,My user 2,user 3,user 4,user 5,user 6");
+		response.put("supervisor",
+				"My supervisor 1,My supervisor 2,supervisor 3,supervisor 4,supervisor 5,supervisor 6");*/
+
+		return populator;
+	}
+
+	public String loadSelector() {
+		Properties prop = new Properties();
+		InputStream selector = null;
+		JSONObject spinnerContent = new JSONObject();
+		try {
+			selector = new FileInputStream("selector.properties");
+			// load a properties file
+			prop.load(selector);
+
+			Set keys = prop.keySet();
+
+			//System.out.println(" the keys size==" + keys.size());
+			for (Object object : keys) {
+				String key = (String) object;
+				//System.out.println(" key==" + key);
+				spinnerContent.put(key, resultSetToString(prop.getProperty(key)));
+			}
+			//System.out.println("  spinnerContent===" + spinnerContent);
+		} catch (Exception exc) {
+
+		}
+		return spinnerContent.toString();
+	}
+
+	private String resultSetToString(String query) {
+		String result = null;
+		try {
+			getDbConnection();
+			Statement statment = conn.createStatement();
+			System.out.println(" Query sent==" + query);
+			ResultSet resultSet = statment.executeQuery(query);
+			ResultSetMetaData rsmd = resultSet.getMetaData();
+
+			int columnsNumber = rsmd.getColumnCount();
+			ArrayList list = new ArrayList();
+			while (resultSet.next()) {
+				
+				//System.out.println("query result(" + resultSet.getString(2)+"(" +resultSet.getString(1)+")");
+				if(columnsNumber>1)
+					list.add(resultSet.getString(2)+"(" +resultSet.getString(1)+")");
+				else if(columnsNumber==1) {
+					list.add(resultSet.getString(1));
+				}
+					
+					
+			}
+			String[] itemnameArray = new String[list.size()];
+			list.toArray(itemnameArray);
+
+			result = Arrays.toString(itemnameArray);
+			result = result.replace("[", "");
+			result = result.replace("]", "");
+			System.out.println("itemnameArray==" + itemnameArray);
+			System.out.println("result==" + result);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// TODO: handle exception
+		}
+
+		return result;
+	}
+    private boolean isUserAuthenticated(String authString){
+        
+        String decodedAuth = "";
+        // Header is in the format "Basic 5tyc0uiDat4"
+        // We need to extract data before decoding it back to original string
+        System.out.println(" Authstring==="+authString);
+        String[] authParts = authString.split("\\s+");
+        String authInfo = authParts[1];
+        // Decode the data back to original string
+        byte[] bytes = null;
+        try {
+            bytes = new BASE64Decoder().decodeBuffer(authInfo);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        decodedAuth = new String(bytes);
+        System.out.println(" Decoded string===" + decodedAuth +" and (ipPassword+\":\"+ipUserName)"+(ipPassword+":"+ipUserName));
+        if((ipUserName+":"+ipPassword).equalsIgnoreCase(decodedAuth)) {
+        	return true;
+        }else
+        	return false;
+
+
+    }
+    
+	@GET
+	@Path("/statusRequest")
+	@Produces({ "text/plain" })
+	public String getRequisition(@QueryParam("faultId") String faultId,@QueryParam("filter") String filter, @HeaderParam("authorization") String authString) {
+
+		JSONArray response = new JSONArray();
+		try {
+			
+	        if(!isUserAuthenticated(authString)){
+	            return "{\"error\":\"User not authenticated\"}";
+	        }
+	        
+        
+			getDbConnection();
+			String whereClause = "";
+			if (filter != null) {
+				whereClause = " WHERE " + filter;
+			}
+			
+/*			String longQuery="SELECT DISTINCT  FAULT_ID,d.full_name AS RequestedBY, ReqnDate AS TRANS_DATE,"+
+							"'PENDING'AS Approvalstatus,c.User_Name AS Collector, "+
+						"'admin' AS Approver,'0' AS Quantity, Remark AS REMARKS FROM am_ad_Requisition a, "+
+						" ST_INVENTORY_USERS c, am_gb_User d WHERE a.ReqnUserID != c.USER_CODE "
+						+ "AND a.UserID = d.User_id AND a.FAULT_ID='"+faultId+"'";*/
+			
+			String longQuery="SELECT b.FAULT_ID AS FAULT_ID,d.full_name AS RequestedBY,a.TRANS_DATE+''+a.TRANS_TIME AS TRANS_DATE,"
+							+"b.distributedstatus AS Approvalstatus,c.User_Name AS Collector,d.User_Name AS Approval,"
+							+ "b.distributedQty AS Quantity,b.Remark AS REMARKS FROM ST_DISTRIBUTION_ORDER a, am_ad_Requisition b, "
+							+ "ST_INVENTORY_USERS c, am_gb_User d WHERE a.REQNID = b.ReqnID AND a.CUSTOMER_CODE = c.USER_CODE "
+							+ "AND b.Supervisor = d.User_id AND b.FAULT_ID='"+faultId+"' "
+									+ "UNION SELECT DISTINCT FAULT_ID,"
+							+ "d.full_name AS RequestedBY, ReqnDate AS TRANS_DATE, 'PENDING'AS Approvalstatus,"
+							+ "c.User_Name AS Collector, 'admin' AS Approver,'0' AS Quantity, Remark AS REMARKS "
+							+ "FROM am_ad_Requisition a, ST_INVENTORY_USERS c, am_gb_User d WHERE a.ReqnUserID != c.USER_CODE "
+							+ "AND a.UserID = d.User_id AND a.STATUS = 'P' AND a.FAULT_ID='"+faultId+"' "
+									+ "UNION SELECT DISTINCT "
+							+ "FAULT_ID,d.full_name AS RequestedBY, ReqnDate AS TRANS_DATE, 'APPROVED'AS Approvalstatus,"
+							+ "c.User_Name AS Collector, 'admin' AS Approver,'0' AS Quantity, Remark AS REMARKS "
+							+ "FROM am_ad_Requisition a, ST_INVENTORY_USERS c, am_gb_User d WHERE a.ReqnUserID != c.USER_CODE "
+							+ "AND a.UserID = d.User_id AND a.STATUS = 'A' AND a.DISTRIBUTEDSTATUS = 'PENDING' "
+							+ "AND a.FAULT_ID='"+faultId+"'";
+			
+			
+			
+			System.out.println(" The final query of statusRequest==="+longQuery);
+			String query = "SELECT FAULT_ID, CREATE_DATE AS APPROVAL_DATE,"
+					+ "RIGHT(CONVERT(VARCHAR, CREATE_DATETIME, 120), 9) "
+					+ " AS APPROVAL_TIME FROM ST_INVENTORY_RFID_APPROVED " + whereClause;
+			Statement statment = conn.createStatement();
+			ResultSet resultSet = statment.executeQuery(longQuery);
+			
+			
+			    while(resultSet.next()) {
+					JSONObject requisition = new JSONObject();
+					requisition.put("FAULT_ID",
+							(resultSet.getString(1) == null ? "XX" : resultSet.getString(1)));
+					requisition.put("RequestedBY", resultSet.getString(2));
+					requisition.put("TRANS_DATE", resultSet.getString(3));
+					requisition.put("Approvalstatus", resultSet.getString(4));
+					requisition.put("Collector", resultSet.getString(5));
+					requisition.put("Approval", resultSet.getString(6));
+					requisition.put("Quantity", resultSet.getString(7));
+					requisition.put("REMARKS", resultSet.getString(8));
+					//requisition.put("REMARKS", resultSet.getString(9));
+					
+					System.out.println("response==" + response);
+					response.put(requisition);
+				//}
+			    }
+			
+			//ArrayList list = new ArrayList();
+//			while (resultSet.next()) {
+//				JSONObject requisition = new JSONObject();
+//				requisition.put("FAULT_ID",
+//						(resultSet.getString(1) == null ? "XX" : resultSet.getString(1)));
+//				requisition.put("RequestedBY", resultSet.getString(2));
+//				requisition.put("TRANS_DATE", resultSet.getString(3));
+//				requisition.put("Approvalstatus", resultSet.getString(4));
+//				requisition.put("Collector", resultSet.getString(5));
+//				requisition.put("Approval", resultSet.getString(6));
+//				requisition.put("Quantity", resultSet.getString(7));
+//				requisition.put("REMARKS", resultSet.getString(8));
+//				//requisition.put("REMARKS", resultSet.getString(9));
+//				
+//				System.out.println("response==" + response);
+//				response.put(requisition);
+//			}
+		} catch (Exception e) {
+			JSONObject errorResponse = new JSONObject();
+			errorResponse.put("ResponseCode", "02");
+			errorResponse.put("ResponseMessage", "Server Error("+e.getMessage()+")");
+			e.printStackTrace();
+			return errorResponse.toString();
+			
+			// TODO: handle exception
+		}
+
+		return response.toString();
+	}
+
+	@POST
+	@Path("/insertReq")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String insertRequisition(String requisition) {
+		final JSONObject jsonObject = new JSONObject(requisition);
+		String insertQuery = "INSERT INTO am_ad_Requisition (ReqnID,UserID,ReqnBranch,ReqnSection,ReqnDepartment,ReqnDate,"
+				+ "ReqnUserID,ItemType,ItemRequested,Status,ApprovalLevel,ApprovalLevelLimit,Supervisor,Company_Code,"
+				+ "Image,Remark,workStationIP,Quantity,distributedstatus,distributedQty,projectCode,Category,"
+				+ "ReqnType,MEASURING_CODE,RETURNED_STOCK,RETURNEDCATEGORY,RETURNED_ORDERNO,FAULT_ID) "
+				+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		try {
+			getDbConnection();
+			PreparedStatement stmt = conn.prepareStatement(insertQuery);
+			stmt.setObject(1, jsonObject.get("ReqnID"));
+			stmt.setObject(2, jsonObject.get("UserID"));
+			stmt.setObject(3, jsonObject.get("ReqnBranch"));
+			stmt.setObject(4, jsonObject.get("ReqnSection"));
+			stmt.setObject(5, jsonObject.get("ReqnDepartment"));
+			stmt.setObject(6, jsonObject.get("ReqnDate"));
+			stmt.setObject(7, jsonObject.get("ReqnUserID"));
+			stmt.setObject(8, jsonObject.get("ItemType"));
+			stmt.setObject(9, jsonObject.get("ItemRequested"));
+			stmt.setObject(10, jsonObject.get("Status"));
+			stmt.setObject(11, jsonObject.get("ApprovalLevel"));
+			stmt.setObject(12, jsonObject.get("ApprovalLevelLimit"));
+			stmt.setObject(13, jsonObject.get("Supervisor"));
+			stmt.setObject(14, jsonObject.get("Company_Code"));
+			stmt.setObject(15, jsonObject.get("Image"));
+			stmt.setObject(16, jsonObject.get("Remark"));
+			stmt.setObject(17, jsonObject.get("workStationIP"));
+			stmt.setObject(18, jsonObject.get("Quantity"));
+			stmt.setObject(19, jsonObject.get("distributedstatus"));
+			stmt.setObject(20, jsonObject.get("distributedQty"));
+			stmt.setObject(21, jsonObject.get("projectCode"));
+			stmt.setObject(22, jsonObject.get("Category"));
+			stmt.setObject(23, jsonObject.get("ReqnType"));
+			stmt.setObject(24, jsonObject.get("MEASURING_CODE"));
+			stmt.setObject(25, jsonObject.get("RETURNED_STOCK"));
+			stmt.setObject(26, jsonObject.get("RETURNEDCATEGORY"));
+			stmt.setObject(27, jsonObject.get("RETURNED_ORDERNO"));
+			stmt.setObject(28, jsonObject.get("FAULT_ID"));
+
+			int insert = stmt.executeUpdate();
+			System.out.println(" inserted Records Here ===" + insert);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		final JSONObject result = new JSONObject();
+		result.put("sucess", true);
+		result.put("Message", "Company added Successfully");
+		return requisition.toString();
+	}
+
+	@POST
+	@Path("/save")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String save(String requisition, @HeaderParam("authorization") String authString) {
+		
+		/*			Remainining:
+		(1). ReqnID*
+
+		*/
+        if(!isUserAuthenticated(authString)){
+            return "{\"error\":\"User not authenticated\"}";
+        }		
+		final JSONObject jsonObject = new JSONObject(requisition);
+		final JSONObject response = new JSONObject();
+		System.out.println(" Saving this requisition=="+requisition);
+		String insertQuery = "insert into am_ad_Requisition (ReqnID,UserID,ReqnBranch,ReqnSection,ReqnDepartment," + 
+				"ItemType,ItemRequested,Status,Supervisor,company_code,Remark,Quantity," + 
+				"projectCode,ReqnDate,returnedCategory,MEASURING_CODE,ReqnUserID,"
+				+ "distributedQty,ReqnType,FAULT_ID,APP_ID,distributedstatus,Category)" + 
+				" values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		
+		String approvalQuery = "INSERT INTO ST_TRANSACTION_APPROVAL (MTID,TRANS_CODE,DESCRIPTION,USERID,APPROVE_OFFICER,"+
+				"TRANS_DATE,STATUS,MAX_APPROVE_LEVEL,CONCURRENCE,ITEM_CODE,QUANTITY,REASON,COMPANY_CODE)" + 
+				" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";		
+		
+		String assetApprovalQuery = "insert into am_asset_approval(asset_id,user_id,super_id,posting_date,"
+				+ "description,effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time," + 
+				"transaction_id,batch_id,transaction_level) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String faultId=String.valueOf(jsonObject.opt("Fault_ID"));
+		
+		System.out.println("1 faultId=="+faultId);
+		
+		if(jsonObject.opt("Fault_ID")==null) {
+			response.put("ResponseCode", "03");
+			response.put("ResponseMessage", "Invalid JSON (Fault_ID is Compulsory)");
+			return response.toString();
+		}
+		
+		try {
+			getDbConnection();
+			String companyCode = "",measurement = "";
+			
+			
+			//String user = StringUtils.substringBetween(jsonObject.getString("user"), "(", ")");
+			String user = jsonObject.getString("user");
+			//String ID = StringUtils.substringBetween(jsonObject.getString("ID"), "(", ")");
+			String ID = jsonObject.getString("ID");
+			//String superUser = jsonObject.getString("super_user");
+			
+			//String user =StringUtils.substringBetween(String.valueOf(jsonObject.getString("user")), "(", ")");
+			
+			//String bu = StringUtils.substringBetween(jsonObject.getString("bu"), "(", ")");
+			String bu = jsonObject.getString("bu");
+			//String section= StringUtils.substringBetween(jsonObject.getString("section"), "(", ")");
+			String section= jsonObject.getString("section");
+			//String department=StringUtils.substringBetween(jsonObject.getString("department"), "(", ")");
+			String department=jsonObject.getString("department");
+			//String itemType=StringUtils.substringBetween(jsonObject.getString("itemType"), "(", ")");
+			String itemType=jsonObject.getString("itemType");
+			
+			
+/*			String[] codes = StringUtils.substringsBetween(jsonObject.getString("item"), "(", ")");
+			int length= codes.length;
+			String code="";
+			if(length>0)
+				code = codes[length-1];
+			else
+				code=StringUtils.substringBetween(jsonObject.getString("item"), "(", ")");*/
+			String code=jsonObject.getString("item");
+			System.out.println(" Code ==="+code);
+			//String supervisor=StringUtils.substringBetween(jsonObject.getString("supervisor"), "(", ")");
+			String supervisor=jsonObject.getString("supervisor");
+			
+			//String collectedBy=StringUtils.substringBetween(jsonObject.getString("Collected By"), "(", ")");
+			String collectedBy=jsonObject.getString("Collected By");
+			System.out.println(" Collected By==="+collectedBy);
+			Object quantity=jsonObject.get("quantity");
+			//String project=StringUtils.substringBetween(jsonObject.getString("project"), "(", ")");
+			String project=jsonObject.getString("project");
+			//String category =StringUtils.substringBetween(String.valueOf(jsonObject.getString("category")), "(", ")");
+			String category =jsonObject.getString("category");
+			String query = "SELECT COMPANY_CODE FROM am_gb_company";
+			
+
+			
+			
+			Statement statment = conn.createStatement();
+			System.out.println(" Query sent==" + query);
+			ResultSet resultSet = statment.executeQuery(query);
+			while (resultSet.next()) {
+				companyCode = resultSet.getString(1);
+			}
+			query = "SELECT START_NO FROM ST_MODULES_CODES WHERE MODULE_NAME = 'REQUISITION'"; 
+			long maxId=0l;
+			resultSet = statment.executeQuery(query);
+			while (resultSet.next()) {
+				maxId = resultSet.getLong(1);
+			}	
+			maxId=maxId+1;
+			query = "SELECT MT_ID + 1 FROM IA_MTID_TABLE WHERE MT_TABLENAME = 'ST_TRANSACTION_APPROVAL'"; 
+			long MT_ID=0l;
+			resultSet = statment.executeQuery(query);
+			while (resultSet.next()) {
+				MT_ID = resultSet.getLong(1);
+			}		
+			query = "SELECT MT_ID + 1 FROM IA_MTID_TABLE WHERE MT_TABLENAME='am_asset_approval'"; 
+			long assetMT_ID=0l;
+			resultSet = statment.executeQuery(query);
+			while (resultSet.next()) {
+				assetMT_ID = resultSet.getLong(1);
+			}			
+			String duplicateFaultId="SELECT FAULT_ID FROM am_ad_Requisition WHERE FAULT_ID='"+faultId+"'";
+			
+			System.out.println(" duplicateFaultId==" + duplicateFaultId);
+			resultSet = statment.executeQuery(duplicateFaultId);
+			if (resultSet.next()) {
+				response.put("ResponseCode", "04");
+				response.put("ResponseMessage", "Duplicate Fault Id not Allowed ");
+				return response.toString();
+			}			
+			
+			
+			System.out.println(" MT_ID==" + MT_ID);
+			System.out.println(" 2user==" + user);
+			String userQuery="SELECT USER_ID,USER_NAME FROM am_gb_User where USER_ID='"+user+"'";
+			
+			System.out.println(" userQuery==" + userQuery);
+			resultSet = statment.executeQuery(userQuery);
+			if (!resultSet.next()) {
+				response.put("ResponseCode", "03");
+				response.put("ResponseMessage", "Invalid JSON (User is Empty or not Valid)");
+				return response.toString();
+			}		
+			
+			
+		
+			String collectedByQuery="SELECT USER_NAME FROM ST_INVENTORY_USERS WHERE user_code='"+collectedBy+"'";
+			
+			System.out.println(" collectedByQuery=="+collectedByQuery);
+			
+			resultSet = statment.executeQuery(collectedByQuery);
+			if (!resultSet.next()) {
+				response.put("ResponseCode", "03");
+				response.put("ResponseMessage", "Invalid JSON (Collected By is Empty or not Valid)");
+				return response.toString();
+			}				
+			String categoryQuery="SELECT category_code FROM  am_ad_category WHERE category_code ='"+category+"'";
+			resultSet = statment.executeQuery(categoryQuery);
+			if (!resultSet.next()) {
+				response.put("ResponseCode", "03");
+				response.put("ResponseMessage", "Invalid JSON (Category is Empty or not Valid)");
+				return response.toString();
+			}
+			String itemTypeQuery="SELECT NAME FROM ST_ITEMTYPE WHERE ITEMTYPE_CODE = '"+itemType+"'";
+			resultSet = statment.executeQuery(itemTypeQuery);
+			if (!resultSet.next()) {
+				response.put("ResponseCode", "03");
+				response.put("ResponseMessage", "Invalid JSON (Item Type is Empty or not Valid)");
+				return response.toString();
+			}			
+			
+			String itemQuery="SELECT DESCRIPTION FROM  ST_INVENTORY_ITEMS  WHERE ITEM_CODE='"+code+"'";
+			
+			resultSet = statment.executeQuery(itemQuery);
+			if (!resultSet.next()) {
+				response.put("ResponseCode", "03");
+				response.put("ResponseMessage", "Invalid JSON (Item is Empty or not Valid)");
+				return response.toString();
+			}				
+			String buQuery="SELECT BRANCH_NAME FROM am_ad_branch WHERE BRANCH_ID="+bu;
+			resultSet = statment.executeQuery(buQuery);
+			if (!resultSet.next()) {
+				response.put("ResponseCode", "03");
+				response.put("ResponseMessage", "Invalid JSON (BU is Empty or not Valid)");
+				return response.toString();
+			}				
+			String supervisorQuery="SELECT Full_Name FROM am_gb_User WHERE User_id="+supervisor;
+			System.out.println(" supervisorQuery=="+supervisorQuery);
+			resultSet = statment.executeQuery(supervisorQuery);
+			if (!resultSet.next()) {
+				response.put("ResponseCode", "03");
+				response.put("ResponseMessage", "Invalid JSON (Supervisor is Empty or not Valid)");
+				return response.toString();
+			}				
+			
+			query = "UPDATE ST_MODULES_CODES SET START_NO=START_NO + 1 WHERE MODULE_NAME = 'REQUISITION'"; 
+			System.out.println(" Query to update ST MODULE=="+query);
+			Statement updateSt=conn.createStatement();
+			int rowAffected = updateSt.executeUpdate(query);
+			System.out.println("1 rowAffected==" + rowAffected);
+			
+			
+			query = "UPDATE IA_MTID_TABLE SET MT_ID = MT_ID + 1 WHERE MT_TABLENAME = 'ST_TRANSACTION_APPROVAL'"; 
+			System.out.println(" Query to update ST IA_MTID_TABLE=="+query);
+			updateSt=conn.createStatement();
+			rowAffected = updateSt.executeUpdate(query);
+			System.out.println("2 rowAffected==" + rowAffected);			
+
+			query = "UPDATE IA_MTID_TABLE SET MT_ID = MT_ID + 1 WHERE MT_TABLENAME = 'am_asset_approval'"; 
+			System.out.println(" Query to update ST IA_MTID_TABLE=="+query);
+			updateSt=conn.createStatement();
+			rowAffected = updateSt.executeUpdate(query);
+			System.out.println("3 rowAffected==" + rowAffected);			
+						
+			PreparedStatement stmt = conn.prepareStatement(insertQuery);
+			
+			String reqnID="REQN/"+maxId;
+			
+			stmt.setString(1,reqnID);
+			System.out.println(" reqnID=="+reqnID);
+			stmt.setObject(2, user );
+			System.out.println(" user=="+user);
+			stmt.setObject(3, bu);
+			System.out.println(" bu=="+bu);
+			stmt.setObject(4, section);
+			System.out.println(" section=="+section);
+			stmt.setObject(5, department);
+			System.out.println(" department=="+department);
+			stmt.setObject(6,itemType );
+			System.out.println(" itemType=="+itemType);
+
+			stmt.setObject(7, code);
+			System.out.println(" code=="+code);
+			stmt.setObject(8, "P");
+			
+			System.out.println(" supervisor=="+supervisor);
+			stmt.setObject(9, supervisor);
+			stmt.setObject(10, companyCode);
+			System.out.println(" companyCode=="+companyCode);
+			String remark = jsonObject.getString("remark");
+			stmt.setObject(11, remark);
+			
+			System.out.println(" remark=="+remark);
+			stmt.setObject(12,quantity );
+			System.out.println(" quantity=="+quantity);
+			stmt.setObject(13,project );
+			System.out.println(" project=="+project);
+			stmt.setDate(14,new java.sql.Date(System.currentTimeMillis()));
+			stmt.setObject(15,"N/A" );
+			System.out.println(" category=="+category);
+			stmt.setObject(16, measurement);
+			System.out.println(" measurement=="+measurement);
+			stmt.setObject(17,  collectedBy);
+			System.out.println(" collectedBy=="+collectedBy);
+			stmt.setObject(18, quantity);
+			stmt.setObject(19, "1");
+			stmt.setObject(20, faultId);
+			
+			System.out.println(" ID=="+ID);
+			stmt.setObject(21, ID);
+			stmt.setObject(22, "Pending");
+			stmt.setObject(23, category);
+			System.out.println(" faultId=="+faultId);
+			System.out.println(" The first insertion here...");
+			int insert = stmt.executeUpdate();
+			System.out.println(" insert=="+insert);
+			
+			PreparedStatement approveStmt = conn.prepareStatement(approvalQuery);
+			approveStmt.setObject(1,MT_ID);
+			approveStmt.setString(2,reqnID);
+			approveStmt.setObject(3,  "REQUISITION");
+			//if(jsonObject.)
+			approveStmt.setObject(4, jsonObject.opt("userName"));
+			approveStmt.setObject(5, supervisor);//User Who sent the transaction
+			//approveStmt.setObject(5, StringUtils.substringBetween(jsonObject.getString("supervisor"), "(", ")"));
+			approveStmt.setDate(6, new java.sql.Date(System.currentTimeMillis()));
+			approveStmt.setObject(7, "A");
+			approveStmt.setObject(8, 1);
+			approveStmt.setObject(9, 0);
+			approveStmt.setObject(10, itemType);
+			approveStmt.setObject(11, 0);
+			approveStmt.setObject(12, jsonObject.opt("remark"));
+			approveStmt.setObject(13, companyCode);
+			int approveInsert = approveStmt.executeUpdate();
+			System.out.println(" approveInsert=="+approveInsert);
+			
+			PreparedStatement assetStmt = conn.prepareStatement(assetApprovalQuery);
+			//assetStmt.setObject(1,ID);
+			assetStmt.setObject(1,reqnID);
+			assetStmt.setString(2,user);
+			assetStmt.setObject(3,  supervisor);
+			//if(jsonObject.)
+			java.sql.Date da = new java.sql.Date(System.currentTimeMillis());
+			
+			System.out.println(" The Posting Date ==="+da);
+			
+			assetStmt.setDate(4,da );
+			assetStmt.setObject(5, "Remark");//User Who sent the transaction
+			//approveStmt.setObject(5, StringUtils.substringBetween(jsonObject.getString("supervisor"), "(", ")"));
+			assetStmt.setDate(6, new java.sql.Date(System.currentTimeMillis()));
+			assetStmt.setObject(7, bu);
+			assetStmt.setObject(8, "ACTIVE");
+			assetStmt.setObject(9, "Requisition");
+			assetStmt.setObject(10, "P");
+			assetStmt.setObject(11, null);
+			assetStmt.setObject(12,assetMT_ID);
+			assetStmt.setObject(13, assetMT_ID);
+			assetStmt.setObject(14, 1);
+			System.out.println(" about to insert assetApprovalQuery="+assetApprovalQuery);
+			int assetInsert = assetStmt.executeUpdate();
+			System.out.println(" assetInsert=="+assetInsert);
+			
+			response.put("ResponseCode", "00");
+			response.put("ResponseMessage", "Requisition Successfully Saved");
+			System.out.println(" inserted Records Here ===" + insert);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			
+			if(e instanceof DataTruncation) {
+				DataTruncation error = (DataTruncation) e;
+				System.out.println(" The Size=="+error.getDataSize()+"  but sent this=="+error.getTransferSize());
+			}
+			response.put("ResponseCode", "02");
+			response.put("ResponseMessage", "Server Error("+e.getMessage()+")-Check The Sample JSON to Confirm!");
+			e.printStackTrace();
+		}
+
+		return response.toString();
+	}
+	@GET
+	@Path("/items")
+	@Produces({ "text/plain" })
+	public String getItems(@QueryParam("itemType") String itemType) {
+
+		JSONObject itemsJSON = new JSONObject();
+		try {
+			
+			getDbConnection();
+
+			String itemType_ = StringUtils.substringBetween(itemType, "(", ")");
+			String query = "SELECT ITEM_CODE,DESCRIPTION "
+					+ "FROM ST_INVENTORY_ITEMS WHERE ITEMTYPE_CODE='"+itemType_+"'"+" ORDER BY DESCRIPTION";
+
+			System.out.println(" items query "+query);
+			itemsJSON.put("item", resultSetToString(query));
+		} catch (Exception e) {
+			e.printStackTrace();
+			// TODO: handle exception
+		}
+
+		return itemsJSON.toString();
+	}	
+}

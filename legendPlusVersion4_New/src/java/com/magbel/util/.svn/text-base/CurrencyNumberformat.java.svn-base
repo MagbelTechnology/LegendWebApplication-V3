@@ -1,0 +1,52 @@
+/*
+ * CurrencyNumberformat.java
+ *
+ * Created on June 2, 2005, 12:39 PM
+ */
+
+package com.magbel.util;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+/**
+ *
+ * @author  Jejelowo Festus
+ * @author  MagBel Technologies LTD
+ * @author  Joseph Street Eleganza House Lagos.
+ * @version 1.0
+ */
+public class CurrencyNumberformat {
+
+    /** Creates a new instance of CurrencyNumberformat */
+    public CurrencyNumberformat() {
+    }
+
+    public String formatAmount(String amount) {
+
+        double myAmount = Double.parseDouble(amount);
+        NumberFormat formatter = NumberFormat.getIntegerInstance(Locale.ENGLISH);
+        formatter.setMinimumFractionDigits(2);
+        formatter.setMaximumFractionDigits(2);
+        String formated = formatter.format(myAmount);
+        return formated;
+    }
+
+    public String formatAmount(double myAmount) {
+        String formated = formatAmount(Double.toString(myAmount));
+        return formated;
+    }
+
+    public String toDecimal(double amount) {
+        DecimalFormat formatta = new DecimalFormat("##0.00");
+        String formatted = formatta.format(amount);
+        return formatted;
+    }
+     public String toBigDecimal(BigDecimal  amount) {
+        DecimalFormat formatta = new DecimalFormat("##0.00");
+        String formatted = formatta.format(amount);
+        return formatted;
+    }
+}

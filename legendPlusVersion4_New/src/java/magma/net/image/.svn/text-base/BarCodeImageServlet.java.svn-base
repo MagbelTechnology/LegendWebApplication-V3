@@ -1,0 +1,95 @@
+package magma.net.image;
+
+import java.io.IOException;
+import java.sql.*;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+import magma.net.dao.MagmaDBConnection;
+
+/**
+ * <p>Title: fileName.java</p>
+ *
+ * <p>Description: File Description</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class BarCodeImageServlet extends HttpServlet {
+    /** Initializes the servlet.
+     */
+    byte[] image;
+    MagmaDBConnection dbConnect;
+
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        dbConnect = new MagmaDBConnection();
+    }
+
+    /** Destroys the servlet.
+     */
+    public void destroy() {
+
+    }
+
+    /** Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     */
+    public void service(HttpServletRequest request,
+                        HttpServletResponse response) throws
+            ServletException, IOException {
+
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", -1);
+
+        response.setContentType("image/jpeg");
+        String imageid = request.getParameter("ID");
+        loadImage(imageid);
+
+        if (image != null) {
+            ServletOutputStream stream = response.getOutputStream();
+            stream.write(image);
+        } else {
+            String warning = "IMAGE NOT Found!";
+            image = warning.getBytes();
+            ServletOutputStream stream2 = response.getOutputStream();
+            stream2.write(image);
+        }
+    }
+
+    /** Returns a short description of the servlet.
+     */
+    public String getServletInfo() {
+        return "Binnary Image Display Servlet";
+    }
+
+    private void loadImage(String imageid) {
+
+        final String IMAGE_QUERY = "SELECT BARCODE FROM AM_BARCODE_IMAGE " +
+                                   "WHERE ASSET_ID = '" + imageid + "'";
+        Connection con = null;
+        PreparedStatement s = null;
+        ResultSet rs = null;
+        try {
+            con = dbConnect.getConnection("fixedasset");
+            s = con.prepareStatement(IMAGE_QUERY);
+            rs = s.executeQuery();
+            while (rs.next()) {
+                this.image = rs.getBytes(1);
+            }
+        } catch (Exception e) {
+            System.out.println("WARN:Error loading image .." + e.getMessage());
+        } finally {
+            dbConnect.closeConnection(con, s, rs);
+        }
+    }
+
+
+}

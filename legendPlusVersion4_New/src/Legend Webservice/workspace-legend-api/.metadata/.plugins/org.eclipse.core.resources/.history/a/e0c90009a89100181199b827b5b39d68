@@ -1,0 +1,238 @@
+package ng.com.justjava.ledendAPI.legend_api;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Properties;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+@Path("/legendAPI")
+public class LegendRESTServices {
+	public static Connection conn;
+
+	public static String JDBC_URL = "jdbc:jtds:sqlserver://@host:1433;databaseName=@databaseName;user=@userName;password=@password";
+
+	@GET
+	@Path("/Updatetag")
+	@Produces({ "text/plain" })
+	public String processTag(@QueryParam("tagId") String epc,
+			@QueryParam("location") String location) {
+		System.out.println(" Inside Here................");
+		Properties prop = new Properties();
+		InputStream setting = null;
+
+		try {
+
+			setting = new FileInputStream("setting.properties");
+			System.out.println(" The sent parameters =="+ epc +" and location =="+location);
+			// load a properties file
+			prop.load(setting);
+
+			String host = prop.getProperty("host");
+			String userName = prop.getProperty("userName");
+			String password = prop.getProperty("password");
+			String databaseName = prop.getProperty("databaseName");
+			// get the property value and print it out
+			JDBC_URL = JDBC_URL.replace("@host", host);
+			JDBC_URL = JDBC_URL.replace("@userName", userName);
+			JDBC_URL = JDBC_URL.replace("@password", password);
+			JDBC_URL = JDBC_URL.replace("@databaseName", databaseName);
+
+			System.out.println(" The JDBC_URL is now==" + JDBC_URL);
+			getDbConnection();
+			processSentTag(epc,location);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (setting != null) {
+				try {
+					setting.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return " hi";
+	}
+
+	public static void getDbConnection() {
+
+		try {
+
+			Class.forName("net.sourceforge.jtds.jdbc.Driver");
+
+			
+			conn = DriverManager.getConnection(JDBC_URL);
+
+			System.out.println(" conn=="+conn);
+			if (conn != null) {
+				DatabaseMetaData metaObj = (DatabaseMetaData) conn.getMetaData();
+
+				System.out.println("Driver Name?= " + metaObj.getDriverName() + ", Driver Version?= "
+						+ metaObj.getDriverVersion() + ", Product Name?= " + metaObj.getDatabaseProductName()
+						+ ", Product Version?= " + metaObj.getDatabaseProductVersion());
+
+			}
+
+		} catch (Exception sqlException) {
+			sqlException.printStackTrace();
+
+		}
+
+	}
+	
+	public String processSentTag(String epc, String location) {
+		
+		Date todayDate = null;
+		SimpleDateFormat dt1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		try {
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+			LocalDateTime now = LocalDateTime.now();
+			String strNow = dtf.format(now);
+			todayDate = dt1.parse(strNow);
+			System.out.println(" 0 "+strNow); //2016/11/16 12:08:43
+			System.out.println("2 The Date Today ==="+todayDate);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String actualLocation = new TestTracker().getAddressByGpsCoordinates(location);
+		System.out.println(" The Date Today ==="+todayDate);
+		String sqlSelect = "SELECT * FROM st_inventory_rfid_unused WHERE rfid_tag ='"+epc+"'";
+		String sqlUpdate = "UPDATE st_inventory_rfid_unused SET scann_status='I' WHERE rfid_tag ='"+epc+"'";
+		String sqlInsert = "INSERT INTO st_inventory_rfid_unused (rfid_tag,scann_type,location,scann_status," +
+				"create_date,create_datetime) VALUES ('"+epc+"', 'N','"+actualLocation+"', 'I',?,?)";
+		 
+		try {
+			if(conn.isClosed())
+				getDbConnection();
+			
+			Statement statement = conn.createStatement();
+			ResultSet resultSet = statement.executeQuery(sqlSelect);
+			if(resultSet.next()) {
+				int update = statement.executeUpdate(sqlUpdate);
+				System.out.println(" Updated Records Here ==="+update);
+			}else {
+				PreparedStatement stmt = conn.prepareStatement(sqlInsert);
+				stmt.setDate(1, new java.sql.Date(new Date().getTime()));
+				stmt.setDate(2, new java.sql.Date(new Date().getTime()));
+				int insert = stmt.executeUpdate();
+				System.out.println(" inserted Records Here ==="+insert);				
+			}
+			conn.close();
+				
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return epc;
+	}
+	
+	@GET
+	@Path("/distributions")
+	@Produces({ "text/plain" })
+	public String getDistrutions() {
+		
+/*		1. Distribution No - distNo
+		2. Customer - customer
+		3. Requisition Description - reqDescription
+		4. Item Requested - itemRequested
+		5. Shipment Date - shipmentDate
+		6. Carrier	- carrier
+		7. Project	- project
+		8. Warehouse	- warehouse
+		9. Reject Reason	- rejectReason
+		10. Freight	- freight
+		11. Require Personal Id	- IdRequire
+		12. Quantity Requested	- quantityRequested
+		13. Quantity Distributed - quantityDistibuted
+*/		
+		
+		System.out.println(" REST API Calls");
+        JSONArray dataList = new JSONArray();
+        JSONObject data1 = new JSONObject();
+        JSONObject data2 = new JSONObject();
+        data1.put("distNo", "DOR/77");
+        data1.put("itemRequested", "7X4MM CONTROL CABLE");
+        data1.put("customer", "BOLADE AKANMU-OLOWU");
+        data1.put("quantityRequested", "3");
+        data1.put("reqDescription", "DOR/77");
+        data1.put("shipmentDate", "27-07-2018");
+        data1.put("carrier", "CISCO TRANS CORP");
+        data1.put("project", "ORDER OF UPS BATTERY");
+        data1.put("warehouse", "IKEJA STORE");
+        data1.put("freight", "PRE-PAID");
+        data1.put("IdRequire", "true");
+        data1.put("quantityDistibuted", "2");
+        
+
+        data2.put("distNo", "DOR/78");
+        data2.put("itemRequested", "7X4MM DIRECT CABLE");
+        data2.put("customer", "AKINOLA ALABA");
+        data2.put("quantityRequested", "7");
+        data2.put("reqDescription", "DOR/78");
+        data2.put("shipmentDate", "23-07-2018");
+        data2.put("carrier", "ABC TRANS CORP");
+        data2.put("project", "ORDER OF CHINESE BATTERY");
+        data2.put("warehouse", "OSHODI STORE");
+        data2.put("freight", "POST-PAID METER");
+        data2.put("IdRequire", "false");
+        data2.put("quantityDistibuted", "5");
+
+        dataList.put(data1);
+        dataList.put(data2);
+
+        System.out.println(" REST API Returns this="+dataList.toString());
+		return dataList.toString();
+	}
+	@GET
+	@Path("/accept")
+	@Produces({ "text/plain" })
+	public String accept(@QueryParam("distNo") String distNo,@QueryParam("rejectReason") String reason,
+			@QueryParam("flag") String flag) {
+		System.out.println(" Thank you for sending rejectReason="+reason+"  for distNo=="+distNo +" flag=="+flag);
+		JSONObject response = new JSONObject();
+		String operationResponse = "";
+		if("reject".equalsIgnoreCase(flag))
+			operationResponse = "Request Successfully Rejected";
+		else if("accept".equalsIgnoreCase(flag)){
+			operationResponse = "Request Successfully Approved";
+		}
+		response.put("response", operationResponse);
+		return response.toString();
+	}
+	@GET
+	@Path("/authenticate")
+	@Produces({ "text/plain" })
+	public String authenticate(@QueryParam("userName") String userName,@QueryParam("password") String password) {
+		JSONObject response = new JSONObject();
+		response.put("response","false");
+		if("admin".equalsIgnoreCase(userName)&&"password".equalsIgnoreCase(password)) {
+			response.put("response","true");;
+		}
+		return response.toString();
+	}
+	
+
+}

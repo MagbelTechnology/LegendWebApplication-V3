@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="budgetextralbudget_Request" language="groovy" pageWidth="2755" pageHeight="842" columnWidth="2735" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filter" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     INTEGRIFY_BUDGET."INTEGRIFY_ID" AS INTEGRIFY_ID,
+     INTEGRIFY_BUDGET."CATEGORY_CODE" AS CATEGORY_CODE,
+     INTEGRIFY_BUDGET."SUB_CATEGORY_CODE" AS SUB_CATEGORY_CODE,
+     INTEGRIFY_BUDGET."REQUEST_DATE" AS REQUEST_DATE,
+     INTEGRIFY_BUDGET."REQUESTER_NAME" AS REQUESTER_NAME,
+     INTEGRIFY_BUDGET."SBU_CODE" AS SBU_CODE,
+     INTEGRIFY_BUDGET."DEPT_NAME" AS DEPT_NAME,
+     INTEGRIFY_BUDGET."AMOUNT_PAYABLE" AS AMOUNT_PAYABLE,
+     INTEGRIFY_BUDGET."ITEM_REQUEST" AS ITEM_REQUEST,
+     INTEGRIFY_BUDGET."QUANTITY" AS QUANTITY,
+     INTEGRIFY_BUDGET."BUDGET_STATUS" AS BUDGET_STATUS,
+     INTEGRIFY_BUDGET."AMOUNT" AS AMOUNT,
+     am_ad_category."category_name" AS am_ad_category_category_name,
+     am_ad_sub_category."sub_category_name" AS am_ad_sub_category_sub_category_name
+FROM
+     "dbo"."am_ad_category" am_ad_category INNER JOIN "dbo"."INTEGRIFY_BUDGET" INTEGRIFY_BUDGET ON am_ad_category."category_code" = INTEGRIFY_BUDGET."CATEGORY_CODE"
+     INNER JOIN "dbo"."am_ad_sub_category" am_ad_sub_category ON INTEGRIFY_BUDGET."SUB_CATEGORY_CODE" = am_ad_sub_category."sub_category_code"
+ $P!{filter}]]>
+	</queryString>
+	<field name="INTEGRIFY_ID" class="java.lang.String"/>
+	<field name="CATEGORY_CODE" class="java.lang.String"/>
+	<field name="SUB_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="REQUEST_DATE" class="java.sql.Timestamp"/>
+	<field name="REQUESTER_NAME" class="java.lang.String"/>
+	<field name="SBU_CODE" class="java.lang.String"/>
+	<field name="DEPT_NAME" class="java.lang.String"/>
+	<field name="AMOUNT_PAYABLE" class="java.math.BigDecimal"/>
+	<field name="ITEM_REQUEST" class="java.lang.String"/>
+	<field name="QUANTITY" class="java.lang.Integer"/>
+	<field name="BUDGET_STATUS" class="java.lang.String"/>
+	<field name="AMOUNT" class="java.math.BigDecimal"/>
+	<field name="am_ad_category_category_name" class="java.lang.String"/>
+	<field name="am_ad_sub_category_sub_category_name" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="75" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch">
+			<staticText>
+				<reportElement x="101" y="-93" width="202" height="20"/>
+				<textElement/>
+				<text><![CDATA[Category Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="303" y="-93" width="309" height="20"/>
+				<textElement/>
+				<text><![CDATA[Sub Category Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="-93" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Integrify Id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="922" y="-93" width="121" height="20"/>
+				<textElement/>
+				<text><![CDATA[Request Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1043" y="-93" width="232" height="20"/>
+				<textElement/>
+				<text><![CDATA[Request Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1275" y="-93" width="92" height="20"/>
+				<textElement/>
+				<text><![CDATA[SBU Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="612" y="-93" width="310" height="20"/>
+				<textElement/>
+				<text><![CDATA[Department Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1367" y="-93" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Amount Payable]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1467" y="-93" width="291" height="20"/>
+				<textElement/>
+				<text><![CDATA[Item Request]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1758" y="-93" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1858" y="-93" width="97" height="20"/>
+				<textElement/>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1955" y="-93" width="254" height="20"/>
+				<textElement/>
+				<text><![CDATA[Budget Status]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement x="101" y="0" width="202" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_category_category_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="0" width="309" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_sub_category_sub_category_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="100" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{INTEGRIFY_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="922" y="0" width="121" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{REQUEST_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1043" y="0" width="232" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{REQUESTER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1275" y="0" width="92" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SBU_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="612" y="0" width="310" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DEPT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="1367" y="0" width="100" height="22"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{AMOUNT_PAYABLE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1467" y="0" width="291" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ITEM_REQUEST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1758" y="0" width="100" height="22"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{QUANTITY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="1858" y="0" width="97" height="22"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1955" y="0" width="254" height="22"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BUDGET_STATUS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StatusReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="Status" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     HD_COMPLAINT."ID" AS HD_COMPLAINT_ID,
+     HD_COMPLAINT."COMPLAINT_ID" AS HD_COMPLAINT_COMPLAINT_ID,
+     HD_COMPLAINT."COMPLAIN_CATEGORY" AS HD_COMPLAINT_COMPLAIN_CATEGORY,
+     HD_COMPLAINT."COMPLAIN_SUB_CATEGORY" AS HD_COMPLAINT_COMPLAIN_SUB_CATE,
+     HD_COMPLAINT."ASSET_ID" AS HD_COMPLAINT_ASSET_ID,
+     HD_COMPLAINT."PRIORITY" AS HD_COMPLAINT_PRIORITY,
+     HD_COMPLAINT."CREATE_DATE" AS HD_COMPLAINT_CREATE_DATE,
+     HD_COMPLAINT."STATUS" AS HD_COMPLAINT_STATUS,
+     HD_COMPLAINT."COMPLAINT_TYPE" AS HD_COMPLAINT_COMPLAINT_TYPE,
+     HD_COMPLAINT."INCIDENT_MODE" AS HD_COMPLAINT_INCIDENT_MODE,
+     HD_COMPLAINT."USER_ID" AS HD_COMPLAINT_USER_ID,
+     HD_COMPLAINT."RESPONSE_MODE" AS HD_COMPLAINT_RESPONSE_MODE,
+     HD_COMPLAINT."REQUESTER_NAME" AS HD_COMPLAINT_REQUESTER_NAME,
+     HD_COMPLAINT."REQUESTER_CONTACT_NO" AS HD_COMPLAINT_REQUESTER_CONTACT,
+     HD_COMPLAINT."WORK_STATION_IP" AS HD_COMPLAINT_WORK_STATION_IP,
+     HD_COMPLAINT."NOTIFY_EMAIL" AS HD_COMPLAINT_NOTIFY_EMAIL,
+     HD_COMPLAINT."REQUEST_BRANCH" AS HD_COMPLAINT_REQUEST_BRANCH,
+     HD_COMPLAINT."REQUEST_DEPARTMENT" AS HD_COMPLAINT_REQUEST_DEPARTMEN,
+     HD_COMPLAINT."COMPANY_CODE" AS HD_COMPLAINT_COMPANY_CODE,
+     HD_COMPLAINT."IMAGE" AS HD_COMPLAINT_IMAGE,
+     HD_COMPLAINT."REQUEST_SECTION" AS HD_COMPLAINT_REQUEST_SECTION,
+     HD_COMPLAINT."REQUEST_SUBJECT" AS HD_COMPLAINT_REQUEST_SUBJECT,
+     HD_COMPLAINT."REQUEST_DESCRIPTION" AS HD_COMPLAINT_REQUEST_DESCRIPTI,
+     HD_COMPLAINT."CREATE_TIME" AS HD_COMPLAINT_CREATE_TIME,
+     HD_COMPLAINT."REQUESTER_ID" AS HD_COMPLAINT_REQUESTER_ID,
+     HD_COMPLAINT."TECHNICIAN" AS HD_COMPLAINT_TECHNICIAN,
+     HD_COMPLAINT."NATURE" AS HD_COMPLAINT_NATURE,
+     HD_COMPLAINT."DUE_DATE" AS HD_COMPLAINT_DUE_DATE,
+     HD_COMPLAINT."RESP_DATE" AS HD_COMPLAINT_RESP_DATE,
+     HD_COMPLAINT."SLA_ID" AS HD_COMPLAINT_SLA_ID,
+     HD_COMPLAINT."MAIL_STATUS" AS HD_COMPLAINT_MAIL_STATUS,
+     HD_COMPLAINT."CREATE_DATETIME" AS HD_COMPLAINT_CREATE_DATETIME,
+     HD_COMPLAINT."CLOSE_DATE" AS HD_COMPLAINT_CLOSE_DATE,
+     HD_STATUS."STATUS_DESCRIPTION" AS HD_STATUS_STATUS_DESCRIPTION
+FROM
+     "HELPDESK"."HD_STATUS" HD_STATUS INNER JOIN "HELPDESK"."HD_COMPLAINT" HD_COMPLAINT ON HD_STATUS."STATUS_CODE" = HD_COMPLAINT."STATUS"
+]]>
+	</queryString>
+	<field name="HD_COMPLAINT_ID" class="java.math.BigDecimal"/>
+	<field name="HD_COMPLAINT_COMPLAINT_ID" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_COMPLAIN_CATEGORY" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_COMPLAIN_SUB_CATE" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_ASSET_ID" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_PRIORITY" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_CREATE_DATE" class="java.sql.Timestamp"/>
+	<field name="HD_COMPLAINT_STATUS" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_COMPLAINT_TYPE" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_INCIDENT_MODE" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_USER_ID" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_RESPONSE_MODE" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_REQUESTER_NAME" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_REQUESTER_CONTACT" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_WORK_STATION_IP" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_NOTIFY_EMAIL" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_REQUEST_BRANCH" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_REQUEST_DEPARTMEN" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_COMPANY_CODE" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_IMAGE" class="oracle.sql.BLOB"/>
+	<field name="HD_COMPLAINT_REQUEST_SECTION" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_REQUEST_SUBJECT" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_REQUEST_DESCRIPTI" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_CREATE_TIME" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_REQUESTER_ID" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_TECHNICIAN" class="java.math.BigDecimal"/>
+	<field name="HD_COMPLAINT_NATURE" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_DUE_DATE" class="java.sql.Timestamp"/>
+	<field name="HD_COMPLAINT_RESP_DATE" class="java.sql.Timestamp"/>
+	<field name="HD_COMPLAINT_SLA_ID" class="java.math.BigDecimal"/>
+	<field name="HD_COMPLAINT_MAIL_STATUS" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_CREATE_DATETIME" class="java.sql.Timestamp"/>
+	<field name="HD_COMPLAINT_CLOSE_DATE" class="java.sql.Timestamp"/>
+	<field name="HD_STATUS_STATUS_DESCRIPTION" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="13" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[HD_COMPLAINT_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="232" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[HD_COMPLAINT_STATUS]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement x="13" y="60" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{HD_COMPLAINT_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="232" y="64" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{HD_COMPLAINT_STATUS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

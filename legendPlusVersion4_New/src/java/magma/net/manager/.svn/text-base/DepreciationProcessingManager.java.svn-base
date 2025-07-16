@@ -1,0 +1,1651 @@
+package magma.net.manager;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import com.magbel.util.DatetimeFormat;
+import com.magbel.util.CurrencyNumberformat;
+import com.magbel.util.CurrentDateTime;
+import magma.net.dao.MagmaDBConnection;
+import magma.net.vao.Asset;
+import magma.net.vao.DistributionDetail;
+import magma.net.vao.AssetTransaction;
+import magma.net.vao.ProcesingInfo;
+import java.sql.Statement;
+import magma.net.vao.ComponentDetail;
+
+/**
+ * <p><b>Title:</b> DepreciationProcessingManager.java</p>
+ *
+ * <p><b>Description:</b> Transaction Object for the<br>
+ * Depreciation processing.</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @author www.ocular-minds.com
+ * @author festus.jejelowo@ocular-minds.com
+ * @version 1.0
+ */
+public class DepreciationProcessingManager extends MagmaDBConnection {
+
+    private FleetHistoryManager historyManager;
+    private Date currentProcessingDate;
+    private Date nextProcessingDate;
+    private Date lastDate;
+    private CurrencyNumberformat formata;
+    private SimpleDateFormat sdf;
+    private DatetimeFormat df;
+    private CurrentDateTime con;
+    private boolean sucessful;
+    private ProcesingInfo process;
+    ArrayList Alist = new ArrayList();
+
+    public DepreciationProcessingManager() 
+    {
+        System.out.println("INFO:Enter Depreciation Transaction Processing ..");
+        sdf = new SimpleDateFormat("dd-MM-yyyy");
+        df = new DatetimeFormat();
+        formata = new CurrencyNumberformat();
+        con = new CurrentDateTime();
+        process = this.getProcessingInfo();
+        this.currentProcessingDate = process.getProcessingDate();
+        this.lastDate = process.getNextProcessingDate();
+        this.nextProcessingDate = process.getNextProcessingDate();
+    }
+
+
+    public void setSucessful(boolean sucessful) {
+        this.sucessful = sucessful;
+    }
+
+    public boolean isSucessful() {
+        return sucessful;
+    }
+
+    public java.util.Date getDateValue(String s_date)
+    {
+      return java.sql.Date.valueOf(s_date);
+    }
+    
+    
+    
+    /**
+     * processDepreciation
+     */
+    public void processDepreciation(String userid) {
+
+        String startDate = process.getFinancialStartDate();
+        String endDate = process.getFinancialEndDate();    
+        historyManager = new FleetHistoryManager();
+       // ArrayList asets = historyManager.findAssetForDepreciation(process.getNextProcessingDate());
+        String nextdate = df.formatDate(process.getNextProcessingDate());
+        
+        String filter =" AND EFFECTIVE_DATE <= '"+process.getNextProcessingDate()+"' ";
+        ArrayList asets = historyManager.findAssetForDepreciation(filter);
+        DepreciationChecks depchk = new DepreciationChecks();
+        int frequency = getProcessingInfo().getFrequency();
+        String startMonth = startDate.substring(3,5);
+        String lastMonth = endDate.substring(3, 5);
+        String processDate = getCompSystemDate();
+       
+        String prodate = df.formatDate(process.getProcessingDate());
+        
+        
+        String proMonth = processDate.substring(3, 5);
+        String proYear = processDate.substring(7,10);
+        String lastYear = endDate.substring(7,10);
+        depchk.insertTempDepreciationEntry();
+        depchk.insertTempDistributedAssets();
+        boolean isNew = false;
+        /*
+         1. If first Month set DPY to Date = 0.00;
+         2. if last month, update acc period with months specified.
+         3. start from where processing Date less or equals start date.
+         4. check if SBU for GL prefix to use.
+         5. If depreciation is new i.e ACCUM DEP = 0.00
+         6. Determine months based on start date.
+         7. if processing month = last depreciation date: dep = NBV - residual
+         8. if is fully depreciated NBV = residual
+         9. if(distribution required: distribute else skip.
+         */
+
+        if (Integer.parseInt(proMonth) == Integer.parseInt(lastMonth)
+                && Integer.parseInt(proYear) == Integer.parseInt(lastYear)) {
+            updateYearEnd();
+        }
+        if (Integer.parseInt(proMonth) == Integer.parseInt(lastMonth)
+                && Integer.parseInt(proYear) == Integer.parseInt(lastYear)) {
+            changeFinancialDate(startDate);
+        }
+        System.out.println("size  "+asets.size());
+        for (int x = 0; x < asets.size(); x++) 
+        {
+        	
+            Asset aset = (Asset) asets.get(x);
+          
+            String assetId = aset.getId();
+
+            double cost = aset.getCost();
+            double monthlyDepreciation = 0.00d;
+            double accumDep = aset.getAccumulatedDepreciation();
+            //System.out.println("accumDep "+accumDep);
+            double residual = aset.getResidualValue();
+            double nbv = aset.getNbv();
+            int remainLife = aset.getRemainingLife();
+            int totalLife = aset.getTotalLife();
+            String branchCode = aset.getBranchId();
+            String departmentCode = aset.getDepartmentId();
+            String sectorCode = aset.getSection();
+            String astatus = aset.getAsset_status();
+            
+            if (astatus.equalsIgnoreCase("ACTIVE")) 
+            {
+                if (isFullyDepreciated(cost, accumDep, residual)) 
+                {
+                    //Skip processing
+                } 
+                else 
+                {
+
+                    if (accumDep == 0.0) 
+                    {
+                    	
+                    	System.out.println("process date "+process.getProcessingDate());
+                    	System.out.println("next process date "+process.getNextProcessingDate());
+                    	
+                    	System.out.println("asset id "+aset.getId());
+                    	System.out.println("accumDep "+accumDep);
+                        isNew = true;
+                        monthlyDepreciation = getCalculatedMonthlyDepreciation(
+                                cost, nbv,
+                                residual, remainLife, totalLife,
+                                aset.getEffectiveDate(), isNew);
+                        
+                    } 
+                    else 
+                    {
+                    	isNew = false;
+                        monthlyDepreciation = getCalculatedMonthlyDepreciation(
+                                cost, nbv,
+                                residual, remainLife, totalLife,
+                                aset.getEffectiveDate(), isNew);
+                    }
+
+                    AssetTransaction asetTran = new AssetTransaction(assetId,
+                            frequency,
+                            cost, monthlyDepreciation, branchCode,
+                            departmentCode,
+                            sectorCode);
+                    if (isNew == true) 
+                    {
+                    int monDiff = df.getDayDifference(sdf.format(this.
+                            nextProcessingDate),
+                            sdf.format(aset.getEffectiveDate())) / 30;
+                    if(monDiff==0){monDiff=1;}
+                    asetTran.setFrequency(monDiff);
+                   
+                    }
+                   
+                    else
+                    {
+                    	asetTran.setFrequency(frequency);
+                    }
+                    
+                    
+                    
+                
+                   
+                      if(aset.getRemainingLife()==0)
+                      {
+                    	  executeNbvResidual(asetTran);
+                      }
+                      else
+                      {
+                    	  
+                       executeProcessDepreciation(asetTran,nextdate, userid);
+                       depchk.updateDepTemp(aset, monthlyDepreciation * asetTran.getFrequency(),asetTran.getFrequency());
+                      }
+                }
+            } else if (astatus.equalsIgnoreCase("DISPOSED")) {
+                Alist.add(aset);
+                System.out.println(aset.getId());
+            } else {
+
+            }
+        }
+        logDepreciationTransactionSummary(processDate,nextdate,userid);
+        notifyNextProcessingDate(this.nextProcessingDate, this.lastDate);
+        depchk.archiveEntrytable();
+        depchk.clearEntrytable();
+        depchk.TransfertoEntrytable(userid);
+    }
+
+    /**
+     * isFullyDepreciated
+     *
+     * @param cost double
+     * @param accumDepreciation double
+     * @param residual double
+     * @return boolean
+     */
+    public boolean isFullyDepreciated(double cost, double accumDepreciation,
+                                      double residual) {
+        boolean isDepreciated = false;
+        double amountDifference = cost - accumDepreciation;
+        if ((amountDifference == residual) || (amountDifference < residual)) {
+            isDepreciated = true;
+        }
+        return isDepreciated;
+    }
+
+
+    /**
+     * isFullyDepreciated
+     *
+     * @param depreciationEndDate Date
+     * @param processingDate Date
+     * @param remainingLife int
+     * @return boolean
+     */
+    public boolean isFullyDepreciated(Date depreciationEndDate,
+                                      Date processingDate, int remainingLife) {
+        boolean isDepreciated = false;
+        if (depreciationEndDate.after(processingDate) && remainingLife > 0) {
+            isDepreciated = true;
+        }
+        return isDepreciated;
+    }
+
+    /**
+     * isDepreciatable
+     *
+     * @param nextProcessingDate Date
+     * @param startDate Date
+     * @return boolean
+     */
+    public boolean isDepreciatable(Date nextProcessingDate, Date startDate) {
+        boolean isDepreciatable = false;
+        if (nextProcessingDate.after(startDate) ||
+            nextProcessingDate.equals(startDate)) {
+            isDepreciatable = true;
+        }
+        return isDepreciatable;
+    }
+
+    /**
+     * getCalculatedMonthlyDepreciation
+     *
+     * @param nbv double
+     * @param residue double
+     * @param remainLife double
+     * @param totalLife double
+     * @param isNew boolean
+     * @return double
+     */
+    public double getCalculatedMonthlyDepreciation(double cost, double nbv,
+            double residue,
+            int remainLife, int totalLife, java.util.Date startDate,
+            boolean isNew) {
+
+        double calculatedDepreciation = 0.00d;
+        if (isNew) {
+            /*int monthDiff = df.getDayDifference(sdf.format(this.
+                    nextProcessingDate), sdf.format(startDate))/30;*/
+            calculatedDepreciation = ((cost - residue) / (double) totalLife);
+        } else {
+            calculatedDepreciation = (cost - residue) / (double) totalLife;
+        }
+
+        String result = formata.formatAmount(calculatedDepreciation);
+        result = result.replaceAll(",", "");
+        calculatedDepreciation = Double.parseDouble(result);
+
+        return calculatedDepreciation;
+    }
+
+    public void updateYearEnd() {
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        String query = "UPDATE AM_GB_COMPANY SET  perform_year_end = 'N'";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+        } catch (Exception ex) {
+            System.out.println("WARN: Error updating perform_year_end->" +
+                               ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+    }
+
+    public void changeFinancialDate(String date) {
+        String newStartDate = this.incrementDateYear(date);
+        int finMonths = process.getNoOfMonths();
+        String newEndDate = this.addMonthToDate(newStartDate, finMonths);
+
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        String query = "UPDATE AM_GB_COMPANY SET FINANCIAL_START_DATE = ?," +
+                       "FINANCIAL_END_DATE = ?";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            ps.setDate(1, dateConvert(newStartDate));
+            ps.setDate(2, dateConvert(newEndDate));
+            ps.execute();
+
+            this.process.setFinancialStartDate(newStartDate);
+            this.process.setFinancialEndDate(newEndDate);
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Changing financial Date ->" +
+                               ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+    }
+
+    public String addMonthToDate(String date, int month) {
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+                "dd-MM-yyyy");
+        java.util.Calendar calendarDate = null;
+        String added = null;
+        if (date == null) {
+            added = null;
+        } else {
+            try {
+                Date dDate = sdf.parse(date);
+                calendarDate = new java.util.GregorianCalendar();
+                calendarDate.setTime(dDate);
+                calendarDate.add(java.util.Calendar.MONTH, month);
+                dDate = calendarDate.getTime();
+                added = sdf.format(dDate);
+            } catch (Exception er) {
+                System.out.println("WARN:Error adding date ->" + er);
+            }
+
+        }
+        return added;
+    }
+
+    public String incrementDateYear(String date) {
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+                "dd-MM-yyyy");
+        java.util.Calendar calendarDate = null;
+        String added = null;
+        if (date == null) {
+            added = null;
+        } else {
+            String newStartDate = this.incrementDateYear(date);
+            int finMonths = process.getNoOfMonths();
+            String newEndDate = this.addMonthToDate(newStartDate, finMonths);
+            try {
+                Date dDate = sdf.parse(date);
+                calendarDate = new java.util.GregorianCalendar();
+                calendarDate.setTime(dDate);
+                calendarDate.add(java.util.Calendar.YEAR, 1);
+                dDate = calendarDate.getTime();
+                added = sdf.format(dDate);
+            } catch (Exception er) {
+                System.out.println("WARN:Error adding year to date ->" + er);
+            }
+        }
+        return added;
+    }
+
+
+    /**
+     * getProcessingInfo
+     *
+     * @return ProcesingInfo
+     */
+    public ProcesingInfo getProcessingInfo() {
+
+        ProcesingInfo processingInfo = null;
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        String query = "SELECT PROCESSING_DATE,PROCESSING_FREQUENCY," +
+                       "NEXT_PROCESSING_DATE,RESIDUAL_VALUE ,    " +
+                       "FINANCIAL_START_DATE,FINANCIAL_END_DATE,  " +
+                       "FINANCIAL_NO_OFMONTHS FROM AM_GB_COMPANY";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                int frequency = rs.getInt("PROCESSING_FREQUENCY");
+                double residual = rs.getDouble("RESIDUAL_VALUE");
+                Date processingDate = rs.getDate("PROCESSING_DATE");
+                Date nextProcessingDate = rs.getDate("NEXT_PROCESSING_DATE");
+                String financialStartDate = sdf.format(rs.getDate(
+                        "FINANCIAL_START_DATE"));
+                String financialEndDate = sdf.format(rs.getDate(
+                        "FINANCIAL_END_DATE"));
+                int noOfMonths = rs.getInt("FINANCIAL_NO_OFMONTHS");
+                processingInfo = new ProcesingInfo(frequency, residual,
+                        processingDate, nextProcessingDate, financialStartDate,
+                        financialEndDate, noOfMonths);
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error getting Processing Info->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return processingInfo;
+    }
+
+
+    /**
+     * logDeprecitionTranction
+     *
+     * @param assetTransaction AssetTransaction
+     */
+    public void logDeprecitionTransaction(AssetTransaction assetTran, String nextdate,String  userid) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        String query = "INSERT INTO monthly_depreciation_processing (" +
+                       "ASSET_ID,MONTHLY_DEP,TRAN_DATE, DEP_DATE, userid,no_of_month" +
+                       ")  VALUES (?,?,?,?,?,?)";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            //ps.setString(1, Long.toString(System.currentTimeMillis()));
+            ps.setString(1, assetTran.getAssetId());
+            // ps.setString(2, assetTran.getBranchCode());
+            ps.setDouble(2, assetTran.getMonthlyDepreciation());
+            ps.setDate(3, dateConvert(getCompSystemDate()));
+            ps.setDate(4, dateConvert(nextdate));
+             ps.setString(5, userid);
+             ps.setInt(6, assetTran.getFrequency());
+
+            ps.execute();
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error logging Depreciation transaction->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+    public String executeNbvResidual(AssetTransaction assetTran) 
+    {
+    	double month=0.00d; 
+    	String output="fail";
+        Connection con = null;
+        PreparedStatement ps = null;
+        String query = "UPDATE AM_ASSET SET  MONTHLY_DEP ="+month+" ,NBV=RESIDUAL_VALUE WHERE ASSET_ID = ? ";
+        System.out.println(query);
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            ps.setString(1,assetTran.getAssetId());
+            
+            ps.executeUpdate();
+            
+            this.setSucessful(true);
+            output="success";
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error executing update on NBV ->" +
+                    ex.getMessage());
+            ex.printStackTrace();
+            this.setSucessful(false);
+        } finally {
+            closeConnection(con, ps);
+        }
+        return output;
+    }
+    /**
+     * executeProcessDepreciation
+     *
+     * @param assetTransaction AssetTransaction
+     */
+    public void executeProcessDepreciation(AssetTransaction assetTran,String nextdate,String userid) 
+    {
+//    	System.out.println(assetTran.getFrequency()+"  "+assetTran.getAssetId());
+        Connection con = null;
+        PreparedStatement ps = null;
+        String query = "UPDATE AM_ASSET  " +
+                       "SET  ACCUM_DEP = ACCUM_DEP + ? ,MONTHLY_DEP = ? ," +
+                       " NBV = COST_PRICE - (ACCUM_DEP + ?),USEFUL_LIFE = USEFUL_LIFE + ? ," +
+                       "REMAINING_LIFE = REMAINING_LIFE - ?, dep_ytd= dep_ytd + ?  " +
+                       "WHERE ASSET_ID = ? ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            ps.setDouble(1,
+                         assetTran.getMonthlyDepreciation() * assetTran.getFrequency());
+            ps.setDouble(2, assetTran.getMonthlyDepreciation());
+            ps.setDouble(3,
+                    assetTran.getMonthlyDepreciation() *
+                    assetTran.getFrequency());
+            ps.setInt(4, assetTran.getFrequency());
+            ps.setInt(5, assetTran.getFrequency());
+            ps.setDouble(6,
+                         assetTran.getMonthlyDepreciation() *
+                         assetTran.getFrequency());
+            ps.setString(7, assetTran.getAssetId());
+            
+            ps.executeUpdate();
+            notifyLastDepAsset(assetTran.getAssetId(), nextdate);
+            logDeprecitionTransaction(assetTran,nextdate,userid);
+            this.setSucessful(true);
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error executing Processed Depreciation ->" +
+                    ex.getMessage());
+            ex.printStackTrace();
+            this.setSucessful(false);
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+    private void notifyNextProcessingDate(Date nextProcessingDate, Date dd) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        String SLIPT_QUERY = "UPDATE AM_GB_COMPANY SET PROCESSING_DATE = ?," +
+                             "NEXT_PROCESSING_DATE = ?    ";
+        dd = nextProcessingDate;
+        nextProcessingDate = df.getDateAddByMonth(this.nextProcessingDate,
+                                                  process.getFrequency());
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(SLIPT_QUERY);
+            ps.setDate(1, dateConvert(dd));
+            ps.setDate(2, dateConvert(nextProcessingDate));
+            ps.executeUpdate();
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error notifing processing Date ->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+
+    public void notifyProcessedAsset(String assetid, String status) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        String NOTIFY_QUERY =
+                "UPDATE AM_ASSET SET ASSET_STATUS = ? WHERE ASSET_ID = ?  ";
+
+       try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(NOTIFY_QUERY);
+            ps.setString(1, status);
+            ps.setString(2, assetid);
+            ps.executeUpdate();
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error notifying processed asset - " + assetid +
+                    "->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+
+    public void notifyRaisedClassifiedAsset(String assetid) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        String NOTIFY_QUERY = "UPDATE  AM_ASSETRECLASSIFICATION " +
+                              "SET RAISE_ENTRY = ? WHERE ASSET_ID = ?  ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(NOTIFY_QUERY);
+            ps.setString(1, "R");
+            ps.setString(2, assetid);
+            ps.executeUpdate();
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error notifying classified asset - " + assetid +
+                    "->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+    public void notifyRaisedAsset(String assetid) {
+
+           Connection con = null;
+           PreparedStatement ps = null;
+           String NOTIFY_QUERY = "UPDATE  AM_ASSET " +
+                                 "SET RAISE_ENTRY = ? WHERE ASSET_ID = ?  ";
+
+           try {
+               con = getConnection("fixedasset");
+               ps = con.prepareStatement(NOTIFY_QUERY);
+               ps.setString(1, "R");
+               ps.setString(2, assetid);
+               ps.executeUpdate();
+
+           } catch (Exception ex) {
+               System.out.println(
+                       "WARNING: Error notifying classified asset - " + assetid +
+                       "->" +
+                       ex.getMessage());
+           } finally {
+               closeConnection(con, ps);
+           }
+
+    }
+    public void notifyProcessedAsset(String assetid) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        String NOTIFY_QUERY =
+                "UPDATE AM_ASSET SET ASSET_STATUS = ? WHERE ASSET_ID = ?  ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(NOTIFY_QUERY);
+            ps.setString(1, "ACTIVE");
+            ps.setString(2, assetid);
+            ps.executeUpdate();
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error notifying processed asset - " + assetid +
+                    "->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+
+    public boolean isAlreadyProcessedDistribution(String distCode) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean alreadyProcessed = false;
+        String PROCESS_QUERY =
+                "SELECT count(DIST_ID) FROM AM_DEPR_DIST WHERE DIST_ID  = ?";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(PROCESS_QUERY);
+            ps.setString(1, distCode);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                if (rs.getInt(1) > 0) {
+                    alreadyProcessed = true;
+                }
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error isAlreadyProcessedDistribution - " +
+                    distCode + "->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return alreadyProcessed;
+    }
+
+    public void clearDistributionEntry(String distCode) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        String CLEAR_QUERY = "DELETE FROM AM_DEPR_DIST WHERE DIST_ID = ?";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(CLEAR_QUERY);
+            ps.setString(1, distCode);
+            ps.execute();
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error clearDistributionEntry  - " + distCode +
+                    "->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+
+    public void splitDistribution(String assetId, String type,
+                                  String userId, String distributionId,
+                                  String expenseAccount, String accumAccount,
+                                  double assignedValue, String counter,
+                                  String rem) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        String SLIPT_QUERY = "INSERT INTO AM_DEPR_DIST(" +
+                             "ASSET_ID,DIST_ID,TYPE,STATUS,USER_ID,CREATE_DT ," +
+                             "DIST_EXP_ACCT,DIST_ACCUM_ACCT,VALUE_ASSIGNED,SEQUENCE_NO,REMAINDER) " +
+                             "VALUES (?,?,?,?,?,?,?,?,?,?,?)   ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(SLIPT_QUERY);
+            ps.setString(1, assetId);
+            ps.setString(2, distributionId);
+            ps.setString(3, type);
+            ps.setString(4, "ACTIVE");
+            ps.setString(5, userId);
+            ps.setDate(6, dateConvert(new java.util.Date()));
+            ps.setString(7, expenseAccount);
+            ps.setString(8, accumAccount);
+            ps.setDouble(9, assignedValue);
+            ps.setString(10, counter);
+            if (rem.equalsIgnoreCase(counter)) {
+                ps.setString(11, "Y");
+            } else {
+                ps.setString(11, "N");
+            }
+            ps.executeUpdate();
+
+            this.setSucessful(true);
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error Sliptting Depreciation ->" +
+                    ex.getMessage());
+            ex.printStackTrace();
+            this.setSucessful(false);
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+
+    public ArrayList findDistributionByAssetId(String assetId) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DistributionDetail dd = null;
+        ArrayList collection = new ArrayList();
+        String FINDER_QUERY = "SELECT DIST_ID,TYPE,STATUS,DIST_EXP_ACCT," +
+                              "DIST_ACCUM_ACCT,VALUE_ASSIGNED,SEQUENCE_NO,REMAINDER    " +
+                              "FROM AM_DEPR_DIST  WHERE ASSET_ID = ? ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(FINDER_QUERY);
+            ps.setString(1, assetId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("DIST_ID");
+                String type = rs.getString("TYPE");
+                String status = rs.getString("STATUS");
+                String expenseAccount = rs.getString("DIST_EXP_ACCT");
+                String accumAccount = rs.getString("DIST_ACCUM_ACCT");
+                double amount = rs.getDouble("VALUE_ASSIGNED");
+                String remainder = rs.getString("REMAINDER");
+                dd = new DistributionDetail(id, assetId, type, status,
+                                            expenseAccount, accumAccount,
+                                            amount,remainder);
+                collection.add(dd);
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error findDistributionByAssetId ->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return collection;
+
+    }
+
+    /**
+     * Dynamically determines the GLPrefix to be
+     * used to create an Depreciation Accu ACC
+     * as DEFAULT during deprecation distribution
+     * for ASSET with id ASSETID
+     *
+     * @param assetid String
+     * @return String
+     */
+    public String getDefaultDistributionAccount(String assetid) {
+
+        String distributionAccount = "";
+        String GL_QUERY = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String BRANCH_ACCOUNT_QUERY = "SELECT B.GL_PREFIX+C.ACCUM_DEP_LEDGER  " +
+                                      "FROM AM_AD_BRANCH B,AM_AD_CATEGORY C,AM_ASSET A  " +
+                                      "WHERE A.CATEGORY_ID = C.CATEGORY_ID  " +
+                                      "AND A.BRANCH_ID = B.BRANCH_ID  " +
+                                      " AND A.ASSET_ID = ?";
+
+        String DEPARTMENT_ACCOUNT_QUERY =
+                "SELECT D.GL_PREFIX+C.ACCUM_DEP_LEDGER " +
+                "FROM sbu_branch_dept D,AM_AD_CATEGORY C,AM_ASSET A  " +
+                "WHERE A.CATEGORY_ID = C.CATEGORY_ID  " +
+                "AND A.DEPT_ID = D.DEPTID  AND  A.BRANCH_ID = D.BRANCHID" +
+                " AND A.ASSET_ID = ?";
+
+        String SECTION_ACCOUNT_QUERY = "SELECT D.GL_PREFIX+C.ACCUM_DEP_LEDGER " +
+                                       "FROM sbu_dept_section D,AM_AD_CATEGORY C,AM_ASSET A  " +
+                                       "WHERE A.CATEGORY_ID = C.CATEGORY_ID  " +
+                                       "AND A.DEPT_ID = D.DEPTID  AND  A.BRANCH_ID = D.BRANCHID" +
+                                       " AND  A.SECTION_ID = D.SECTIONID AND A.ASSET_ID = ?";
+
+        String sbuLevel[] = getSUBSupportedLevel();
+        String required = sbuLevel[0];
+        String level = sbuLevel[1];
+
+        if (required.equalsIgnoreCase("Y")) {
+            if (level.equalsIgnoreCase("department")) {
+                GL_QUERY = DEPARTMENT_ACCOUNT_QUERY;
+            } else if (level.equalsIgnoreCase("section/unit")) {
+                GL_QUERY = SECTION_ACCOUNT_QUERY;
+
+            }
+        } else {
+            GL_QUERY = BRANCH_ACCOUNT_QUERY;
+        }
+
+        try {
+
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(GL_QUERY);
+            System.out.println("GL_QUERY___"+GL_QUERY);
+            ps.setString(1, assetid);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                distributionAccount = rs.getString(1);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println(
+                    "WARNING: Error getting Default Distribution Account ->\n" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return distributionAccount;
+    }
+
+    /**
+     * Obtains new distribution code
+     * by taking a next serial no
+     * the currently existing distribution table.
+     * @param assetid String
+     * @return String
+     */
+    public String getNewDitributionCode() {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String distCode = "0";
+        String query = "SELECT COUNT(DISTINCT(ASSET_ID))+1 AS NEW_CODE " +
+                       "FROM AM_DEPR_DIST";
+
+        try {
+
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                distCode = rs.getString(1);
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error getting new distribution code ->\n" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        if(distCode==null || distCode=="")distCode="1";
+        return distCode;
+    }
+
+    /**
+     * Checks if SUB is rquired from Comapny
+     * and retrieves the SUB Level to determine
+     * what GL_PREFIX to use for default
+     * depreciation accumulated account
+     *
+     * @return String[]
+     */
+    private String[] getSUBSupportedLevel() {
+        String[] SUBLevel = new String[2];
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        String query = "SELECT SBU_REQUIRED,SBU_LEVEL  " +
+                       "FROM AM_GB_COMPANY";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String required = rs.getString("SBU_REQUIRED");
+                String level = rs.getString("SBU_LEVEL");
+                SUBLevel[0] = required;
+                SUBLevel[1] = level;
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error getting SUBSupportedLevel ->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return SUBLevel;
+    }
+
+    /**
+     * Checks the GL Account for
+     * Tax and VAT fro the Company
+     * info.
+     *
+     * @return String[]
+     */
+    public String[] getTaxVatGLFromCompany() {
+        String[] TaxVatGL = new String[2];
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        String query = "SELECT VAT_ACCOUNT,WHT_ACCOUNT " +
+                       "FROM AM_GB_COMPANY";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String vatGL = rs.getString(1);
+                String taxGL = rs.getString(2);
+                TaxVatGL[0] = vatGL;
+                TaxVatGL[1] = taxGL;
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error getting Tax and Vat GL From Company ->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return TaxVatGL;
+    }
+
+    /**
+     * Checks if Account Type and TranCode
+     * should be used in Raise Entry
+     * as defined in the AM_AD_LEGACY_SYS_CONFIG.
+     *
+     * @return boolean[]
+     */
+    public boolean[] getAccountTypeTranCode() {
+        boolean[] AccTypeTranCode = new boolean[2];
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        String query = "SELECT REQ_ACCTTYPE,REQ_TRANCODE   " +
+                       "FROM  AM_AD_LEGACY_SYS_CONFIG";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String accType = rs.getString(1);
+                String tranCode = rs.getString(2);
+                AccTypeTranCode[0] = ((accType.equalsIgnoreCase("Y")) ? true : false);
+                AccTypeTranCode[1] = ((tranCode.equalsIgnoreCase("Y")) ? true : false);
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error getting Account Type and TranCode From SysConfig ->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return AccTypeTranCode;
+    }
+
+    public void logRaisedEntryTransaction(String debitAccount,
+                                          String debitAccType,
+                                          String debitTranCode,
+                                          String debitNarration,
+                                          String creditAccount,
+                                          String creditAccType,
+                                          String creditTranCode,
+                                          String creditNarration, String amount,
+                                          String userId, String supervisor,
+                                          String legacyId,
+                                          String batchId, String rejectReason) {
+
+        String tranQuery = "INSERT INTO AM_ENTRY_TABLE(" +
+                           "DR_ACCT,DR_ACCT_TYPE,DR_TRAN_CODE,DR_NARRATION," +
+                           "CR_ACCT,CR_ACCT_TYPE,CR_TRAN_CODE,CR_NARRATION," +
+                           "AMOUNT,USER_ID,SUPER_ID,LEGACY_ID,BATCH_ID," +
+                           "POSTING_DATE,EFFECTIVE_DATE,PROCESS_STATUS ," +
+                           "SUPERVISOR,REJECT_REASON " +
+                           "	) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        if (amount == null || amount.equals("")) {
+            amount = "0.00";
+        }
+        if (userId == null || userId.equals("")) {
+            userId = "0";
+        }
+        if (supervisor == null || supervisor.equals("")) {
+            userId = "0";
+        }
+
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+
+        try {
+
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(tranQuery);
+            ps.setString(1, debitAccount);
+            ps.setString(2, debitAccType);
+            ps.setString(3, debitTranCode);
+            ps.setString(4, debitNarration);
+            ps.setString(5, creditAccount);
+            ps.setString(6, creditAccType);
+            ps.setString(7, creditTranCode);
+            ps.setString(8, creditNarration);
+            ps.setDouble(9, Double.parseDouble(amount));
+            ps.setInt(10, Integer.parseInt(userId));
+            ps.setInt(11, Integer.parseInt(supervisor));
+            ps.setString(12, legacyId);
+            ps.setString(13, batchId);
+            ps.setDate(14, dateConvert(new java.util.Date()));
+            ps.setDate(15, dateConvert(new java.util.Date()));
+            ps.setString(16, "U");
+            ps.setString(17, supervisor);
+            ps.setString(18, rejectReason);
+            ps.execute();
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error raising entry  ->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+
+    /**
+     * Checks obtains processing date
+     * from AM_AD_LEGACY_SYS_CONFIG.
+     *
+     * @return String
+     */
+    public String getProcessingDate() {
+        String sysDate = "";
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        String query = "SELECT PROCESS_DATE FROM  AM_AD_LEGACY_SYS_CONFIG";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                sysDate = df.formatDate(rs.getDate(1));
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error getting processing date From SysConfig ->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return sysDate;
+    }
+
+    public String getSystemDate() {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String sysDate = "";
+        String selectQuery = "SELECT PROCESS_DATE FROM AM_AD_LEGACY_SYS_CONFIG";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                sysDate = formatDate(rs.getDate(1));
+            }
+
+        } catch (Exception e) {
+            System.out.println(
+                    "WARNING:Error getting SystemDate->" +
+                    e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return sysDate;
+
+    }
+
+    public String getCompSystemDate() {
+
+        //Connection con = null;
+        //PreparedStatement ps = null;
+        //ResultSet rs = null;
+        String sysDate = formatDate(new java.util.Date());
+       /* String selectQuery = "SELECT SYSTEM_DATE FROM am_gb_company";
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                sysDate = formatDate(rs.getDate(1));
+            }
+
+        } catch (Exception e) {
+            System.out.println(
+                    "WARNING:Error getting SystemDate->" +
+                    e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }*/
+
+        return sysDate;
+
+    }
+
+    public boolean depdone() {
+        SimpleDateFormat sdff = new SimpleDateFormat("MM");
+        SimpleDateFormat sdff2 = new SimpleDateFormat("yyyy");
+         String sql =
+            "SELECT * FROM month_depprocesing_summary WHERE datepart(month,DEP_DATE) = " +
+                sdff.format(df.dateConvert(this.getProcessingInfo().getNextProcessingDate())) +" AND "
+                +" datepart(year,DEP_DATE) = " +sdff2.format(df.dateConvert(this.getProcessingInfo().getNextProcessingDate()));
+       System.out.println(sql);
+             boolean exists = false;
+             Connection con = null;
+             Statement stmt=null;
+              ResultSet rs = null;
+        try {
+             con = getConnection("fixedasset");
+             stmt = con.createStatement();
+             rs = stmt.executeQuery(sql);
+            exists = rs.next();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        finally {
+           closeConnection(con, stmt, rs);
+       }
+
+        return exists;
+
+    }
+
+    public void logRaisedEntryTransaction(String debitAccount,
+                                          String debitAccType,
+                                          String debitTranCode,
+                                          String debitNarration,
+                                          String creditAccount,
+                                          String creditAccType,
+                                          String creditTranCode,
+                                          String creditNarration, String amount,
+                                          String userId, String supervisor,
+                                          String legacyId,
+                                          String batchId, String rejectReason,
+                                          String currid, String branchcode) {
+
+        String tranQuery = "INSERT INTO AM_ENTRY_TABLE(" +
+                           "DR_ACCT,DR_ACCT_TYPE,DR_TRAN_CODE,DR_NARRATION," +
+                           "CR_ACCT,CR_ACCT_TYPE,CR_TRAN_CODE,CR_NARRATION," +
+                           "AMOUNT,USER_ID,SUPER_ID,LEGACY_ID,BATCH_ID," +
+                           "POSTING_DATE,EFFECTIVE_DATE,PROCESS_STATUS ," +
+                           "SUPERVISOR,REJECT_REASON,currency_id,branchCode " +
+                           "	) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        if (amount == null || amount.equals("")) {
+            amount = "0.00";
+        }
+        if (userId == null || userId.equals("")) {
+            userId = "0";
+        }
+        if (supervisor == null || supervisor.equals("")) {
+            supervisor = "0";
+        }
+        if (currid == null || currid.equals("")) {
+            currid = "1";
+        }
+
+        Connection con = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+
+        try {
+
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(tranQuery);
+            ps.setString(1, debitAccount);
+            ps.setString(2, debitAccType);
+            ps.setString(3, debitTranCode);
+            ps.setString(4, debitNarration);
+            ps.setString(5, creditAccount);
+            ps.setString(6, creditAccType);
+            ps.setString(7, creditTranCode);
+            ps.setString(8, creditNarration);
+            ps.setDouble(9, Double.parseDouble(amount));
+            ps.setInt(10, Integer.parseInt(userId));
+            ps.setInt(11, Integer.parseInt(supervisor));
+            ps.setString(12, legacyId);
+            ps.setString(13, batchId);
+            ps.setDate(14, dateConvert(new java.util.Date()));
+            ps.setDate(15, dateConvert(new java.util.Date()));
+            ps.setString(16, "U");
+            ps.setString(17, supervisor);
+            ps.setString(18, rejectReason);
+            ps.setString(19, currid);
+            ps.setString(20, branchcode);
+            ps.execute();
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARNING: Error raising entry  ->" +
+                    ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+    public void logDepreciationTransactionSummary(String procdate,String nextdate,String userid) {
+           Connection con = null;
+           PreparedStatement ps = null;
+           String query = "INSERT INTO [month_depprocesing_summary]" +
+                          "([processing_date],[userid],[dep_date])" +
+                          " VALUES(?,?,?)";
+           try {
+               con = getConnection("fixedasset");
+               ps = con.prepareStatement(query);
+               ps.setDate(1, df.dateConvert(procdate));
+               ps.setString(2,userid);
+               ps.setDate(3, dateConvert(nextdate));
+               ps.execute();
+
+           } catch (Exception ex) {
+               System.out.println(
+                       "WARNING: Error logging Depreciation transaction->" +
+                       ex.getMessage());
+           } finally {
+               closeConnection(con, ps);
+           }
+
+       }
+       public void notifyProcessedDistributedAsset(String assetid) {
+       Connection con = null;
+       PreparedStatement ps = null;
+       String NOTIFY_QUERY =
+               "UPDATE AM_ASSET SET REQ_REDISTRIBUTION = ? WHERE ASSET_ID = ?  ";
+
+       try {
+           con = getConnection("fixedasset");
+           ps = con.prepareStatement(NOTIFY_QUERY);
+           ps.setString(1, "Y");
+           ps.setString(2, assetid);
+           ps.executeUpdate();
+
+       } catch (Exception ex) {
+           System.out.println(
+                   "WARNING: Error notifying processed asset - " + assetid +
+                   "->" +
+                   ex.getMessage());
+       } finally {
+           closeConnection(con, ps);
+       }
+
+   }
+   public void notifyLastDepAsset(String assetid, String datex) {
+       Connection con = null;
+       PreparedStatement ps = null;
+       String NOTIFY_QUERY =
+               "UPDATE AM_ASSET SET last_dep_date = ? WHERE ASSET_ID = ?  ";
+
+       try {
+           con = getConnection("fixedasset");
+           ps = con.prepareStatement(NOTIFY_QUERY);
+           ps.setDate(1, df.dateConvert(datex));
+           ps.setString(2, assetid);
+           ps.executeUpdate();
+
+       } catch (Exception ex) {
+           System.out.println(
+                   "WARNING: Error notifying processed asset - " + assetid +
+                   "->" +
+                   ex.getMessage());
+       } finally {
+           closeConnection(con, ps);
+       }
+   }
+
+    // AM_COMPONENT_DIST modification lanre
+
+   public boolean isAlreadyProcessedComponent(String componentCode)
+   {
+       Connection con = null;
+       PreparedStatement ps = null;
+       ResultSet rs = null;
+       boolean alreadyProcessed = false;
+       String PROCESS_QUERY =
+               "SELECT count(COMPONENT_ID) FROM AM_COMPONENT_DIST WHERE COMPONENT_ID  = ?";
+
+       try {
+           con = getConnection("fixedasset");
+           ps = con.prepareStatement(PROCESS_QUERY);
+           ps.setString(1, componentCode);
+
+           rs = ps.executeQuery();
+
+           while (rs.next()) {
+               if (rs.getInt(1) > 0) {
+                   alreadyProcessed = true;
+               }
+           }
+
+       } catch (Exception ex) {
+           System.out.println(
+                   "WARNING: Error isAlreadyProcessedDistribution - " +
+                   componentCode + "->" +
+                   ex.getMessage());
+       } finally {
+           closeConnection(con, ps, rs);
+       }
+       return alreadyProcessed;
+   }
+
+   public void clearComponentEntry(String componentCode)
+   {
+       Connection con = null;
+       PreparedStatement ps = null;
+       String CLEAR_QUERY = "DELETE FROM AM_COMPONENT_DIST WHERE COMPONENT_ID = ?";
+
+       try {
+           con = getConnection("fixedasset");
+           ps = con.prepareStatement(CLEAR_QUERY);
+           ps.setString(1, componentCode);
+           ps.execute();
+
+       } catch (Exception ex) {
+           System.out.println(
+                   "WARNING: Error clearDistributionEntry  - " + componentCode +
+                   "->" +
+                   ex.getMessage());
+       } finally {
+           closeConnection(con, ps);
+       }
+
+   }
+
+
+
+   public ArrayList findComponentByAssetId(String assetId) {
+
+       Connection con = null;
+       PreparedStatement ps = null;
+       ResultSet rs = null;
+       ComponentDetail dd = null;
+       ArrayList collection = new ArrayList();
+       String FINDER_QUERY = "SELECT COMPONENT_ID,TYPE,STATUS,COMPONENT_EXP_ACCT," +
+                             "COST_VALUE,VALUE_ASSIGNED,SEQUENCE_NO,REMAINDER ,DEP_ASSIGNED   " +
+                             "FROM AM_COMPONENT_DIST  WHERE ASSET_ID = ? ";
+
+       try {
+           con = getConnection("fixedasset");
+           ps = con.prepareStatement(FINDER_QUERY);
+           ps.setString(1, assetId);
+           rs = ps.executeQuery();
+
+           while (rs.next()) {
+
+               String id = rs.getString("COMPONENT_ID");
+               String type = rs.getString("TYPE");
+               String status = rs.getString("STATUS");
+               String expenseAccount = rs.getString("COMPONENT_EXP_ACCT");
+               double costValue = rs.getDouble("COST_VALUE");
+               double amount = rs.getDouble("VALUE_ASSIGNED");
+               String remainder = rs.getString("REMAINDER");
+               double depAssigned = rs.getDouble("DEP_ASSIGNED");
+               String serialNumber = rs.getString("SEQUENCE_NO");
+               dd = new ComponentDetail(id, assetId, type, status,
+                                           expenseAccount, costValue,
+                                           amount,remainder,depAssigned,serialNumber);
+               collection.add(dd);
+           }
+
+       } catch (Exception ex) {
+           System.out.println(
+                   "WARNING: Error findDistributionByAssetId ->" +
+                   ex.getMessage());
+       } finally {
+           closeConnection(con, ps, rs);
+       }
+
+       return collection;
+
+   }
+
+   public ArrayList findComponentByAssetIdView(String assetId) {
+
+       Connection con = null;
+       PreparedStatement ps = null;
+       ResultSet rs = null;
+       ComponentDetail dd = null;
+       ArrayList collection = new ArrayList();
+       String FINDER_QUERY = "SELECT COMPONENT_ID,TYPE,STATUS,COMPONENT_EXP_ACCT," +
+                             "COST_VALUE,VALUE_ASSIGNED,SEQUENCE_NO,REMAINDER ,DEP_ASSIGNED   " +
+                             "FROM AM_COMPONENT_DIST  WHERE ASSET_ID = ? AND CREATED = 'N' ";
+
+       try {
+           con = getConnection("fixedasset");
+           ps = con.prepareStatement(FINDER_QUERY);
+           ps.setString(1, assetId);
+           rs = ps.executeQuery();
+
+           while (rs.next()) {
+
+               String id = rs.getString("COMPONENT_ID");
+               String type = rs.getString("TYPE");
+               String status = rs.getString("STATUS");
+               String expenseAccount = rs.getString("COMPONENT_EXP_ACCT");
+               double costValue = rs.getDouble("COST_VALUE");
+               double amount = rs.getDouble("VALUE_ASSIGNED");
+               String remainder = rs.getString("REMAINDER");
+               double depAssigned = rs.getDouble("DEP_ASSIGNED");
+               String serialNumber = rs.getString("SEQUENCE_NO");
+               dd = new ComponentDetail(id, assetId, type, status,
+                                           expenseAccount, costValue,
+                                           amount,remainder,depAssigned,serialNumber);
+               collection.add(dd);
+           }
+
+       } catch (Exception ex) {
+           System.out.println(
+                   "WARNING: Error findDistributionByAssetId ->" +
+                   ex.getMessage());
+       } finally {
+           closeConnection(con, ps, rs);
+       }
+
+       return collection;
+
+   }
+   public void insertComponent(String assetId, String type,
+           String userId, String distributionId,
+           String expenseAccount, double costValue,
+           double assignedValue, String counter,
+           String rem,double depAssigned) {
+
+Connection con = null;
+PreparedStatement ps = null;
+String SLIPT_QUERY = "INSERT INTO AM_COMPONENT_DIST(" +
+      "ASSET_ID,COMPONENT_ID,TYPE,STATUS,USER_ID,CREATE_DT ," +
+      "COMPONENT_EXP_ACCT,COST_VALUE,VALUE_ASSIGNED,SEQUENCE_NO,REMAINDER,DEP_ASSIGNED) " +
+      "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)  ";
+
+try {
+ con = getConnection("fixedasset");
+ ps = con.prepareStatement(SLIPT_QUERY);
+ ps.setString(1, assetId);
+ ps.setString(2, distributionId);
+ ps.setString(3, type);
+ ps.setString(4, "ACTIVE");
+ ps.setString(5, userId);
+ ps.setDate(6, dateConvert(new java.util.Date()));
+ps.setString(7, expenseAccount);
+ps.setDouble(8, costValue);
+ps.setDouble(9, assignedValue);
+ps.setString(10, counter);
+if (rem.equalsIgnoreCase(counter)) {
+ps.setString(11, "Y");
+} else {
+ps.setString(11, "N");
+}
+ps.setDouble(12, depAssigned);
+ps.executeUpdate();
+
+updateMultipleComponent(assetId);
+
+this.setSucessful(true);
+} catch (Exception ex) {
+System.out.println(
+"WARNING: Error submittting component ->" +
+ex.getMessage());
+ex.printStackTrace();
+this.setSucessful(false);
+}
+
+finally
+{
+closeConnection(con, ps);
+}
+
+}
+   public void updateMultipleComponent(String assetid) {
+       Connection con = null;
+       PreparedStatement ps = null;
+       String NOTIFY_QUERY =
+               "UPDATE AM_ASSET SET Multiple = ? WHERE ASSET_ID = ?  ";
+
+       try {
+           con = getConnection("fixedasset");
+           ps = con.prepareStatement(NOTIFY_QUERY);
+           ps.setString(1, "Y");
+           ps.setString(2, assetid);
+           ps.executeUpdate();
+
+       } catch (Exception ex) {
+           System.out.println(
+                   "WARNING: Error updating asset component- " + assetid +
+                   "->" +
+                   ex.getMessage());
+       } finally {
+           closeConnection(con, ps);
+       }
+   }
+
+
+
+   public boolean recordInserted(String assetId,String depExpenseValue,double depAccumValueAmount,double depreciationAmount,String sequenceNo) {
+
+       Connection con = null;
+       PreparedStatement ps = null;
+       ResultSet rs = null;
+       boolean done = true;
+       String query = "SELECT * FROM AM_COMPONENT_DIST WHERE ASSET_ID=? AND COMPONENT_EXP_ACCT=? AND COST_VALUE=? AND DEP_ASSIGNED=? SEQUENCE_NO= ? ";
+
+       try {
+           con = getConnection("fixedasset");
+           ps = con.prepareStatement(query);
+           ps.setString(1, assetId);
+           ps.setString(2, depExpenseValue);
+           ps.setDouble(3, depAccumValueAmount);
+           ps.setDouble(4, depreciationAmount);
+           ps.setString(5, sequenceNo);
+           rs = ps.executeQuery();
+
+           while (rs.next())
+           {
+
+              done=false;
+
+           }
+
+       } catch (Exception ex) {
+           System.out.println(
+                   "WARNING: Error getting component ->" +
+                   ex.getMessage());
+       } finally {
+           closeConnection(con, ps, rs);
+       }
+
+       return done;
+
+   }
+
+
+}

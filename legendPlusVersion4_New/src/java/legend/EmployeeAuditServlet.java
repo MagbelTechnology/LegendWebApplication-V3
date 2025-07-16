@@ -1,0 +1,224 @@
+package legend;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import audit.AuditTrailGen;
+
+/**
+ * <p>Title: </p>
+ *
+ * <p>Description: </p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: </p>
+ *
+ * @author not attributable
+ * @version 1.0
+ */
+public class EmployeeAuditServlet extends HttpServlet {
+    public EmployeeAuditServlet() {
+    }
+
+    /**
+     * Initializes the servlet.
+     *
+     * @param config ServletConfig
+     * @throws ServletException
+     */
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+    }
+
+    /** Destroys the servlet.
+     */
+    public void destroy() {
+
+    }
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void service(HttpServletRequest request, HttpServletResponse response) throws
+            ServletException, IOException {
+
+        response.setContentType("text/html");
+        response.setDateHeader("Expires", -1);
+
+        HttpSession session = request.getSession();
+        PrintWriter out = response.getWriter();
+
+        //String type = request.getParameter("TYPE");
+		
+        //java.sql.Date dt = new java.sql.Date();
+        AuditTrailGen  audit = new AuditTrailGen();
+        //java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/mm/yyyy");
+
+		String statusMessage = "";
+		boolean updtst = false;
+		
+        //String loginId = request.getParameter("loginId");
+			int loginID;
+		 String loginId = (String)session.getAttribute("CurrentUser");
+		 if(loginId == null) {  loginID = 0; }
+			else { loginID = Integer.parseInt(loginId);	}
+		
+		 String userClass = (String)session.getAttribute("UserClass");
+		String branchcode = (String)session.getAttribute("UserCenter");
+		if(branchcode == null) { branchcode = "not set";	}
+
+        String employeeId = request.getParameter("employeeId");
+
+        TechEmployeesBean dsb = null;
+        try{
+            dsb = new TechEmployeesBean();
+        }catch(Throwable e){}
+
+        String buttSave = request.getParameter("buttSave");
+        //String buttAssg = request.getParameter("buttAssg");
+
+        String[] prop = {
+                request.getParameter("employeeCode"),
+                request.getParameter("employeeName"),
+                request.getParameter("contactAddress"),
+                request.getParameter("employeeState"),
+                request.getParameter("employeePhone"),
+                request.getParameter("employeeFax"),
+                request.getParameter("employeeEmail"),
+                request.getParameter("employeeDept"),
+                request.getParameter("accountType"),
+                request.getParameter("accountNumber"),
+                request.getParameter("employeeStatus"),
+                request.getParameter("employeeProvince"),
+                (String)session.getAttribute("CurrentUser")
+        };
+
+        java.util.Vector v = new java.util.Vector();
+
+        String[] _prop = {
+                request.getParameter("_employeeCode"),
+                request.getParameter("_employeeName"),
+                request.getParameter("_contactAddress"),
+                request.getParameter("_employeeState"),
+                request.getParameter("_employeePhone"),
+                request.getParameter("_employeeFax"),
+                request.getParameter("_employeeEmail"),
+                request.getParameter("_employeeDept"),
+                request.getParameter("_accountType"),
+                request.getParameter("_accountNumber"),
+                request.getParameter("_employeeStatus"),
+                request.getParameter("_employeeProvince")
+        };
+
+        //java.sql.Date effectiveDate = new java.sql.Date(sdf.parse(dt.textDate()).getTime());
+        String name;
+        String oldValue;
+        String newValue;
+        String actionPerformed;
+        //System.out.print(employeeId+"1");
+        String computerName = null;
+        String remoteAddress = request.getRemoteAddr();
+        InetAddress inetAddress = InetAddress.getByName(remoteAddress);
+        System.out.println("inetAddress: " + inetAddress);
+        computerName = inetAddress.getHostName();
+        System.out.println("computerName: " + computerName);
+        if (computerName.equalsIgnoreCase("localhost")) {
+            computerName = java.net.InetAddress.getLocalHost().getCanonicalHostName();
+        } 
+       String hostName = "";
+       
+       if (hostName.equals(request.getRemoteAddr())) {
+           InetAddress addr = InetAddress.getByName(request.getRemoteAddr());
+           hostName = addr.getHostName();
+           
+	        }
+	
+	        if (InetAddress.getLocalHost().getHostAddress().equals(request.getRemoteAddr())) {
+	                hostName = "Local Host";
+	        }
+	        
+	        InetAddress ip;
+			ip = InetAddress.getLocalHost();
+			String ipAddress = ip.getHostAddress();
+			System.out.println("Current IP address : " + ip.getHostAddress());
+
+			NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+	        byte[] mac = network.getHardwareAddress();
+	        if(mac == null){
+	               String value = "";
+	               mac = value.getBytes();
+	        }
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < mac.length; i++) {
+				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+			}
+			String macAddress = sb.toString();
+			System.out.println(sb.toString());
+			
+        try{
+        	 if (!userClass.equals("NULL") || userClass!=null){
+            dsb.setEmployees(prop);
+            if(buttSave != null)
+				{
+                    if (employeeId.equals("")) 
+						{
+							if (dsb.insertEmployees())
+								{
+									//statusMessage = "Record saved successfully.";
+									out.print("<script>alert('Record saved successfully.')</script>");
+									out.print("<script>window.location = 'techEmployees.jsp'</script>");
+								}
+						} 
+					else if (!employeeId.equals("")) 
+						{
+							//System.out.print(employeeId+"3");
+							//session.setAttribute("employeees", prop);
+							audit.select( 1, "SELECT * FROM  AM_AD_EMPLOYEE  WHERE employee_Id = '"+ employeeId +"'");
+							boolean isupdt = dsb.updateEmployees(employeeId);
+							//updtst = true;
+							audit.select( 2, "SELECT * FROM  AM_AD_EMPLOYEE  WHERE employee_Id = '"+ employeeId +"'");
+							updtst = audit.logAuditTrail("AM_AD_EMPLOYEE" ,  branchcode, loginID, employeeId,hostName,ipAddress,macAddress);
+							System.out.println("Update status = "+updtst); 
+							if(updtst == true)
+								{
+									//statusMessage = "Update on record is successfull";
+									out.print("<script>alert('Update on record is successfull')</script>");
+									out.print("<script>window.location = 'techEmployees.jsp?employeeId="+employeeId+"'</script>");
+									//out.print("<script>window.location = 'manageBranchs.jsp?status=A'</script>");
+								}
+							else 
+								{
+								 //statusMessage = "No changes made on record";
+								 out.print("<script>alert('No changes made on record')</script>");
+								out.print("<script>window.location = 'techEmployees.jsp?employeeId="+employeeId+"'</script>");
+								}
+							
+						}
+				}
+        }
+			}
+		catch(Throwable e)
+			{
+				e.printStackTrace();
+				//statusMessage = "Ensure unique record entry.";
+				out.print("<script>alert('Ensure unique record entry.')</script>");
+				out.print("<script>window.location = 'techEmployees.jsp?employeeId="+employeeId+"'</script>");
+				System.err.print(e.getMessage());
+			}
+    }
+}

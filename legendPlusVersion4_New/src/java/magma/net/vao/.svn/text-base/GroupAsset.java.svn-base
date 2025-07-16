@@ -1,0 +1,212 @@
+package magma.net.vao;
+
+import java.io.Serializable;
+
+/**
+ * <p>Title: GroupAsset.java</p>
+ *
+ * <p>Description: Holds details of a Group Asset.</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class GroupAsset implements Serializable {
+
+    private String id;
+    private String registrationNo;
+    private String description;
+    private String branchCode;
+    private String sectionCode;
+    private String deptCode;
+    private String category;
+    private double costPrice;
+    private String dateCreated;
+    private double accumulatedDepreciation;
+    private String depreciationEndDate;
+
+    private String make;
+    private String model;
+    private String tax;
+    private String taxAmount;
+    private String maintainBy;
+    private String vat;
+    private double vatableCost;
+
+    public GroupAsset(String id, String registrationNo, String description,
+                      String branchCode, String deptCode, String sectionCode,
+                      String category, double costPrice, String dateCreated,
+                      double accumulatedDepreciation,
+                      String depreciationEndDate,
+                      String make, String model, String tax, String taxAmount,
+                      String maintainBy, String vat, double vatableCost) {
+
+        setId(id);
+        setRegistrationNo(registrationNo);
+        setDescription(description);
+        setBranchCode(branchCode);
+        setSectionCode(sectionCode);
+        setDeptCode(deptCode);
+        setCategory(category);
+        setCostPrice(costPrice);
+        setDateCreated(dateCreated);
+        setAccumulatedDepreciation(accumulatedDepreciation);
+        setDepreciationEndDate(depreciationEndDate);
+        setMake(make);
+        setModel(model);
+        setTax(tax);
+        setTaxAmount(taxAmount);
+        setMaintainBy(maintainBy);
+        setVat(vat);
+        setVatableCost(vatableCost);
+
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setRegistrationNo(String registrationNo) {
+        this.registrationNo = registrationNo;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setBranchCode(String branchCode) {
+        this.branchCode = branchCode;
+    }
+
+    public void setSectionCode(String sectionCode) {
+        this.sectionCode = sectionCode;
+    }
+
+    public void setDeptCode(String deptCode) {
+        this.deptCode = deptCode;
+    }
+
+    public void setCostPrice(double costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public void setAccumulatedDepreciation(double accumulatedDepreciation) {
+        this.accumulatedDepreciation = accumulatedDepreciation;
+    }
+
+    public void setDepreciationEndDate(String depreciationEndDate) {
+        this.depreciationEndDate = depreciationEndDate;
+    }
+
+    public void setMake(String make) {
+        this.make = make;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public void setTax(String tax) {
+        this.tax = tax;
+    }
+
+    public void setTaxAmount(String taxAmount) {
+        this.taxAmount = taxAmount;
+    }
+
+    public void setMaintainBy(String maintainBy) {
+        this.maintainBy = maintainBy;
+    }
+
+    public void setVat(String vat) {
+        this.vat = vat;
+    }
+
+    public void setVatableCost(double vatableCost) {
+        this.vatableCost = vatableCost;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getRegistrationNo() {
+        return registrationNo;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getBranchCode() {
+        return branchCode;
+    }
+
+    public String getCategory() {
+        return this.category;
+    }
+
+    public String getSectionCode() {
+        return this.sectionCode;
+    }
+
+    public String setDeptCode() {
+        return this.deptCode;
+    }
+
+    public double getCostPrice() {
+        return costPrice;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public double getAccumulatedDepreciation() {
+        return accumulatedDepreciation;
+    }
+
+    public String getDepreciationEndDate() {
+        return depreciationEndDate;
+    }
+
+    public String getMake() {
+        return this.make;
+    }
+
+    public String getModel() {
+        return this.model;
+    }
+
+    public String getTax() {
+        return this.tax;
+    }
+
+    public String getTaxAmount() {
+        return this.taxAmount;
+    }
+
+    public String getMaintainBy() {
+        return this.maintainBy;
+    }
+
+    public String getVat() {
+        return this.vat = vat;
+    }
+
+    public double getVatableCost() {
+        return this.vatableCost;
+    }
+
+}

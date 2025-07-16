@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Bid_Analysis_Report" pageWidth="877" pageHeight="842" orientation="Landscape" columnWidth="817" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="ReqnId" class="java.lang.String"/>
+	<parameter name="BaseDir" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     am_gb_company."company_code" AS am_gb_company_company_code,
+     am_gb_company."company_address" AS am_gb_company_company_address,
+     PR_RFQ_RESPONSE."ReqnID" AS PR_RFQ_RESPONSE_ReqnID,
+     PR_RFQ_RESPONSE."UserID" AS PR_RFQ_RESPONSE_UserID,
+     PR_RFQ_RESPONSE."Status" AS PR_RFQ_RESPONSE_Status,
+     PR_RFQ_RESPONSE."Company_Code" AS PR_RFQ_RESPONSE_Company_Code,
+     PR_RFQ_RESPONSE."Vendor_Code" AS PR_RFQ_RESPONSE_Vendor_Code,
+     PR_RFQ_RESPONSE."Quoted_Vendor_code" AS PR_RFQ_RESPONSE_Quoted_Vendor_code,
+     PR_RFQ_RESPONSE."QuotedBy" AS PR_RFQ_RESPONSE_QuotedBy,
+     PR_RFQ_RESPONSE."Job_Title" AS PR_RFQ_RESPONSE_Job_Title,
+     PR_RFQ_RESPONSE."Email" AS PR_RFQ_RESPONSE_Email,
+     PR_RFQ_RESPONSE."DaysQuote_Valid" AS PR_RFQ_RESPONSE_DaysQuote_Valid,
+     PR_RFQ_RESPONSE."Remark" AS PR_RFQ_RESPONSE_Remark,
+     PR_RFQ_RESPONSE_DETAIL."Description" AS PR_RFQ_RESPONSE_DETAIL_Description,
+     PR_RFQ_RESPONSE_DETAIL."Delivery_Date" AS PR_RFQ_RESPONSE_DETAIL_Delivery_Date,
+     PR_RFQ_RESPONSE_DETAIL."Quantity" AS PR_RFQ_RESPONSE_DETAIL_Quantity,
+     PR_RFQ_RESPONSE_DETAIL."Unit_Price" AS PR_RFQ_RESPONSE_DETAIL_Unit_Price,
+     PR_RFQ_RESPONSE_DETAIL."Cost_Price" AS PR_RFQ_RESPONSE_DETAIL_Cost_Price,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     am_ad_vendor."Vendor_Status" AS am_ad_vendor_Vendor_Status,
+     PR_RFQ_RESPONSE_DETAIL."Item_No" AS PR_RFQ_RESPONSE_DETAIL_Item_No,
+     PR_RFQ_RESPONSE_DETAIL."ReqnID" AS PR_RFQ_RESPONSE_DETAIL_ReqnID
+FROM
+     "dbo"."PR_RFQ_RESPONSE_DETAIL" PR_RFQ_RESPONSE_DETAIL RIGHT OUTER JOIN "dbo"."PR_RFQ_RESPONSE" PR_RFQ_RESPONSE ON PR_RFQ_RESPONSE_DETAIL."Vendor_Code" = PR_RFQ_RESPONSE."Vendor_Code"
+     AND PR_RFQ_RESPONSE_DETAIL."ReqnID" = PR_RFQ_RESPONSE."ReqnID"
+     INNER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON PR_RFQ_RESPONSE."Vendor_Code" = am_ad_vendor."Vendor_Code",
+     "dbo"."am_gb_company" am_gb_company
+WHERE
+     PR_RFQ_RESPONSE_DETAIL."Unit_Price" <> 0
+     and PR_RFQ_RESPONSE."ReqnID" = $P{ReqnId}]]>
+	</queryString>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_gb_company_company_code" class="java.lang.String"/>
+	<field name="am_gb_company_company_address" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_ReqnID" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_UserID" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Status" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Company_Code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Vendor_Code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Quoted_Vendor_code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_QuotedBy" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Job_Title" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Email" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DaysQuote_Valid" class="java.lang.Integer"/>
+	<field name="PR_RFQ_RESPONSE_Remark" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Description" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Delivery_Date" class="java.sql.Timestamp"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Quantity" class="java.lang.Integer"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Unit_Price" class="java.math.BigDecimal"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Status" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Item_No" class="java.lang.Integer"/>
+	<sortField name="PR_RFQ_RESPONSE_ReqnID"/>
+	<sortField name="PR_RFQ_RESPONSE_DETAIL_Item_No"/>
+	<sortField name="PR_RFQ_RESPONSE_Vendor_Code"/>
+	<group name="Requisition_Group" isReprintHeaderOnEachPage="true">
+		<groupExpression><![CDATA[$F{PR_RFQ_RESPONSE_ReqnID}]]></groupExpression>
+		<groupHeader>
+			<band height="19" splitType="Stretch">
+				<subreport isUsingCache="true">
+					<reportElement key="subreport-1" x="7" y="7" width="735" height="10"/>
+					<subreportParameter name="ReqnId">
+						<subreportParameterExpression><![CDATA[$P{ReqnId}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression class="java.lang.String"><![CDATA["../deploy/legend2.net.war/reports/RFQ_RESPONSE_SUMMARY.JASPER"]]></subreportExpression>
+				</subreport>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band splitType="Stretch"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="111" splitType="Stretch">
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-22" mode="Opaque" x="288" y="90" width="81" height="21" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_ReqnID}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-27" mode="Opaque" x="288" y="64" width="81" height="28" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Reference Number]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-23" mode="Opaque" x="381" y="90" width="131" height="21" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-28" mode="Opaque" x="381" y="64" width="131" height="27" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Buyer]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-24" x="605" y="5" width="101" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-25" x="706" y="5" width="36" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement key="line-5" x="7" y="54" width="727" height="1"/>
+			</line>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-27" mode="Opaque" x="7" y="90" width="94" height="21" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_ReqnID}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-31" mode="Opaque" x="7" y="64" width="94" height="27" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[RFQ Number]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="false">
+				<reportElement key="textField-28" mode="Opaque" x="102" y="90" width="90" height="21" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Delivery_Date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-32" mode="Opaque" x="102" y="64" width="90" height="27" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Issue Date]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="false">
+				<reportElement key="textField-29" mode="Opaque" x="194" y="90" width="90" height="21" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Delivery_Date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-33" mode="Opaque" x="194" y="64" width="90" height="27" forecolor="#FFFFFF" backcolor="#000099"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Closing Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-40" x="7" y="18" width="273" height="29" forecolor="#FF3300"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="18" isBold="true" isItalic="true" pdfFontName="Helvetica-BoldOblique"/>
+				</textElement>
+				<text><![CDATA[Bid Analysis Report]]></text>
+			</staticText>
+			<image>
+				<reportElement key="image-1" x="475" y="3" width="122" height="44"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<imageExpression class="java.io.File"><![CDATA[new File($P{BaseDir}, "../images/client.gif")]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="19" splitType="Stretch">
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-31" x="7" y="0" width="59" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Item_No}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField-32" x="582" y="0" width="100" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Cost_Price}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="false">
+				<reportElement key="textField-33" x="74" y="0" width="111" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Delivery_Date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-34" x="193" y="0" width="156" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Description}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-35" x="355" y="0" width="74" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Quantity}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-36" x="435" y="0" width="142" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-37" x="684" y="0" width="46" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_Status}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="18" splitType="Stretch"/>
+	</summary>
+</jasperReport>

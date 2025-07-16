@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ProjectClosedReport" language="groovy" pageWidth="1315" pageHeight="842" columnWidth="1295" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filter" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select DISTINCT b.BRANCH_NAME,d.Dept_name,s.SBU_NAME,st.STATUS_NAME,CAST(replace(replace(replace(COST, ', ', '~ '), ',', ''), '~ ', ', ') AS DECIMAL(10,2)) AS COST_PRICE , *from ST_GL_PROJECT a, am_ad_branch b,am_ad_department d,AM_SBU_ATTACHEMENT s, AM_GB_STATUS st
+where a.BRANCH_ID = b.BRANCH_ID
+and a.DEPT_ID = d.Dept_ID
+and a.SBU_CODE = s.SBU_CODE
+and a.STATUS = st.STATUS_CODE
+and a.STATUS = 'C'
+$P!{filter}  ]]>
+	</queryString>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="Dept_name" class="java.lang.String"/>
+	<field name="SBU_NAME" class="java.lang.String"/>
+	<field name="STATUS_NAME" class="java.lang.String"/>
+	<field name="COST_PRICE" class="java.math.BigDecimal"/>
+	<field name="MTID" class="java.lang.String"/>
+	<field name="CODE" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="COST" class="java.lang.String"/>
+	<field name="CAPITAL" class="java.lang.String"/>
+	<field name="OTHERS" class="java.lang.String"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="TRANS_DATE" class="java.lang.String"/>
+	<field name="CUSTOMER_CODE" class="java.lang.String"/>
+	<field name="BRANCH_ID" class="java.lang.String"/>
+	<field name="DEPT_ID" class="java.lang.String"/>
+	<field name="SBU_CODE" class="java.lang.String"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="BRANCH_ACRONYM" class="java.lang.String"/>
+	<field name="GL_PREFIX" class="java.lang.String"/>
+	<field name="BRANCH_ADDRESS" class="java.lang.String"/>
+	<field name="STATE" class="java.lang.String"/>
+	<field name="PHONE_NO" class="java.lang.String"/>
+	<field name="FAX_NO" class="java.lang.String"/>
+	<field name="REGION_CODE" class="java.lang.String"/>
+	<field name="PROVINCE" class="java.lang.String"/>
+	<field name="BRANCH_STATUS" class="java.lang.String"/>
+	<field name="USER_ID" class="java.lang.String"/>
+	<field name="CREATE_DATE" class="java.sql.Timestamp"/>
+	<field name="GL_SUFFIX" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="uncapitalized_account" class="java.lang.String"/>
+	<field name="ZONE_CODE" class="java.lang.String"/>
+	<field name="Tmp_REGION_CODE_3" class="java.lang.String"/>
+	<field name="region" class="java.lang.String"/>
+	<field name="Dept_code" class="java.lang.String"/>
+	<field name="Dept_acronym" class="java.lang.String"/>
+	<field name="Branch" class="java.lang.Integer"/>
+	<field name="Dept_Status" class="java.lang.String"/>
+	<field name="ATTACH_ID" class="java.lang.Integer"/>
+	<field name="GL_SUFIX" class="java.lang.String"/>
+	<field name="CREATE_USER" class="java.lang.Integer"/>
+	<field name="STATUS_CODE" class="java.lang.String"/>
+	<variable name="totalNo" class="java.lang.Number" calculation="Count">
+		<variableExpression><![CDATA[$F{MTID}]]></variableExpression>
+	</variable>
+	<variable name="totalCost" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{COST_PRICE}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="501" height="30"/>
+				<textElement>
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Projects Closed Report]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="38" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[BRANCH NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="173" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[DEPARTMENT NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="277" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[SBU CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="401" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="530" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[PROJECT START DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="649" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[PROJECT END DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="751" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[PROJECT COST PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="862" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[PROJECT STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="38" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[S/No.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="38" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="173" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Dept_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="277" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SBU_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="401" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="d/M/yyyy">
+				<reportElement x="530" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{START_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="d/M/yyyy">
+				<reportElement x="649" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{END_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="751" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{COST_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="862" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{STATUS_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement x="0" y="0" width="38" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Number"><![CDATA[$V{totalNo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="###0">
+				<reportElement x="110" y="0" width="28" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Number"><![CDATA[$V{totalNo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="401" y="0" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalCost}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="0" width="91" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="173" y="0" width="191" height="20"/>
+				<textElement/>
+				<text><![CDATA[Project Total Value Approved & Registered]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

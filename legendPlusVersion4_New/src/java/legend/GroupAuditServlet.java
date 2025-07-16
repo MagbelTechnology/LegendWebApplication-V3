@@ -1,0 +1,233 @@
+package legend;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletConfig;
+
+import com.magbel.util.DatetimeFormat;
+
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import legend.GroupSetupBean;
+import audit.*;
+
+/**
+ * <p>Title: </p>
+ *
+ * <p>Description: </p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: </p>
+ *
+ * @author not attributable
+ * @version 1.0
+ */
+public class GroupAuditServlet extends HttpServlet {
+    public GroupAuditServlet() {
+    }
+
+    DatetimeFormat dtf = new DatetimeFormat();
+
+    /**
+     * Initializes the servlet.
+     *
+     * @param config ServletConfig
+     * @throws ServletException
+     */
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+    }
+
+    /** Destroys the servlet.
+     */
+    public void destroy() {
+
+    }
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void service(HttpServletRequest request, HttpServletResponse response) throws
+            ServletException, IOException {
+
+        response.setContentType("text/html");
+        response.setDateHeader("Expires", -1);
+
+        HttpSession session = request.getSession();
+        PrintWriter out = response.getWriter();
+
+        //String type = request.getParameter("TYPE");
+		String statusMessage = "";
+		boolean updtst = false;	 
+		
+        //java.sql.Date dt = new java.sql.Date();
+        AuditTrailGen  audit = new AuditTrailGen();
+		  
+        //java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/mm/yyyy");
+
+      	int loginID;
+		 String loginId = (String)session.getAttribute("CurrentUser");
+		 if(loginId == null) {  loginID = 0; }
+			else { loginID = Integer.parseInt(loginId);	}
+		
+		 String userClass = (String)session.getAttribute("UserClass");
+		 
+		String branchcode = (String)session.getAttribute("UserCenter");
+		if(branchcode == null) { branchcode = "not set";	}
+
+        String buttSave = request.getParameter("buttSave");
+
+        String acronym = request.getParameter("groupAcronym");
+        if(acronym != null){
+            acronym = acronym.toUpperCase();
+        }
+
+        String groupId = request.getParameter("groupId");
+        //if(groupId == null){groupId = "";}
+
+        //String user = (String)session.getAttribute("CurrentUser");
+        String[] prop = {
+                        request.getParameter("groupCode"),
+                        acronym,
+                        request.getParameter("groupName"),
+                        request.getParameter("groupAddress"),
+                        request.getParameter("groupPhone"),
+                        request.getParameter("groupFax"),
+                        request.getParameter("groupStatus"),
+                        (String)session.getAttribute("CurrentUser")
+        };
+        java.util.Vector v = new java.util.Vector();
+
+        String[] _prop = {
+                         request.getParameter("_groupCode"),
+                         acronym,
+                         request.getParameter("_groupName"),
+                         request.getParameter("_groupAddress"),
+                         request.getParameter("_groupPhone"),
+                         request.getParameter("_groupFax"),
+                         request.getParameter("_groupStatus"),
+        };
+
+        //java.sql.Date effectiveDate = new java.sql.Date(sdf.parse(dt.textDate()).getTime());
+        String name;
+        String oldValue;
+        String newValue;
+        String actionPerformed;
+        System.out.print(groupId+"1");
+        
+        String computerName = null;
+        String remoteAddress = request.getRemoteAddr();
+        InetAddress inetAddress = InetAddress.getByName(remoteAddress);
+        System.out.println("inetAddress: " + inetAddress);
+        computerName = inetAddress.getHostName();
+        System.out.println("computerName: " + computerName);
+        if (computerName.equalsIgnoreCase("localhost")) {
+            computerName = java.net.InetAddress.getLocalHost().getCanonicalHostName();
+        } 
+       String hostName = "";
+       
+       if (hostName.equals(request.getRemoteAddr())) {
+           InetAddress addr = InetAddress.getByName(request.getRemoteAddr());
+           hostName = addr.getHostName();
+           
+	        }
+	
+	        if (InetAddress.getLocalHost().getHostAddress().equals(request.getRemoteAddr())) {
+	                hostName = "Local Host";
+	        }
+	        
+	        InetAddress ip;
+			ip = InetAddress.getLocalHost();
+			String ipAddress = ip.getHostAddress();
+			System.out.println("Current IP address : " + ip.getHostAddress());
+
+			NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+	        byte[] mac = network.getHardwareAddress();
+	        if(mac == null){
+	               String value = "";
+	               mac = value.getBytes();
+	        }
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < mac.length; i++) {
+				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+			}
+			String macAddress = sb.toString();
+			System.out.println(sb.toString());
+			
+        try{
+        	 if (!userClass.equals("NULL") || userClass!=null){
+            GroupSetupBean gsb = new GroupSetupBean();
+            //gsb.setGroups(prop);
+            if(buttSave != null)
+				{
+                if(groupId.equals(""))
+					{
+						System.out.print(groupId+"3");
+						if(gsb.insertGroups(prop))
+							{
+								out.print("<script>alert('Record saved successfully.')</script>");
+								out.print("<script>window.location = 'groupSetup.jsp'</script>");
+							}
+						else
+							{
+							 System.out.println("Error saving record: New record for 'group'  with\n "+groupId+" could not be created"); 
+							 out.print("<script>window.location = 'groupSetup.jsp'</script>");
+							}
+					}
+                if(!groupId.equals(""))
+					{
+                    System.out.print(groupId+"2");
+					audit.select(1, "SELECT * FROM  AM_AD_GROUP  WHERE group_Id = '"+ groupId +"'");
+                    boolean isupdt = gsb.updateGroups(groupId, prop);
+					audit.select( 2, "SELECT * FROM  AM_AD_GROUP  WHERE group_Id = '"+ groupId +"'");
+					updtst = audit.logAuditTrail("AM_AD_GROUP" ,  branchcode, loginID, groupId,hostName,ipAddress,macAddress);
+					System.out.println("Update status = "+updtst); 
+                        if(updtst == true)
+							{
+								out.print("<script>alert('Update on record is successfull')</script>");
+								out.print("<script>window.location = 'groupSetup.jsp?groupId="+groupId+"&PC=3'</script>");
+								
+								//out.print("<script>window.location = 'manageGroups.jsp?status=A'</script>");
+							}
+						else 
+							{
+								//statusMessage = "No changes made on record";
+								 out.print("<script>alert('No changes made on record')</script>");
+								out.print("<script>window.location = 'groupSetup.jsp?status=A'</script>");
+							}
+                    }
+                }
+        }
+            }
+        catch(Throwable e)
+		{
+			e.printStackTrace();
+            out.print("<script>alert('Ensure unique record entry.')</script>");
+			out.print("<script>window.location = 'groupSetup.jsp'</script>");
+            System.err.print(e.getMessage());
+        }
+    }
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return String
+     */
+    public String getServletInfo() {
+        return "Company Audit Servlet";
+    }
+}

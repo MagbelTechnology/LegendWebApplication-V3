@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Xls_asset_detail" pageWidth="4324" pageHeight="595" orientation="Landscape" columnWidth="4294" leftMargin="0" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<parameter name="BaseDir" class="java.io.File"/>
+	<queryString>
+		<![CDATA[SELECT
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     ST_STOCK."Asset_id" AS am_Asset_Asset_id,
+     ST_STOCK."Description" AS am_Asset_Description,
+     am_ad_branch."BRANCH_NAME" AS am_ad_branch_BRANCH_NAME,
+     am_ad_category."category_name" AS am_ad_category_category_name,
+     ST_STOCK."Accum_dep" AS am_Asset_Accum_dep,
+     ST_STOCK."monthly_dep" AS am_Asset_monthly_dep,
+     ST_STOCK."Cost_Price" AS am_Asset_Cost_Price,
+     ST_STOCK."NBV" AS am_Asset_NBV,
+     ST_STOCK."Date_purchased" AS am_Asset_Date_purchased,
+     am_ad_category."Dep_rate" AS am_ad_category_Dep_rate,
+     am_ad_category."Accum_Dep_ledger" AS am_ad_category_Accum_Dep_ledger,
+     am_ad_category."Dep_ledger" AS am_ad_category_Dep_ledger,
+     am_ad_category."Asset_Ledger" AS am_ad_category_Asset_Ledger,
+     am_ad_category."gl_account" AS am_ad_category_gl_account,
+     ST_STOCK."dep_end_date" AS am_Asset_dep_end_date,
+     ST_STOCK."effective_date" AS am_Asset_effective_date,
+     ST_STOCK."Posting_Date" AS am_Asset_Posting_Date,
+     am_ad_department."Dept_name" AS am_ad_department_Dept_name,
+     am_ad_section."Section_Name" AS am_ad_section_Section_Name,
+     ST_STOCK."QUANTITY" AS ST_STOCK_QUANTITY,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     am_gb_assetMake."AssetMake" AS am_gb_assetMake_AssetMake,
+     am_ad_vendor_A."Vendor_Name" AS am_ad_vendor_A_Vendor_Name,
+     ST_STOCK."Branch_ID" AS am_Asset_Branch_ID,
+     ST_STOCK."Dept_ID" AS am_Asset_Dept_ID,
+     ST_STOCK."Category_ID" AS am_Asset_Category_ID,
+     ST_STOCK."Section_id" AS am_Asset_Section_id,
+     ST_STOCK."Vendor_AC" AS am_Asset_Vendor_AC,
+     ST_STOCK."Dep_Rate" AS am_Asset_Dep_Rate,
+     ST_STOCK."Asset_Make" AS am_Asset_Asset_Make,
+     ST_STOCK."Supplier_Name" AS am_Asset_Supplier_Name,
+     ST_STOCK."Asset_Maintenance" AS am_Asset_Asset_Maintenance,
+     ST_STOCK."Residual_Value" AS am_Asset_Residual_Value,
+     ST_STOCK."Authorized_By" AS am_Asset_Authorized_By,
+     ST_STOCK."Wh_Tax" AS am_Asset_Wh_Tax,
+     ST_STOCK."Wh_Tax_Amount" AS am_Asset_Wh_Tax_Amount,
+     ST_STOCK."Req_Redistribution" AS am_Asset_Req_Redistribution,
+     ST_STOCK."Useful_Life" AS am_Asset_Useful_Life,
+     ST_STOCK."Total_Life" AS am_Asset_Total_Life,
+     ST_STOCK."Location" AS am_Asset_Location,
+     ST_STOCK."Remaining_Life" AS am_Asset_Remaining_Life,
+     ST_STOCK."Vatable_Cost" AS am_Asset_Vatable_Cost,
+     ST_STOCK."Vat" AS am_Asset_Vat,
+     ST_STOCK."Req_Depreciation" AS am_Asset_Req_Depreciation,
+     ST_STOCK."Subject_TO_Vat" AS am_Asset_Subject_TO_Vat,
+     ST_STOCK."Who_TO_Rem" AS am_Asset_Who_TO_Rem,
+     ST_STOCK."Email1" AS am_Asset_Email1,
+     ST_STOCK."Who_To_Rem_2" AS am_Asset_Who_To_Rem_2,
+     ST_STOCK."Email2" AS am_Asset_Email2,
+     ST_STOCK."Raise_Entry" AS am_Asset_Raise_Entry,
+     ST_STOCK."Dep_Ytd" AS am_Asset_Dep_Ytd,
+     ST_STOCK."Section" AS am_Asset_Section,
+     ST_STOCK."Asset_Status" AS am_Asset_Asset_Status,
+     ST_STOCK."State" AS am_Asset_State,
+     ST_STOCK."Driver" AS am_Asset_Driver,
+     ST_STOCK."User_ID" AS am_Asset_User_ID,
+     ST_STOCK."Date_Disposed" AS am_Asset_Date_Disposed,
+     ST_STOCK."PROVINCE" AS am_Asset_PROVINCE,
+     ST_STOCK."Multiple" AS am_Asset_Multiple,
+     ST_STOCK."WAR_START_DATE" AS am_Asset_WAR_START_DATE,
+     ST_STOCK."WAR_MONTH" AS am_Asset_WAR_MONTH,
+     ST_STOCK."WAR_EXPIRY_DATE" AS am_Asset_WAR_EXPIRY_DATE,
+     ST_STOCK."Last_Dep_Date" AS am_Asset_Last_Dep_Date,
+     ST_STOCK."BRANCH_CODE" AS am_Asset_BRANCH_CODE,
+     ST_STOCK."SECTION_CODE" AS am_Asset_SECTION_CODE,
+     ST_STOCK."DEPT_CODE" AS am_Asset_DEPT_CODE,
+     ST_STOCK."CATEGORY_CODE" AS am_Asset_CATEGORY_CODE,
+     ST_STOCK."AMOUNT_PTD" AS am_Asset_AMOUNT_PTD,
+     ST_STOCK."AMOUNT_REM" AS am_Asset_AMOUNT_REM,
+     ST_STOCK."PART_PAY" AS am_Asset_PART_PAY,
+     ST_STOCK."FULLY_PAID" AS am_Asset_FULLY_PAID,
+     ST_STOCK."GROUP_ID" AS am_Asset_GROUP_ID,
+     ST_STOCK."BAR_CODE" AS am_Asset_BAR_CODE,
+     ST_STOCK."SBU_CODE" AS am_Asset_SBU_CODE,
+     ST_STOCK."LPO" AS am_Asset_LPO,
+     ST_STOCK."supervisor" AS am_Asset_supervisor,
+     ST_STOCK."defer_pay" AS am_Asset_defer_pay,
+     ST_STOCK."OLD_ASSET_ID" AS am_Asset_OLD_ASSET_ID,
+     ST_STOCK."WHT_PERCENT" AS am_Asset_WHT_PERCENT,
+     ST_STOCK."Post_reject_reason" AS am_Asset_Post_reject_reason,
+     ST_STOCK."Finacle_Posted_Date" AS am_Asset_Finacle_Posted_Date,
+     ST_STOCK."system_ip" AS am_Asset_system_ip,
+     ST_STOCK."mac_address" AS am_Asset_mac_address,
+     ST_STOCK."asset_code" AS am_Asset_asset_code,
+     ST_STOCK."memo" AS am_Asset_memo,
+     ST_STOCK."memovalue" AS am_Asset_memovalue,
+     ST_STOCK."IMPROV_COST" AS am_Asset_IMPROV_COST,
+     ST_STOCK."IMPROV_ACCUMDEP" AS am_Asset_IMPROV_ACCUMDEP,
+     ST_STOCK."IMPROV_MONTHLYDEP" AS am_Asset_IMPROV_MONTHLYDEP,
+     ST_STOCK."IMPROV_NBV" AS am_Asset_IMPROV_NBV,
+     ST_STOCK."TOTAL_NBV" AS am_Asset_TOTAL_NBV,
+     Sbu_SetUp."Sbu_name" AS Sbu_SetUp_Sbu_name,
+     AM_GB_LOCATION."location" AS AM_GB_LOCATION_location,
+     am_gb_states."state_name" AS am_gb_states_state_name
+FROM
+     "dbo"."am_ad_branch" am_ad_branch INNER JOIN "dbo"."ST_STOCK" ST_STOCK ON am_ad_branch."BRANCH_CODE" = ST_STOCK."BRANCH_CODE"
+     INNER JOIN "dbo"."am_ad_category" am_ad_category ON ST_STOCK."CATEGORY_CODE" = am_ad_category."category_code"
+     LEFT OUTER JOIN "dbo"."am_ad_department" am_ad_department ON ST_STOCK."BRANCH_CODE" = am_ad_department."Dept_code"
+     LEFT OUTER JOIN "dbo"."am_ad_section" am_ad_section ON ST_STOCK."SECTION_CODE" = am_ad_section."Section_Code"
+     LEFT OUTER JOIN "dbo"."am_gb_assetMake" am_gb_assetMake ON ST_STOCK."asset_make" = am_gb_assetMake."AssetMake_ID"
+     LEFT OUTER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON ST_STOCK."supplier_name" = am_ad_vendor."Vendor_ID"
+     LEFT OUTER JOIN "dbo"."Sbu_SetUp" Sbu_SetUp ON ST_STOCK."SBU_CODE" = Sbu_SetUp."Sbu_code"
+     LEFT OUTER JOIN "dbo"."AM_GB_LOCATION" AM_GB_LOCATION ON ST_STOCK."location" = AM_GB_LOCATION."Location_Id"
+     LEFT OUTER JOIN "dbo"."am_gb_states" am_gb_states ON ST_STOCK."state" = am_gb_states."State_Id"
+     LEFT OUTER JOIN "dbo"."am_ad_vendor" am_ad_vendor_A ON ST_STOCK."asset_maintenance" = am_ad_vendor_A."Vendor_ID",
+     "dbo"."am_gb_company" am_gb_company
+WHERE
+     am_ad_branch."BRANCH_CODE" = st_stock."BRANCH_CODE"
+     and (st_stock."Asset_Status" = 'ACTIVE' or st_stock."Asset_Status" = 'APPROVED')
+ $P!{filterClause}
+ORDER BY
+     ST_STOCK."BRANCH_CODE" ASC,
+     ST_STOCK."CATEGORY_CODE" ASC]]>
+	</queryString>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_Asset_Asset_id" class="java.lang.String"/>
+	<field name="am_Asset_Description" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_ad_category_category_name" class="java.lang.String"/>
+	<field name="am_Asset_Accum_dep" class="java.math.BigDecimal"/>
+	<field name="am_Asset_monthly_dep" class="java.math.BigDecimal"/>
+	<field name="am_Asset_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="am_Asset_NBV" class="java.math.BigDecimal"/>
+	<field name="am_Asset_Date_purchased" class="java.sql.Timestamp"/>
+	<field name="am_ad_category_Dep_rate" class="java.math.BigDecimal"/>
+	<field name="am_ad_category_Accum_Dep_ledger" class="java.lang.String"/>
+	<field name="am_ad_category_Dep_ledger" class="java.lang.String"/>
+	<field name="am_ad_category_Asset_Ledger" class="java.lang.String"/>
+	<field name="am_ad_category_gl_account" class="java.lang.String"/>
+	<field name="am_Asset_dep_end_date" class="java.sql.Timestamp"/>
+	<field name="am_Asset_effective_date" class="java.sql.Timestamp"/>
+	<field name="am_Asset_Posting_Date" class="java.sql.Timestamp"/>
+	<field name="am_ad_department_Dept_name" class="java.lang.String"/>
+	<field name="am_ad_section_Section_Name" class="java.lang.String"/>
+	<field name="ST_STOCK_QUANTITY" class="java.lang.Integer"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="am_gb_assetMake_AssetMake" class="java.lang.String"/>
+	<field name="am_ad_vendor_A_Vendor_Name" class="java.lang.String"/>
+	<field name="am_Asset_Branch_ID" class="java.lang.Integer"/>
+	<field name="am_Asset_Dept_ID" class="java.lang.Integer"/>
+	<field name="am_Asset_Category_ID" class="java.lang.Integer"/>
+	<field name="am_Asset_Section_id" class="java.lang.Integer"/>
+	<field name="am_Asset_Vendor_AC" class="java.lang.String"/>
+	<field name="am_Asset_Dep_Rate" class="java.math.BigDecimal"/>
+	<field name="am_Asset_Asset_Make" class="java.lang.String"/>
+	<field name="am_Asset_Supplier_Name" class="java.lang.Integer"/>
+	<field name="am_Asset_Asset_Maintenance" class="java.lang.Integer"/>
+	<field name="am_Asset_Residual_Value" class="java.math.BigDecimal"/>
+	<field name="am_Asset_Authorized_By" class="java.lang.String"/>
+	<field name="am_Asset_Wh_Tax" class="java.lang.String"/>
+	<field name="am_Asset_Wh_Tax_Amount" class="java.math.BigDecimal"/>
+	<field name="am_Asset_Req_Redistribution" class="java.lang.String"/>
+	<field name="am_Asset_Useful_Life" class="java.lang.Integer"/>
+	<field name="am_Asset_Total_Life" class="java.lang.Integer"/>
+	<field name="am_Asset_Location" class="java.lang.Integer"/>
+	<field name="am_Asset_Remaining_Life" class="java.lang.Integer"/>
+	<field name="am_Asset_Vatable_Cost" class="java.math.BigDecimal"/>
+	<field name="am_Asset_Vat" class="java.math.BigDecimal"/>
+	<field name="am_Asset_Req_Depreciation" class="java.lang.String"/>
+	<field name="am_Asset_Subject_TO_Vat" class="java.lang.String"/>
+	<field name="am_Asset_Who_TO_Rem" class="java.lang.String"/>
+	<field name="am_Asset_Email1" class="java.lang.String"/>
+	<field name="am_Asset_Who_To_Rem_2" class="java.lang.String"/>
+	<field name="am_Asset_Email2" class="java.lang.String"/>
+	<field name="am_Asset_Raise_Entry" class="java.lang.String"/>
+	<field name="am_Asset_Dep_Ytd" class="java.math.BigDecimal"/>
+	<field name="am_Asset_Section" class="java.lang.String"/>
+	<field name="am_Asset_Asset_Status" class="java.lang.String"/>
+	<field name="am_Asset_State" class="java.lang.Integer"/>
+	<field name="am_Asset_Driver" class="java.lang.Integer"/>
+	<field name="am_Asset_User_ID" class="java.lang.Integer"/>
+	<field name="am_Asset_Date_Disposed" class="java.sql.Timestamp"/>
+	<field name="am_Asset_PROVINCE" class="java.lang.Integer"/>
+	<field name="am_Asset_Multiple" class="java.lang.String"/>
+	<field name="am_Asset_WAR_START_DATE" class="java.sql.Timestamp"/>
+	<field name="am_Asset_WAR_MONTH" class="java.lang.Integer"/>
+	<field name="am_Asset_WAR_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="am_Asset_Last_Dep_Date" class="java.sql.Timestamp"/>
+	<field name="am_Asset_BRANCH_CODE" class="java.lang.String"/>
+	<field name="am_Asset_SECTION_CODE" class="java.lang.String"/>
+	<field name="am_Asset_DEPT_CODE" class="java.lang.String"/>
+	<field name="am_Asset_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="am_Asset_AMOUNT_PTD" class="java.math.BigDecimal"/>
+	<field name="am_Asset_AMOUNT_REM" class="java.math.BigDecimal"/>
+	<field name="am_Asset_PART_PAY" class="java.lang.String"/>
+	<field name="am_Asset_FULLY_PAID" class="java.lang.String"/>
+	<field name="am_Asset_GROUP_ID" class="java.lang.Long"/>
+	<field name="am_Asset_BAR_CODE" class="java.lang.String"/>
+	<field name="am_Asset_SBU_CODE" class="java.lang.String"/>
+	<field name="am_Asset_LPO" class="java.lang.String"/>
+	<field name="am_Asset_supervisor" class="java.lang.String"/>
+	<field name="am_Asset_defer_pay" class="java.lang.String"/>
+	<field name="am_Asset_OLD_ASSET_ID" class="java.lang.String"/>
+	<field name="am_Asset_WHT_PERCENT" class="java.lang.Integer"/>
+	<field name="am_Asset_Post_reject_reason" class="java.lang.String"/>
+	<field name="am_Asset_Finacle_Posted_Date" class="java.sql.Timestamp"/>
+	<field name="am_Asset_system_ip" class="java.lang.String"/>
+	<field name="am_Asset_mac_address" class="java.lang.String"/>
+	<field name="am_Asset_asset_code" class="java.lang.Integer"/>
+	<field name="am_Asset_memo" class="java.lang.String"/>
+	<field name="am_Asset_memovalue" class="java.lang.String"/>
+	<field name="am_Asset_IMPROV_COST" class="java.math.BigDecimal"/>
+	<field name="am_Asset_IMPROV_ACCUMDEP" class="java.math.BigDecimal"/>
+	<field name="am_Asset_IMPROV_MONTHLYDEP" class="java.math.BigDecimal"/>
+	<field name="am_Asset_IMPROV_NBV" class="java.math.BigDecimal"/>
+	<field name="am_Asset_TOTAL_NBV" class="java.math.BigDecimal"/>
+	<field name="Sbu_SetUp_Sbu_name" class="java.lang.String"/>
+	<field name="AM_GB_LOCATION_location" class="java.lang.String"/>
+	<field name="am_gb_states_state_name" class="java.lang.String"/>
+	<sortField name="am_ad_branch_BRANCH_NAME"/>
+	<sortField name="am_ad_category_category_name"/>
+	<variable name="Total_Mon_Depr" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_Asset_monthly_dep}]]></variableExpression>
+	</variable>
+	<variable name="Total_Accum_Dep" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_Asset_Accum_dep}]]></variableExpression>
+	</variable>
+	<variable name="Total_NBV" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_Asset_NBV}]]></variableExpression>
+	</variable>
+	<variable name="Total_Cost_Price" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_Asset_Cost_Price}]]></variableExpression>
+	</variable>
+	<variable name="Record_Number" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Count">
+		<variableExpression><![CDATA[$F{am_Asset_Asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Month_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_Asset_monthly_dep}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Cost_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_Asset_Cost_Price}]]></variableExpression>
+	</variable>
+	<variable name="Branch_NBV_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_Asset_NBV}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Accum_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_Asset_Accum_dep}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Record_No" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Count">
+		<variableExpression><![CDATA[$F{am_Asset_Asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Total_Record" class="java.lang.Integer" resetType="Column" incrementType="Column" calculation="Count">
+		<variableExpression><![CDATA[$F{am_Asset_Asset_id}]]></variableExpression>
+		<initialValueExpression><![CDATA[$V{Total_Record}]]></initialValueExpression>
+	</variable>
+	<group name="am_ad_branch_BRANCH_NAME">
+		<groupExpression><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></groupExpression>
+	</group>
+	<group name="am_ad_category_category_name">
+		<groupExpression><![CDATA[$F{am_ad_category_category_name}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText-13" x="0" y="1" width="119" height="16" printWhenGroupChanges="am_ad_category_category_name"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset Id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-14" x="119" y="1" width="250" height="16" printWhenGroupChanges="am_ad_category_category_name"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-23" x="609" y="1" width="96" height="16" printWhenGroupChanges="am_ad_category_category_name"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Purch.   Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-25" x="703" y="1" width="88" height="16" printWhenGroupChanges="am_ad_category_category_name"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="3363" y="1" width="109" height="16"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[BarCode/Vehicle No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="3792" y="-1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="4119" y="-1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[LPO Number
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="489" y="0" width="121" height="17" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Category Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="369" y="0" width="120" height="17" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Branch Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-25" x="791" y="-1" width="88" height="16" printWhenGroupChanges="am_ad_category_category_name"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Cost Price]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement key="textField" x="1" y="0" width="118" height="20" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Asset_Asset_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement key="textField" x="119" y="0" width="250" height="20" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Asset_Description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField" x="703" y="0" width="88" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{ST_STOCK_QUANTITY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-31" x="609" y="0" width="96" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{am_Asset_Date_purchased}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="1947" y="0" width="109" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Asset_BAR_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="3792" y="0" width="109" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{AM_GB_LOCATION_location}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="4119" y="0" width="109" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Asset_LPO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField-33" x="489" y="0" width="121" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_category_category_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField-33" x="369" y="0" width="120" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField" x="791" y="0" width="88" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{am_Asset_Cost_Price}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

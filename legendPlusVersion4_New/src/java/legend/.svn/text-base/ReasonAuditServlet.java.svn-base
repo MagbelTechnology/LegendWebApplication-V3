@@ -1,0 +1,175 @@
+package legend;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import com.magbel.util.Cryptomanager;
+import javax.servlet.ServletConfig;
+import java.io.PrintWriter;
+import javax.servlet.http.HttpServletResponse;
+import audit.*;
+
+/**
+ * <p>
+ * Title:
+ * </p>
+ * 
+ * <p>
+ * Description:
+ * </p>
+ * 
+ * <p>
+ * Copyright: Copyright (c) 2006
+ * </p>
+ * 
+ * <p>
+ * Disposal:
+ * </p>
+ * 
+ * @author not attributable
+ * @version 1.0
+ */
+public class ReasonAuditServlet extends HttpServlet {
+	public ReasonAuditServlet() {
+	}
+
+	/**
+	 * Initializes the servlet.
+	 * 
+	 * @param config
+	 *            ServletConfig
+	 * @throws ServletException
+	 */
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+	}
+
+	/**
+	 * Destroys the servlet.
+	 */
+	public void destroy() {
+
+	}
+
+	/**
+	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+	 * methods.
+	 * 
+	 * @param request
+	 *            servlet request
+	 * @param response
+	 *            servlet response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void service(HttpServletRequest request, HttpServletResponse response) throws
+            ServletException, IOException {
+
+        response.setContentType("text/html");
+        response.setDateHeader("Expires", -1);
+
+        HttpSession session = request.getSession();
+        PrintWriter out = response.getWriter();
+
+        // String type = request.getParameter("TYPE");
+
+        // java.sql.Date dt = new java.sql.Date();
+        AuditTrailGen  audit = new AuditTrailGen();
+        // java.text.SimpleDateFormat sdf = new
+		// java.text.SimpleDateFormat("dd/mm/yyyy");
+		String statusMessage = "";
+		boolean updtst = false;
+        // String loginId = request.getParameter("loginId");
+			int loginID;
+		 String loginId = (String)session.getAttribute("CurrentUser");
+		 if(loginId == null) {  loginID = 0; }
+			else { loginID = Integer.parseInt(loginId);	}
+		
+		
+		String branchcode = (String)session.getAttribute("UserCenter");
+		if(branchcode == null) { branchcode = "not set";	}
+
+        Cryptomanager cm = new Cryptomanager();
+
+        String reasonId = request.getParameter("reasonId");
+
+       legend.admin.handlers.CompanyHandler ch = new legend.admin.handlers.CompanyHandler();
+
+        String buttSave = request.getParameter("buttSave");
+         
+    	 String reasonCode = request.getParameter("reasonCode");
+    	 String description = request.getParameter("reasonDesc");
+    	 String reasonStatus =  request.getParameter("reasonStatus");
+    	 String userId =  (String)session.getAttribute("CurrentUser");
+           
+    	 legend.admin.objects.DisposableReasons dispose = new legend.admin.objects.DisposableReasons();
+             dispose.setReasonCode(reasonCode) ;
+             dispose.setDescription(description);
+             dispose.setReasonStatus(reasonStatus);
+             dispose.setUserId(userId);
+
+        
+        try{
+            
+            if(buttSave != null)
+				{
+				 if (reasonId.equals("")) 
+					{
+					 if(ch.getDisposableReasonsByReasonCode(reasonCode)!=null)
+					 {
+						 out.print("<script>alert('Reason Code is in Use')</script>");
+						 out.print("<script>history.go(-1)</script>");
+					 }
+					 else
+					 {
+                     if (ch.createDisposableReasons(dispose))
+						{
+							// statusMessage = "Record saved successfully";
+							out.print("<script>alert('Record saved successfully.')</script>");
+							out.print("<script>window.location = 'disposalReasons.jsp?reasonId="+ch.getDisposableReasonsByReasonCode(reasonCode).getReasonId()+"'</script>");
+						}
+					 else
+						{
+						 System.out.println("Error saving record: New record \nfor 'disposal reason'  with reason code "+dispose.getReasonCode()+" could not be created"); 
+						out.print("<script>history.go(-1)</script>");
+						}
+					} 
+					}
+				 else if (!reasonId.equals(""))
+					{
+
+					 dispose.setReasonId(reasonId);
+						audit.select( 1, "SELECT * FROM  AM_AD_DISPOSALREASONS   WHERE reason_Id = '"+ reasonId+"'");
+						boolean isupdt = ch.updateDisposableReasons(dispose);
+						audit.select( 2, "SELECT * FROM  AM_AD_DISPOSALREASONS   WHERE reason_Id = '"+ reasonId +"'");
+						updtst = audit.logAuditTrail("AM_AD_DISPOSALREASONS" ,  branchcode, loginID, reasonId);
+						   if(updtst == true)
+							{
+								// statusMessage = "Update on record is
+								// successfull";
+								out.print("<script>alert('Update on record is successfull')</script>");
+								out.print("<script>window.location = 'disposalReasons.jsp?reasonId="+reasonId+"'</script>");
+								// out.print("<script>window.location =
+								// 'manageBranchs.jsp?status=A'</script>");
+							}
+						else 
+								{
+								// statusMessage = "No changes made on record";
+								 out.print("<script>alert('No changes made on record')</script>");
+								 out.print("<script>window.location = 'disposalReasons.jsp?reasonId="+reasonId+"'</script>");
+								}
+					}
+				}
+			}
+			catch(Throwable e)
+			{
+				e.printStackTrace();
+				// statusMessage = "Ensure unique record entry";
+				out.print("<script>alert('Ensure unique record entry.')</script>");
+				out.print("<script>window.location = 'disposalReasons.jsp?reasonId="+reasonId+"'</script>");
+				System.err.print(e.getMessage());
+			}
+    }
+}

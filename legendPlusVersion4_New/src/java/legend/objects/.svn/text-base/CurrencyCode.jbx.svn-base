@@ -1,0 +1,15 @@
+[PropertyInfo]
+currency_id,String,false,false,currency_id,currency_id,true,<default>
+iso_code,String,false,false,iso_code,iso_code,true,<default>
+currency_symbol,String,false,false,currency_symbol,currency_symbol,true,<default>
+description,String,false,false,description,description,true,<default>
+status,String,false,false,status,status,true,<default>
+create_dt,String,false,false,create_dt,create_dt,true,<default>
+local_currency,String,false,false,local_currency,local_currency,true,<default>
+user_id,String,false,false,user_id,user_id,true,<default>
+mtid,String,false,false,mtid,mtid,true,<default>
+[IconNames]
+
+
+
+

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Fixed_Asset_Schedule_SubReport2"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="842"
+		 pageHeight="595"
+		 columnWidth="782"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="2" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<queryString><![CDATA[SELECT
+     fixed_asset_schedule."class_code" AS fixed_asset_schedule_class_code,
+     fixed_asset_schedule."start_date" AS fixed_asset_schedule_start_date,
+     fixed_asset_schedule."end_date" AS fixed_asset_schedule_end_date,
+     fixed_asset_schedule."class_name" AS fixed_asset_schedule_class_name,
+     fixed_asset_schedule."cost_open_bal" AS fixed_asset_schedule_cost_open_bal,
+     fixed_asset_schedule."cost_disposal" AS fixed_asset_schedule_cost_disposal,
+     fixed_asset_schedule."cost_additions" AS fixed_asset_schedule_cost_additions,
+     fixed_asset_schedule."cost_reclass" AS fixed_asset_schedule_cost_reclass,
+     fixed_asset_schedule."dep_open_bal" AS fixed_asset_schedule_dep_open_bal,
+     fixed_asset_schedule."dep_charge" AS fixed_asset_schedule_dep_charge,
+     fixed_asset_schedule."dep_disposal" AS fixed_asset_schedule_dep_disposal,
+     fixed_asset_schedule."dep_reclass" AS fixed_asset_schedule_dep_reclass,
+     fixed_asset_schedule."revaluation" AS fixed_asset_schedule_revaluation,
+     fixed_asset_schedule."improvement" AS fixed_asset_schedule_improvement,
+     fixed_asset_schedule."nbv_open_bal" AS fixed_asset_schedule_nbv_open_bal,
+     fixed_asset_schedule."nbv_closing_bal" AS fixed_asset_schedule_nbv_closing_bal
+FROM
+     "dbo"."fixed_asset_schedule" fixed_asset_schedule]]></queryString>
+
+	<field name="fixed_asset_schedule_class_code" class="java.lang.String"/>
+	<field name="fixed_asset_schedule_start_date" class="java.sql.Timestamp"/>
+	<field name="fixed_asset_schedule_end_date" class="java.sql.Timestamp"/>
+	<field name="fixed_asset_schedule_class_name" class="java.lang.String"/>
+	<field name="fixed_asset_schedule_cost_open_bal" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_cost_disposal" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_cost_additions" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_cost_reclass" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_dep_open_bal" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_dep_charge" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_dep_disposal" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_dep_reclass" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_revaluation" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_improvement" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_nbv_open_bal" class="java.math.BigDecimal"/>
+	<field name="fixed_asset_schedule_nbv_closing_bal" class="java.math.BigDecimal"/>
+
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="100"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="140"
+						y="20"
+						width="123"
+						height="22"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="280"
+						y="18"
+						width="139"
+						height="24"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{Field}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<lastPageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</lastPageFooter>
+		<summary>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

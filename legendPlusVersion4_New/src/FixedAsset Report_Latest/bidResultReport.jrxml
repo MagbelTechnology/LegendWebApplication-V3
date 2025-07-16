@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bidResultReport" language="groovy" pageWidth="1315" pageHeight="842" columnWidth="1295" leftMargin="0" rightMargin="20" topMargin="0" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filter" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select BID_CODE,BID_TAG,STAFFID,COALESCE(FIRST_NAME,'')+'  '+COALESCE(SUR_NAME,'') AS STAFF_NAME,Asset_Status,Description,Bid_Date,Bid_Title,max(bid_Value) Bid_Value,BASE_PRICE,
+1 AS QUANTITY from AM_BID_RESULT where asset_id = asset_id
+ $P!{filter}]]>
+	</queryString>
+	<field name="BID_CODE" class="java.lang.String"/>
+	<field name="BID_TAG" class="java.lang.String"/>
+	<field name="STAFFID" class="java.lang.String"/>
+	<field name="STAFF_NAME" class="java.lang.String"/>
+	<field name="Asset_Status" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="Bid_Date" class="java.sql.Timestamp"/>
+	<field name="Bid_Title" class="java.lang.String"/>
+	<field name="Bid_Value" class="java.math.BigDecimal"/>
+	<field name="BASE_PRICE" class="java.math.BigDecimal"/>
+	<field name="QUANTITY" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="272" height="20"/>
+				<textElement/>
+				<text><![CDATA[ASSET BID RESULT  PROCESSED ON]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="272" y="0" width="170" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Bid_Date}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="46" y="1" width="79" height="19"/>
+				<textElement/>
+				<text><![CDATA[STAFFID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="1" width="147" height="19"/>
+				<textElement/>
+				<text><![CDATA[STAFF_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="272" y="1" width="87" height="19"/>
+				<textElement/>
+				<text><![CDATA[BID_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="359" y="1" width="83" height="19"/>
+				<textElement/>
+				<text><![CDATA[BID_TAG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="442" y="1" width="52" height="19"/>
+				<textElement/>
+				<text><![CDATA[QUANTITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="494" y="1" width="85" height="19"/>
+				<textElement/>
+				<text><![CDATA[BASE_PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="579" y="1" width="88" height="19"/>
+				<textElement/>
+				<text><![CDATA[Bid_Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="1" width="46" height="19"/>
+				<textElement/>
+				<text><![CDATA[S/No.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="46" y="1" width="79" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{STAFFID}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="125" y="1" width="147" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{STAFF_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="272" y="1" width="87" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BID_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="359" y="1" width="83" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BID_TAG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="442" y="1" width="52" height="19"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{QUANTITY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="494" y="1" width="85" height="19"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{BASE_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="579" y="1" width="88" height="19"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Bid_Value}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="1" width="46" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

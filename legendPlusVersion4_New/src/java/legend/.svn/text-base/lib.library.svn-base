@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+<!--JBuilder Library Definition File-->
+<fullname>lib</fullname>
+<class>
+<path>[lib/servlet-api.jar]</path>
+<path>[lib/sqljdbc.jar]</path>
+<path>[lib/JTwain.jar]</path>
+<path>[lib/mssql9-driver.jar]</path>
+<path>[lib/jxl.jar]</path>
+<path>[lib/opens-library.jar]</path>
+</class>
+<lastmodsaved>1159716182609</lastmodsaved>
+</library>

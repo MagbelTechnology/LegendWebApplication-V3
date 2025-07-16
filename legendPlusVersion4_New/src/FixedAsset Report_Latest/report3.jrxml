@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report3" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="initiatorName" class="java.lang.String"/>
+	<field name="supervisorName" class="java.lang.String"/>
+	<field name="asset_id" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_gb_User_User_Name" class="java.lang.String"/>
+	<field name="am_gb_User_Full_Name" class="java.lang.String"/>
+	<field name="CREDITNGN" class="java.lang.String"/>
+	<field name="DEBITNGN" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_Description" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_creditAccount" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_debitAccountName" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_debitAccount" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_creditAccountName" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_amount" class="java.math.BigDecimal"/>
+	<field name="am_Raisentry_Transaction_iso" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_transaction_date" class="java.sql.Timestamp"/>
+	<field name="am_Raisentry_Transaction_asset_id" class="java.lang.String"/>
+	<field name="am_gb_User_User_id" class="java.lang.Integer"/>
+	<field name="am_Error_Description_Description" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_page1" class="java.lang.String"/>
+	<field name="INTEGRIFY_ID" class="java.lang.String"/>
+	<field name="POSTED_BY" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_CODE" class="java.lang.String"/>
+	<field name="Trans_id" class="java.lang.String"/>
+	<field name="initiatorId" class="java.lang.Integer"/>
+	<field name="supervisorId" class="java.lang.Integer"/>
+	<field name="User_id" class="java.lang.Integer"/>
+	<field name="User_Name" class="java.lang.String"/>
+	<field name="Full_Name" class="java.lang.String"/>
+	<field name="Legacy_Sys_id" class="java.lang.String"/>
+	<field name="Class" class="java.lang.String"/>
+	<field name="Branch" class="java.lang.Integer"/>
+	<field name="Password" class="java.lang.String"/>
+	<field name="Phone_No" class="java.lang.String"/>
+	<field name="is_supervisor" class="java.lang.String"/>
+	<field name="must_change_pwd" class="java.lang.String"/>
+	<field name="Login_Status" class="java.lang.String"/>
+	<field name="User_Status" class="java.lang.String"/>
+	<field name="UserId" class="java.lang.Integer"/>
+	<field name="Create_Date" class="java.sql.Timestamp"/>
+	<field name="password_changed" class="java.lang.String"/>
+	<field name="password_expiry" class="java.sql.Timestamp"/>
+	<field name="login_date" class="java.sql.Timestamp"/>
+	<field name="Login_System" class="java.lang.String"/>
+	<field name="Fleet_admin" class="java.lang.String"/>
+	<field name="email" class="java.lang.String"/>
+	<field name="branch_restriction" class="java.lang.String"/>
+	<field name="Expiry_Days" class="java.math.BigDecimal"/>
+	<field name="Expiry_Date" class="java.sql.Timestamp"/>
+	<field name="approval_level" class="java.lang.String"/>
+	<field name="Approval_Limit" class="java.lang.String"/>
+	<field name="dept_code" class="java.lang.String"/>
+	<field name="token_required" class="java.lang.String"/>
+	<field name="dept_restriction" class="java.lang.String"/>
+	<field name="UnderTaker" class="java.lang.String"/>
+	<field name="is_StockAdministrator" class="java.lang.String"/>
+	<field name="is_Storekeeper" class="java.lang.String"/>
+	<field name="REGION_CODE" class="java.lang.String"/>
+	<field name="ZONE_CODE" class="java.lang.String"/>
+	<field name="REGION_RESTRICTION" class="java.lang.String"/>
+	<field name="ZONE_RESTRICTION" class="java.lang.String"/>
+	<field name="Facility_Admin" class="java.lang.String"/>
+	<field name="Store_Admin" class="java.lang.String"/>
+	<variable name="Record_Number" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

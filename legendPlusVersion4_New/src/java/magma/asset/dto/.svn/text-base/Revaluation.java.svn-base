@@ -1,0 +1,303 @@
+package magma.asset.dto;
+
+
+public class Revaluation {
+    private int revalueId;
+    private String assetId;
+    private double costIncrease;
+    private String revalueReason;
+    private String revalueDate;
+    private int userId;
+    private String raiseEntry;
+    private String revVendorAcct;
+    private double cost;
+    private double vatableCost;
+    private double vatAmt;
+    private double whtAmt;
+    private double nbv;
+    private double accumDep;
+    private double oldCost;
+    private double oldVatableCost;
+    private double oldVatAmt;
+    private double oldWhtAmt;
+    private double oldNbv;
+    private double oldAccumDep;
+    private String effDate;
+    private int branchId;
+    private int deptId;
+    private int categoryId;
+    private String regNo;
+    private String assetStatus;
+    private String description;
+    //private double cost;
+    private String assetUser;
+
+    public Revaluation(int revalueId, String assetId, double costIncrease,
+                       String revalueReason,
+                       String revalueDate, int userId, String raiseEntry,
+                       String revVendorAcct,
+                       double cost, double vatableCost, double vatAmt,
+                       double whtAmt, double nbv, double accumDep,
+                       double oldCost, double oldVatableCost, double oldVatAmt,
+                       double oldWhtAmt,
+                       double oldNbv, double oldAccumDep, String effDate,
+                       int branchId, int deptId,
+                       int categoryId, String regNo, String desc,
+                       String assetUser, String assetStatus) {
+        setRevalueId(revalueId);
+        setAssetId(assetId);
+        setCostIncrease(costIncrease);
+        setRevalueReason(revalueReason);
+        setRevalueDate(revalueDate);
+        setUserId(userId);
+        setRaiseEntry(raiseEntry);
+        setRevVendorAcct(revVendorAcct);
+        setCost(cost);
+        setVatableCost(vatableCost);
+        setVatAmt(vatAmt);
+        setWhtAmt(whtAmt);
+        setNbv(nbv);
+        setAccumDep(accumDep);
+        setOldCost(oldCost);
+        setOldVatableCost(oldVatableCost);
+        setOldVatAmt(oldVatAmt);
+        setOldWhtAmt(oldWhtAmt);
+        setOldNbv(oldNbv);
+        setOldAccumDep(oldAccumDep);
+        setEffDate(effDate);
+        setBranchId(branchId);
+        setDeptId(deptId);
+        setCategoryId(categoryId);
+        setRegNo(regNo);
+        setDescription(desc);
+        //setCost(cost);
+        setAssetUser(assetUser);
+        setAssetStatus(assetStatus);
+
+    }
+
+    public int getRevalueId() {
+        return revalueId;
+    }
+
+    public void setRevalueId(int revalueId) {
+        this.revalueId = revalueId;
+    }
+
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
+    }
+
+    public double getCostIncrease() {
+        return costIncrease;
+    }
+
+    public void setCostIncrease(double costIncrease) {
+        this.costIncrease = costIncrease;
+    }
+
+    public String getRevalueReason() {
+        return revalueReason;
+    }
+
+    public void setRevalueReason(String revalueReason) {
+        this.revalueReason = revalueReason;
+    }
+
+    public String getRevalueDate() {
+        return revalueDate;
+    }
+
+    public void setRevalueDate(String revalueDate) {
+        this.revalueDate = revalueDate;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getRaiseEntry() {
+        return raiseEntry;
+    }
+
+    public void setRaiseEntry(String raiseEntry) {
+        this.raiseEntry = raiseEntry;
+    }
+
+    public String getRevVendorAcct() {
+        return revVendorAcct;
+    }
+
+    public void setRevVendorAcct(String revVendorAcct) {
+        this.revVendorAcct = revVendorAcct;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
+    }
+
+    public double getVatableCost() {
+        return vatableCost;
+    }
+
+    public void setVatableCost(double vatableCost) {
+        this.vatableCost = vatableCost;
+    }
+
+    public double getVatAmt() {
+        return vatAmt;
+    }
+
+    public void setVatAmt(double vatAmt) {
+        this.vatAmt = vatAmt;
+    }
+
+    public double getWhtAmt() {
+        return whtAmt;
+    }
+
+    public void setWhtAmt(double whtAmt) {
+        this.whtAmt = whtAmt;
+    }
+
+    public double getNbv() {
+        return nbv;
+    }
+
+    public void setNbv(double nbv) {
+        this.nbv = nbv;
+    }
+
+    public double getAccumDep() {
+        return accumDep;
+    }
+
+    public void setAccumDep(double accumDep) {
+        this.accumDep = accumDep;
+    }
+
+    public double getOldCost() {
+        return oldCost;
+    }
+
+    public void setOldCost(double oldCost) {
+        this.oldCost = oldCost;
+    }
+
+    public double getOldVatableCost() {
+        return oldVatableCost;
+    }
+
+    public void setOldVatableCost(double oldVatableCost) {
+        this.oldVatableCost = oldVatableCost;
+    }
+
+    public double getOldVatAmt() {
+        return oldVatAmt;
+    }
+
+    public void setOldVatAmt(double oldVatAmt) {
+        this.oldVatAmt = oldVatAmt;
+    }
+
+    public double getOldWhtAmt() {
+        return oldWhtAmt;
+    }
+
+    public void setOldWhtAmt(double oldWhtAmt) {
+        this.oldWhtAmt = oldWhtAmt;
+    }
+
+    public double getOldNbv() {
+        return oldNbv;
+    }
+
+    public void setOldNbv(double oldNbv) {
+        this.oldNbv = oldNbv;
+    }
+
+    public double getOldAccumDep() {
+        return oldAccumDep;
+    }
+
+    public void setOldAccumDep(double oldAccumDep) {
+        this.oldAccumDep = oldAccumDep;
+    }
+
+    public String getEffDate() {
+        return effDate;
+    }
+
+    public void setEffDate(String effDate) {
+        this.effDate = effDate;
+    }
+
+    public int getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(int branchId) {
+        this.branchId = branchId;
+    }
+
+    public int getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(int deptId) {
+        this.deptId = deptId;
+    }
+
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getRegNo() {
+        return regNo;
+    }
+
+    public void setRegNo(String regNo) {
+        this.regNo = regNo;
+    }
+
+    public String getAssetStatus() {
+        return assetStatus;
+    }
+
+    public void setAssetStatus(String assetStatus) {
+        this.assetStatus = assetStatus;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAssetUser() {
+        return assetUser;
+    }
+
+    public void setAssetUser(String assetUser) {
+        this.assetUser = assetUser;
+    }
+
+}

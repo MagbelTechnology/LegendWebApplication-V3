@@ -1,0 +1,43 @@
+9
+
+dir
+3
+http://192.168.0.2/svn/legend-repos/Legend/src/java/magma/net
+http://192.168.0.2/svn/legend-repos
+
+
+
+2009-04-07T17:55:30.125000Z
+3
+ganiyu
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+626f5ae3-11a5-694e-888f-b5191e30f6ef
+
+image
+dir
+
+dao
+dir
+
+vao
+dir
+
+manager
+dir
+
+report
+dir
+

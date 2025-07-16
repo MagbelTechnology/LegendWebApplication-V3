@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process
+END
+ApprovalLevelLimitActionUpdateServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process/ApprovalLevelLimitActionUpdateServlet.java
+END
+ApprovalServletLevel.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process/ApprovalServletLevel.java
+END
+ApprovalLevelActionUpdateServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process/ApprovalLevelActionUpdateServlet.java
+END
+MailActionServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process/MailActionServlet.java
+END
+ApprovalServletLimit.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process/ApprovalServletLimit.java
+END
+MailActionUpdateServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process/MailActionUpdateServlet.java
+END
+BranchSBUServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process/BranchSBUServlet.java
+END
+BranchSBUServlet2.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/process/BranchSBUServlet2.java
+END

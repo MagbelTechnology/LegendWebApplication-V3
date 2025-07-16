@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Xls_WIP_RECLASSIFICATION"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="842"
+		 pageHeight="595"
+		 columnWidth="782"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="filterClause" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="BaseDir" isForPrompting="true" class="java.io.File"/>
+	<queryString><![CDATA[SELECT
+     AM_WIP_RECLASSIFICATION."Asset_id" AS AM_WIP_RECLASSIFICATION_Asset_id,
+     AM_ASSET."Description" AS AM_ASSET_Description,
+     AM_ASSET."Cost_Price" AS AM_ASSET_Cost_Price,
+     AM_ASSET."Accum_Dep" AS AM_ASSET_Accum_Dep,
+     AM_ASSET."Monthly_Dep" AS AM_ASSET_Monthly_Dep,
+     AM_ASSET."NBV" AS AM_ASSET_NBV,
+     AM_ASSET."Date_purchased" AS AM_ASSET_Date_purchased,
+     AM_ASSET."Posting_Date" AS AM_ASSET_Posting_Date,
+     AM_ASSET."Effective_Date" AS AM_ASSET_Effective_Date,
+     AM_ASSET."BRANCH_CODE" AS AM_ASSET_BRANCH_CODE,
+     AM_ASSET."CATEGORY_CODE" AS AM_ASSET_CATEGORY_CODE,
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     AM_ASSET."Asset_id" AS AM_ASSET_Asset_id,
+     AM_ASSET."OLD_ASSET_ID" AS AM_ASSET_OLD_ASSET_ID,
+     am_ad_branch."BRANCH_NAME" AS am_ad_branch_BRANCH_NAME,
+     AM_ASSET."Asset_Status" AS AM_ASSET_Asset_Status
+FROM
+     "dbo"."AM_WIP_RECLASSIFICATION" AM_WIP_RECLASSIFICATION INNER JOIN "dbo"."am_ad_branch" am_ad_branch ON AM_WIP_RECLASSIFICATION."NEW_BRANCH_CODE" = am_ad_branch."BRANCH_CODE"
+     INNER JOIN "dbo"."AM_ASSET" AM_ASSET ON AM_WIP_RECLASSIFICATION."Asset_id" = AM_ASSET."OLD_ASSET_ID",
+     "dbo"."am_gb_company" am_gb_company
+where AM_ASSET."Asset_Status" = 'ACTIVE' $P!{filterClause}]]></queryString>
+
+	<field name="AM_WIP_RECLASSIFICATION_Asset_id" class="java.lang.String"/>
+	<field name="AM_ASSET_Description" class="java.lang.String"/>
+	<field name="AM_ASSET_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_Accum_Dep" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_NBV" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_Date_purchased" class="java.sql.Timestamp"/>
+	<field name="AM_ASSET_Posting_Date" class="java.sql.Timestamp"/>
+	<field name="AM_ASSET_Effective_Date" class="java.sql.Timestamp"/>
+	<field name="AM_ASSET_BRANCH_CODE" class="java.lang.String"/>
+	<field name="AM_ASSET_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="AM_ASSET_Asset_id" class="java.lang.String"/>
+	<field name="AM_ASSET_OLD_ASSET_ID" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="AM_ASSET_Asset_Status" class="java.lang.String"/>
+
+	<sortField name="am_ad_branch_BRANCH_NAME" />
+
+
+		<group  name="Branch" >
+			<groupExpression><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></groupExpression>
+			<groupHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="23"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="0"
+						y="1"
+						width="126"
+						height="22"
+						key="staticText-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<text><![CDATA[New Asset ID]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="126"
+						y="1"
+						width="116"
+						height="22"
+						key="staticText-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<text><![CDATA[Old Asset ID]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="242"
+						y="1"
+						width="193"
+						height="22"
+						key="staticText-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<text><![CDATA[Asset Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="435"
+						y="1"
+						width="75"
+						height="22"
+						key="staticText-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<text><![CDATA[Cost Price]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="510"
+						y="1"
+						width="90"
+						height="22"
+						key="staticText-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<text><![CDATA[Accum Depr.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="600"
+						y="1"
+						width="87"
+						height="22"
+						key="staticText-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<text><![CDATA[Monthly Depr.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="687"
+						y="1"
+						width="95"
+						height="22"
+						key="staticText-7"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<text><![CDATA[NBV]]></text>
+				</staticText>
+			</band>
+		</title>
+		<pageHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="23"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="1"
+						width="126"
+						height="22"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_ASSET_Asset_id}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="435"
+						y="1"
+						width="75"
+						height="22"
+						key="textField-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{AM_ASSET_Cost_Price}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="242"
+						y="1"
+						width="193"
+						height="22"
+						key="textField-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_ASSET_Description}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="126"
+						y="1"
+						width="116"
+						height="22"
+						key="textField-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_WIP_RECLASSIFICATION_Asset_id}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="510"
+						y="1"
+						width="90"
+						height="22"
+						key="textField-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{AM_ASSET_Accum_Dep}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="600"
+						y="1"
+						width="87"
+						height="22"
+						key="textField-7"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{AM_ASSET_Monthly_Dep}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="687"
+						y="1"
+						width="95"
+						height="22"
+						key="textField-8"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{AM_ASSET_NBV}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<lastPageFooter>
+			<band height="1"  isSplitAllowed="true" >
+			</band>
+		</lastPageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

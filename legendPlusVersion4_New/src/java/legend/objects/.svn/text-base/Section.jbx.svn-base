@@ -1,0 +1,13 @@
+[PropertyInfo]
+section_id,String,false,false,section_id,section_id,true,<default>
+section_code,String,false,false,section_code,section_code,true,<default>
+section_acromyn,String,false,false,section_acromyn,section_acromyn,true,<default>
+section_name,String,false,false,section_name,section_name,true,<default>
+glprefix,String,false,false,glprefix,glprefix,true,<default>
+section_status,String,false,false,section_status,section_status,true,<default>
+userid,String,false,false,userid,userid,true,<default>
+[IconNames]
+
+
+
+

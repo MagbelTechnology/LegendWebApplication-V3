@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AssetTagUpdate" language="groovy" pageWidth="1315" pageHeight="842" columnWidth="1295" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select MTID,OLD_TAG,NEW_TAG,a.USER_ID,ERROR_MESSAGE,d.BRANCH_CODE,e.CATEGORY_CODE,e.CATEGORY_NAME,c.Full_Name,DESCRIPTION,a.CREATE_DATE from AM_ASSET_UPDATE_TAG a, AM_ASSET b, AM_GB_USER c, am_ad_branch d, am_ad_category e
+WHERE a.OLD_TAG = b.BAR_CODE
+AND a.USER_ID = c.User_id
+AND b.Branch_ID = d.BRANCH_ID
+AND b.category_ID = e.category_ID]]>
+	</queryString>
+	<field name="MTID" class="java.lang.Integer"/>
+	<field name="OLD_TAG" class="java.lang.String"/>
+	<field name="NEW_TAG" class="java.lang.String"/>
+	<field name="USER_ID" class="java.lang.String"/>
+	<field name="ERROR_MESSAGE" class="java.lang.String"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="CATEGORY_CODE" class="java.lang.String"/>
+	<field name="CATEGORY_NAME" class="java.lang.String"/>
+	<field name="Full_Name" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="CREATE_DATE" class="java.sql.Timestamp"/>
+	<variable name="recordCount" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{MTID}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="67" height="22"/>
+				<textElement/>
+				<text><![CDATA[S/No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="809" y="0" width="128" height="22"/>
+				<textElement/>
+				<text><![CDATA[Old Tag Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="937" y="0" width="117" height="22"/>
+				<textElement/>
+				<text><![CDATA[New Tag Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1054" y="0" width="219" height="22"/>
+				<textElement/>
+				<text><![CDATA[Transaction Messge]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="1" width="100" height="21"/>
+				<textElement/>
+				<text><![CDATA[SOL ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="1" width="496" height="21"/>
+				<textElement/>
+				<text><![CDATA[ASSET DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="167" y="0" width="146" height="22"/>
+				<textElement/>
+				<text><![CDATA[CATEGORY NAME]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="809" y="0" width="128" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{OLD_TAG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="937" y="0" width="117" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{NEW_TAG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1054" y="0" width="219" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ERROR_MESSAGE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="67" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{recordCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="67" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BRANCH_CODE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="313" y="0" width="496" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="167" y="0" width="146" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CATEGORY_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="QRCode_Report_Generator" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d7d7ff9c-44d8-4d1b-ad27-8cdbe373b8ae">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select top 20 bar_code from am_asset where bar_code != '']]>
+	</queryString>
+	<field name="bar_code" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<image>
+				<reportElement x="82" y="0" width="143" height="105" uuid="1bffbe1e-9e7d-4eec-ab51-234f48e6ed50"/>
+				<imageExpression><![CDATA[com.google.zxing.client.j2se.MatrixToImageWriter.toBufferedImage(
+     new com.google.zxing.qrcode.QRCodeWriter().encode(
+         $F{bar_code},
+         com.google.zxing.BarcodeFormat.QR_CODE, 300, 300))]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="100" y="93" width="94" height="20" uuid="4137ac6f-546a-4b92-8fb3-81aaac9bfee3"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{bar_code}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="20" y="2" width="140" height="67" uuid="c00b9a92-f422-426a-9b10-ff62e7953657"/>
+				<imageExpression><![CDATA["D:\\jboss-4.0.5.GA\\server\\default\\deploy\\legend3FCMB.net.war\\images\\clientlogo.gif"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="192" y="12" width="129" height="20" forecolor="#660066" uuid="62895870-a2af-4f28-b104-9a7a7f5ed65c"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[This property belongs to]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="192" y="25" width="129" height="20" forecolor="#660066" uuid="d6f3f08e-0d5b-4f80-b69d-7c951e3908d3"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[First City Monument Bank]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

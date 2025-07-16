@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="asset_Created_byuser" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="782" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<parameter name="BaseDir" class="java.io.File"/>
+	<queryString>
+		<![CDATA[SELECT
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     AM_ASSET."Asset_id" AS AM_ASSET_Asset_id,
+     AM_ASSET."Description" AS AM_ASSET_Description,
+     am_ad_branch."BRANCH_NAME" AS am_ad_branch_BRANCH_NAME,
+     am_ad_category."category_name" AS am_ad_category_category_name,
+     AM_ASSET."Accum_dep" AS AM_ASSET_Accum_dep,
+     AM_ASSET."monthly_dep" AS AM_ASSET_monthly_dep,
+     AM_ASSET."Cost_Price" AS AM_ASSET_Cost_Price,
+     AM_ASSET."NBV" AS AM_ASSET_NBV,
+     AM_ASSET."Date_purchased" AS AM_ASSET_Date_purchased,
+     am_ad_category."Dep_rate" AS am_ad_category_Dep_rate,
+     am_ad_category."Accum_Dep_ledger" AS am_ad_category_Accum_Dep_ledger,
+     am_ad_category."Dep_ledger" AS am_ad_category_Dep_ledger,
+     am_ad_category."Asset_Ledger" AS am_ad_category_Asset_Ledger,
+     am_ad_category."gl_account" AS am_ad_category_gl_account,
+     AM_ASSET."dep_end_date" AS AM_ASSET_dep_end_date,
+     AM_ASSET."effective_date" AS AM_ASSET_effective_date,
+     AM_ASSET."Posting_Date" AS AM_ASSET_Posting_Date,
+     am_gb_User."Full_Name" AS am_gb_User_Full_Name,
+     AM_ASSET."Asset_Status" AS AM_ASSET_Asset_Status
+FROM
+     "dbo"."am_ad_branch" am_ad_branch INNER JOIN "dbo"."AM_ASSET" AM_ASSET ON am_ad_branch."BRANCH_CODE" = AM_ASSET."BRANCH_CODE"
+     INNER JOIN "dbo"."am_ad_category" am_ad_category ON AM_ASSET."CATEGORY_CODE" = am_ad_category."category_code"
+     INNER JOIN "dbo"."am_gb_User" am_gb_User ON AM_ASSET."User_ID" = am_gb_User."User_id",
+     "dbo"."am_gb_company" am_gb_company
+WHERE
+     am_ad_branch."BRANCH_CODE" = AM_ASSET."BRANCH_CODE"  $P!{filterClause}
+ORDER BY
+     AM_ASSET."BRANCH_CODE" ASC,
+     AM_ASSET."CATEGORY_CODE" ASC,
+     AM_ASSET."User_ID" ASC]]>
+	</queryString>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="AM_ASSET_Asset_id" class="java.lang.String"/>
+	<field name="AM_ASSET_Description" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_ad_category_category_name" class="java.lang.String"/>
+	<field name="AM_ASSET_Accum_dep" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_monthly_dep" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_NBV" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_Date_purchased" class="java.sql.Timestamp"/>
+	<field name="am_ad_category_Dep_rate" class="java.math.BigDecimal"/>
+	<field name="am_ad_category_Accum_Dep_ledger" class="java.lang.String"/>
+	<field name="am_ad_category_Dep_ledger" class="java.lang.String"/>
+	<field name="am_ad_category_Asset_Ledger" class="java.lang.String"/>
+	<field name="am_ad_category_gl_account" class="java.lang.String"/>
+	<field name="AM_ASSET_dep_end_date" class="java.sql.Timestamp"/>
+	<field name="AM_ASSET_effective_date" class="java.sql.Timestamp"/>
+	<field name="AM_ASSET_Posting_Date" class="java.sql.Timestamp"/>
+	<field name="am_gb_User_Full_Name" class="java.lang.String"/>
+	<field name="AM_ASSET_Asset_Status" class="java.lang.String"/>
+	<sortField name="am_ad_branch_BRANCH_NAME"/>
+	<sortField name="am_ad_category_category_name"/>
+	<variable name="Total_Mon_Depr" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="Total_Accum_Dep" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="Total_NBV" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="Total_Cost_Price" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_Cost_Price}]]></variableExpression>
+	</variable>
+	<variable name="Record_Number" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Count">
+		<variableExpression><![CDATA[$F{AM_ASSET_Asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Month_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="Branch_Cost_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="Branch_NBV_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="Branch_Accum_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<variable name="Branch_Record_No" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Count">
+		<variableExpression><![CDATA[$F{AM_ASSET_Asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Total_Record" class="java.lang.Integer" resetType="Column" incrementType="Column" calculation="Count">
+		<variableExpression><![CDATA[]]></variableExpression>
+		<initialValueExpression><![CDATA[$V{Total_Record}]]></initialValueExpression>
+	</variable>
+	<group name="am_ad_branch_BRANCH_NAME">
+		<groupExpression><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></groupExpression>
+		<groupHeader>
+			<band height="1" splitType="Stretch"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="37" splitType="Prevent">
+				<staticText>
+					<reportElement key="staticText-12" x="9" y="5" width="95" height="19"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Branch Total]]></text>
+				</staticText>
+				<textField evaluationTime="Group" evaluationGroup="am_ad_branch_BRANCH_NAME" isBlankWhenNull="false">
+					<reportElement key="textField-26" x="145" y="6" width="82" height="18"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Branch_Record_No}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="am_ad_branch_BRANCH_NAME" pattern="#,##0.00" isBlankWhenNull="false">
+					<reportElement key="textField-29" x="606" y="5" width="98" height="17"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{Branch_Cost_Total}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="am_ad_category_category_name">
+		<groupExpression><![CDATA[$F{am_ad_category_category_name}]]></groupExpression>
+		<groupHeader>
+			<band height="38" splitType="Stretch">
+				<textField evaluationTime="Group" evaluationGroup="am_ad_category_category_name" isBlankWhenNull="false">
+					<reportElement key="textField-24" mode="Transparent" x="249" y="7" width="338" height="23" printWhenGroupChanges="am_ad_category_category_name"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font size="18"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_category_category_name}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="am_ad_category_category_name" isBlankWhenNull="false">
+					<reportElement key="textField-34" x="591" y="7" width="186" height="20"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="36" splitType="Prevent">
+				<textField evaluationTime="Group" evaluationGroup="am_ad_category_category_name" pattern="" isBlankWhenNull="false">
+					<reportElement key="textField-5" x="145" y="16" width="82" height="16" printWhenGroupChanges="am_ad_category_category_name"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Record_Number}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="am_ad_category_category_name" pattern="#,##0.00" isBlankWhenNull="false">
+					<reportElement key="textField-7" x="606" y="13" width="98" height="18"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{Total_Cost_Price}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement key="line-4" x="-41" y="9" width="771" height="1"/>
+				</line>
+				<staticText>
+					<reportElement key="staticText-11" x="9" y="16" width="115" height="17" printWhenGroupChanges="am_ad_category_category_name"/>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement>
+						<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+					</textElement>
+					<text><![CDATA[Category Total]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="16" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="140" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText" x="162" y="45" width="358" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[ASSET CREATED BY USERS REPORT]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="640" y="7" width="101" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="741" y="7" width="36" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="541" y="7" width="94" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement key="line-1" x="584" y="69" width="1" height="1"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-1" x="9" y="74" width="137" height="19"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-2" x="151" y="74" width="286" height="19"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="437" y="74" width="76" height="19"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Purch.Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-5" x="518" y="74" width="94" height="19"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[CREATED BY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" x="615" y="75" width="82" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Cost Price]]></text>
+			</staticText>
+			<line direction="BottomUp">
+				<reportElement key="line-2" x="11" y="97" width="766" height="1"/>
+			</line>
+			<line>
+				<reportElement key="line-3" x="9" y="69" width="768" height="2"/>
+			</line>
+			<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="am_ad_category_category_name" pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-17" isPrintRepeatedValues="false" x="526" y="107" width="176" height="20" isPrintWhenDetailOverflows="true" printWhenGroupChanges="am_ad_category_category_name"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_category_category_name}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Group" evaluationGroup="am_ad_branch_BRANCH_NAME" isBlankWhenNull="true">
+				<reportElement key="textField-23" x="186" y="103" width="338" height="34"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="18" isBold="false" pdfFontName="Helvetica"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-25" x="145" y="6" width="389" height="30" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="18" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_company_company_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-13" x="704" y="75" width="75" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<image>
+				<reportElement key="image-1" x="19" y="7" width="122" height="44"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<imageExpression class="java.io.File"><![CDATA[new File($P{BaseDir}, "../images/client.gif")]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="0" y="0" width="151" height="17" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{AM_ASSET_Asset_id}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="153" y="0" width="284" height="17" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{AM_ASSET_Description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" x="604" y="0" width="93" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{AM_ASSET_Cost_Price}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="false">
+				<reportElement key="textField-31" x="445" y="0" width="68" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{AM_ASSET_Date_purchased}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-32" x="517" y="0" width="86" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_User_Full_Name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-35" x="704" y="0" width="76" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{AM_ASSET_Asset_Status}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="7" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="3" splitType="Stretch"/>
+	</summary>
+</jasperReport>

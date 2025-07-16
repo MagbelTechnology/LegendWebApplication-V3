@@ -1,0 +1,121 @@
+package magma.net.image;
+
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+import magma.net.dao.MagmaDBConnection;
+import magma.net.vao.Technician;
+
+public class TechniciansFactoryServlet extends HttpServlet {
+
+    private ServletContext context;
+    private HashMap users = new HashMap();
+
+    public void init(ServletConfig config) throws ServletException {
+        this.context = config.getServletContext();
+    }
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws
+            IOException, ServletException {
+        /*
+         * First obtain the process request
+         */
+        String techType = request.getParameter("TECHTYPE");
+
+        HttpSession session = request.getSession(true);
+        ArrayList list = null;
+
+        if (techType != null) {
+            list = findAllTechniciansByType(techType);
+            processTechniciansRequest(request, response, list);
+        }
+    }
+
+    private void processTechniciansRequest(HttpServletRequest request,
+                                           HttpServletResponse response,
+                                           ArrayList list) throws
+            IOException, ServletException {
+        StringBuffer sb = new StringBuffer();
+        response.setContentType("text/xml");
+        response.setHeader("Cache-Control", "no-cache");
+
+        sb.append("<TECHNICIANS>\n");
+        for (int x = 0; x < list.size(); x++) {
+
+            Technician technician = (Technician) list.get(x);
+            sb.append("<TECHOPTIONS>\n");
+            sb.append("<TECHNCODE>" + technician.getId() + "</TECHNCODE>\n");
+            sb.append("<TECHNAME>" + technician.getName() + "</TECHNAME>\n");
+            sb.append("</TECHOPTIONS>\n");
+        }
+
+        sb.append("</TECHNICIANS>");
+
+        response.getWriter().write(sb.toString());
+
+    }
+
+    private void reportSessionTerminated(HttpServletRequest request,
+                                         HttpServletResponse response) throws
+            IOException, ServletException {
+        StringBuffer sb = new StringBuffer();
+        response.setContentType("text/xml");
+        response.setHeader("Cache-Control", "no-cache");
+        sb.append("<TECHNICIANS>\n");
+        sb.append("<TECHOPTIONS>\n");
+        sb.append("<TECHNCODE>Session Expired</TECHNCODE>\n");
+        sb.append("<TECHNAME>Please Login</TECHNAME>\n");
+        sb.append("</TECHOPTIONS>\n");
+
+        sb.append("</TECHNICIANS>");
+
+        response.getWriter().write(sb.toString());
+
+    }
+
+    private ArrayList findAllTechniciansByType(String type) {
+
+        String SELECT_QUERY = "";
+        if (type.equalsIgnoreCase("I")) {
+            SELECT_QUERY = "SELECT EMPLOYEE_ID,EMPLOYEE_NAME  " +
+                           "FROM am_ad_employee WHERE EMPLOYEE_STATUS='A'";
+        } else {
+            SELECT_QUERY = "SELECT VENDOR_ID,VENDOR_NAME " +
+                           "FROM AM_AD_VENDOR WHERE VENDOR_STATUS='A'";
+        }
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+        MagmaDBConnection mCon = new MagmaDBConnection();
+
+        try {
+            con = mCon.getConnection("fixedasset");
+            ps = con.prepareStatement(SELECT_QUERY);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString(1);
+                String name = rs.getString(2);
+                Technician tech = new Technician(id, name);
+
+                list.add(tech);
+
+            }
+
+        } catch (Exception er) {
+            System.out.println("WARN:Error retrieving technicians " + er);
+        } finally {
+            mCon.closeConnection(con, ps, rs);
+        }
+
+        return list;
+    }
+
+}

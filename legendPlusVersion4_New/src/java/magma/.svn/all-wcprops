@@ -1,0 +1,503 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/legend-repos/!svn/ver/3/Legend/src/java/magma
+END
+BranAcqusBudgetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/BranAcqusBudgetBean.java
+END
+MaintenanceRepsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/MaintenanceRepsBean.java
+END
+GroupSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/GroupSetupBean.java
+END
+MakesServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/MakesServlet.java
+END
+RaiseReclassBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RaiseReclassBean.java
+END
+FuelingEntriesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/FuelingEntriesBean.java
+END
+GroupAssetBean_old.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/GroupAssetBean_old.java
+END
+sbuservlet2.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/sbuservlet2.java
+END
+DateManipulations.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/DateManipulations.java
+END
+ListDisposalsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ListDisposalsBean.java
+END
+SystemConnectBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/SystemConnectBean.java
+END
+ListRevalueBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ListRevalueBean.java
+END
+StateSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/StateSetupBean.java
+END
+ApprovalLimitServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ApprovalLimitServlet.java
+END
+RaiseDisposalBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RaiseDisposalBean.java
+END
+AssetRecordsBean.jbx
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/AssetRecordsBean.jbx
+END
+CompanyDriversBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/CompanyDriversBean.java
+END
+VehicleLubricantsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/VehicleLubricantsBean.java
+END
+RaiseTransferBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RaiseTransferBean.java
+END
+InsuranceSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/InsuranceSetupBean.java
+END
+ActiveUserBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ActiveUserBean.java
+END
+AssetDisposalBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/AssetDisposalBean.java
+END
+GroupAssetDetailBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/GroupAssetDetailBean.java
+END
+InsuranceEntriesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/InsuranceEntriesBean.java
+END
+AssetReclassificationBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/AssetReclassificationBean.java
+END
+AssetTransferBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/AssetTransferBean.java
+END
+AssetDetailsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/AssetDetailsBean.java
+END
+SectionSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/SectionSetupBean.java
+END
+ClassSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ClassSetupBean.java
+END
+RemoteScripting.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RemoteScripting.java
+END
+UpdateRevaluationBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/UpdateRevaluationBean.java
+END
+GroupAssetToAssetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/GroupAssetToAssetBean.java
+END
+UserSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/UserSetupBean.java
+END
+ManageSectionsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ManageSectionsBean.java
+END
+AssetRecordsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/AssetRecordsBean.java
+END
+SystemFooterBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/SystemFooterBean.java
+END
+rob_styles.css
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/rob_styles.css
+END
+TechEmployeesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/TechEmployeesBean.java
+END
+SystemUsersBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/SystemUsersBean.java
+END
+sbuservlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/sbuservlet.java
+END
+DisposalReasonsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/DisposalReasonsBean.java
+END
+CurrentDateTime.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/CurrentDateTime.java
+END
+Deptservlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/Deptservlet.java
+END
+LicenseEntriesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/LicenseEntriesBean.java
+END
+MaintenanceBudgetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/MaintenanceBudgetBean.java
+END
+SystemDesktopBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/SystemDesktopBean.java
+END
+FuelTypesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/FuelTypesBean.java
+END
+UpdateDisposalBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/UpdateDisposalBean.java
+END
+BarCodeHistoryBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/BarCodeHistoryBean.java
+END
+UpdateReclassificationBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/UpdateReclassificationBean.java
+END
+SecurityClassesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/SecurityClassesBean.java
+END
+UpdateTransferBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/UpdateTransferBean.java
+END
+RaiseRevalueBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RaiseRevalueBean.java
+END
+ListReclassBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ListReclassBean.java
+END
+ManageGroupsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ManageGroupsBean.java
+END
+RemoteMethods.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RemoteMethods.java
+END
+GroupAssetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/GroupAssetBean.java
+END
+AccidentRecordsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/AccidentRecordsBean.java
+END
+SystemHeaderBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/SystemHeaderBean.java
+END
+CategorySetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/CategorySetupBean.java
+END
+ManageBranchesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ManageBranchesBean.java
+END
+ConnectionClass.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ConnectionClass.java
+END
+AssetRevalueBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/AssetRevalueBean.java
+END
+RaiseAssetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RaiseAssetBean.java
+END
+BranMaintBudgetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/BranMaintBudgetBean.java
+END
+GAssetRecordsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/GAssetRecordsBean.java
+END
+ManageUsersBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ManageUsersBean.java
+END
+ManageDepartsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ManageDepartsBean.java
+END
+BranchSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/BranchSetupBean.java
+END
+ManageRegionsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ManageRegionsBean.java
+END
+ListTransferBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ListTransferBean.java
+END
+AcquisitionBudgetBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/AcquisitionBudgetBean.java
+END
+AssetReclassificationBean.jbx
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/AssetReclassificationBean.jbx
+END
+ApprovalBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/legend-repos/!svn/ver/3/Legend/src/java/magma/ApprovalBean.java
+END
+CompanyDefBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/CompanyDefBean.java
+END
+RaiseAssetDetailBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RaiseAssetDetailBean.java
+END
+CategoryClassesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/CategoryClassesBean.java
+END
+DepartSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/DepartSetupBean.java
+END
+LimitApprovalServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/LimitApprovalServlet.java
+END
+RegionSetupBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/RegionSetupBean.java
+END
+ManageClassesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/ManageClassesBean.java
+END
+LicenseTypesBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/LicenseTypesBean.java
+END
+CompanyVendorsBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/CompanyVendorsBean.java
+END

@@ -1,0 +1,188 @@
+package magma.net.manager;
+
+import jxl.*;
+import java.util.Date;
+import java.io.File;
+import java.sql.*;
+import java.util.*;
+import java.util.ArrayList;
+import com.magbel.util.FileFormat;
+import magma.net.vao.BranchAllocation;
+import magma.net.dao.MagmaDBConnection;
+
+/**
+ * <p>Title: ExcelUploadManager.java</p>
+ *
+ * <p>Description: File Description</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class ExcelUploadManager extends MagmaDBConnection {
+    private ArrayList budgetList;
+    public ExcelUploadManager() {
+        System.out.println("INFO:Excel ExcelUploadManager instatiated.");
+    }
+
+    public ArrayList getBudgetList() {
+        return this.budgetList;
+    }
+
+    public void acceptExcel(String fileObj) {
+
+        int rows = 0;
+        int cols = 0;
+        Sheet sht = null;
+        Sheet[] sheets = null;
+
+        this.budgetList = new ArrayList();
+
+        try {
+            Workbook workbook = Workbook.getWorkbook(new File(fileObj));
+            sheets = workbook.getSheets();
+            performReading(sheets);
+        } catch (Exception io) {
+            System.out.println("WARN: Error uploading file ->" + io.getMessage());
+        }
+    }
+
+    public void acceptExcel(File file) {
+
+        int rows = 0;
+        int cols = 0;
+        Sheet sht = null;
+        Sheet[] sheets = null;
+
+        this.budgetList = new ArrayList();
+
+        try {
+            Workbook workbook = Workbook.getWorkbook(file);
+            sheets = workbook.getSheets();
+            performReading(sheets);
+        } catch (Exception io) {
+            System.out.println("WARN: Error uploading file ->" + io.toString());
+        }
+    }
+
+    public ArrayList getFileFromServer(File uploadedFile) {
+        acceptExcel(uploadedFile);
+        return getBudgetList();
+    }
+
+
+    private void performReading(Sheet[] sheets) {
+        System.out.println("TOTAL SHEETS FOUND IS:" + sheets.length + " sheets");
+        boolean sucessful = true;
+        for (int index = 0; index < sheets.length; index++) {
+            System.out.print("Sheet:" + index);
+            int rows = sheets[index].getRows();
+            int cols = sheets[index].getColumns();
+            for (int x = 1; x < rows; x++) {
+                Cell[] cell = sheets[index].getRow(x);
+
+                String cellTest = cell[0].getContents();
+                if (cellTest == null || cellTest.equalsIgnoreCase("")) {
+                    //Skip reading for empty cell
+                } else {
+                    insertCellContents(cell);
+                }
+            }
+        }
+
+    }
+
+    private void insertCellContents(Cell[] cell) {
+
+        int size = cell.length;
+
+        String empty = "";
+        String branchName = "";
+        String branchCode = "";
+        String categoryCode = "";
+        String total = "";
+        String firstQuarter = "";
+        String secondQuarter = "";
+        String thirdQuarter = "";
+        String fourthQuarter = "";
+        String residue = "";
+
+        boolean status = true;
+
+        try {
+
+            branchCode = cell[0].getContents();
+            branchName = cell[1].getContents();
+            categoryCode = cell[2].getContents();
+            total = cell[3].getContents();
+            firstQuarter = cell[4].getContents();
+            secondQuarter = cell[5].getContents();
+            thirdQuarter = cell[6].getContents();
+            fourthQuarter = cell[7].getContents();
+
+            if (size < 9) {
+                residue = "0.00";
+            } else {
+                residue = cell[8].getContents();
+            }
+
+        } catch (Exception ex) {
+            status = false;
+        }
+
+        if (status) {
+
+            if (branchCode.equals(empty)) {
+                //Skip
+            } else {
+                addCellContent(branchCode, branchName, categoryCode, total,
+                               firstQuarter, secondQuarter, thirdQuarter,
+                               fourthQuarter, residue);
+            }
+        }
+
+    }
+
+    private void addCellContent(String branchCode, String branchName,
+                                String categoryCode, String total,
+                                String firstQuarter, String secondQuarter,
+                                String thirdQuarter, String fourthQuarter,
+                                String residue) {
+        String id = "";
+        double firstQauterAmount = Double.parseDouble(firstQuarter);
+        double secondQuaterAmount = Double.parseDouble(secondQuarter);
+        double thirdQauterAmount = Double.parseDouble(thirdQuarter);
+        double fourthQuaterAmount = Double.parseDouble(fourthQuarter);
+        double totalAmount = Double.parseDouble(total);
+        double balanceAmount = Double.parseDouble(residue);
+        String type = "P";
+
+        BranchAllocation ba = new BranchAllocation(id, branchCode, branchName,
+                firstQauterAmount, secondQuaterAmount, thirdQauterAmount,
+                fourthQuaterAmount, totalAmount, balanceAmount, type);
+        this.budgetList.add(ba);
+
+    }
+
+    public static void main(String[] args) {
+        ExcelUploadManager excelManager = new ExcelUploadManager();
+        FileFormat fm = new FileFormat();
+        String file = "d:\\BookBudget.xls";
+        excelManager.acceptExcel(file);
+
+        System.out.println("The content of file[" + file + "] is :\n");
+        System.out.println("======\t\t============================\t\t=======");
+        ArrayList list = excelManager.getBudgetList();
+
+        for (int x = 0; x < list.size(); x++) {
+            BranchAllocation ba = (BranchAllocation) list.get(x);
+            System.out.println(ba.getBranchCode() + "\t|\t" +
+                               fm.formatText(25, ba.getBranchName()) + "\t|" +
+                               fm.formatTextRightJustified(18,
+                    Double.toString(ba.getTotalAmount())));
+        }
+    }
+}

@@ -1,0 +1,9 @@
+JarIndex-Version: 1.0
+
+ocular-minds.jar
+com
+com/ocularminds
+com/ocularminds/chart
+com/ocularminds/mail
+com/ocularminds/web
+

@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Xls_BulkAssetTransfer_List" language="groovy" pageWidth="1819" pageHeight="842" columnWidth="1799" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<parameter name="batchId" class="java.lang.String">
+		<parameterDescription><![CDATA[]]></parameterDescription>
+	</parameter>
+	<parameter name="startDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     am_gb_bulkTransfer."Asset_id" AS am_gb_bulkTransfer_Asset_id,
+     am_gb_bulkTransfer."Registration_No" AS am_gb_bulkTransfer_Registration_No,
+     am_gb_bulkTransfer."Description" AS am_gb_bulkTransfer_Description,
+     am_gb_bulkTransfer."oldbranch_id" AS am_gb_bulkTransfer_oldbranch_id,
+     am_gb_bulkTransfer."olddept_id" AS am_gb_bulkTransfer_olddept_id,
+     am_gb_bulkTransfer."oldSBU_CODE" AS am_gb_bulkTransfer_oldSBU_CODE,
+     am_gb_bulkTransfer."oldsection_id" AS am_gb_bulkTransfer_oldsection_id,
+     am_gb_bulkTransfer."oldAsset_User" AS am_gb_bulkTransfer_oldAsset_User,
+     am_gb_bulkTransfer."newbranch_id" AS am_gb_bulkTransfer_newbranch_id,
+     am_gb_bulkTransfer."newdept_id" AS am_gb_bulkTransfer_newdept_id,
+     am_gb_bulkTransfer."newSBU_CODE" AS am_gb_bulkTransfer_newSBU_CODE,
+     am_gb_bulkTransfer."newsection_id" AS am_gb_bulkTransfer_newsection_id,
+     am_gb_bulkTransfer."newAsset_User" AS am_gb_bulkTransfer_newAsset_User,
+     am_gb_bulkTransfer."Batch_id" AS am_gb_bulkTransfer_Batch_id,
+     am_gb_bulkTransfer."Transferby_id" AS am_gb_bulkTransfer_Transferby_id,
+     am_gb_bulkTransfer."CATEGORY_ID" AS am_gb_bulkTransfer_CATEGORY_ID,
+     am_gb_bulkTransfer."NEW_ASSET_ID" AS am_gb_bulkTransfer_NEW_ASSET_ID,
+     am_gb_bulkTransfer."ACCUM_DEP" AS am_gb_bulkTransfer_ACCUM_DEP,
+     am_gb_bulkTransfer."MONTHLY_DEP" AS am_gb_bulkTransfer_MONTHLY_DEP,
+     am_gb_bulkTransfer."NBV" AS am_gb_bulkTransfer_NBV,
+     am_gb_bulkTransfer."TRANSFER_DATE" AS am_gb_bulkTransfer_TRANSFER_DATE,
+     am_gb_bulkTransfer."transId" AS am_gb_bulkTransfer_transId,
+     am_gb_bulkTransfer."TRANSFER_COST" AS am_gb_bulkTransfer_TRANSFER_COST,
+     am_gb_bulkTransfer."asset_code" AS am_gb_bulkTransfer_asset_code,
+     am_ad_branch."BRANCH_NAME" AS am_ad_branch_BRANCH_NAME,
+     am_ad_branch_A."BRANCH_NAME" AS am_ad_branch_A_BRANCH_NAME,
+     am_gb_User."Full_Name" AS am_gb_User_Full_Name,
+     am_gb_User."User_Name" AS am_gb_User_User_Name,
+     am_gb_bulkTransfer."COST_PRICE" AS am_gb_bulkTransfer_COST_PRICE
+FROM
+     "dbo"."am_ad_branch" am_ad_branch INNER JOIN "dbo"."am_gb_bulkTransfer" am_gb_bulkTransfer ON am_ad_branch."BRANCH_ID" = am_gb_bulkTransfer."oldbranch_id"
+     INNER JOIN "dbo"."am_ad_branch" am_ad_branch_A ON am_gb_bulkTransfer."newbranch_id" = am_ad_branch_A."BRANCH_ID"
+     INNER JOIN "dbo"."am_gb_User" am_gb_User ON am_gb_bulkTransfer."Transferby_id" = am_gb_User."User_id"
+$P!{filterClause}
+ORDER BY
+     Batch_id ASC]]>
+	</queryString>
+	<field name="am_gb_bulkTransfer_Asset_id" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_Registration_No" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_Description" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_oldbranch_id" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_olddept_id" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_oldSBU_CODE" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_oldsection_id" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_oldAsset_User" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_newbranch_id" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_newdept_id" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_newSBU_CODE" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_newsection_id" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_newAsset_User" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_Batch_id" class="java.lang.Integer"/>
+	<field name="am_gb_bulkTransfer_Transferby_id" class="java.lang.Integer"/>
+	<field name="am_gb_bulkTransfer_CATEGORY_ID" class="java.lang.Integer"/>
+	<field name="am_gb_bulkTransfer_NEW_ASSET_ID" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_ACCUM_DEP" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_MONTHLY_DEP" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_NBV" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_TRANSFER_DATE" class="java.sql.Timestamp"/>
+	<field name="am_gb_bulkTransfer_transId" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_TRANSFER_COST" class="java.math.BigDecimal"/>
+	<field name="am_gb_bulkTransfer_asset_code" class="java.lang.Integer"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_ad_branch_A_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_gb_User_Full_Name" class="java.lang.String"/>
+	<field name="am_gb_User_User_Name" class="java.lang.String"/>
+	<field name="am_gb_bulkTransfer_COST_PRICE" class="java.lang.String"/>
+	<group name="Batch_Id">
+		<groupExpression><![CDATA[$F{am_gb_bulkTransfer_Batch_id}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement x="105" y="0" width="484" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$F{am_gb_bulkTransfer_Batch_id}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="105" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Batch Id:]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<textField>
+					<reportElement x="105" y="0" width="484" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Batch_Id_COUNT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="0" width="105" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Batch Total:]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="32" splitType="Stretch">
+			<staticText>
+				<reportElement x="105" y="12" width="484" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BULK ASSET TRANSFER LIST]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="105" height="20"/>
+				<textElement/>
+				<text><![CDATA[OLD ASSET ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="0" width="484" height="20"/>
+				<textElement/>
+				<text><![CDATA[ASSET  DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="798" y="0" width="133" height="20"/>
+				<textElement/>
+				<text><![CDATA[NEW ASSET ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="931" y="0" width="126" height="20"/>
+				<textElement/>
+				<text><![CDATA[TRANSFER COST PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1057" y="0" width="120" height="20"/>
+				<textElement/>
+				<text><![CDATA[TRANSFER NBV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="589" y="0" width="209" height="20"/>
+				<textElement/>
+				<text><![CDATA[OLD BRANCH NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1177" y="0" width="117" height="20"/>
+				<textElement/>
+				<text><![CDATA[NEW BRANCH NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1294" y="0" width="148" height="20"/>
+				<textElement/>
+				<text><![CDATA[TRANSFER BY USER ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1442" y="0" width="335" height="20"/>
+				<textElement/>
+				<text><![CDATA[TRANSFER BY USER NAME]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="19" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="105" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulkTransfer_Asset_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="105" y="0" width="484" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulkTransfer_Description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="798" y="0" width="133" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulkTransfer_NEW_ASSET_ID}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement x="931" y="0" width="126" height="19"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulkTransfer_COST_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement x="1057" y="0" width="120" height="19"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulkTransfer_NBV}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="589" y="0" width="209" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1177" y="0" width="117" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_branch_A_BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1294" y="0" width="148" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_User_User_Name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1442" y="0" width="335" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_User_Full_Name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

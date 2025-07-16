@@ -1,0 +1,1291 @@
+package magma.net.manager;
+
+
+import com.magbel.util.*;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
+import magma.net.vao.Transaction;
+import magma.net.dao.MagmaDBConnection;
+import magma.net.vao.FleetTransaction;
+
+//import java.io.*;
+//import java.text.*;
+
+
+public class FleetTransactManager extends MagmaDBConnection {
+   DataConnect connect = new DataConnect();
+    public FleetTransactManager() {
+        super();
+        System.out.println("INFO:FleetTransactManager instantiated.");
+    }
+
+    public void logFleetTransaction(FleetTransaction tran) {
+        if (isExistingTransaction(tran.getAssetId(), tran.getRegistrationNo())) {
+            updateTransaction(tran);
+        } else {
+            createTransaction(tran);
+        }
+    }
+
+
+    /**
+     * createTransaction
+     *
+     * @param tran FleetTransaction
+     */
+    public void createTransaction(FleetTransaction tran) {
+
+        String query = "INSERT INTO FT_FLEET_MASTER " +
+                       " (ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID " +
+                       " ,CATEGORY_ID,DATE_PURCHASED,ASSET_MAKE,ASSET_USER " +
+                       " ,ASSET_MAINTENANCE,CREATE_DATE,EFFECTIVE_DATE " +
+                       " ,LOCATION,RAISE_ENTRY,DEP_YTD,PREMIUM_LTD " +
+                       ",PREMIUM_PTD,MAINT_LTD,MAINT_PTD,FUEL_LTD " +
+                       " ,FUEL_PTD,ACCIDENT_COUNT,ACCIDENT_COST_LTD " +
+                       " ,ACCIDENT_COST_PTD,LICENCE_PERMIT_LTD,LICENCE_PERMIT_PTD " +
+                       " ,LAST_UPDATE_DATE,STATUS,USER_ID,INSURANCE_COST_LTD," +
+                       "INSURANCE_COST_PTD  " +
+                       " )  VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
+                       "?,?,?,?,?,?,?,?,?) ";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(query);
+
+            ps.setString(1, tran.getAssetId());
+            ps.setString(2, tran.getRegistrationNo());
+            ps.setString(3, tran.getBranchId());
+            ps.setString(4, tran.getDeptId());
+            ps.setString(5, tran.getCategory());
+            ps.setDate(6, dateConvert(tran.getDatePurchased()));
+            ps.setString(7, tran.getAssetMake());
+            ps.setString(8, tran.getAssetUser());
+            ps.setString(9, tran.getAssetMaintenance());
+            ps.setDate(10, dateConvert(tran.getCreateDate()));
+            ps.setDate(11, dateConvert(tran.getEffectiveDate()));
+            ps.setString(12, tran.getLocation());
+            ps.setString(13, "");
+            ps.setDouble(14, tran.getDepreciation());
+            ps.setDouble(15, tran.getPremiumLiveToDate());
+            ps.setDouble(16, tran.getPremimumPeriodToDate());
+            ps.setDouble(17, tran.getMaintLiveToDate());
+            ps.setDouble(18, tran.getMaintPeriodToDate());
+            ps.setDouble(19, tran.getFuelLiveToDate());
+            ps.setDouble(20, tran.getFuelPeriodToDate());
+            ps.setInt(21, tran.getAccidentCount());
+            ps.setDouble(22, tran.getAccidentCostLiveToDate());
+            ps.setDouble(23, tran.getAccidentCostPeriodToDate());
+            ps.setDouble(24, tran.getLicencePermitLiveToDate());
+            ps.setDouble(25, tran.getLicencePermitPeriodToDate());
+            ps.setDate(26, dateConvert(new java.util.Date()));
+            ps.setString(27, tran.getStatus());
+            ps.setString(28, tran.getAssetUser());
+            ps.setDouble(29, tran.getInsuranceLiveToDate());
+            ps.setDouble(30, tran.getInsurancePremiumToDate());
+
+            ps.execute();
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error Creating Fleet Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+            e.printStackTrace();
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+
+    /**
+     * updateTransaction
+     *
+     * @param tran FleetTransaction
+     */
+    public void updateTransaction(FleetTransaction tran) {
+
+        String query = "UPDATE FT_FLEET_MASTER " +
+                       " SET ASSET_MAINTENANCE = ?,CREATE_DATE = ?,EFFECTIVE_DATE = ?, " +
+                       "LOCATION = ?,RAISE_ENTRY = ?,DEP_YTD = DEP_YTD + ?," +
+                       "PREMIUM_LTD = PREMIUM_LTD + ?,PREMIUM_PTD =PREMIUM_PTD+?," +
+                       "MAINT_LTD = MAINT_LTD + ?,MAINT_PTD = MAINT_PTD+?," +
+                       "FUEL_LTD = FUEL_LTD+ ?,FUEL_PTD = FUEL_PTD + ?," +
+                       "ACCIDENT_COUNT = ACCIDENT_COUNT+ ?," +
+                       "ACCIDENT_COST_LTD = ACCIDENT_COST_LTD + ?, " +
+                       "ACCIDENT_COST_PTD = ACCIDENT_COST_PTD + ?," +
+                       "LICENCE_PERMIT_LTD = LICENCE_PERMIT_LTD + ?," +
+                       "LICENCE_PERMIT_PTD = LICENCE_PERMIT_PTD + ?," +
+                       "LAST_UPDATE_DATE = ?,STATUS = ? ," +
+                       "INSURANCE_COST_LTD = INSURANCE_COST_LTD + ?," +
+                       "INSURANCE_COST_PTD = INSURANCE_COST_PTD + ?   " +
+                       " WHERE ASSET_ID = ? AND REGISTRATION_NO = ?";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(query);
+
+            ps.setString(1, tran.getAssetMaintenance());
+            ps.setDate(2, dateConvert(tran.getCreateDate()));
+            ps.setDate(3, dateConvert(tran.getEffectiveDate()));
+            ps.setString(4, "");
+            ps.setString(5, "");
+            ps.setDouble(6, tran.getDepreciation());
+            ps.setDouble(7, tran.getPremiumLiveToDate());
+            ps.setDouble(8, tran.getPremimumPeriodToDate());
+            ps.setDouble(9, tran.getMaintLiveToDate());
+            ps.setDouble(10, tran.getMaintPeriodToDate());
+            ps.setDouble(11, tran.getFuelLiveToDate());
+            ps.setDouble(12, tran.getFuelPeriodToDate());
+            ps.setInt(13, tran.getAccidentCount());
+            ps.setDouble(14, tran.getAccidentCostLiveToDate());
+            ps.setDouble(15, tran.getAccidentCostPeriodToDate());
+            ps.setDouble(16, tran.getLicencePermitLiveToDate());
+            ps.setDouble(17, tran.getLicencePermitPeriodToDate());
+            ps.setDate(18, dateConvert(new java.util.Date()));
+            ps.setString(19, tran.getStatus());
+            ps.setDouble(20, tran.getInsuranceLiveToDate());
+            ps.setDouble(21, tran.getInsurancePremiumToDate());
+            ps.setString(22, tran.getAssetId());
+            ps.setString(23, tran.getRegistrationNo());
+
+            ps.execute();
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error updating Fleet Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+            e.printStackTrace();
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+
+    /**
+     * isExistingTransaction
+     *
+     * @param assetId String
+     * @param registrationNo String
+     * @return boolean
+     */
+    public boolean isExistingTransaction(String assetId, String registrationNo) {
+
+        boolean exists = false;
+        String query = "SELECT ASSET_ID,REGISTRATION_NO FROM FT_FLEET_MASTER " +
+                       "WHERE ASSET_ID = ? AND REGISTRATION_NO = ?";
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(query);
+            ps.setString(1, assetId);
+            ps.setString(2, registrationNo);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                exists = true;
+            }
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error determining the existence\n" +
+                             " of transaction with asset_id/reg.no:" +
+                             assetId + "- " + registrationNo + " ->" +
+                             e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return exists;
+    }
+
+    public Transaction findTransactionById(String uidd) {
+    /*
+     * modified by Olabo on 05-09-2006
+     * 
+     */
+        String SELECT_QUERY = "SELECT a.TRANSACTION_ID,a.DR_ACCT,CR_ACCT,a.DR_ACCT_TYPE,a.CR_ACCT_TYPE," +
+                              "a.DR_TRAN_CODE,a.CR_TRAN_CODE,a.DR_NARRATION,a.CR_NARRATION,a.AMOUNT,a.USER_ID," +
+                              "a.SUPER_ID,a.LEGACY_ID,a.POSTING_DATE," +
+                              "a.EFFECTIVE_DATE,a.PROCESS_STATUS,a.SUPERVISOR," +
+                              "a.REJECT_REASON,a.BATCH_ID,a.TRAN_TYPE,a.TRAN_SENT_TIME,b.FULL_NAME,c.ASSET_ID,c.BRANCH_ID,c.DEPT_ID,"+
+                              "c.CATEGORY_ID,c.REGISTRATION_NO,c.DESCRIPTION,c.ASSET_STATUS " +
+                              "FROM AM_ENTRY_TABLE a,AM_GB_USER b,AM_ASSET_MAIN c " +
+                              "WHERE a.ASSET_ID = c.ASSET_ID AND a.USER_ID = b.USER_ID AND "+
+                              "a.PROCESS_STATUS = 'U' AND a.TRANSACTION_ID = " + Integer.parseInt(uidd);
+                              
+        Transaction tran = null;
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(SELECT_QUERY);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("TRANSACTION_ID");
+                String debitAccount = rs.getString("DR_ACCT");
+                String creditAccount = rs.getString("CR_ACCT");
+                String drAcctType = rs.getString("DR_ACCT_TYPE");
+                String crAcctType = rs.getString("CR_ACCT_TYPE");
+                String drTranCode = rs.getString("DR_TRAN_CODE");
+                String crTranCode = rs.getString("CR_TRAN_CODE");
+                String creditNarration = rs.getString("CR_NARRATION");
+                String debitNarration = rs.getString("DR_NARRATION");
+                double amount = rs.getDouble("AMOUNT");
+                String userId = rs.getString("USER_ID");
+                String superId = rs.getString("SUPER_ID");
+                String legacyCode = rs.getString("LEGACY_ID");
+                String code = "";//rs.getString("TRAN_CODE");
+                String postingDate = formatDate(rs.getDate("POSTING_DATE"));
+                String effectiveDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+                String status = rs.getString("PROCESS_STATUS");
+                String supervisor = rs.getString("SUPERVISOR");
+                String rejectReason = rs.getString("REJECT_REASON");
+                String batchId = rs.getString("BATCH_ID");
+                String fullName = rs.getString("FULL_NAME"); 
+                String assetId = rs.getString("ASSET_ID");
+                int branchId = rs.getInt("BRANCH_ID");
+                int deptId = rs.getInt("DEPT_ID");
+                int categoryId = rs.getInt("CATEGORY_ID");
+                String regNo = rs.getString("REGISTRATION_NO");
+                String desc = rs.getString("DESCRIPTION");
+                //double cost = rs.getDouble("COST_PRICE");
+                //String assetUser = rs.getString("ASSET_USER");
+                String assetStatus = rs.getString("ASSET_STATUS");
+                String tranType = rs.getString("TRAN_TYPE");
+                String sentTime = rs.getString("TRAN_SENT_TIME");
+              
+                tran = new Transaction(id, debitAccount,
+                                       creditAccount, creditNarration,
+                                       debitNarration,
+                                       amount, userId, superId, legacyCode,
+                                       code, postingDate,
+                                       effectiveDate, status, supervisor,
+                                       rejectReason,
+                                       batchId,fullName,assetId,drAcctType,crAcctType,drTranCode,
+                                       crTranCode,branchId,deptId,categoryId,regNo,desc,assetStatus,tranType,sentTime);
+            }
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error Fetching Transaction Detail" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return tran;
+    }
+   
+
+      
+    
+    
+  
+  
+  
+ private void updateRaiseEntryStatus(String batchId)
+    {
+        String query = "DELETE FROM AM_ENTRY_TABLE WHERE ASSET_ID = ? ";
+        //String updateTable 
+                              
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(query);
+            ps.setString(1,batchId);
+            ps.execute();
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error Deleting Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    } 
+    
+  
+  public void notifyReadTransaction(ArrayList tranids) {
+        if (tranids != null) {
+            for (int x = 0; x < tranids.size(); x++) {
+                notifyReadTransaction(((Transaction) tranids.get(x)).getId());
+            }
+        }
+
+    }
+
+    
+
+    public void notifyReadTransaction(String tranid) {
+        String UPDATE_QUERY = "UPDATE AM_ENTRY_TABLE SET PROCESS_STATUS = 'Q' " +
+                              "WHERE TRANSACTION_ID = ?";
+        String status = "P";
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(UPDATE_QUERY);
+
+            ps.setString(1, tranid);
+
+            ps.execute();
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error notifying read Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+    
+    /*
+     * modified by olabo 08-09-2006
+     * to add export 2 a legacy sytem module functions
+     */
+     
+  private ArrayList getApprovedEntries()
+  {
+   String SELECT_QUERY = "SELECT transaction_id,dr_acct,cr_acct,dr_narration,cr_narration,amount,user_id,"+
+                         "super_id,legacy_id,tran_code,posting_date,effective_date,process_status,supervisor,"+
+                         "reject_reason,batch_id FROM am_entry_table WHERE process_status = 'P'";
+                         
+   Connection con = null;
+   PreparedStatement ps = null;
+   ResultSet rs = null;
+   
+   ArrayList list = new ArrayList();
+   DataConnect connect = new DataConnect();
+   try 
+   {
+    con = getConnection("legendPlus");
+    ps = con.prepareStatement(SELECT_QUERY);
+    
+    rs = ps.executeQuery();
+    while (rs.next()) 
+    {
+     String transId  = rs.getString("transaction_id");
+     String drAcct = rs.getString("dr_acct");
+     String crAcct = rs.getString("cr_acct");
+     String drNarration = rs.getString("dr_narration");
+     String crNarration = rs.getString("cr_narration");
+     double amount = Double.parseDouble(rs.getString("amount"));
+     String superId = rs.getString("super_id");
+     String legacyId = rs.getString("legacy_id");
+     String tranCode = rs.getString("tran_code");
+     String postDate = rs.getString("posting_date");
+     String effDate = rs.getString("effective_date");
+     String status = rs.getString("process_status");
+     String supervisor = rs.getString("supervisor");
+     String rejectReason = rs.getString("reject_reason");
+     String batchId = rs.getString("batch_id");
+     String userId = "0";
+     String fullName = "";
+     
+     Transaction tran = new Transaction(transId,drAcct,crAcct,drNarration,
+     crNarration,amount,userId,superId,legacyId,tranCode,postDate,effDate,status,
+     supervisor,rejectReason,batchId,fullName,"","","","","",0,0,0,"","","","","");
+     list.add(tran); 
+    }
+   }
+   catch (Exception e) 
+   {
+     String warning = "WARNING:Error getting Approved Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+   }
+   finally 
+   {
+    closeConnection(con, ps);
+   }
+   return list;     
+    
+  }
+  
+  private void export2EquinoxLegacySystem()
+  {
+   Connection con = null;
+   PreparedStatement ps = null;
+   
+   String query = "INSERT INTO equinox_trans_input (acct_no,acct_type,effective_dt,create_dt,"+
+                   "empl_id,tran_code,amt,description,super_empl_id,crncy_id,orig_branch_no,"+
+                   "user_id,sup_user_id,process_status)"+
+                   " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                   
+    DataConnect connect = new DataConnect();               
+    ArrayList list = getApprovedEntries();  
+    try
+    {
+     con = getConnection("legendPlus");
+     for(int i=0; i < list.size(); i++)
+     {
+      String account = "";
+      String narration = "";
+      for(int l=0; l < 2; l++)
+      {
+       ps = con.prepareStatement(query);
+       account = (l==0?((Transaction)list.get(i)).getDebitAccount():((Transaction)list.get(i)).getCreditAccount());
+       ps.setString(1,account);
+       ps.setString(2,"");
+       ps.setString(3,((Transaction)list.get(i)).getEffectiveDate());
+       ps.setString(4,((Transaction)list.get(i)).getPostingDate());
+       ps.setString(5,"");
+       ps.setString(6,((Transaction)list.get(i)).getCode());
+       ps.setDouble(7,((Transaction)list.get(i)).getAmount());
+       narration = (l==0?((Transaction)list.get(i)).getDebitNarration():((Transaction)list.get(i)).getCreditNarration());
+       ps.setString(8,narration);
+       ps.setString(9,"");
+       ps.setString(10,"");
+       ps.setInt(11,0);
+       ps.setInt(12,Integer.parseInt(((Transaction)list.get(i)).getUserId()));
+       ps.setInt(13,Integer.parseInt(((Transaction)list.get(i)).getSuperId()));
+       ps.setString(14,((Transaction)list.get(i)).getStatus());
+       ps.execute();
+      }
+     }
+           
+    }
+    catch(Exception e)
+    {
+     System.out.println("INFO:Error inserting EQUINOX_TRANS_INPUT ->" +
+     e.getMessage()); e.printStackTrace();
+    }
+    finally
+    {
+     closeConnection(con, ps);
+    }
+   }
+  
+  private void export2FinacleLegacySystem()
+  {
+  }
+  private void export2FlexcubeLegacySystem()
+  {
+  }
+  
+  //added by olabo   
+  //export to a legacy system function
+  public void export2LegacySystem()
+  {
+   String[] appDetail = getLegacySystemDetail();
+   if(appDetail[0].equalsIgnoreCase("EQUINOX"))
+   {
+     export2EquinoxLegacySystem();
+   }
+   else
+   {
+     
+   }
+    
+  }  
+  
+  //added by olabo   
+  public String[] getLegacySystemDetail() 
+  {
+   String SELECT_QUERY = "SELECT app_name,version,client_name,req_accttype,req_trancode FROM AM_AD_LEGACY_SYS_CONFIG ";
+   String[] result = new String[5];
+      
+   Connection con = null;
+   PreparedStatement ps = null;
+   ResultSet rs = null;
+   
+   try 
+   {
+    con = getConnection("legendPlus");
+    ps = con.prepareStatement(SELECT_QUERY);
+    rs = ps.executeQuery();
+    while (rs.next()) 
+    {
+     result[0] = rs.getString("app_name");
+     result[1] = rs.getString("version");
+     result[2] = rs.getString("client_name");
+     result[3] = rs.getString("req_accttype");
+     result[4] = rs.getString("req_trancode");
+    }
+   }
+   catch (Exception e) 
+   {
+    e.getMessage();
+   }
+   finally 
+   {
+    closeConnection(con, ps, rs);
+   }
+   return result;     
+  }
+  
+  //added by olabo used to get Debit account details (LEDGER ACCOUNT)  
+  public String getDebitAccountDetail(String operateType,String categoryId)
+  {
+   String operateAcct = "";
+   String query = "";
+   if(operateType.equalsIgnoreCase("maint"))
+   {
+    query = "SELECT gl_account_fleet FROM am_ad_category WHERE category_id = '"+categoryId+"'";
+   }
+   else if(operateType.equalsIgnoreCase("fuel"))
+   {
+    query = "SELECT fuel_ledger_fleet FROM am_ad_category WHERE category_id = '"+categoryId+"'";
+   }
+   else if(operateType.equalsIgnoreCase("licence"))
+   {
+    query = "SELECT license_ledger_fleet FROM am_ad_category WHERE category_id = '"+categoryId+"'";
+   }
+   else if(operateType.equalsIgnoreCase("insurance"))
+   {
+    query = "SELECT insurance_acct_fleet FROM am_ad_category WHERE category_id = '"+categoryId+"'";
+   }
+   else if(operateType.equalsIgnoreCase("accident"))
+   {
+    query = "SELECT accident_ledger_fleet FROM am_ad_category WHERE category_id = '"+categoryId+"'";
+   }
+   else
+   {
+    query = "";//accident
+   }
+      
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try 
+    {
+     con = getConnection("legendPlus");//connect.getConnection("jdbc:sqlserver://localhost:1433;database=legend","legend","legend");
+     ps = con.prepareStatement(query);
+     rs = ps.executeQuery();
+     while (rs.next()) 
+     {
+      operateAcct = rs.getString(1);
+     }
+    }
+    catch (Exception e) 
+    {
+     String warning = "WARNING:Error Fetching Operation Ledger Account" +
+                             " ->" + e.getMessage();
+     System.out.println(warning);
+    } 
+    finally 
+    {
+     closeConnection(con, ps, rs);
+    }
+    if(operateAcct == null){operateAcct = "";}
+    return operateAcct;
+   }
+    
+  //added by olabo     
+  public String[] getVendorAccountDetail(String techType,String techId)
+  {
+   String vendorAcct = "";
+   String query = "";
+   String[] result = new String[2];
+       //System.out.println("====techType: "+techType+"    techId: "+techId);
+   if(techType.equalsIgnoreCase("I"))
+   {
+//    query = "SELECT employee_acct,account_type FROM am_ad_employee WHERE employee_Name = '"+techId+"'";
+	   query = "SELECT account_number,account_type FROM am_ad_vendor WHERE vendor_Name = '"+techId+"'";
+   }
+   else
+   {
+    query = "SELECT account_number,account_type FROM am_ad_vendor WHERE vendor_Name = '"+techId+"'"; 
+   }
+   
+   Connection con = null;
+   PreparedStatement ps = null;
+   ResultSet rs = null;
+   if((techId != null)||(techId.equals("")))
+   {
+    try 
+    {
+     con = getConnection("legendPlus");
+     ps = con.prepareStatement(query);
+     rs = ps.executeQuery();
+     while (rs.next()) 
+     {
+      result[0] = rs.getString("account_number");
+      result[1] = rs.getString("account_type");
+     }
+    }
+    catch (Exception e) 
+    {
+     String warning = "WARNING:Error Fetching Vendor/technician Account" +
+                             " ->" + e.getMessage();
+     System.out.println(warning);
+    } 
+    finally 
+    {
+     closeConnection(con, ps, rs);
+    }
+   }
+    if(result[0] == null){result[0] = "";} //account number
+    if(result[1] == null){result[1] = "";} //account type
+    return result;
+   }
+  
+  //added by Olabo 
+  public String[] getInsuranceAccountDetail(String isuranceId)
+  {
+   String vendorAcct = "";
+   String query = "";
+   String[] result = new String[2];
+       
+   query = "SELECT account_number,account_type FROM am_ad_Insurance WHERE insuranceId = '"+isuranceId+"'"; 
+   
+   Connection con = null;
+   PreparedStatement ps = null;
+   ResultSet rs = null;
+   try 
+    {
+     con = getConnection("legendPlus");
+     ps = con.prepareStatement(query);
+     rs = ps.executeQuery();
+     while (rs.next()) 
+     {
+      result[0] = rs.getString("account_number");
+      result[1] = rs.getString("account_type");
+     }
+    }
+    catch (Exception e) 
+    {
+     String warning = "WARNING:Error Fetching Insurance Account Detail" +
+                             " ->" + e.getMessage();
+     System.out.println(warning);
+    } 
+    finally 
+    {
+     closeConnection(con, ps, rs);
+    }
+  
+    return result;
+   }
+  
+  //getCompany 
+  public String[] getCompanyInfo()
+  {
+   String[] result = new String[7];
+       
+   String query = "SELECT vat_rate,wht_rate,fed_wht_rate,vat_account,wht_account,sbu_required,sbu_level"+
+                  " FROM am_gb_company "; 
+   
+   Connection con = null;
+   PreparedStatement ps = null;
+   ResultSet rs = null;
+   try 
+    {
+     con = getConnection("legendPlus");
+     ps = con.prepareStatement(query);
+     rs = ps.executeQuery();
+     while (rs.next()) 
+     {
+      result[0] = rs.getString("vat_rate");
+      result[1] = rs.getString("wht_rate");
+      result[2] = rs.getString("vat_account");
+      result[3] = rs.getString("wht_account");
+      result[4] = rs.getString("sbu_required");
+      result[5] = rs.getString("sbu_level");
+      result[6] = rs.getString("fed_wht_rate");
+     }
+    }
+    catch (Exception e) 
+    {
+     String warning = "WARNING:Error Fetching Company Details" +
+                             " ->" + e.getMessage();
+     System.out.println(warning);
+    } 
+    finally 
+    {
+     closeConnection(con, ps, rs);
+    }
+  
+    return result;
+   }
+  
+  //method to get Vat Amount
+   public double getVatAmount(double cost)
+   {
+    String[] companyInfo = getCompanyInfo();
+    double result = 0;
+    
+    double vatRate = 0;
+    double vatAmount = 0;
+    
+    if(companyInfo != null)
+    {
+     vatRate = Double.parseDouble(companyInfo[0]);
+     vatAmount = (cost * vatRate) / 100;
+     
+    }
+    
+    result = vatAmount;
+    return result;
+   }
+  
+   //get WHT Amount 
+   public double getWhtAmount(double cost)
+   {
+    String[] companyInfo = getCompanyInfo();
+    double result = 0;
+    
+    double whtRate = 0;
+    double whtAmount = 0;
+    
+    if(companyInfo != null)
+    {
+     whtRate = Double.parseDouble(companyInfo[1]);
+     whtAmount = (cost) * whtRate / 100;
+    }
+    
+    result = whtAmount;
+   
+    return result;
+   }
+   //added by olabo   
+   public int raiseEntry(String drAcct,String crAcct,String drAcctType,String crAcctType,String drTranCode,
+                               String crTranCode,String drNarration,String crNarration,
+                                double amount,String userId,String batchId,String entryDate,String superId)
+    {
+     int i = 0;
+     //String superId = "0";
+	   String legacyId = "";
+	   String tranCode = "";
+     String postDate = entryDate;//dateConvert(new java.util.Date()).toString();
+	   String effDate = dateConvert(new java.util.Date()).toString();
+	   String status = "U";
+	   String supervisor = "";
+	   String rejectReason = "";
+	   //String batchId = assetId;
+     
+     
+     String query = "INSERT INTO am_entry_table(dr_acct,cr_acct,dr_narration,cr_narration,amount,user_id,"+
+     "super_id,legacy_id,dr_tran_code,cr_tran_code,posting_date,effective_date,process_status,supervisor,reject_reason,batch_id,dr_acct_type,cr_acct_type)"+
+     " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    Connection con = null;
+    PreparedStatement ps = null;
+    try 
+    {
+     con = getConnection("legendPlus");
+     ps = con.prepareStatement(query);
+     ps.setString(1,drAcct);
+     ps.setString(2,crAcct);
+     ps.setString(3,drNarration);
+     ps.setString(4,crNarration);
+     ps.setDouble(5,amount);
+     ps.setString(6,userId);
+     ps.setString(7,superId);
+     ps.setString(8,legacyId);
+     ps.setString(9,drTranCode);
+     ps.setString(10,crTranCode);
+     ps.setDate(11,dateConvert(entryDate));
+     ps.setDate(12,dateConvert(effDate));
+     ps.setString(13,status);
+     ps.setString(14,supervisor);
+     ps.setString(15,rejectReason);
+     ps.setString(16,batchId);
+     ps.setString(17,drAcctType);
+     ps.setString(18,crAcctType);
+     i = ps.executeUpdate();
+    }
+    catch(Exception e)
+    {
+     String warning = "WARNING:Error inserting Raise Entry ->" + e.getMessage();
+     System.out.println(warning);
+     e.printStackTrace();
+    } 
+    finally 
+    {
+     closeConnection(con, ps);
+    }
+    return i;
+    }
+ 
+ //added by olabo   
+ public int getMaxNum(String transType,String assetId)
+ {
+  int maxNum = 0;
+  Connection con = null;
+  Statement  stmt = null;
+  ResultSet rs = null; 
+  PreparedStatement ps = null;
+  String qry = "SELECT MAX(LT_ID) FROM "+transType+" WHERE ASSET_ID = '"+assetId+"'";
+  
+  try
+  {
+   con = getConnection("legendPlus");
+   ps = con.prepareStatement(qry);
+   rs = ps.executeQuery();
+   while(rs.next())
+   {
+     maxNum = rs.getInt(1)+1;
+   }
+   //System.out.println("max num..."+maxNum);
+  }
+  catch(Exception e)
+  {
+   System.out.println("WARNING::ERROR "+transType+" "+e);
+   e.printStackTrace();
+  }
+  finally
+  {
+  try
+  {
+   if(ps != null){ps.close();}
+   if(con != null){con.close();}
+  }
+  catch(Exception e)
+  {
+   System.out.println("WARNING::Error Closing Connection "+e);
+  }
+  }
+   return maxNum;
+ }
+
+ //for generating batch ID for AM_ENTRY_TABLE
+ public int getMaxNum(String userId)
+ {
+  int maxNum = 0;
+  Connection con = null;
+  Statement  stmt = null;
+  ResultSet rs = null; 
+  PreparedStatement ps = null;
+  String qry = "SELECT MAX(TRANSACTION_ID) FROM AM_ENTRY_TABLE WHERE USER_ID = '"+userId+"'";
+  
+  try
+  {
+   con = getConnection("legendPlus");
+   ps = con.prepareStatement(qry);
+   rs = ps.executeQuery();
+   while(rs.next())
+   {
+     maxNum = rs.getInt(1)+1;
+   }
+   
+  }
+  catch(Exception e)
+  {
+   System.out.println("WARNING::ERROR FETCHING MAX FROM AM_ENTRY_TABLE "+e);
+   e.printStackTrace();
+  }
+  finally
+  {
+  try
+  {
+   if(ps != null){ps.close();}
+   if(con != null){con.close();}
+  }
+  catch(Exception e)
+  {
+   System.out.println("WARNING::Error Closing Connection "+e);
+  }
+  }
+   return maxNum;
+ }
+ 
+//method to get Vat and Wht Amount
+ public double[] getVatWhtAmount(double cost, String subj2Vat,
+                                 String subj2Wht) {
+     String[] companyInfo = getCompanyInfo();
+     double result[] = new double[2];
+
+     double vatRate = 0;
+     double whtRate = 0;
+     double vatAmount = 0;
+     double whtAmount = 0;
+
+     if (companyInfo != null) {
+         vatRate = Double.parseDouble(companyInfo[0]);
+         //whtRate = Double.parseDouble(companyInfo[1]);
+         vatAmount = (cost * vatRate) / 100;
+         //whtAmount = (vatAmount + cost) * whtRate / 100;
+
+         //System.out.println("<<<<.whtRate.0: "+Double.parseDouble(companyInfo[0])+"   whtRate.1: "+Double.parseDouble(companyInfo[1]));
+   	   whtRate = Double.parseDouble(companyInfo[1]);
+   	  
+   	//System.out.println("<<<<=====subj2Wht: "+subj2Wht+"      subj2Vat: "+subj2Vat);
+          if(subj2Wht.equalsIgnoreCase("S")){
+            whtRate = Double.parseDouble(companyInfo[1]);
+             }
+            if(subj2Wht.equalsIgnoreCase("F")){  
+            whtRate = Double.parseDouble(companyInfo[6]);
+            }
+         if(subj2Wht.equalsIgnoreCase("N")){whtRate =0;}
+         	  whtAmount = (cost * whtRate) / 100;
+          //  whtAmount = (whtAmount + cost) * whtRate / 100;
+
+         if (subj2Vat.equalsIgnoreCase("N")) {
+             vatAmount = 0;
+         }
+
+   //          whtAmount = (vatAmount + cost) * whtRate / 100;
+         //if (subj2Wht.equalsIgnoreCase("N")) {
+           //  whtAmount = 0;
+         //}
+             //System.out.println("<<<<vatAmount: "+vatAmount+"   whtAmount: "+whtAmount+"  cost: "+cost);
+     }
+
+     result[0] = vatAmount;
+     result[1] = whtAmount;
+
+     return result;
+ }
+ 
+//method to get Vat and Wht Amount
+public double[] getWhtAmount(double cost,String subj2Wht,String rate) {
+//    String[] companyInfo = getCompanyInfo();
+    double result[] = new double[2];
+
+    double whtRate = 0;
+    double whtAmount = 0;
+
+//    if (companyInfo != null) {
+    	whtRate = Double.parseDouble(rate);
+        //whtRate = Double.parseDouble(companyInfo[1]);
+        whtAmount = (cost * whtRate) / 100;
+        //whtAmount = (vatAmount + cost) * whtRate / 100;
+
+        //System.out.println("<<<<.whtRate.0: "+Double.parseDouble(rate)+"   whtRate.1: "+Double.parseDouble(rate));
+  	   whtRate = Double.parseDouble(rate);
+  	  
+  	   
+         if(subj2Wht.equalsIgnoreCase("S")){
+           whtRate = Double.parseDouble(rate);
+            }
+           if(subj2Wht.equalsIgnoreCase("F")){  
+           whtRate = Double.parseDouble(rate);
+           }
+        if(subj2Wht.equalsIgnoreCase("N")){whtRate =0;}
+        	  whtAmount = (cost * whtRate) / 100;
+            //System.out.println("<<<<whtAmount: "+whtAmount+"  cost: "+cost);
+  //  }
+
+    result[0] = whtAmount;
+    result[1] = whtAmount;
+
+    return result;
+}
+
+//method to get Vat and Wht Amount
+public double[] getVatAmount(double cost, String subj2Vat,String rate) {
+//  String[] companyInfo = getCompanyInfo();
+  double result[] = new double[2];
+
+  double vatRate = 0;
+  double vatAmount = 0;
+//  if (companyInfo != null) {
+      vatRate = Double.parseDouble(rate);
+      //whtRate = Double.parseDouble(companyInfo[1]);
+      vatAmount = (cost * vatRate) / 100;
+      //whtAmount = (vatAmount + cost) * whtRate / 100;
+
+      //System.out.println("<<<<.whtRate.0: "+Double.parseDouble(rate)+"   whtRate.1: "+Double.parseDouble(rate));
+      vatRate = Double.parseDouble(rate);
+	  
+	   
+       if(subj2Vat.equalsIgnoreCase("S")){
+    	   vatRate = Double.parseDouble(rate);
+          }
+         if(subj2Vat.equalsIgnoreCase("F")){  
+        	 vatRate = Double.parseDouble(rate);
+         }
+      if(subj2Vat.equalsIgnoreCase("N")){vatRate =0;}
+      		vatAmount = (cost * vatRate) / 100;
+       //  whtAmount = (whtAmount + cost) * whtRate / 100;
+
+  result[0] = vatAmount;
+  result[1] = vatAmount;
+
+  return result;
+}
+ 
+ public String countPendingTransaction(String superId) {
+
+        if (superId == null) {
+            superId = "0";
+        }
+        String query = "SELECT count(*) FROM am_entry_table WHERE super_id ='" +
+                       superId + "' AND process_status = 'U'";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        ArrayList list = new ArrayList();
+        String rowNum = "0";
+        try {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                rowNum = rs.getString(1);
+            }
+        } catch (Exception e) {
+            String warning = "WARN:Error getting Number Of Pending Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps);
+        }
+        return rowNum;
+
+    }
+ 
+ //added by olabo   
+ public int getMaxCountNum(String transType,String assetId)
+ {
+  int maxNum = 0;
+  Connection con = null;
+  Statement  stmt = null;
+  ResultSet rs = null; 
+  PreparedStatement ps = null;
+  String qry = "SELECT MAX(LT_ID) FROM "+transType+" ";
+  
+  try
+  {
+   con = getConnection("legendPlus");
+   ps = con.prepareStatement(qry);
+   rs = ps.executeQuery();
+   while(rs.next())
+   {
+     maxNum = rs.getInt(1)+1;
+   }
+   //System.out.println("max num..."+maxNum);
+  }
+  catch(Exception e)
+  {
+   System.out.println("WARNING::ERROR "+transType+" "+e);
+   e.printStackTrace();
+  }
+  finally
+  {
+  try
+  {
+   if(ps != null){ps.close();}
+   if(con != null){con.close();}
+  }
+  catch(Exception e)
+  {
+   System.out.println("WARNING::Error Closing Connection "+e);
+  }
+  }
+   return maxNum;
+ }
+
+//added by olabo   
+public int getMaxCountNumFM(String transType,String assetId)
+{
+ int maxNum = 0;
+ Connection con = null;
+ Statement  stmt = null;
+ ResultSet rs = null; 
+ PreparedStatement ps = null;
+ String qry = "SELECT MAX(ID) FROM "+transType+" ";
+ 
+ try
+ {
+  con = getConnection("legendPlus");
+  ps = con.prepareStatement(qry);
+  rs = ps.executeQuery();
+  while(rs.next())
+  {
+    maxNum = rs.getInt(1)+1;
+  }
+  //System.out.println("max num..."+maxNum);
+ }
+ catch(Exception e)
+ {
+  System.out.println("WARNING::ERROR "+transType+" "+e);
+  e.printStackTrace();
+ }
+ finally
+ {
+ try
+ {
+  if(ps != null){ps.close();}
+  if(con != null){con.close();}
+ }
+ catch(Exception e)
+ {
+  System.out.println("WARNING::Error Closing Connection "+e);
+ }
+ }
+  return maxNum;
+}
+
+
+public void logFacilityTransaction(FleetTransaction tran)
+{
+    if(isExistingFacilityTransaction(tran.getAssetId(), tran.getRegistrationNo()))
+    {
+        updateFacilityTransaction(tran);
+    } else
+    {
+        createFacilityTransaction(tran);
+    }
+}
+
+
+public boolean isExistingFacilityTransaction(String assetId, String registrationNo)
+{
+    boolean exists;
+    String query;
+    ResultSet rs;
+    Connection con;
+    PreparedStatement ps;
+    exists = false;
+    query = "SELECT ASSET_ID,REGISTRATION_NO FROM FM_MASTER WHERE ASSET_ID = ? AND REGISTRATI" +
+"ON_NO = ?"
+;
+    rs = null;
+    con = null;
+    ps = null;
+    try
+    {
+        con = getConnection("legendPlus");
+        ps = con.prepareStatement(query);
+        ps.setString(1, assetId);
+        ps.setString(2, registrationNo);
+        rs = ps.executeQuery();
+        if(rs.next())
+        {
+            exists = true;
+        }
+    }
+    catch(Exception e)
+    {
+        String warning = (new StringBuilder("WARNING:Error determining the existence\n of transaction with asset_id/reg.no:")+assetId+"- "+registrationNo+" ->"+e.getMessage());
+        System.out.println(warning);
+    }
+    closeConnection(con, ps, rs);
+    return exists;
+}
+
+public void createFacilityTransaction(FleetTransaction tran)
+{
+    String query;
+    Connection con;
+    PreparedStatement ps;
+    query = "INSERT INTO FM_MASTER  (ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID  ,CATEGORY_ID" +
+",DATE_PURCHASED,ASSET_MAKE,ASSET_USER  ,ASSET_MAINTENANCE,CREATE_DATE,EFFECTIVE_" +
+"DATE  ,LOCATION,RAISE_ENTRY,DEP_YTD,PREMIUM_LTD ,PREMIUM_PTD,MAINT_LTD,MAINT_PTD" +
+",FUEL_LTD  ,FUEL_PTD,ACCIDENT_COUNT,ACCIDENT_COST_LTD  ,ACCIDENT_COST_PTD,LICENC" +
+"E_PERMIT_LTD,LICENCE_PERMIT_PTD  ,LAST_UPDATE_DATE,STATUS,USER_ID,INSURANCE_COST" +
+"_LTD,INSURANCE_COST_PTD   )  VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
+"?,?,?,?,?,?,?,?) "
+;
+    con = null;
+    ps = null;
+    try
+    {
+        con = getConnection("legendPlus");
+        ps = con.prepareStatement(query);
+        ps.setString(1, tran.getAssetId());
+        ps.setString(2, tran.getRegistrationNo());
+        ps.setString(3, tran.getBranchId());
+        ps.setString(4, tran.getDeptId());
+        ps.setString(5, tran.getCategory());
+        ps.setDate(6, dateConvert(tran.getDatePurchased()));
+        ps.setString(7, tran.getAssetMake());
+        ps.setString(8, tran.getAssetUser());
+        ps.setString(9, tran.getAssetMaintenance());
+        ps.setDate(10, dateConvert(tran.getCreateDate()));
+        ps.setDate(11, dateConvert(tran.getEffectiveDate()));
+        ps.setString(12, tran.getLocation());
+        ps.setString(13, "");
+        ps.setDouble(14, tran.getDepreciation());
+        ps.setDouble(15, tran.getPremiumLiveToDate());
+        ps.setDouble(16, tran.getPremimumPeriodToDate());
+        ps.setDouble(17, tran.getMaintLiveToDate());
+        ps.setDouble(18, tran.getMaintPeriodToDate());
+        ps.setDouble(19, tran.getFuelLiveToDate());
+        ps.setDouble(20, tran.getFuelPeriodToDate());
+        ps.setInt(21, tran.getAccidentCount());
+        ps.setDouble(22, tran.getAccidentCostLiveToDate());
+        ps.setDouble(23, tran.getAccidentCostPeriodToDate());
+        ps.setDouble(24, tran.getLicencePermitLiveToDate());
+        ps.setDouble(25, tran.getLicencePermitPeriodToDate());
+        ps.setDate(26, dateConvert(new Date()));
+        ps.setString(27, tran.getStatus());
+        ps.setString(28, tran.getAssetUser());
+        ps.setDouble(29, tran.getInsuranceLiveToDate());
+        ps.setDouble(30, tran.getInsurancePremiumToDate());
+        ps.execute();
+    }
+    catch(Exception e)
+    {
+        String warning = (new StringBuilder("WARNING:Error Creating Facility Transaction ->")+e.getMessage());
+        System.out.println(warning);
+        e.printStackTrace();
+    }
+    closeConnection(con, ps);
+}
+
+public void updateFacilityTransaction(FleetTransaction tran)
+{
+    String query;
+    Connection con;
+    PreparedStatement ps;
+    query = "UPDATE FM_MASTER  SET ASSET_MAINTENANCE = ?,CREATE_DATE = ?,EFFECTIVE_DATE = ?, " +
+"LOCATION = ?,RAISE_ENTRY = ?,DEP_YTD = DEP_YTD + ?,PREMIUM_LTD = PREMIUM_LTD + ?" +
+",PREMIUM_PTD =PREMIUM_PTD+?,MAINT_LTD = MAINT_LTD + ?,MAINT_PTD = MAINT_PTD+?,FU" +
+"EL_LTD = FUEL_LTD+ ?,FUEL_PTD = FUEL_PTD + ?,ACCIDENT_COUNT = ACCIDENT_COUNT+ ?," +
+"ACCIDENT_COST_LTD = ACCIDENT_COST_LTD + ?, ACCIDENT_COST_PTD = ACCIDENT_COST_PTD" +
+" + ?,LICENCE_PERMIT_LTD = LICENCE_PERMIT_LTD + ?,LICENCE_PERMIT_PTD = LICENCE_PE" +
+"RMIT_PTD + ?,LAST_UPDATE_DATE = ?,STATUS = ? ,INSURANCE_COST_LTD = INSURANCE_COS" +
+"T_LTD + ?,INSURANCE_COST_PTD = INSURANCE_COST_PTD + ?    WHERE ASSET_ID = ? AND " +
+"REGISTRATION_NO = ?"
+;
+    con = null;
+    ps = null;
+    try
+    {
+        con = getConnection("legendPlus");
+        ps = con.prepareStatement(query);
+        ps.setString(1, tran.getAssetMaintenance());
+        ps.setDate(2, dateConvert(tran.getCreateDate()));
+        ps.setDate(3, dateConvert(tran.getEffectiveDate()));
+        ps.setString(4, "");
+        ps.setString(5, "");
+        ps.setDouble(6, tran.getDepreciation());
+        ps.setDouble(7, tran.getPremiumLiveToDate());
+        ps.setDouble(8, tran.getPremimumPeriodToDate());
+        ps.setDouble(9, tran.getMaintLiveToDate());
+        ps.setDouble(10, tran.getMaintPeriodToDate());
+        ps.setDouble(11, tran.getFuelLiveToDate());
+        ps.setDouble(12, tran.getFuelPeriodToDate());
+        ps.setInt(13, tran.getAccidentCount());
+        ps.setDouble(14, tran.getAccidentCostLiveToDate());
+        ps.setDouble(15, tran.getAccidentCostPeriodToDate());
+        ps.setDouble(16, tran.getLicencePermitLiveToDate());
+        ps.setDouble(17, tran.getLicencePermitPeriodToDate());
+        ps.setDate(18, dateConvert(new Date()));
+        ps.setString(19, tran.getStatus());
+        ps.setDouble(20, tran.getInsuranceLiveToDate());
+        ps.setDouble(21, tran.getInsurancePremiumToDate());
+        ps.setString(22, tran.getAssetId());
+        ps.setString(23, tran.getRegistrationNo());
+        ps.execute();
+    }
+    catch(Exception e)
+    {
+        String warning = (new StringBuilder("WARNING:Error updating Facility Transaction ->")+e.getMessage());
+        System.out.println(warning);
+        e.printStackTrace();
+    }
+    closeConnection(con, ps);
+
+}
+
+
+
+ 
+ }

@@ -1,0 +1,436 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package legend;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import magma.AssetRecordsBean;
+import magma.asset.manager.AssetManager;
+import magma.AssetReclassificationBean;
+import com.magbel.legend.bus.ApprovalRecords;
+//import magma.net.manager.AssetManager;
+
+/**
+ *
+ * @author Olabo
+ */
+public class ApprovalServlet extends HttpServlet {
+   
+    /** 
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+       
+        AssetManager asset_manager = new AssetManager();
+        ApprovalRecords aprecords = new ApprovalRecords();
+
+
+
+
+        try {
+           AssetReclassificationBean asset_reclassification = new AssetReclassificationBean();
+           AssetRecordsBean arb = new AssetRecordsBean();
+
+         String astatus = request.getParameter("astatus");
+         //String newAsset = request.getParameter("approveBtn");
+
+         String full_status = request.getParameter("full_status");
+            String asset_id = request.getParameter("id");
+            String rr = request.getParameter("reject_reason");
+            String tableName = request.getParameter("tableName")==null?"":request.getParameter("tableName");
+            String columnName = request.getParameter("columnName");
+            String category = request.getParameter("category");
+
+            //for asset transfer
+            String newBranch = request.getParameter("newBranch");
+            String newDept = request.getParameter("newDept");
+            String newSec = request.getParameter("newSection");
+
+            //for asset reclassification
+            String branch = request.getParameter("branch_id");
+            String dept = request.getParameter("department_id");
+            String section = request.getParameter("section_id");
+            String newCategory = request.getParameter("new_category");
+
+
+            
+            int tranId = Integer.parseInt(request.getParameter("tranId"));
+
+            int tranLevel= Integer.parseInt(request.getParameter("tranLevel"));
+
+            int approvalCount= Integer.parseInt(request.getParameter("approvalCount"));
+
+            int userId = Integer.parseInt(request.getParameter("user_id"));
+
+            int supervisor = (request.getParameter("supervisor") == null)?0:Integer.parseInt(request.getParameter("supervisor"));
+
+
+
+            if(supervisor == 0){supervisor = userId;}
+            int currentSupervisor = approvalCount;
+            currentSupervisor +=1;
+            String sup = "approval"+currentSupervisor;
+            String supervisorUpdate = "update am_asset_approval set "+sup+" = "+supervisor+" where transaction_id = " +tranId;
+
+           String[] raiseEntryInfo = aprecords.raiseEntryInfo(asset_id);
+
+           String description = raiseEntryInfo[0];
+           String branch_id = raiseEntryInfo[1];
+           String subject_to_vat = raiseEntryInfo[2];
+           String wh_tax = raiseEntryInfo[3];
+           String flag = "";
+           String partPay = "";
+           String asset_User_Name = aprecords.getCodeName("SELECT full_name from am_gb_user where user_id = " + userId);
+           String branchName = aprecords.getCodeName(" SELECT branch_name from am_ad_branch where branch_id= " + Integer.parseInt(branch_id) );
+
+          
+if(tableName.equals("")){
+if(astatus.equalsIgnoreCase("A")){
+//Approval for new asset creation
+        arb.updateAssetStatusApproval(tranId);
+        arb.updateAssetStatus(asset_id);
+
+}//inner if
+}else{
+
+ if(astatus.equalsIgnoreCase("A")){
+      approvalCount += 1;
+if(full_status.equalsIgnoreCase("Disposed")){
+
+
+       // approvalCount += 1;
+
+        
+
+   if(approvalCount == tranLevel){
+     String page ="ASSET DISPOSAL RAISE ENTRY";
+     String url ="DocumentHelp.jsp?np=disposeAsset&id=" +asset_id+"&operation=0&exitPage=manageDisposals&pageDirect=Y";
+
+     // System.out.println("in equality ===========================================");
+        String q= "update am_asset_approval set process_status='A', asset_status='Disposed' where transaction_id = '"+tranId+"'";
+        arb.updateAssetStatusChange(q);
+        String q2 = "update am_AssetDisposal set disposal_status='D' where asset_id = '"+asset_id+"'";
+        arb.updateAssetStatusChange(q2);
+
+        String q3 = "update am_asset set Asset_Status='Disposed' where asset_id = '"+asset_id+"'";
+         arb.updateAssetStatusChange(q3);
+         aprecords.insertApproval(asset_id, description, page, flag, partPay, asset_User_Name, branchName, subject_to_vat, wh_tax, url);
+          aprecords.updateRaiseEntry(asset_id);
+   }
+
+   arb.incrementApprovalCount(tranId,approvalCount,supervisor);
+  
+}//inner if
+
+
+
+if(full_status.equalsIgnoreCase("Reclassified")){
+
+     if(approvalCount == tranLevel){
+
+         String page ="ASSET RECLASSIFICATION RAISE ENTRY";
+     String url = "";//DocumentHelp.jsp?np=assetReclassRaiseEntry&id="+asset_id+"&pageDirect=Y";
+
+ String q= "update am_asset_approval set process_status='A',asset_status='Reclassified' where transaction_id = '"+tranId+"'";
+   arb.updateAssetStatusChange(q);
+    asset_reclassification.updateAssetReclassification(asset_id);
+
+    try{
+String newAsset_id="";
+AutoIDSetup aid_setup = new AutoIDSetup();
+
+System.out.print("######### the category id is" + newCategory);
+System.out.print("######### the branch id is" + branch);
+System.out.print("######### the section id is" + section);
+System.out.print("######### the dept id is" + dept);
+
+//String cat_id = aid_setup.getCategoryID(category);
+newAsset_id = aid_setup.getIdentity(branch,dept,section,newCategory);
+System.out.println("The new asset ID after being reclassified is <<<<<<<<<>>>>>>>>>>>>>>>>" + newAsset_id);
+
+url = "DocumentHelp.jsp?np=assetReclassRaiseEntry&id="+newAsset_id+"&pageDirect=Y";
+
+String change_id_query2 = "update am_asset set old_asset_id ='"+asset_id+"', asset_id ='"+newAsset_id+"' where asset_id ='"+asset_id+"'";
+
+//System.out.print("######### the query  is " + change_id_query2);
+arb.updateAssetStatusChange(change_id_query2);
+//id=newAsset_id;
+}
+catch(Exception e){
+System.out.println("Error occurred in approval servlet when reclassifying asset " + e);
+}
+
+ catch(Throwable t){
+ System.out.println("Throwable occurred in approval servlet when reclassifying asset" + t);
+ }
+ 
+aprecords.insertApproval(asset_id, description, page, flag, partPay, asset_User_Name, branchName, subject_to_vat, wh_tax, url);
+aprecords.updateRaiseEntry(asset_id);
+
+     }
+
+   arb.incrementApprovalCount(tranId,approvalCount,supervisor);
+
+}//inner if
+
+if(full_status.equalsIgnoreCase("Revalued")){
+   
+
+    if(approvalCount == tranLevel){
+              String page ="ASSET REVALUATION RAISE ENTRY";
+     String url ="DocumentHelp.jsp?np=assetRevalue&id="+asset_id+"&operation=0&exitPage=manageRevaluation&pageDirect=Y";
+
+    System.out.println("===============here in revalued=============");
+    String q= "update am_asset_approval set process_status='A',asset_status='Revalued' where transaction_id = '"+tranId+"'";
+   String q3 = "update am_assetrevalue set approval_Status='ACTIVE' where revalue_id = '"+ Integer.toString(tranId)+"'";
+    arb.updateAssetStatusChange(q);
+      arb.updateAssetStatusChange(q3);
+ asset_manager.updateAssetRevalue(asset_id);
+
+ aprecords.insertApproval(asset_id, description, page, flag, partPay, asset_User_Name, branchName, subject_to_vat, wh_tax, url);
+aprecords.updateRaiseEntry(asset_id);
+
+  }
+
+   arb.incrementApprovalCount(tranId,approvalCount,supervisor);
+
+}//inner if
+
+
+if(full_status.equalsIgnoreCase("Transferred")){
+    System.out.println("===============here in transfered method of approval servlet=============");
+    if (approvalCount == tranLevel) {
+
+        String page = "ASSET TRANSFER RAISE ENTRY";
+        String url = ""; //DocumentHelp.jsp?np=assetTransfersRaiseEntry&id=" + asset_id + "&operation=0&exitPage=DocumentHelp.jsp?np=manageTransfers&pageDirect=Y";
+
+        String q = "update am_asset_approval set process_status='A',asset_status='Transferred' where transaction_id = '" + tranId + "'";
+        String q3 = "update am_assettransfer set approval_Status='ACTIVE' where transfer_id = '" + Integer.toString(tranId) + "'";
+        arb.updateAssetStatusChange(q);
+        arb.updateAssetStatusChange(q3);
+        asset_manager.updateAssetTransfer(asset_id);
+
+        //comment off for trouble shooting starts
+
+        magma.net.manager.AssetManager assetManager = new magma.net.manager.AssetManager();
+       try {
+            AutoIDSetup aid_setup = new AutoIDSetup();
+            String cat_id = aid_setup.getCategoryID(category);
+            System.out.println("@@@ the category id is" + cat_id);
+             System.out.println("@@@ the newBranch id is" + newBranch);
+              System.out.println("@@@ the newDept id is" + newDept);
+               System.out.println("@@@ the newSec id is" + newSec);
+
+            String newAsset_id = aid_setup.getIdentity(newBranch, newDept, newSec, cat_id);
+
+            assetManager.transferAssetsUpdate(asset_id, newAsset_id);
+            assetManager.updateOldAssetWithApproval(asset_id, newAsset_id,tranId);
+            url = "DocumentHelp.jsp?np=assetTransfersRaiseEntry&id=" + newAsset_id + "&operation=0&exitPage=DocumentHelp.jsp?np=manageTransfers&pageDirect=Y";
+             //--CHANGE ASSET ID TO NEWLY GENERATED ID
+            //--String change_id_query = "update am_asset set old_asset_id ='" + asset_id + "' where asset_id =' " + newAsset_id + " '";
+            //--arb.updateAssetStatusChange(change_id_query);
+
+            //--String change_id_query2 = "update am_asset set asset_status ='INACTIVE' where asset_id =' " + asset_id + " '";
+            //--arb.updateAssetStatusChange(change_id_query2);
+        System.out.println("The new asset ID after being transferred is <<<<<<<<<>>>>>>>>>>>>>>>>" + newAsset_id);
+
+        // //comment off for trouble shooting ends
+
+        }catch(Throwable ex){
+            System.out.println("ApprovalServlet: Error occured while generating And updating new asset id for transfered asset " +ex);
+                }
+
+
+
+
+
+
+
+
+        aprecords.insertApproval(asset_id, description, page, flag, partPay, asset_User_Name, branchName, subject_to_vat, wh_tax, url);
+        aprecords.updateRaiseEntry(asset_id);
+
+     }
+
+   arb.incrementApprovalCount(tranId,approvalCount,supervisor);
+}//inner if
+
+
+if(full_status.equalsIgnoreCase("Maintained")){
+  System.out.println("===============here in Maintained section of approvalServlet =============");
+
+   if(approvalCount == tranLevel){
+
+       String page = "ASSET MAINTENACE RAISE ENTRY";
+       String url = "DocumentHelp.jsp?np=assetRevalueMaintenance&id" + asset_id + "&operation=0&exitPage=manageMaitenance&pageDirect=Y";
+
+
+       String q = "update am_asset_approval set process_status='A', asset_status='Asset Maintained' where transaction_id = '" + tranId + "'";
+       arb.updateAssetStatusChange(q);
+
+       String q3 = "update am_Maintenance set approval_Status='ACTIVE' where revalue_id = '" + Integer.toString(tranId) + "'";
+       arb.updateAssetStatusChange(q3);
+
+       asset_manager.updateAssetMaintenance(asset_id);
+
+       aprecords.insertApproval(asset_id, description, page, flag, partPay, asset_User_Name, branchName, subject_to_vat, wh_tax, url);
+       aprecords.updateRaiseEntry(asset_id);
+ }
+
+   arb.incrementApprovalCount(tranId,approvalCount,supervisor);
+
+}//inner if
+
+if(full_status.equalsIgnoreCase("Depreciation Adjusted")){
+   
+     if(approvalCount == tranLevel){
+
+    String q= "update am_asset_approval set process_status='A', asset_status='Asset Depreciation Adjusted' where transaction_id="+tranId;
+    arb.updateAssetStatusChange(q);
+
+    String q3 = "update AM_ASSET_DEP_ADJUSTMENT set approval_Status='ACTIVE' where id = '"+ Integer.toString(tranId)+"'";
+        arb.updateAssetStatusChange(q3);
+
+        asset_manager.updateAssetDepreciation(asset_id);
+
+
+    }
+
+   arb.incrementApprovalCount(tranId,approvalCount,supervisor);
+
+  }//inner if
+
+
+ }//outer if
+ else{
+ if(full_status.equalsIgnoreCase("Depreciation Adjusted")&& astatus.equalsIgnoreCase("R")){
+
+    // String q= "update am_asset_approval set asset_status='Asset Depreciation Adjusted' where asset_id = '"+asset_id+"'and transaction_id="+tranId;
+   String q= "update am_asset_approval set process_status='R', asset_status='No Asset  Depreciation Adjusted', reject_reason='"+rr+"' where transaction_id="+tranId;
+
+    arb.updateAssetStatusChange(q);
+  }//inner if
+
+
+ if(full_status.equalsIgnoreCase("Maintained")&& astatus.equalsIgnoreCase("R")){
+
+    // String q= "update am_asset_approval set asset_status='Asset Depreciation Adjusted' where asset_id = '"+asset_id+"'and transaction_id="+tranId;
+   String q= "update am_asset_approval set process_status='R', asset_status='Asset Maintenance rejected', reject_reason='"+rr+"' where transaction_id="+tranId;
+
+    arb.updateAssetStatusChange(q);
+  }//inner if
+
+
+ if(full_status.equalsIgnoreCase("Transferred")&& astatus.equalsIgnoreCase("R")){
+ 
+    // String q= "update am_asset_approval set asset_status='Asset Depreciation Adjusted' where asset_id = '"+asset_id+"'and transaction_id="+tranId;
+   String q= "update am_asset_approval set process_status='R', asset_status='Asset transfer rejected', reject_reason='"+rr+"' where transaction_id="+tranId;
+
+    arb.updateAssetStatusChange(q);
+  }//inner if
+
+
+ if(full_status.equalsIgnoreCase("Revalued")&& astatus.equalsIgnoreCase("R")){
+   
+    // String q= "update am_asset_approval set asset_status='Asset Depreciation Adjusted' where asset_id = '"+asset_id+"'and transaction_id="+tranId;
+   String q= "update am_asset_approval set process_status='R', asset_status='Asset revaluation rejected', reject_reason='"+rr+"' where transaction_id="+tranId;
+
+    arb.updateAssetStatusChange(q);
+    
+
+  }//
+
+
+  if(full_status.equalsIgnoreCase("Reclassified")&& astatus.equalsIgnoreCase("R")){
+  
+    // String q= "update am_asset_approval set asset_status='Asset Depreciation Adjusted' where asset_id = '"+asset_id+"'and transaction_id="+tranId;
+   String q= "update am_asset_approval set process_status='R', asset_status='Asset reclassification rejected', reject_reason='"+rr+"' where transaction_id="+tranId;
+
+    arb.updateAssetStatusChange(q);
+  }//
+
+
+  if(full_status.equalsIgnoreCase("Disposed")&& astatus.equalsIgnoreCase("R")){
+    
+    // String q= "update am_asset_approval set asset_status='Asset Depreciation Adjusted' where asset_id = '"+asset_id+"'and transaction_id="+tranId;
+   String q= "update am_asset_approval set asset_status='Asset disposal rejected',"+
+           "process_status='R', reject_reason='"+rr+"' where transaction_id="+tranId;
+    arb.updateAssetStatusChange(q);
+
+    String q1 = "update am_asset set Asset_Status='ACTIVE' where asset_id = '"+asset_id+"'";
+     arb.updateAssetStatusChange(q1);
+
+     String q2 = "update am_AssetDisposal set disposal_status='R' where asset_id = '"+asset_id+"'";
+     arb.updateAssetStatusChange(q2);
+  }//
+
+ }
+}//else
+    arb.updateAssetStatusChange(supervisorUpdate);
+
+out.println("<script>alert('Approval status saved')</script>");
+		out.println("<script>");
+		out.println("window.location='DocumentHelp.jsp?np=transactionForApprovalList'");
+	   // out.println("window.location='DocumentHelp.jsp'");
+		out.println("</script>");
+
+           
+        }catch(Exception e){
+            System.out.println("ApprovalServlet: The following error occurred " + e);
+        }
+        finally {
+            out.close();
+        }
+    } 
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /** 
+     * Handles the HTTP <code>GET</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        processRequest(request, response);
+    } 
+
+    /** 
+     * Handles the HTTP <code>POST</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /** 
+     * Returns a short description of the servlet.
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+}

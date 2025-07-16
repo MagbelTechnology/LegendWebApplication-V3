@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="General_Bid_Analysis_Report"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="877"
+		 pageHeight="842"
+		 columnWidth="817"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="BaseDir" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="filterClause" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="ReqnId" isForPrompting="true" class="java.lang.String"/>
+	<queryString><![CDATA[SELECT
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     am_gb_company."company_code" AS am_gb_company_company_code,
+     am_gb_company."company_address" AS am_gb_company_company_address,
+     PR_RFQ_RESPONSE."ReqnID" AS PR_RFQ_RESPONSE_ReqnID,
+     PR_RFQ_RESPONSE."UserID" AS PR_RFQ_RESPONSE_UserID,
+     PR_RFQ_RESPONSE."Status" AS PR_RFQ_RESPONSE_Status,
+     PR_RFQ_RESPONSE."Company_Code" AS PR_RFQ_RESPONSE_Company_Code,
+     PR_RFQ_RESPONSE."Vendor_Code" AS PR_RFQ_RESPONSE_Vendor_Code,
+     PR_RFQ_RESPONSE."Quoted_Vendor_code" AS PR_RFQ_RESPONSE_Quoted_Vendor_code,
+     PR_RFQ_RESPONSE."QuotedBy" AS PR_RFQ_RESPONSE_QuotedBy,
+     PR_RFQ_RESPONSE."Job_Title" AS PR_RFQ_RESPONSE_Job_Title,
+     PR_RFQ_RESPONSE."Email" AS PR_RFQ_RESPONSE_Email,
+     PR_RFQ_RESPONSE."DaysQuote_Valid" AS PR_RFQ_RESPONSE_DaysQuote_Valid,
+     PR_RFQ_RESPONSE."Remark" AS PR_RFQ_RESPONSE_Remark,
+     PR_RFQ_RESPONSE_DETAIL."Description" AS PR_RFQ_RESPONSE_DETAIL_Description,
+     PR_RFQ_RESPONSE_DETAIL."Delivery_Date" AS PR_RFQ_RESPONSE_DETAIL_Delivery_Date,
+     PR_RFQ_RESPONSE_DETAIL."Quantity" AS PR_RFQ_RESPONSE_DETAIL_Quantity,
+     PR_RFQ_RESPONSE_DETAIL."Unit_Price" AS PR_RFQ_RESPONSE_DETAIL_Unit_Price,
+     PR_RFQ_RESPONSE_DETAIL."Cost_Price" AS PR_RFQ_RESPONSE_DETAIL_Cost_Price,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     am_ad_vendor."Vendor_Status" AS am_ad_vendor_Vendor_Status,
+     PR_RFQ_RESPONSE_DETAIL."Item_No" AS PR_RFQ_RESPONSE_DETAIL_Item_No
+FROM
+     "dbo"."PR_RFQ_RESPONSE_DETAIL" PR_RFQ_RESPONSE_DETAIL RIGHT OUTER JOIN "dbo"."PR_RFQ_RESPONSE" PR_RFQ_RESPONSE ON PR_RFQ_RESPONSE_DETAIL."Vendor_Code" = PR_RFQ_RESPONSE."Vendor_Code"
+     AND PR_RFQ_RESPONSE_DETAIL."ReqnID" = PR_RFQ_RESPONSE."ReqnID"
+     INNER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON PR_RFQ_RESPONSE."Vendor_Code" = am_ad_vendor."Vendor_Code",
+     "dbo"."am_gb_company" am_gb_company
+where PR_RFQ_RESPONSE_DETAIL."Unit_Price" <> 0 ]]></queryString>
+
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_gb_company_company_code" class="java.lang.String"/>
+	<field name="am_gb_company_company_address" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_ReqnID" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_UserID" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Status" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Company_Code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Vendor_Code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Quoted_Vendor_code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_QuotedBy" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Job_Title" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Email" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DaysQuote_Valid" class="java.lang.Integer"/>
+	<field name="PR_RFQ_RESPONSE_Remark" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Description" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Delivery_Date" class="java.sql.Timestamp"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Quantity" class="java.lang.Integer"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Unit_Price" class="java.math.BigDecimal"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Status" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Item_No" class="java.lang.Integer"/>
+
+	<sortField name="PR_RFQ_RESPONSE_ReqnID" />
+	<sortField name="PR_RFQ_RESPONSE_DETAIL_Item_No" />
+	<sortField name="PR_RFQ_RESPONSE_Vendor_Code" />
+
+
+		<group  name="Requisition_Group" isReprintHeaderOnEachPage="true" >
+			<groupExpression><![CDATA[$F{PR_RFQ_RESPONSE_ReqnID}]]></groupExpression>
+			<groupHeader>
+			<band height="19"  isSplitAllowed="true" >
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="-26"
+						y="7"
+						width="735"
+						height="10"
+						key="subreport-1"/>
+					<subreportParameter  name="ReqnId">
+						<subreportParameterExpression><![CDATA[$P{ReqnId}]]></subreportParameterExpression>
+					</subreportParameter>
+					<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["C:/jboss-4.0.5.GA/server/default/deploy/legend2.net.war/reports/RFQ_RESPONSE_SUMMARY.JASPER"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="111"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="288"
+						y="90"
+						width="81"
+						height="21"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="textField-22"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_ReqnID}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="288"
+						y="64"
+						width="81"
+						height="28"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-27"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Reference Number]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="381"
+						y="90"
+						width="131"
+						height="21"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="textField-23"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="381"
+						y="64"
+						width="131"
+						height="27"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-28"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Buyer]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="605"
+						y="5"
+						width="101"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-24"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Report" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="706"
+						y="5"
+						width="36"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-25"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<line direction="TopDown">
+					<reportElement
+						x="7"
+						y="54"
+						width="727"
+						height="0"
+						key="line-5"/>
+					<graphicElement stretchType="NoStretch"/>
+				</line>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="7"
+						y="90"
+						width="94"
+						height="21"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="textField-27"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_ReqnID}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="7"
+						y="64"
+						width="94"
+						height="27"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-31"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[RFQ Number]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="102"
+						y="90"
+						width="90"
+						height="21"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="textField-28"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Delivery_Date}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="102"
+						y="64"
+						width="90"
+						height="27"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-32"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Issue Date]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="194"
+						y="90"
+						width="90"
+						height="21"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="textField-29"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Delivery_Date}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="194"
+						y="64"
+						width="90"
+						height="27"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-33"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Closing Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="7"
+						y="18"
+						width="273"
+						height="29"
+						forecolor="#FF3300"
+						key="staticText-40"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Left">
+						<font pdfFontName="Helvetica-BoldOblique" size="18" isBold="true" isItalic="true"/>
+					</textElement>
+				<text><![CDATA[Bid Analysis Report]]></text>
+				</staticText>
+			</band>
+		</title>
+		<pageHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="19"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="7"
+						y="0"
+						width="59"
+						height="18"
+						key="textField-31"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Item_No}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="582"
+						y="0"
+						width="100"
+						height="18"
+						key="textField-32"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Cost_Price}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="74"
+						y="0"
+						width="111"
+						height="18"
+						key="textField-33"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Delivery_Date}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="193"
+						y="0"
+						width="156"
+						height="18"
+						key="textField-34"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Description}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="355"
+						y="0"
+						width="74"
+						height="18"
+						key="textField-35"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$F{PR_RFQ_RESPONSE_DETAIL_Quantity}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="435"
+						y="0"
+						width="142"
+						height="18"
+						key="textField-36"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="684"
+						y="0"
+						width="46"
+						height="18"
+						key="textField-37"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_Status}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="18"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

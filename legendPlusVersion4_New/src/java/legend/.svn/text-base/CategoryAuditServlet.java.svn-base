@@ -1,0 +1,264 @@
+package legend;
+
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.ServletConfig;
+import java.io.PrintWriter;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
+
+import audit.*;
+
+/**
+ * <p>
+ * Title:
+ * </p>
+ * 
+ * <p>
+ * Description:
+ * </p>
+ * 
+ * <p>
+ * Copyright: Copyright (c) 2006
+ * </p>
+ * 
+ * <p>
+ * Company:
+ * </p>
+ * 
+ * @author not attributable
+ * @version 1.0
+ */
+public class CategoryAuditServlet extends HttpServlet {
+	public CategoryAuditServlet() {
+	}
+
+	/**
+	 * Initializes the servlet.
+	 * 
+	 * @param config
+	 *            ServletConfig
+	 * @throws ServletException
+	 */
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+	}
+
+	/**
+	 * Destroys the servlet.
+	 */
+	public void destroy() {
+
+	}
+
+	/**
+	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+	 * methods.
+	 * 
+	 * @param request
+	 *            servlet request
+	 * @param response
+	 *            servlet response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		response.setContentType("text/html");
+		response.setDateHeader("Expires", -1);
+
+		HttpSession session = request.getSession();
+		PrintWriter out = response.getWriter();
+
+		// String type = request.getParameter("TYPE");
+		StringBuffer sb = new StringBuffer();
+		String statusMessage = "";
+		boolean updtst = false;
+
+		// java.sql.Date dt = new java.sql.Date();
+		AuditTrailGen audit = new AuditTrailGen();
+		// java.text.SimpleDateFormat sdf = new
+		// java.text.SimpleDateFormat("dd/mm/yyyy");
+
+		// String loginId = request.getParameter("loginId");
+		int loginID;
+		String loginId = (String) session.getAttribute("CurrentUser");
+		if (loginId == null) {
+			loginID = 0;
+		} else {
+			loginID = Integer.parseInt(loginId);
+		}
+
+		String branchcode = (String) session.getAttribute("UserCenter");
+		if (branchcode == null) {
+			branchcode = "not set";
+		}
+
+		legend.admin.objects.Category cat = new legend.admin.objects.Category();
+		legend.admin.handlers.AdminHandler admin = new legend.admin.handlers.AdminHandler();
+		RecalculateDep recal = null;
+		try {
+			recal = new RecalculateDep();
+		} catch (Throwable e) {
+		}
+
+		String categoryId = request.getParameter("categoryId");
+
+		String buttSave = request.getParameter("buttSave");
+
+		String recaldep = request.getParameter("rd");
+		if (recaldep == null) {
+			recaldep = "N";
+		}
+
+		String upexassets = request.getParameter("rd");
+		if ( upexassets == null) {
+			upexassets = "N";
+		}
+
+		String acronym = request.getParameter("categoryAcronym");
+		if (acronym != null) {
+			acronym = acronym.toUpperCase();
+		}
+		String reqFleet = request.getParameter("requiredForFleet");
+		if (reqFleet == "" || reqFleet == null) {
+			reqFleet = "N";
+		}
+
+		String categoryCode = request.getParameter("categoryCode");
+		String categoryName = request.getParameter("categoryName");
+		String categoryAcronym = acronym;
+		String requiredforFleet = reqFleet;
+		String categoryClass = request.getParameter("categoryClass");
+		String pmCyclePeriod = (request.getParameter("pmCyclePeriod")
+				.equals("") ? "0" : request.getParameter("pmCyclePeriod"));
+		String mileage = (request.getParameter("mileage").equals("") ? "0"
+				: request.getParameter("mileage"));
+		String notifyMaintdays = (request.getParameter("notifyMaintDays")
+				.equals("") ? "0" : request.getParameter("notifyMaintDays"));
+		String notifyEveryDays = (request.getParameter("notifyEveryDays")
+				.equals("") ? "0" : request.getParameter("notifyEveryDays"));
+		String residualValue = request.getParameter("residualValue");
+		String depRate = request.getParameter("depRate");
+		String assetLedger = request.getParameter("assetLedger");
+		String depLedger = request.getParameter("depLedger");
+		String accumDepLedger = request.getParameter("accumDepLedger");
+		String glAccount = request.getParameter("glAccount");
+		String insuranceAcct = request.getParameter("insuranceAcct");
+		String licenseLedger = request.getParameter("licenseAcct");
+		String fuelLedger = request.getParameter("fuelAcct");
+		String accidentLedger = request.getParameter("accidentAcct");
+		String categoryStatus = request.getParameter("categoryStatus");
+		String userId = (String) session.getAttribute("CurrentUser");
+		String acctType = request.getParameter("acc_type");
+		String currencyId = request.getParameter("currency");
+
+		cat.setAccidentLedger(accidentLedger);
+		cat.setAcctType(acctType);
+		cat.setAccumDepLedger(accumDepLedger);
+		cat.setAssetLedger(assetLedger);
+		cat.setCategoryAcronym(categoryAcronym);
+		cat.setCategoryClass(categoryClass);
+		cat.setCategoryCode(categoryCode);
+		//cat.setCategoryId(categoryId);
+		cat.setCategoryName(categoryName);
+		cat.setCategoryStatus(categoryStatus);
+		cat.setDepLedger(depLedger);
+		cat.setDepRate(depRate);
+		cat.setFuelLedger(fuelLedger);
+		cat.setGlAccount(glAccount);
+		cat.setInsuranceAcct(insuranceAcct);
+		cat.setLicenseLedger(licenseLedger);
+		cat.setMileage(mileage);
+		cat.setNotifyEveryDays(notifyEveryDays);
+		cat.setNotifyMaintdays(notifyMaintdays);
+		cat.setPmCyclePeriod(pmCyclePeriod);
+		cat.setRequiredforFleet(requiredforFleet);
+		cat.setResidualValue(residualValue);
+		cat.setUserId(userId);
+		cat.setCurrencyId(currencyId);
+
+		try {
+
+			/*
+			 * for (int i = 0; i < prop.length; i += 1) {
+			 * System.out.print(i+"-->"+prop[i]); }
+			 */
+			if (buttSave != null) {
+
+				if (categoryId.equals("")) {
+					if (admin.getCategoryByCode(categoryCode) == null) {
+						if (admin.getCategoryByQuery(
+								"WHERE category_acronym='" + categoryAcronym
+										+ "'").size() <= 0) {
+							if (admin.createCategory(cat)) {
+
+								// statusMessage = "Record saved successfully";
+								out
+										.print("<script>alert('Record saved successfully.')</script>");
+								out
+										.print("<script>window.location = 'categorySetup.jsp?categoryId="
+												+ admin.getCategoryByCode(
+														categoryCode)
+														.getCategoryId()
+												+ "&PC=14'</script>");
+							}
+						} else {
+							// StringBuffer sb
+							// statusMessage = "Category with Category Acronym"+
+							out
+									.print("<script>alert('Category with Category Acronym "
+											+ categoryAcronym
+											+ " Exists Already!')</script>");
+							out.print("<script>window.history.back()</script>");
+						}
+					} else {
+						out.print("<script>alert('Category with Category Code "
+								+ categoryCode + " Exists Already!')</script>");
+						out.print("<script>window.history.back()</script>");
+					}
+				} else if (!categoryId.equals("")) {
+					cat.setCategoryId(categoryId);
+					audit.select(1,
+							"SELECT * FROM  AM_AD_CATEGORY  WHERE category_Id = '"
+									+ categoryId + "'");
+					boolean isupdt = admin.updateCategory(cat);
+					audit.select(2,
+							"SELECT * FROM  AM_AD_CATEGORY  WHERE category_Id = '"
+									+ categoryId + "'");
+					updtst = audit.logAuditTrail("AM_AD_CATEGORY", branchcode,
+							loginID, categoryId);
+					recal.updateAsset(categoryId, request
+							.getParameter("_depRate"), depRate, userId,
+							recaldep, upexassets, categoryCode);
+					if (updtst == true) {
+						out
+								.print("<script>alert('Update on record is successfull')</script>");
+						out
+								.print("<script>window.location = 'categorySetup.jsp?categoryId="
+										+ categoryId + "&PC=14'</script>");
+						// out.print("<script>window.location =
+						// 'manageBranchs.jsp?status=A'</script>");
+					} else {
+						// statusMessage = "No changes made on record";
+						out
+								.print("<script>alert('No changes made on record')</script>");
+						out
+								.print("<script>window.location = 'categorySetup.jsp?categoryId="
+										+ categoryId + "&PC=14'</script>");
+					}
+				}
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			out.print("<script>alert('Ensure unique record entry.')</script>");
+			out
+					.print("<script>window.location = 'categorySetup.jsp?categoryId="
+							+ categoryId + "&PC=14'</script>");
+			System.err.print(e.getMessage());
+		}
+	}
+}

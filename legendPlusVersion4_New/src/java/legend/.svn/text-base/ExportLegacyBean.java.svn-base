@@ -1,0 +1,133 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package legend;
+
+//import legend.admin.objects.Company;
+import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+//import java.sql.ResultSetMetaData;
+
+//import java.beans.*;
+//import java.io.Serializable;
+
+/**
+ *
+ * @author Ganiyu
+ */
+public class ExportLegacyBean extends ConnectionClass {
+
+    private String processing_status;
+
+public ExportLegacyBean()throws Exception{
+    super();
+}
+
+    /**
+     * @return the processing_status
+     */
+    public boolean export() {
+        boolean outcome = false;
+         try{  ConnectionClass cc = new ConnectionClass();
+        processing_status = cc.getProcessingStatus();
+        outcome = cc.populateFinacleTemp(Integer.parseInt(processing_status));
+       // System.out.println("++++++++++++++++++++ just before populating the finacle temp");
+         }catch(Exception e){e.printStackTrace();}
+        
+        return outcome;
+    }
+
+
+/*
+    public ArrayList getArrayList(){
+ ArrayList al = new ArrayList();
+ ExportComponentBean ecb = new ExportComponentBean();
+
+ try{
+  String query = "SELECT unique_id,dr_acct, cr_acct, amount, narration, narration2 FROM finacle_ext" ;
+
+  ResultSet rs = getStatement().executeQuery(query);
+//ResultSetMetaData rsmd = rs.getMetaData();
+//ecb.setIdColumnName(rsmd.getColumnName(1));
+//ecb.setDrColumnName(rsmd.getColumnName(2));
+
+//ecb.setCrColumnName(rsmd.getColumnName(3));
+//ecb.setCrColumnName(rsmd.getColumnName(4));
+//ecb.setNarrationColumnName(rsmd.getColumnName(5));
+//ecb.setNarration2ColumnName(rsmd.getColumnName(6));
+
+//al.add(ecb);
+
+int i = 0;
+if(rs.next()){
+ecb.setId(rs.getInt("unique_id"));
+ecb.setDr_acct(rs.getString("dr_acct"));
+ecb.setCr_acct(rs.getString("cr_acct"));
+ecb.setAmount(rs.getDouble("amount"));
+ecb.setNarration(rs.getString("narration"));
+ecb.setNarration2(rs.getString("narration2"));
+al.add(ecb);
+    System.out.println("the count for i is <<<<<<<<<" + ++i);
+}
+freeResource();
+ }catch(Exception e){e.printStackTrace();}
+
+    System.out.println("the size of arraylist is ======="+ al.size() );
+return al;
+}
+
+
+*/
+
+
+public ArrayList getArrayList(){
+ArrayList al = new ArrayList();
+// ExportComponentBean ecb = new ExportComponentBean();
+try{
+String query = "SELECT unique_id,dr_acct, cr_acct, amount, narration, narration2,record_processed FROM finacle_ext" ;
+ResultSet rs = getStatement().executeQuery(query);
+int i = 0;
+while(rs.next()){
+ExportComponentBean ecb = new ExportComponentBean();
+String res = rs.getString("record_processed");
+
+if(res.equalsIgnoreCase("Y") )continue;
+
+ecb.setRecord_processed(rs.getString("record_processed"));
+ecb.setId(rs.getInt("unique_id"));
+ecb.setDr_acct(rs.getString("dr_acct"));
+ecb.setCr_acct(rs.getString("cr_acct"));
+ecb.setAmount(rs.getDouble("amount"));
+ecb.setNarration(rs.getString("narration"));
+ecb.setNarration2(rs.getString("narration2"));
+
+al.add(ecb);
+    //System.out.println("the count for i is <<<<<<<<<" + ++i);
+} //while(rs.next())
+freeResource();
+
+}//try
+
+catch(Exception e){
+e.printStackTrace();
+}//catch
+
+// System.out.println("the size of arraylist is ======="+ al.size() );
+return al;
+}//
+
+    /**
+     * @param processing_status the processing_status to set
+     */
+    public void setProcessing_status(String processing_status) {
+        this.processing_status = processing_status;
+    }
+
+
+
+
+}//ExportLegacyBean class;

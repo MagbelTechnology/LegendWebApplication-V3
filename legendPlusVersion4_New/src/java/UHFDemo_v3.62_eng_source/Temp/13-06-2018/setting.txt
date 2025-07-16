@@ -1,0 +1,5 @@
+datasource=http://192.168.10.10
+databaseName=InventoryDB
+userName=inventoryusr
+password=Inventory123
+readerIP=192.168.10.101

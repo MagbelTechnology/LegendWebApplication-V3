@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="XlsTransfer_Report"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="1228"
+		 pageHeight="595"
+		 columnWidth="1198"
+		 columnSpacing="0"
+		 leftMargin="0"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.zoom" value="1.0" />
+	<property name="ireport.x" value="0" />
+	<property name="ireport.y" value="0" />
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="filterClause" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="BaseDir" isForPrompting="true" class="java.io.File"/>
+	<queryString><![CDATA[SELECT
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     am_ad_category."category_name" AS am_ad_category_category_name,
+     am_ad_category."Dep_rate" AS am_ad_category_Dep_rate,
+     am_ad_category."Accum_Dep_ledger" AS am_ad_category_Accum_Dep_ledger,
+     am_ad_category."Dep_ledger" AS am_ad_category_Dep_ledger,
+     am_ad_category."Asset_Ledger" AS am_ad_category_Asset_Ledger,
+     am_ad_category."gl_account" AS am_ad_category_gl_account,
+     am_assetTransfer."asset_id" AS am_assetTransfer_asset_id,
+     am_assetTransfer."OLD_branch_Id" AS am_assetTransfer_OLD_branch_Id,
+     am_assetTransfer."OLD_dept_ID" AS am_assetTransfer_OLD_dept_ID,
+     am_assetTransfer."Transfer_Date" AS am_assetTransfer_Transfer_Date,
+     am_assetTransfer."OLD_Asset_user" AS am_assetTransfer_OLD_Asset_user,
+     am_assetTransfer."OLD_Section" AS am_assetTransfer_OLD_Section,
+     am_assetTransfer."OLD_BRANCH_CODE" AS am_assetTransfer_OLD_BRANCH_CODE,
+     am_assetTransfer."OLD_SECTION_CODE" AS am_assetTransfer_OLD_SECTION_CODE,
+     am_assetTransfer."OLD_DEPT_CODE" AS am_assetTransfer_OLD_DEPT_CODE,
+     am_ad_branch_A."BRANCH_NAME" AS am_ad_branch_A_BRANCH_NAME,
+     am_assetTransfer."approval_status" AS am_assetTransfer_approval_status,
+     am_assetTransfer."OLD_CATEGORY_CODE" AS am_assetTransfer_OLD_CATEGORY_CODE,
+     am_assetTransfer."description" AS am_assetTransfer_description,
+     am_assetTransfer."cost_price" AS am_assetTransfer_cost_price,
+     am_assetTransfer."Accum_Dep" AS am_assetTransfer_Accum_Dep,
+     am_assetTransfer."Monthly_Dep" AS am_assetTransfer_Monthly_Dep,
+     am_assetTransfer."NEW_BRANCH_CODE" AS am_assetTransfer_NEW_BRANCH_CODE,
+     am_assetTransfer."NEW_SECTION_CODE" AS am_assetTransfer_NEW_SECTION_CODE,
+     am_assetTransfer."NEW_DEPT_CODE" AS am_assetTransfer_NEW_DEPT_CODE,
+     am_assetTransfer."NBV" AS am_assetTransfer_NBV,
+     am_assetTransfer."New_Asset_id" AS am_assetTransfer_New_Asset_id,
+     am_ad_branch_A."BRANCH_ID" AS am_ad_branch_A_BRANCH_ID
+FROM
+     "dbo"."am_assetTransfer" am_assetTransfer INNER JOIN "dbo"."am_ad_branch" am_ad_branch_A ON am_assetTransfer."OLD_BRANCH_CODE" = am_ad_branch_A."BRANCH_CODE"
+     INNER JOIN "dbo"."am_ad_category" am_ad_category ON am_assetTransfer."OLD_CATEGORY_CODE" = am_ad_category."category_code",
+     "dbo"."am_gb_company" am_gb_company
+WHERE
+     am_assetTransfer."approval_status" = 'ACTIVE' $P!{filterClause}
+ORDER BY
+     am_assetTransfer."OLD_BRANCH_CODE" ASC,
+     am_assetTransfer."OLD_CATEGORY_CODE" ASC]]></queryString>
+
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_ad_category_category_name" class="java.lang.String"/>
+	<field name="am_ad_category_Dep_rate" class="java.math.BigDecimal"/>
+	<field name="am_ad_category_Accum_Dep_ledger" class="java.lang.String"/>
+	<field name="am_ad_category_Dep_ledger" class="java.lang.String"/>
+	<field name="am_ad_category_Asset_Ledger" class="java.lang.String"/>
+	<field name="am_ad_category_gl_account" class="java.lang.String"/>
+	<field name="am_assetTransfer_asset_id" class="java.lang.String"/>
+	<field name="am_assetTransfer_OLD_branch_Id" class="java.lang.Integer"/>
+	<field name="am_assetTransfer_OLD_dept_ID" class="java.lang.Integer"/>
+	<field name="am_assetTransfer_Transfer_Date" class="java.sql.Timestamp"/>
+	<field name="am_assetTransfer_OLD_Asset_user" class="java.lang.String"/>
+	<field name="am_assetTransfer_OLD_Section" class="java.lang.Integer"/>
+	<field name="am_assetTransfer_OLD_BRANCH_CODE" class="java.lang.String"/>
+	<field name="am_assetTransfer_OLD_SECTION_CODE" class="java.lang.String"/>
+	<field name="am_assetTransfer_OLD_DEPT_CODE" class="java.lang.String"/>
+	<field name="am_ad_branch_A_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_assetTransfer_approval_status" class="java.lang.String"/>
+	<field name="am_assetTransfer_OLD_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="am_assetTransfer_description" class="java.lang.String"/>
+	<field name="am_assetTransfer_cost_price" class="java.math.BigDecimal"/>
+	<field name="am_assetTransfer_Accum_Dep" class="java.math.BigDecimal"/>
+	<field name="am_assetTransfer_Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="am_assetTransfer_NEW_BRANCH_CODE" class="java.lang.String"/>
+	<field name="am_assetTransfer_NEW_SECTION_CODE" class="java.lang.String"/>
+	<field name="am_assetTransfer_NEW_DEPT_CODE" class="java.lang.String"/>
+	<field name="am_assetTransfer_NBV" class="java.math.BigDecimal"/>
+	<field name="am_assetTransfer_New_Asset_id" class="java.lang.String"/>
+	<field name="am_ad_branch_A_BRANCH_ID" class="java.lang.Integer"/>
+
+	<sortField name="am_ad_branch_A_BRANCH_NAME" />
+	<sortField name="am_ad_category_category_name" />
+
+	<variable name="Total_Mon_Depr" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_Monthly_Dep}]]></variableExpression>
+	</variable>
+	<variable name="Total_Accum_Dep" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_Accum_Dep}]]></variableExpression>
+	</variable>
+	<variable name="Total_NBV" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_NBV}]]></variableExpression>
+	</variable>
+	<variable name="Total_Cost_Price" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_cost_price}]]></variableExpression>
+	</variable>
+	<variable name="Record_Number" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Count">
+		<variableExpression><![CDATA[$F{am_assetTransfer_asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Month_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_Monthly_Dep}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Cost_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_cost_price}]]></variableExpression>
+	</variable>
+	<variable name="Branch_NBV_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_NBV}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Accum_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_Accum_Dep}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Record_No" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Count">
+		<variableExpression><![CDATA[$F{am_assetTransfer_asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Asset_Total" class="java.lang.Integer" resetType="Report" calculation="Count">
+		<variableExpression><![CDATA[$F{am_assetTransfer_asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Asset_Cost" class="java.math.BigDecimal" resetType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_cost_price}]]></variableExpression>
+	</variable>
+	<variable name="Asset_Accum" class="java.math.BigDecimal" resetType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_Accum_Dep}]]></variableExpression>
+	</variable>
+	<variable name="Asset_Monthly" class="java.math.BigDecimal" resetType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_Monthly_Dep}]]></variableExpression>
+	</variable>
+	<variable name="Asset_NBV" class="java.math.BigDecimal" resetType="Report" calculation="Sum">
+		<variableExpression><![CDATA[$F{am_assetTransfer_NBV}]]></variableExpression>
+	</variable>
+
+		<group  name="am_ad_branch_BRANCH_NAME" >
+			<groupExpression><![CDATA[$F{am_ad_branch_A_BRANCH_NAME}]]></groupExpression>
+			<groupHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="am_ad_category_category_name" >
+			<groupExpression><![CDATA[$F{am_ad_category_category_name}]]></groupExpression>
+			<groupHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="20"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="0"
+						y="1"
+						width="143"
+						height="19"
+						key="staticText-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Old Asset ID]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="286"
+						y="1"
+						width="398"
+						height="19"
+						key="staticText-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Left">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Asset Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="684"
+						y="1"
+						width="65"
+						height="19"
+						key="staticText-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Transfer Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="749"
+						y="1"
+						width="91"
+						height="19"
+						key="staticText-4"
+						isPrintWhenDetailOverflows="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Accum Deprec.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="840"
+						y="1"
+						width="82"
+						height="19"
+						key="staticText-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Cost Price]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="922"
+						y="1"
+						width="96"
+						height="19"
+						key="staticText-7"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[NBV]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="1018"
+						y="1"
+						width="98"
+						height="19"
+						key="staticText-14"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[OLD Branch]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="143"
+						y="1"
+						width="143"
+						height="19"
+						key="staticText-15"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[New Asset ID]]></text>
+				</staticText>
+			</band>
+		</title>
+		<pageHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="12"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="0"
+						width="143"
+						height="12"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_assetTransfer_asset_id}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="286"
+						y="0"
+						width="398"
+						height="12"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_assetTransfer_description}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="###0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="749"
+						y="0"
+						width="91"
+						height="12"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{am_assetTransfer_Accum_Dep}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="684"
+						y="0"
+						width="65"
+						height="12"
+						key="textField-31"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[$F{am_assetTransfer_Transfer_Date}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="1018"
+						y="0"
+						width="98"
+						height="12"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-37"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Left">
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_assetTransfer_OLD_BRANCH_CODE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="###0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="922"
+						y="0"
+						width="96"
+						height="12"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-38"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{am_assetTransfer_NBV}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="###0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="840"
+						y="0"
+						width="82"
+						height="12"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-39"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{am_assetTransfer_cost_price}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="143"
+						y="0"
+						width="143"
+						height="12"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-40"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_assetTransfer_New_Asset_id}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

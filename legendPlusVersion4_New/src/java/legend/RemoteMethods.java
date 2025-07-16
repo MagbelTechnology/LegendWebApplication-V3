@@ -1,0 +1,73 @@
+package legend;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
+
+public class RemoteMethods extends RemoteScripting {
+    public void log(String msg) {
+        //System.out.println("Legend RemoteScripting: " + msg);
+    }
+
+    public static String getDepRate(String Category) {
+        try { 
+            ResultSet rs = new ConnectionClass().getStatement().executeQuery(
+                    "select dep_rate from am_ad_category where category_id='" +
+                    Category +
+                    "'");
+            if (rs.next()) {
+                return rs.getString(1);
+            }
+        } catch (SQLException ex) {
+        } catch (Exception ex) {
+        }
+        return "Error";
+    }
+
+    public static String getVendorAC(String vendor) {
+
+        return "Pending";
+    }
+
+    public static String getDepEndDate(String vals) {
+        if (vals != null) {
+            StringTokenizer st1 = new StringTokenizer(vals, ",");
+            if (st1.countTokens() == 2) {
+                String s1 = st1.nextToken();
+                String s2 = st1.nextToken();
+
+                Float rate = Float.parseFloat(s1);
+
+                StringTokenizer st2 = new StringTokenizer(s2, "/");
+                if (st2.countTokens() == 3) {
+                    String day = st2.nextToken();
+                    String month = st2.nextToken();
+                    String year = st2.nextToken();
+
+                    if ((year.length() == 4) && (day.length() > 0) &&
+                        (day.length() < 3) && (month.length() > 0) &&
+                        (month.length() < 3)) {
+                        Calendar c = new GregorianCalendar(Integer.parseInt(
+                                year), Integer.parseInt(month) - 1,
+                                Integer.parseInt(day));
+
+                        int months = (int) (100 / rate * 12);
+                        c.add(Calendar.MONTH, months);
+                        c.add(Calendar.DAY_OF_YEAR, -1 * Integer.parseInt(day));
+
+                        int endDay = c.get(Calendar.DAY_OF_MONTH);
+                        int endMonth = c.get(Calendar.MONTH) + 1;
+                        int endYear = c.get(Calendar.YEAR);
+
+                        return endDay + "/" + endMonth + "/" + endYear;
+                    }
+
+                }
+            }
+        }
+        return "Error";
+    }
+
+}

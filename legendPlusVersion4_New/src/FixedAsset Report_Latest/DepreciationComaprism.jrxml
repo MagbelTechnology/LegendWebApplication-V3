@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DepreciationComaprism" language="groovy" pageWidth="2179" pageHeight="841" columnWidth="2159" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select a.Asset_Id, a.Branch_Code,a.Category_Code, c.category_name,a.Monthly_Dep,a.Accum_Dep,a.Cost_Price,a.NBV,
+a.IMPROV_Monthly_Dep,a.IMPROV_Accum_Dep,a.IMPROV_COST,a.IMPROV_NBV,
+b.Monthly_Dep AS Prev_Monthly_Dep,b.Accum_Dep AS Prev_Accum_Dep,b.Cost_Price AS Prev_Cost_Price,
+b.NBV AS Prev_NBV,a.Monthly_Dep-b.Monthly_Dep AS Monthly_Difference,a.Accum_Dep-b.Accum_Dep AS Accum_Difference,
+a.NBV-b.NBV AS NBV_Difference, b.IMPROV_Monthly_Dep AS Prev_IMPROV_Monthly_Dep,
+b.IMPROV_Accum_Dep AS Prev_IMPROV_Accum_Dep,b.IMPROV_COST AS Prev_IMPROV_COST,
+b.IMPROV_NBV AS Prev_IMPROV_NBV,a.IMPROV_Monthly_Dep-b.IMPROV_Monthly_Dep AS Prev_Monthly_Difference
+from Depreciation_Comparism_Current a, Depreciation_Comparism_Previous b, am_ad_category c
+ where a.Category_Code = c.Category_Code and a.Asset_Id = b.Asset_Id
+ UNION
+select Asset_Id, Branch_Code,a.Category_Code, c.category_name,Monthly_Dep,Accum_Dep,Cost_Price,NBV,IMPROV_Monthly_Dep,
+IMPROV_Accum_Dep,IMPROV_COST,IMPROV_NBV,0.00 AS bMonthly_Dep,0.00 AS bAccum_Dep,
+0.00 AS bCost_Price,0.00 AS bNBV,Monthly_Dep AS Monthly_Difference,Accum_Dep AS Accum_Difference,
+NBV AS NBV_Difference, 0.00 AS Prev_IMPROV_Monthly_Dep,
+0.00 AS Prev_IMPROV_Accum_Dep,0.00 AS Prev_IMPROV_COST,
+0.00 AS Prev_IMPROV_NBV,IMPROV_Monthly_Dep AS Prev_Monthly_Difference from Depreciation_Comparism_Current a, am_ad_category c
+where a.Asset_Id not in (select Asset_Id from Depreciation_Comparism_Previous)
+and a.Category_Code = c.category_code]]>
+	</queryString>
+	<field name="Asset_Id" class="java.lang.String"/>
+	<field name="Branch_Code" class="java.lang.String"/>
+	<field name="Category_Code" class="java.lang.String"/>
+	<field name="category_name" class="java.lang.String"/>
+	<field name="Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="Accum_Dep" class="java.math.BigDecimal"/>
+	<field name="Cost_Price" class="java.math.BigDecimal"/>
+	<field name="NBV" class="java.math.BigDecimal"/>
+	<field name="IMPROV_Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="IMPROV_Accum_Dep" class="java.math.BigDecimal"/>
+	<field name="IMPROV_COST" class="java.math.BigDecimal"/>
+	<field name="IMPROV_NBV" class="java.math.BigDecimal"/>
+	<field name="Prev_Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="Prev_Accum_Dep" class="java.math.BigDecimal"/>
+	<field name="Prev_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="Prev_NBV" class="java.math.BigDecimal"/>
+	<field name="Monthly_Difference" class="java.math.BigDecimal"/>
+	<field name="Accum_Difference" class="java.math.BigDecimal"/>
+	<field name="NBV_Difference" class="java.math.BigDecimal"/>
+	<field name="Prev_IMPROV_Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="Prev_IMPROV_Accum_Dep" class="java.math.BigDecimal"/>
+	<field name="Prev_IMPROV_COST" class="java.math.BigDecimal"/>
+	<field name="Prev_IMPROV_NBV" class="java.math.BigDecimal"/>
+	<field name="Prev_Monthly_Difference" class="java.math.BigDecimal"/>
+	<variable name="RecNo" class="java.lang.Integer" resetType="Group" resetGroup="BranchCode" incrementType="Column" calculation="Count"/>
+	<group name="BranchCode">
+		<groupExpression><![CDATA[$F{Branch_Code}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement x="45" y="0" width="100" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{Branch_Code}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="CategoryCode">
+		<groupExpression><![CDATA[$F{Category_Code}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="245" y="0" width="404" height="35"/>
+				<textElement>
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Asset Depreciation Comparism]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="45" height="20"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[S/No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="45" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Asset_Id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="145" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Branch_Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="245" y="0" width="404" height="20"/>
+				<textElement/>
+				<text><![CDATA[category_name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="649" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Monthly_Dep]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="749" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Accum_Dep]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="849" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Cost_Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="949" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[NBV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1049" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[IMPROV_Monthly_Dep]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1149" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[IMPROV_Accum_Dep]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1249" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[IMPROV_COST]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1349" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[IMPROV_NBV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1449" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Monthly_Difference]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1549" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Accum_Difference]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1649" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[NBV_Difference]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="1" width="45" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{RecNo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Branch_Code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="649" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Monthly_Dep}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="749" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Accum_Dep}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="849" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Cost_Price}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="949" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NBV}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1049" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{IMPROV_Monthly_Dep}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1149" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{IMPROV_Accum_Dep}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1249" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{IMPROV_COST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1349" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{IMPROV_NBV}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1449" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Monthly_Difference}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1549" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Accum_Difference}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1649" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NBV_Difference}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="45" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset_Id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="245" y="1" width="404" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{category_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

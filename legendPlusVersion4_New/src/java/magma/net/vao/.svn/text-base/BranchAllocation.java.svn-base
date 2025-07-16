@@ -1,0 +1,138 @@
+package magma.net.vao;
+
+import java.io.Serializable;
+
+/**
+ * <p>Title: fileName.java</p>
+ *
+ * <p>Description: File Description</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class BranchAllocation implements Serializable {
+
+    private String id;
+    private String branchCode;
+    private String branchName;
+    private double firstQauterAmount;
+    private double secondQuaterAmount;
+    private double thirdQauterAmount;
+    private double fourthQuaterAmount;
+    private double totalAmount;
+    private double balanceAmount;
+    private String type;
+    private String category;
+
+    public BranchAllocation(String id, String branchCode, String branchName,
+                            double firstQauterAmount,
+                            double secondQuaterAmount, double thirdQauterAmount,
+                            double fourthQuaterAmount,
+                            double totalAmount, double balanceAmount,
+                            String type
+            ) {
+
+        setId(id);
+        setBranchCode(branchCode);
+        setBranchName(branchName);
+        setFirstQauterAmount(firstQauterAmount);
+        setSecondQuaterAmount(secondQuaterAmount);
+        setThirdQauterAmount(thirdQauterAmount);
+        setFourthQuaterAmount(fourthQuaterAmount);
+        setTotalAmount(totalAmount);
+        setBalanceAmount(balanceAmount);
+        setType(type);
+    }
+
+    public void setBranchCode(String branchCode) {
+        this.branchCode = branchCode;
+    }
+
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
+    }
+
+    public void setFirstQauterAmount(double firstQauterAmount) {
+        this.firstQauterAmount = firstQauterAmount;
+    }
+
+    public void setSecondQuaterAmount(double secondQuaterAmount) {
+        this.secondQuaterAmount = secondQuaterAmount;
+    }
+
+    public void setThirdQauterAmount(double thirdQauterAmount) {
+        this.thirdQauterAmount = thirdQauterAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setBalanceAmount(double balanceAmount) {
+        this.balanceAmount = balanceAmount;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setFourthQuaterAmount(double fourthQuaterAmount) {
+        this.fourthQuaterAmount = fourthQuaterAmount;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getBranchCode() {
+        return branchCode;
+    }
+
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public double getFirstQauterAmount() {
+        return firstQauterAmount;
+    }
+
+    public double getSecondQuaterAmount() {
+        return secondQuaterAmount;
+    }
+
+    public double getThirdQauterAmount() {
+        return thirdQauterAmount;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public double getBalanceAmount() {
+        return balanceAmount;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public double getFourthQuaterAmount() {
+        return fourthQuaterAmount;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getId() {
+        return id;
+    }
+}

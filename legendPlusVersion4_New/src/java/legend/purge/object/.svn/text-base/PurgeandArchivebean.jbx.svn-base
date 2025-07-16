@@ -1,0 +1,11 @@
+[PropertyInfo]
+record_Index,String,false,false,record_Index,record_Index,true,<default>
+table_Name,String,false,false,table_Name,table_Name,true,<default>
+description,String,false,false,description,description,true,<default>
+no_of_days,int,false,false,no_of_days,no_of_days,true,<default>
+archive,String,false,false,archive,archive,true,<default>
+[IconNames]
+
+
+
+

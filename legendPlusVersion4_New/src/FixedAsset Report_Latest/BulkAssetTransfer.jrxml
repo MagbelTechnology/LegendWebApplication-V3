@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BulkAssetTransfer" language="groovy" pageWidth="1315" pageHeight="842" columnWidth="1275" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<parameter name="batchId" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     am_gb_bulktransferPostings."Asset_id" AS am_gb_bulktransferPostings_Asset_id,
+     am_gb_bulktransferPostings."narration" AS am_gb_bulktransferPostings_narration,
+     am_gb_bulktransferPostings."BATCHID" AS am_gb_bulktransferPostings_BATCHID,
+     am_gb_bulktransferPostings."sbu_code" AS am_gb_bulktransferPostings_sbu_code,
+     am_gb_bulktransferPostings."Account" AS am_gb_bulktransferPostings_Account,
+     am_gb_bulktransferPostings."STATUS" AS am_gb_bulktransferPostings_STATUS,
+     am_gb_bulktransferPostings."amount" AS am_gb_bulktransferPostings_amount
+FROM
+     "dbo"."am_gb_bulktransferPostings" am_gb_bulktransferPostings
+     $P!{filterClause}
+ORDER BY am_gb_bulktransferPostings."BATCHID"]]>
+	</queryString>
+	<field name="am_gb_bulktransferPostings_Asset_id" class="java.lang.String"/>
+	<field name="am_gb_bulktransferPostings_narration" class="java.lang.String"/>
+	<field name="am_gb_bulktransferPostings_BATCHID" class="java.lang.String"/>
+	<field name="am_gb_bulktransferPostings_sbu_code" class="java.lang.String"/>
+	<field name="am_gb_bulktransferPostings_Account" class="java.lang.String"/>
+	<field name="am_gb_bulktransferPostings_STATUS" class="java.lang.String"/>
+	<field name="am_gb_bulktransferPostings_amount" class="java.lang.String"/>
+	<sortField name="am_gb_bulktransferPostings_BATCHID"/>
+	<group name="BATCH ID">
+		<groupExpression><![CDATA[$F{am_gb_bulktransferPostings_BATCHID}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<textField>
+					<reportElement x="175" y="1" width="109" height="20"/>
+					<textElement>
+						<font size="12" isBold="true" isItalic="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulktransferPostings_BATCHID}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="1" width="175" height="20"/>
+					<textElement>
+						<font size="12" isBold="true" isItalic="true" isUnderline="false"/>
+					</textElement>
+					<text><![CDATA[BATCH ID =========]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="284" height="20"/>
+				<textElement/>
+				<text><![CDATA[account number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="0" width="42" height="20"/>
+				<textElement/>
+				<text><![CDATA[cr/dr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="326" y="0" width="126" height="20"/>
+				<textElement/>
+				<text><![CDATA[amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="452" y="0" width="711" height="20"/>
+				<textElement/>
+				<text><![CDATA[narration]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1163" y="0" width="60" height="20"/>
+				<textElement/>
+				<text><![CDATA[sbu code]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="28" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="284" height="16"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulktransferPostings_Account}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="284" y="0" width="42" height="16"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulktransferPostings_STATUS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="0" width="126" height="16"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulktransferPostings_amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="452" y="0" width="711" height="16"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulktransferPostings_narration}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1163" y="0" width="60" height="16"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_bulktransferPostings_sbu_code}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

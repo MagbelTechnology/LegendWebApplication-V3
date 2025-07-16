@@ -1,0 +1,95 @@
+package com.magbel.legend.servlet;
+
+
+
+import com.magbel.legend.bus.ApprovalRecords;
+//import com.magbel.legend.mail.BulkMail;
+import com.magbel.legend.vao.Approval;
+import com.magbel.legend.mail.EmailSmsServiceBus;
+import java.io.*;
+import magma.AssetRecordsBean;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+
+import java.util.*;
+
+public class RejectProcess extends HttpServlet
+{
+
+	private ApprovalRecords service;
+	private AssetRecordsBean bean;
+	//private BulkMail mail;
+	private EmailSmsServiceBus email;
+    public RejectProcess()
+    {
+    }
+
+    public void init(ServletConfig config)
+        throws ServletException
+    {
+        super.init(config);
+        try
+        {
+        service = new ApprovalRecords();
+        bean = new AssetRecordsBean();
+        email = new EmailSmsServiceBus();
+       // mail = new BulkMail();
+        }
+        catch(Exception et)
+        {et.printStackTrace();}
+    }
+    public void destroy()
+    {
+    }
+
+    public void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        response.setContentType("text/html");
+       
+        HttpSession session = request.getSession();
+        PrintWriter out = response.getWriter();
+        String id = request.getParameter("asset_id");
+        String page1 = request.getParameter("page1");
+        String reject_reason = request.getParameter("reject_reason"); 
+	    
+	   
+   try
+   {
+	  //delete record from raise entry list base on asset id and page name
+	 if(service.deleteRaiseEntry(id,page1))
+	 {
+		 service.updateRaiseEntry(id, "N");
+		 service.updateAssetStatus(id, "R");
+		 String from="";
+		 String msgText1="Rejection of asset with Asset Id '"+id+"' due to '"+reject_reason+"'";
+		 String subject="Asset Creation Rejection";
+		 String url="E:/jboss-4.0.5.GA/server/epostserver/deploy/legend2.net.war";
+		 String to="";
+		 String userid="";
+		 //send mail
+		email.sendMailUser(id, subject, msgText1);
+		 ///email.sendEMailAsset(from, subject, msgText1, url, to, userid, id);
+	
+		 
+		 out.println("<script>alert('Entry removed from posting !')</script>");
+  	   out.println("<script>");
+  	 out.println("window.close();");
+  	   out.println("</script>");
+	 }
+	 else{ out.println("<script>alert('Entry removal not successful!')</script>");
+  	   out.println("<script>");
+  	   out.println("window.close();");
+  	   out.println("</script>");}
+
+    }
+   catch(Exception e){e.printStackTrace();}
+  }   
+  
+    public String getServletInfo()
+    {
+        return "Confirmation Action Servlet";
+    }
+}

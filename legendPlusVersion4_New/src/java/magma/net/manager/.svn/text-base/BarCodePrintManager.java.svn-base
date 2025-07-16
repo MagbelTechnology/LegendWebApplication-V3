@@ -1,0 +1,139 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package magma.net.manager;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import magma.BarCodeHistoryBean;
+import magma.net.dao.MagmaDBConnection;
+
+/**
+ *
+ * @author Olabo
+ */
+public class BarCodePrintManager extends MagmaDBConnection{
+
+
+
+     private MagmaDBConnection dbConnection = new MagmaDBConnection();
+         Connection con1 = null;
+            PreparedStatement ps1 = null;
+            ResultSet rs1 = null;
+
+     public ArrayList findBarCodeByQuery(String queryFilter) {
+         System.out.println("the content of queryFilter is $$$$$$$$$$$$$$$$$$$$" +queryFilter);
+        String selectQuery = "select ASSET_ID,DESCRIPTION,BAR_CODE,BRANCH_CODE,category_code from am_barcode_history where PRINT_FLD = 'N'" + queryFilter;
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList barcodelist = new ArrayList();
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                   BarCodeHistoryBean bhb = new BarCodeHistoryBean();
+
+
+            bhb.setAsset_id((rs.getString(1) == null)?"":rs.getString(1));
+            bhb.setDescription((rs.getString(2) == null)?"":rs.getString(2));
+            bhb.setBar_code((rs.getString(3) == null)?"":rs.getString(3));
+            bhb.setBranch_code((rs.getString(4) == null)?"":getBranchName(rs.getString(4)));
+            //bhb.setBranch_code((rs.getString(4) == null)?"":rs.getString(4));
+            bhb.setCategory((rs.getString(5) == null)?"":getCategoryName(rs.getString(5)));
+            //bhb.setCategory((rs.getString(5) == null)?"":rs.getString(5));
+            //bhb.setCreate_date((rs.getDate(6) == null)?"":rs.getDate(6).toString());
+            barcodelist.add(bhb);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching ALL Asset ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return barcodelist;
+
+    }
+
+
+      public String getBranchName(String id){
+String branch_name= "";
+ try {
+     //System.out.println("the value of id received by getBranchName() is " +id);
+            con1 = dbConnection.getConnection("fixedasset");
+
+            String query = "select BRANCH_NAME from am_ad_branch where BRANCH_CODE ='"+id+"'";
+
+            ps1 = con1.prepareStatement(query);
+            rs1 = ps1.executeQuery();
+             //int counter =0;
+            while(rs1.next()){
+
+
+
+            branch_name = ((rs1.getString(1) == null)?"":rs1.getString(1));
+
+
+            }//while
+            //}//for
+        } catch (Exception e) {
+            System.out.println("BarCodePrintServlet:=== DB erorr occured in method getBranchName()" +e);
+        }
+    finally{
+      dbConnection.closeConnection(con1, ps1,rs1);
+    }
+
+    return branch_name;
+
+}//getBranchName()
+
+
+
+   public String getCategoryName(String id){
+String category_name= "";
+ try {
+     //System.out.println("the value of id received by getBranchName() is " +id);
+            con1 = dbConnection.getConnection("fixedasset");
+
+            String query = "select category_name from am_ad_category where category_code ='"+id+"'";
+
+            ps1 = con1.prepareStatement(query);
+            rs1 = ps1.executeQuery();
+             //int counter =0;
+            while(rs1.next()){
+
+
+
+            category_name = ((rs1.getString(1) == null)?"":rs1.getString(1));
+
+
+            }//while
+            //}//for
+        } catch (Exception e) {
+            System.out.println("BarCodePrintServlet:=== DB erorr occured in method getCategoryName()" +e);
+        }
+    finally{
+      dbConnection.closeConnection(con1, ps1,rs1);
+    }
+
+    return category_name;
+
+}//getCategoryName()
+
+
+
+
+
+}

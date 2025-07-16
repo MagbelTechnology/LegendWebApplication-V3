@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+<!--JBuilder Library Definition File-->
+<fullname>Servlet</fullname>
+<class>
+<path>lib</path>
+</class>
+<required>JBoss 4.x+ Servlet</required>
+<lastmodsaved>1159716019078</lastmodsaved>
+</library>

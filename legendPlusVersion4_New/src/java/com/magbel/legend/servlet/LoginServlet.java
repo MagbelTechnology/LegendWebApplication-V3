@@ -1,0 +1,744 @@
+package com.magbel.legend.servlet;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.security.Key;
+import java.util.Base64;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.magbel.legend.mail.EmailSmsServiceBus;
+import com.magbel.util.Cryptomanager;
+
+import magma.AssetRecordsBean;
+
+
+public class LoginServlet extends HttpServlet {
+   private static final long serialVersionUID = 1L;
+   private static final String ALGO = "AES"; 
+
+   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	  try {
+	   HttpSession session = request.getSession();
+	   Properties prop = new Properties();
+	   PrintWriter out = response.getWriter();
+	   File file = new File("C:\\Property\\LegendPlus.properties");
+	   FileInputStream input = new FileInputStream(file);
+	   prop.load(input);
+
+	   String ThirdPartyLabel = prop.getProperty("ThirdPartyLabel");
+	   String PasswordValidation = prop.getProperty("PasswordValidation");
+	   System.out.println("<<<<<<<PasswordValidation: " + PasswordValidation);	
+	   String loginImage = prop.getProperty("loginImage");
+	   //System.out.println("<<<<<<<We are here: ");	
+	   
+	   String userName = request.getParameter("userName");
+       String encryptedPassword = request.getParameter("userPswd");
+       String encryptedToken = request.getParameter("token");
+
+//      System.out.println("=======>>>>>userName: "+userName+"     encryptedPassword: "+encryptedPassword+"     encryptedToken: "+encryptedToken);
+       
+       String secretKey="mustbe16byteskey";
+       String encodedBase64Key = encodeKey(secretKey);
+       
+       //String decryptedUsername = decrypt(encryptedUsername, secretKey);
+       String decryptedPassword = decrypt(encryptedPassword, encodedBase64Key);
+       String decryptedToken= decrypt(encryptedToken, encodedBase64Key);
+       
+      // System.out.println("=======>>>>>encryptedUsername: "+userName+"     decryptedPassword: "+decryptedPassword+"     decryptedToken: "+decryptedToken);
+	   
+	    
+	    String jsonResponse="";
+	   
+	   String getUserName = request.getParameter("passuserName");
+		String getpassPassword = request.getParameter("passPassword");
+		System.out.println("=======>>>>>passuserName: "+getUserName+"     passPassword: "+getpassPassword);
+//		String applicationType = "AND A.ROLE_UUID != '450'";
+		String applicationType = "";
+		legend.admin.handlers.CompanyHandler ch = new legend.admin.handlers.CompanyHandler();
+		legend.admin.handlers.SecurityHandler_07_11_2024 sh = new legend.admin.handlers.SecurityHandler_07_11_2024();
+		legend.admin.handlers.AdminHandler handler = new legend.admin.handlers.AdminHandler();
+		com.magbel.menu.handlers.MenuHandler menur = new com.magbel.menu.handlers.MenuHandler();
+		com.magbel.util.HtmlUtility htmlUtil = new com.magbel.util.HtmlUtility();
+		legend.admin.objects.Company comp = ch.getCompany();
+		com.magbel.util.Cryptomanager cm = new com.magbel.util.Cryptomanager();
+		EmailSmsServiceBus mail = new EmailSmsServiceBus(); 
+		 AssetRecordsBean arb = new AssetRecordsBean();
+		 JsonObject responseJson = new JsonObject();
+
+		 String CompCode = "1";
+		 String Apps = "LEGEND";
+			String compname = sh.getCompanyInfo(CompCode);	
+		System.out.println("<<<<<<<compname: "+compname);	
+		 String id = session.getId();
+		 String tokenfld = "";
+		 	String deployer = getServletContext().getRealPath(
+		 			"/error.properties");
+		 	String LicfileName = getServletContext()
+		 			.getRealPath("/license.txt");
+		 	String buttConn = request.getParameter("buttConn");
+		 	System.out.println("<<<<<<<buttConn: " + buttConn);
+		 	//String buttConn = jsonObject.get("buttConn").getAsString();
+			String workstationIp = request.getRemoteAddr();
+			InetAddress address = InetAddress.getByName(workstationIp);
+			String workstationName = address.getHostName();
+		 	Calendar currentcal = Calendar.getInstance();
+		 	String np = request.getParameter("np");
+		 	//String np = "np";
+			String urlconcat = "";
+			String newurlConnect = request.getRequestURL()+""+request.getQueryString();
+			String []connect = newurlConnect.split("=");
+			int ConnectNo = connect.length;
+			String loginSuccessful = "N";
+			 String userId = "";
+			 int logonAttempt = Integer.parseInt(sh.getCompanyLoginAttempt());
+			
+			if(ConnectNo!=1){
+				connect[0] ="http://localhost:8080/legendPlus/DocumentHelp.jsp?np";
+				//urlconcat = connect[0]+"="+connect[1]+"="+connect[2]+"="+connect[3]+"="+connect[4]+"="+connect[5]+"="+connect[6]+"="+connect[7]+"="+connect[8];
+				urlconcat = connect[0]+"="+connect[1]+"="+connect[2]+"="+connect[3]+"="+connect[4];
+
+				}else{urlconcat = "http://localhost:8080/legendPlus/systemConnect.jsp";}
+
+			if (buttConn != null) {
+				try {
+					//lisence
+					// if(sh.login(deployer))
+					boolean result = false;
+		//System.out.println("<<<<<<<getUserName: " + getUserName);	
+//				System.out.println("<<<<<<<compname: " + compname+"    deployer: "+deployer+"    Apps: "+Apps+"     LicfileName: "+LicfileName);
+					 result = sh.login(deployer, compname, Apps,
+							LicfileName);					
+//					System.out.println(">>>>>>>>>>>>>>>>>>>>License Result:  "+ result);
+			
+			
+		if(result){
+					if (sh.login(deployer, compname, Apps, LicfileName) && (getUserName == "")) {
+						//String logonAttempt = sh.getCompanyLoginAttempt();
+						//==============================================
+
+
+						legend.admin.objects.User user = null;
+						
+						tokenfld = "Y";
+						java.util.List list_token = sh
+							
+									.getUserByQueryProc(
+											" "
+													+ (request
+															.getParameter("userName")).toLowerCase()
+													+ ""," "
+													+ Cryptomanager.encrypt(sh.Name(
+															(request.getParameter("userName")).toLowerCase(),
+															request.getParameter("userPswd")))
+													+ "", Cryptomanager.encrypt((request
+													.getParameter("userName"))).toLowerCase(),tokenfld,
+													Cryptomanager.encrypt(request.getParameter("userPswd")));
+											
+//						System.out.print("Token: " + list_token);
+//						System.out.print("Token Size: " + list_token.size());
+						if (list_token != null && list_token.size() > 0) {
+						
+//						String Token_UserId = sh.getTokenUserId(request.getParameter("userName"));
+						String Token_UserId = "";
+						if(ThirdPartyLabel.equalsIgnoreCase("INTEGRIFY")){
+						Token_UserId = sh.getTokenUserId(request.getParameter("userName"));
+						}
+						if(ThirdPartyLabel.equalsIgnoreCase("K2")){
+						Token_UserId = request.getParameter("userName");
+						}	
+//						System.out.print("User Id for Token Users: " + Token_UserId);					
+							
+//							System.out.print("User Id for Token Users: " + Token_UserId);
+
+							if (sh.tokenLogin((Token_UserId).toLowerCase(),
+									request.getParameter("token"),request.getParameter("userName")) == 1) {
+								user = (legend.admin.objects.User) list_token
+										.get(0);
+								session.setAttribute("FAILED_LOGON_CTN", "0");
+							} else {
+								session.setAttribute("FAILED_LOGON_CTN", "1");
+								out.print("<script>alert('Token Required:Try Again.')</script>");
+								out.println("<script>window.location = 'systemConnect.jsp'</script>");
+							}
+						}
+						
+						if ((user == null && list_token.size() < 1) || (user != null && !user.isTokenRequired())) {
+
+
+							if ((request.getParameter("token") != null)||(request.getParameter("token") != "")) {
+
+								String token = request.getParameter("token")
+										.trim();
+				//			    System.out.print("Token====: " + token);						
+								if (!token.trim().equalsIgnoreCase("")) {
+									session.setAttribute("FAILED_LOGON_CTN", "1");
+									out.print("<script>alert('Token Required: Invalid User Name/Password details. Try Again.')</script>");
+									out.println("<script>window.location = 'systemConnect.jsp'</script>");
+									
+								}
+									
+
+							}
+							 tokenfld = "N";
+							java.util.List list = sh									
+									.getUserByQueryProc(
+											" "
+													+ (request
+															.getParameter("userName")).toLowerCase()
+													+ ""," "
+													+ Cryptomanager.encrypt(sh.Name(
+															(request.getParameter("userName")).toLowerCase(),
+															request.getParameter("userPswd")))
+													+ "", Cryptomanager.encrypt((request
+													.getParameter("userName"))).toLowerCase(),tokenfld,
+													Cryptomanager.encrypt(request.getParameter("userPswd")));
+										System.out.print("<<<<<<<< List Size: " + list.size());	
+							if (list != null && list.size() > 0)
+								user = (legend.admin.objects.User) list.get(0);
+						} else {
+							session.setAttribute("FAILED_LOGON_CTN", "1");
+							out.print("<script>alert('Invalid User Name/Password details. Try Again.')</script>");
+							out.println("<script>window.location = 'systemConnect.jsp'</script>");
+
+						}
+
+						if (user != null) {
+							session.setAttribute("FAILED_LOGON_CTN", "0");
+
+							//System.out.println("############################################TEST TEST ############################################");						
+
+							if (user != null
+									&& user.getUserStatus().equalsIgnoreCase(
+											"ACTIVE")) //if(user != null) //the condition for access to system denial for inactive user goes here
+							{
+
+								System.out
+										.println("#################################################################################################"
+												+ "##################### For this particular user token required=="
+												+ user.isTokenRequired());
+
+								Date d1 = new Date(currentcal.getTimeInMillis());
+								Date d2 = user.getExpDate();
+								System.out.println("D2 >>>>>> " +  d2);
+								if (d2 == null) {
+									//System.out.println("i entered here ");
+									d2 = d1;
+								}//comparing d2 and d1
+
+								if ((d1.equals(d2)) || (d1.before(d2))) {
+									//System.out.println("In here --------- 1");
+
+									if (user.getLoginStatus().equals("3")) {
+										out.print("<script>alert('You have exceded logon limits. Contact Administrator.')</script>");
+										out.println("<script>window.location = 'systemConnect.jsp'</script>");
+									}
+									System.out.print("Login Status Test:  "
+											+ user.getLoginStatus());
+
+									if (user.getLoginStatus().equals("0")) {
+										session = request.getSession(true);
+										session.setAttribute("connected",
+												new String("true"));
+										session.setMaxInactiveInterval(60 * comp
+												.getSessionTimeout());
+
+										magma.net.manager.SytemsManager sm = new magma.net.manager.SytemsManager();
+										java.util.ArrayList functions = sm
+												.findFunctionsBySecurityClass(user
+														.getUserClass());
+										java.util.List menus = menur
+												.findMenus(user.getUserClass(),applicationType);
+										java.util.ArrayList classFunctions = sm
+												.findClassFunctionsById(user
+														.getUserClass());
+										session.setAttribute("classfunctions",
+												classFunctions);
+										session.setAttribute("Menus", menus);
+										session.setAttribute("priviledges",
+												functions);
+										session.setAttribute("CurrentUser",
+												user.getUserId());
+										session.setAttribute("SignInName",
+												user.getUserName());
+										session.setAttribute("UserClass",
+												user.getUserClass());
+										session.setAttribute("UserCenter",
+												user.getBranch());
+										session.setAttribute("LastSignIn",
+												user.getLastLogindate());
+										session.setAttribute("SignInFrom",
+												request.getRemoteAddr());
+										session.setAttribute("IsSupervisor",
+												user.getIsSupervisor());
+										session.setAttribute("FleetAdmin",
+												user.getFleetAdmin());
+										session.setAttribute("_user", user);
+										session.setAttribute("WorkstationName",
+												workstationName);
+										session.setAttribute("WorkstationIp",
+												workstationIp);
+										session.setAttribute("LoginStatus",
+												user.getLoginStatus());
+			//							System.out
+			//									.println("-------------------");
+										//admin.start();
+//										System.out
+//												.println("------------------");
+										String loguser = "N";
+
+										if (comp.getLogUserAudit() != null) {
+											loguser = comp.getLogUserAudit();
+										}
+
+										session.setAttribute("LoginAudit",
+												loguser);
+										Cookie cu = new Cookie("curr_user",
+												user.getUserId());
+										response.addCookie(cu);
+
+										sh.updateLogins(user.getUserId(), "1",
+												request.getRemoteAddr());
+
+										session.setAttribute(
+												"FAILED_LOGON_CTN", "0");
+
+										if (sh.queryPexpiry(user.getUserId())) {
+											response.sendRedirect("changePassword1.jsp");
+											//System.out.println("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ here i am");
+											//out.println("<script>window.location = 'changePassword.jsp'</script>");
+										} else if (user.getMustChangePwd()
+												.equals("Y")) {
+											response.sendRedirect("changePassword1.jsp");
+											//out.println("<script>window.location = 'changePassword.jsp'</script>");
+										} else {
+			//							System.out.print("<<<<=======Browser Parameter: "+np+"  newurl: "+newurl);
+											//response.sendRedirect(urlfromMail);
+											if(np==null){
+											System.out.print("<<<<=======Browser Parameter with null: "+np);
+											response.sendRedirect("DocumentHelp.jsp");
+										}
+											//response.sendRedirect(newurl);
+											if(np!=null){//System.out.print("<<<<=======Browser Parameter without null: "+np);
+											response.sendRedirect(urlconcat);
+											}
+											session.setAttribute(
+													"FAILED_LOGON_CTN", "0");
+											handler.SaveLoginAudit(
+													user.getUserId(),
+													user.getBranch(),
+													workstationName,
+													workstationIp, id);
+			//								System.out
+			//										.println("-----------xx----------- Logging in --------");
+
+									 loginSuccessful = "Y";
+									  userId = user.getUserId();
+
+										
+											//out.println("<script>window.location = 'systemWebtop.jsp'</script>");
+										}
+									} else {
+										if (user.getLoginStatus().equals("4")) {
+											out.print("<script>alert('You can not Logon to Legend by this Time')</script>");
+										} else {
+											out.print("<script>alert('User already connected to Legend')</script>");
+										}
+									}
+
+								} else {
+				//					System.out.println("In here --------- 2");
+									out.print("<script>alert('Access Denied. Please contact your Administrator !!!!')</script>");
+								}
+							} else {
+								out.print("<script>alert('You are not authorized to use Legend')</script>");
+							}//the else part of inactive user goes here
+						} else {
+							//for logon count logonAttempt
+			//				System.out
+			//						.println("-----------xx----------- Logging in --hh----");
+							//System.out.println("<<<<<<<<<<<<<<<<< here 1");
+							if ((String) session
+									.getAttribute("FAILED_LOGON_CTN") != null) {
+								//System.out.println("<<<<<<<<<<<<<<<<< here 2");
+								int logoncount = Integer
+										.parseInt((String) session
+												.getAttribute("FAILED_LOGON_CTN"));
+								logoncount += 1;
+								//System.out.println("<<<<<<<<<<<<<<<<< here logoncount " + logoncount);
+								if (logoncount == logonAttempt) {
+
+									sh.updateLoginAsAboveLimit(
+											request.getParameter("userName"),
+											request.getRemoteAddr());
+									out.print("<script>alert('You have exceded the allowed logon attempts limit.')</script>");
+									out.println("<script>window.location = 'systemConnect.jsp'</script>");
+								} else {
+									session.setAttribute("FAILED_LOGON_CTN",
+											String.valueOf(logoncount));
+
+								}
+
+							}//if((String)session.getAttribute("FAILED_LOGON_CTN") != null)
+
+							else {
+
+								session.setAttribute("FAILED_LOGON_CTN", "1");
+								//out.print("<script>alert('Invalid user details. Try Again.')</script>");
+							}
+
+							//if(Integer.parseInt((String)session.getAttribute("FAILED_LOGON_CTN")) < 3)	
+							out.print("<script>alert('Invalid User Name/Password details. Try Again.')</script>");
+
+						}
+						//License end
+					} 
+					if(getUserName != ""){
+
+						//String logonAttempt = sh.getCompanyLoginAttempt();
+						//==============================================
+
+
+						legend.admin.objects.User user = null;
+						
+						tokenfld = "Y";
+						java.util.List list_token = sh
+							
+									.getUserByQueryNoPasswordProc(
+											" "
+													+ (request
+															.getParameter("userName")).toLowerCase()
+													+ ""," "
+													+ (request
+													.getParameter("userName")).toLowerCase(),tokenfld);
+											
+//						System.out.print("Token: " + list_token);
+//						System.out.print("Token Size: " + list_token.size());
+						if (list_token != null && list_token.size() > 0) {
+						
+//						String Token_UserId = sh.getTokenUserId(request.getParameter("userName"));
+
+						String Token_UserId = "";
+						if(ThirdPartyLabel.equalsIgnoreCase("INTEGRIFY")){
+						Token_UserId = sh.getTokenUserId(request.getParameter("userName"));
+						}
+						if(ThirdPartyLabel.equalsIgnoreCase("K2")){
+						Token_UserId = request.getParameter("userName");
+						}	
+						System.out.print("User Id for Token Users: " + Token_UserId);					
+							
+							System.out.print("User Id for Token Users: " + Token_UserId);
+
+							if (sh.tokenLogin((Token_UserId).toLowerCase(),
+									request.getParameter("token"),request.getParameter("userName")) == 1) {
+								user = (legend.admin.objects.User) list_token
+										.get(0);
+								session.setAttribute("FAILED_LOGON_CTN", "0");
+							} else {
+								session.setAttribute("FAILED_LOGON_CTN", "1");
+								out.print("<script>alert('Token Required:Try Again.')</script>");
+								out.println("<script>window.location = 'systemConnect.jsp'</script>");
+							}
+						}
+						
+						if ((user == null && list_token.size() < 1) || (user != null && !user.isTokenRequired())) {
+
+
+							if ((request.getParameter("token") != null)||(request.getParameter("token") != "")) {
+
+								String token = request.getParameter("token")
+										.trim();
+				//			    System.out.print("Token====: " + token);						
+								if (!token.trim().equalsIgnoreCase("")) {
+									session.setAttribute("FAILED_LOGON_CTN", "1");
+									out.print("<script>alert('Token Required: Invalid User Name/Password details. Try Again.')</script>");
+									out.println("<script>window.location = 'systemConnect.jsp'</script>");
+									
+								}
+									
+
+							}
+							 tokenfld = "N";
+							java.util.List list = sh									
+									.getUserByQueryNoPasswordProc(
+											" "
+													+ (request
+															.getParameter("userName")).toLowerCase()
+													+ ""," "
+													+ (request
+													.getParameter("userName")).toLowerCase(),tokenfld);
+											
+							if (list != null && list.size() > 0)
+								user = (legend.admin.objects.User) list.get(0);
+						} else {
+							session.setAttribute("FAILED_LOGON_CTN", "1");
+							out.print("<script>alert('Invalid User Name/Password details. Try Again.')</script>");
+							out.println("<script>window.location = 'systemConnect.jsp'</script>");
+
+						}
+
+						if (user != null) {
+							session.setAttribute("FAILED_LOGON_CTN", "0");
+
+							//System.out.println("############################################TEST TEST ############################################");						
+
+							if (user != null
+									&& user.getUserStatus().equalsIgnoreCase(
+											"ACTIVE")) //if(user != null) //the condition for access to system denial for inactive user goes here
+							{
+
+								System.out
+										.println("#################################################################################################"
+												+ "##################### For this particular user token required=="
+												+ user.isTokenRequired());
+
+								Date d1 = new Date(currentcal.getTimeInMillis());
+								Date d2 = user.getExpDate();
+								//System.out.println("D2 >>>>>> " +  d2);
+								if (d2 == null) {
+									//System.out.println("i entered here ");
+									d2 = d1;
+								}//comparing d2 and d1
+
+								if ((d1.equals(d2)) || (d1.before(d2))) {
+									System.out.println("In here --------- 1");
+
+									if (user.getLoginStatus().equals("3")) {
+										out.print("<script>alert('You have exceded logon limits. Contact Administrator.')</script>");
+										out.println("<script>window.location = 'systemConnect.jsp'</script>");
+									}
+									System.out.print("Login Status Test:  "
+											+ user.getLoginStatus());
+
+									if (user.getLoginStatus().equals("0")) {
+										session = request.getSession(true);
+										session.setAttribute("connected",
+												new String("true"));
+										session.setMaxInactiveInterval(60 * comp
+												.getSessionTimeout());
+			//System.out.print("We are here: ");
+										magma.net.manager.SytemsManager sm = new magma.net.manager.SytemsManager();
+										java.util.ArrayList functions = sm
+												.findFunctionsBySecurityClass(user
+														.getUserClass());
+										java.util.List menus = menur
+												.findMenus(user.getUserClass(),applicationType);
+										java.util.ArrayList classFunctions = sm
+												.findClassFunctionsById(user
+														.getUserClass());
+										session.setAttribute("classfunctions",
+												classFunctions);
+										session.setAttribute("Menus", menus);
+										session.setAttribute("priviledges",
+												functions);
+										session.setAttribute("CurrentUser",
+												user.getUserId());
+										session.setAttribute("SignInName",
+												user.getUserName());
+										session.setAttribute("UserClass",
+												user.getUserClass());
+										session.setAttribute("UserCenter",
+												user.getBranch());
+										session.setAttribute("LastSignIn",
+												user.getLastLogindate());
+										session.setAttribute("SignInFrom",
+												request.getRemoteAddr());
+										session.setAttribute("IsSupervisor",
+												user.getIsSupervisor());
+										session.setAttribute("FleetAdmin",
+												user.getFleetAdmin());
+										session.setAttribute("_user", user);
+										session.setAttribute("WorkstationName",
+												workstationName);
+										session.setAttribute("WorkstationIp",
+												workstationIp);
+										session.setAttribute("LoginStatus",
+												user.getLoginStatus());
+			//							System.out
+			//									.println("-------------------");
+										//admin.start();
+										System.out
+												.println("------------------");
+										String loguser = "N";
+
+										if (comp.getLogUserAudit() != null) {
+											loguser = comp.getLogUserAudit();
+										}
+
+										session.setAttribute("LoginAudit",
+												loguser);
+										Cookie cu = new Cookie("curr_user",
+												user.getUserId());
+										response.addCookie(cu);
+
+										sh.updateLogins(user.getUserId(), "1",
+												request.getRemoteAddr());
+
+										session.setAttribute(
+												"FAILED_LOGON_CTN", "0");
+
+										if (sh.queryPexpiry(user.getUserId())) {
+											response.sendRedirect("changePassword1.jsp");
+											//System.out.println("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ here i am");
+											//out.println("<script>window.location = 'changePassword.jsp'</script>");
+										} else if (user.getMustChangePwd()
+												.equals("Y")) {
+											response.sendRedirect("changePassword1.jsp");
+											//out.println("<script>window.location = 'changePassword.jsp'</script>");
+										} else {
+									//	System.out.print("<<<<=======Browser Parameter: "+np+"  newurl: "+newurl);
+											//response.sendRedirect(urlfromMail);
+											if(np==null){
+											System.out.print("<<<<=======Browser Parameter with null: "+np);
+											response.sendRedirect("DocumentHelp.jsp");
+										}
+											//response.sendRedirect(newurl);
+											if(np!=null){//System.out.print("<<<<=======Browser Parameter without null: "+np);
+											response.sendRedirect(urlconcat);
+											}
+											session.setAttribute(
+													"FAILED_LOGON_CTN", "0");
+											handler.SaveLoginAudit(
+													user.getUserId(),
+													user.getBranch(),
+													workstationName,
+													workstationIp, id);
+			//								System.out
+			//										.println("-----------xx----------- Logging in --------");
+
+									 loginSuccessful = "Y";
+									  userId = user.getUserId();
+
+										
+											//out.println("<script>window.location = 'systemWebtop.jsp'</script>");
+										}
+									} else {
+										if (user.getLoginStatus().equals("4")) {
+											out.print("<script>alert('You can not Logon to Legend by this Time')</script>");
+										} else {
+											out.print("<script>alert('User already connected to Legend')</script>");
+										}
+									}
+
+								} else {
+				//					System.out.println("In here --------- 2");
+									out.print("<script>alert('Access Denied. Please contact your Administrator !!!!')</script>");
+								}
+							} else {
+								out.print("<script>alert('You are not authorized to use Legend')</script>");
+							}//the else part of inactive user goes here
+						} else {
+							//for logon count logonAttempt
+			//				System.out
+			//						.println("-----------xx----------- Logging in --hh----");
+							//System.out.println("<<<<<<<<<<<<<<<<< here 1");
+							if ((String) session
+									.getAttribute("FAILED_LOGON_CTN") != null) {
+								//System.out.println("<<<<<<<<<<<<<<<<< here 2");
+								int logoncount = Integer
+										.parseInt((String) session
+												.getAttribute("FAILED_LOGON_CTN"));
+								logoncount += 1;
+								//System.out.println("<<<<<<<<<<<<<<<<< here logoncount " + logoncount);
+								if (logoncount == logonAttempt) {
+
+									sh.updateLoginAsAboveLimit(
+											request.getParameter("userName"),
+											request.getRemoteAddr());
+									out.print("<script>alert('You have exceded the allowed logon attempts limit.')</script>");
+									out.println("<script>window.location = 'systemConnect.jsp'</script>");
+								} else {
+									session.setAttribute("FAILED_LOGON_CTN",
+											String.valueOf(logoncount));
+
+								}
+
+							}//if((String)session.getAttribute("FAILED_LOGON_CTN") != null)
+
+							else {
+
+								session.setAttribute("FAILED_LOGON_CTN", "1");
+								//out.print("<script>alert('Invalid user details. Try Again.')</script>");
+							}
+
+							//if(Integer.parseInt((String)session.getAttribute("FAILED_LOGON_CTN")) < 3)	
+							out.print("<script>alert('Invalid User Name/Password details. Try Again.')</script>");
+
+						}
+						//.........End of Login without Password......
+//					System.out.println("<<<<<<<<<<<<<<<<< here getUserName " + getUserName);
+					}
+					}
+					 else {
+						out.println("<script>alert('Application has expired or key is not valid');</script>");
+						out.print("<script>window.location = 'systemConnect.jsp'</script>");
+					}
+					
+				} catch (Throwable t) {
+					System.err.print(t.getMessage());
+					t.printStackTrace();
+					out.print("<script>alert('Error occured while processing your request. Try Again.')</script>");
+				}//catch
+				
+			} //else{out.print("<script>alert('You are not authorized to use Legend')</script>");}
+		
+	  }catch(Exception e) {
+		  e.getMessage();
+	  }
+
+	  
+   }
+
+   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+      this.doPost(request, response);
+   }
+   
+   public static String decrypt(String strToDecrypt, String secret) {
+		try {
+		Key key = generateKey(secret);
+		Cipher cipher = Cipher.getInstance(ALGO);
+		cipher.init(Cipher.DECRYPT_MODE, key);
+		return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+		} catch (Exception e) {
+		System.out.println("Error while decrypting: " + e.toString());
+		}
+		return null;
+		}
+
+
+	private static Key generateKey(String secret) throws Exception {
+		byte[] decoded = Base64.getDecoder().decode(secret.getBytes());
+		Key key = new SecretKeySpec(decoded, ALGO);
+		return key;
+		}
+
+		public static String decodeKey(String str) {
+		byte[] decoded = Base64.getDecoder().decode(str.getBytes());
+		return new String(decoded);
+		}
+
+		public static String encodeKey(String str) {
+		byte[] encoded = Base64.getEncoder().encode(str.getBytes());
+		return new String(encoded);
+		}
+  
+   
+}

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Bid_Letter"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="1020"
+		 pageHeight="842"
+		 columnWidth="960"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="2" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<queryString><![CDATA[SELECT
+     AM_BID_RESULT."Bid_Code" AS AM_BID_RESULT_Bid_Code,
+     AM_BID_RESULT."Asset_id" AS AM_BID_RESULT_Asset_id,
+     AM_BID_RESULT."Description" AS AM_BID_RESULT_Description,
+     AM_BID_RESULT."Asset_Make" AS AM_BID_RESULT_Asset_Make,
+     AM_BID_RESULT."Bid_Value" AS AM_BID_RESULT_Bid_Value,
+     AM_BID_RESULT."First_Name" AS AM_BID_RESULT_First_Name,
+     AM_BID_RESULT."Sur_Name" AS AM_BID_RESULT_Sur_Name,
+     AM_BID_RESULT."Address_1" AS AM_BID_RESULT_Address_1,
+     AM_BID_RESULT."Address_2" AS AM_BID_RESULT_Address_2,
+     AM_BID_RESULT."Email_Address" AS AM_BID_RESULT_Email_Address,
+     AM_BID_RESULT."Phone_No" AS AM_BID_RESULT_Phone_No,
+     AM_BID_RESULT."Bid_Process" AS AM_BID_RESULT_Bid_Process,
+     AM_BID_RESULT."Bid_Title" AS AM_BID_RESULT_Bid_Title,
+     AM_BID_RESULT."Bid_Date" AS AM_BID_RESULT_Bid_Date,
+     AM_BID_RESULT."Initials" AS AM_BID_RESULT_Initials,
+     am_gb_company."company_name" AS am_gb_company_company_name
+FROM
+     "dbo"."AM_BID_RESULT" AM_BID_RESULT,
+     "dbo"."am_gb_company" am_gb_company
+order by AM_BID_RESULT."Asset_id"]]></queryString>
+
+	<field name="AM_BID_RESULT_Bid_Code" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Asset_id" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Description" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Asset_Make" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Bid_Value" class="java.math.BigDecimal"/>
+	<field name="AM_BID_RESULT_First_Name" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Sur_Name" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Address_1" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Address_2" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Email_Address" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Phone_No" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Bid_Process" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Bid_Title" class="java.lang.String"/>
+	<field name="AM_BID_RESULT_Bid_Date" class="java.sql.Timestamp"/>
+	<field name="AM_BID_RESULT_Initials" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+
+	<sortField name="AM_BID_RESULT_Asset_id" />
+
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="50"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="51"
+						y="11"
+						width="591"
+						height="30"
+						forecolor="#FFFFFF"
+						backcolor="#0033CC"
+						key="textField-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_gb_company_company_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="100"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="11"
+						y="11"
+						width="139"
+						height="31"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_BID_RESULT_Asset_id}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="165"
+						y="11"
+						width="139"
+						height="31"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_BID_RESULT_Bid_Code}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="309"
+						y="11"
+						width="139"
+						height="31"
+						key="textField-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_BID_RESULT_Description}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="474"
+						y="11"
+						width="139"
+						height="31"
+						key="textField-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{AM_BID_RESULT_Bid_Value}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<lastPageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</lastPageFooter>
+		<summary>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Inward_Instrument_Difference"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="1020"
+		 pageHeight="842"
+		 columnWidth="960"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="2" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<queryString><![CDATA[SELECT
+     INWARD_CHEQUE."CHEQUE_NO" AS INWARD_CHEQUE_CHEQUE_NO,
+     INWARD_CHEQUE."CHQ_CLEAR_ACCT_NO" AS INWARD_CHEQUE_CHQ_CLEAR_ACCT_NO,
+     INWARD_CHEQUE."CHQ_BANK_BRANCH" AS INWARD_CHEQUE_CHQ_BANK_BRANCH,
+     INWARD_CHEQUE."AMOUNT" AS INWARD_CHEQUE_AMOUNT,
+     INWARD_CHEQUE."Sort_Code" AS INWARD_CHEQUE_Sort_Code,
+     INWARD_CHEQUE_SCAN."AMOUNT" AS INWARD_CHEQUE_SCAN_AMOUNT,
+     ad_gb_company."company_code" AS ad_gb_company_company_code,
+     ad_gb_company."company_name" AS ad_gb_company_company_name,
+     ad_gb_company."company_address" AS ad_gb_company_company_address
+FROM
+     "dbo"."INWARD_CHEQUE_SCAN" INWARD_CHEQUE_SCAN FULL OUTER JOIN "dbo"."INWARD_CHEQUE" INWARD_CHEQUE ON INWARD_CHEQUE_SCAN."CUST_ACCOUNT_NO" = INWARD_CHEQUE."CHQ_CLEAR_ACCT_NO"
+     AND INWARD_CHEQUE_SCAN."CHEQUE_NO" = INWARD_CHEQUE."CHEQUE_NO",
+     "dbo"."ad_gb_company" ad_gb_company]]></queryString>
+
+	<field name="INWARD_CHEQUE_CHEQUE_NO" class="java.lang.String"/>
+	<field name="INWARD_CHEQUE_CHQ_CLEAR_ACCT_NO" class="java.lang.String"/>
+	<field name="INWARD_CHEQUE_CHQ_BANK_BRANCH" class="java.lang.String"/>
+	<field name="INWARD_CHEQUE_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="INWARD_CHEQUE_Sort_Code" class="java.lang.String"/>
+	<field name="INWARD_CHEQUE_SCAN_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="ad_gb_company_company_code" class="java.lang.String"/>
+	<field name="ad_gb_company_company_name" class="java.lang.String"/>
+	<field name="ad_gb_company_company_address" class="java.lang.String"/>
+
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="100"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="20"
+						y="16"
+						width="112"
+						height="25"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{INWARD_CHEQUE_Sort_Code}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="136"
+						y="16"
+						width="112"
+						height="25"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{INWARD_CHEQUE_CHQ_CLEAR_ACCT_NO}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="254"
+						y="16"
+						width="112"
+						height="25"
+						key="textField-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{INWARD_CHEQUE_CHEQUE_NO}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="###0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="377"
+						y="16"
+						width="112"
+						height="25"
+						key="textField-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{INWARD_CHEQUE_AMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="###0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="502"
+						y="16"
+						width="112"
+						height="25"
+						key="textField-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{INWARD_CHEQUE_SCAN_AMOUNT}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<lastPageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</lastPageFooter>
+		<summary>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

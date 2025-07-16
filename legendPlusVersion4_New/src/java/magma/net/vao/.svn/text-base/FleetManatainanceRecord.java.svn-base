@@ -1,0 +1,174 @@
+package magma.net.vao;
+
+/**
+ * <p>Title: FleetManatainanceRecord.java</p>
+ *
+ * <p>Description: File Description</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class FleetManatainanceRecord extends FleetRecord {
+    private String dateOfRepair;
+    private String technicianType;
+    private String technicianName;
+    private double milleageBeforeMaintenance;
+    private double milleageAfterMaintenance;
+    private String details;
+    private String componentReplaced;
+    private String lastPerformedDate;
+    private String nextPerformedDate;
+    private String maintenanceType;
+    private String histId;
+    private String invoiceNo;
+    private double vatAmt;
+    private double whtAmt;
+
+    public FleetManatainanceRecord(String id, String type, double cost,
+                                   String assetCode,
+                                   String registrationNo, String dateOfRepair,
+                                   String technicianType,
+                                   String technicianName,
+                                   double milleageBeforeMaintenance,
+                                   double milleageAfterMaintenance,
+                                   String details, String componentReplaced,
+                                   String lastPerformedDate,
+                                   String nextPerformedDate,
+                                   String maintenanceType, String status,
+                                   String histId, String invoiceNo,
+                                   double vatAmt, double whtAmt) {
+
+        super(id, type, cost, assetCode, registrationNo, status);
+        setDateOfRepair(dateOfRepair);
+        setTechnicianType(technicianType);
+        setTechnicianName(technicianName);
+        setMilleageBeforeMaintenance(milleageBeforeMaintenance);
+        setMilleageAfterMaintenance(milleageAfterMaintenance);
+        setDetails(details);
+        setComponentReplaced(componentReplaced);
+        setLastPerformedDate(lastPerformedDate);
+        setNextPerformedDate(nextPerformedDate);
+        setMaintenanceType(maintenanceType);
+        setHistId(histId);
+        setInvoiceNo(invoiceNo);
+        setVatAmt(vatAmt);
+        setWhtAmt(whtAmt);
+    }
+
+    public void setDateOfRepair(String dateOfRepair) {
+        this.dateOfRepair = dateOfRepair;
+
+    }
+
+    public void setTechnicianType(String technicianType) {
+        this.technicianType = technicianType;
+    }
+
+    public void setTechnicianName(String technicianName) {
+        this.technicianName = technicianName;
+    }
+
+    public void setMilleageBeforeMaintenance(double milleageBeforeMaintenance) {
+        this.milleageBeforeMaintenance = milleageBeforeMaintenance;
+    }
+
+    public void setMilleageAfterMaintenance(double milleageAfterMaintenance) {
+        this.milleageAfterMaintenance = milleageAfterMaintenance;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public void setComponentReplaced(String componentReplaced) {
+        this.componentReplaced = componentReplaced;
+    }
+
+    public void setLastPerformedDate(String lastPerformedDate) {
+        this.lastPerformedDate = lastPerformedDate;
+    }
+
+    public void setNextPerformedDate(String nextPerformedDate) {
+        this.nextPerformedDate = nextPerformedDate;
+    }
+
+    public void setMaintenanceType(String maintenanceType) {
+        this.maintenanceType = maintenanceType;
+    }
+
+    public String getDateOfRepair() {
+        return dateOfRepair;
+    }
+
+    public String getTechnicianType() {
+        return technicianType;
+    }
+
+    public String getTechnicianName() {
+        return technicianName;
+    }
+
+    public double getMilleageBeforeMaintenance() {
+        return milleageBeforeMaintenance;
+    }
+
+    public double getMilleageAfterMaintenance() {
+        return milleageAfterMaintenance;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public String getComponentReplaced() {
+        return componentReplaced;
+    }
+
+    public String getLastPerformedDate() {
+        return lastPerformedDate;
+    }
+
+    public String getNextPerformedDate() {
+        return nextPerformedDate;
+    }
+
+    public String getMaintenanceType() {
+        return maintenanceType;
+    }
+
+    public String getHistId() {
+        return histId;
+    }
+
+    public void setHistId(String histId) {
+        this.histId = histId;
+    }
+
+    public String getInvoiceNo() {
+        return invoiceNo;
+    }
+
+    public void setInvoiceNo(String invoiceNo) {
+        this.invoiceNo = invoiceNo;
+    }
+
+    public double getVatAmt() {
+        return vatAmt;
+    }
+
+    public void setVatAmt(double vatAmt) {
+        this.vatAmt = vatAmt;
+    }
+
+    public double getWhtAmt() {
+        return whtAmt;
+    }
+
+    public void setWhtAmt(double whtAmt) {
+        this.whtAmt = whtAmt;
+    }
+}

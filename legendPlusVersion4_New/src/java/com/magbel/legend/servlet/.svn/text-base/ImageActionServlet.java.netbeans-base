@@ -1,0 +1,102 @@
+package com.magbel.legend.servlet;
+
+
+
+import com.magbel.legend.bus.ApprovalRecords;
+
+import java.io.*;
+
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+
+import java.util.*;
+
+public class ImageActionServlet extends HttpServlet
+{
+
+	private ApprovalRecords service;
+
+    public ImageActionServlet()
+    {
+    }
+
+    public void init(ServletConfig config)
+        throws ServletException
+    {
+        super.init(config);
+        try
+        {
+        service = new ApprovalRecords();
+ 
+        }
+        catch(Exception et)
+        {et.printStackTrace();}
+    }
+    public void destroy()
+    {
+    }
+
+    public void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        response.setContentType("text/html");
+       
+        HttpSession session = request.getSession();
+        PrintWriter out = response.getWriter();
+        
+        String assetId = request.getParameter("assetId");
+        System.out.println("assetId "+assetId);
+        String pageName = request.getParameter("pageName");
+        System.out.println("pageName "+pageName);
+        String userId="";
+        String branch = "";
+        String file = request.getParameter("file");
+       
+       
+     legend.admin.objects.User user = null;
+   	 if(session.getAttribute("_user")!=null) 
+   	 { 
+   		 user =(legend.admin.objects.User)session.getAttribute("_user"); 
+   	     userId=user.getUserId(); 
+   	     branch=user.getBranch();
+   	     
+   	 }
+   	 //check image not existing
+        if(!service.isImageExisting(assetId, pageName))
+        {
+        boolean output = service.insertBlob(assetId, userId, pageName, file);
+        System.out.println("Stauts of image"+output);
+        if(output==true)
+        {
+        out.println("<script>alert('Image successfully saved!')</script>");
+		out.println("<script>");
+//		out.println("window.location='DocumentHelp.jsp?np=assetDetails'");
+		out.println("window.location='DocumentHelp.jsp?np=updateAsset&id="+assetId+"'");
+		
+	    //out.println("window.location='DocumentHelp.jsp?np=updateAsset&id='"+assetId+"';'");
+		out.println("</script>");
+        }
+        else
+        {
+        out.println("<script>alert('Image not saved!')</script>");
+		out.println("<script>");
+//		out.println("window.location='DocumentHelp.jsp?np=assetDetails'");
+		out.println("window.location='DocumentHelp.jsp?np=updateAsset&id="+assetId+"'");
+	   // out.println("window.location='DocumentHelp.jsp'");
+		out.println("</script>");
+		}
+        }
+        else{out.println("<script>alert('Image already exist!')</script>");
+		out.println("<script>");
+//		out.println("window.location='DocumentHelp.jsp?np=assetDetails'");
+		out.println("window.location='DocumentHelp.jsp?np=updateAsset&id="+assetId+"'");
+	   // out.println("window.location='DocumentHelp.jsp'");
+		out.println("</script>");}
+    }
+    public String getServletInfo()
+    {
+        return "Confirmation Action Servlet";
+    }
+}

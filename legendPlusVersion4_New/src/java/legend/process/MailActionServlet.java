@@ -1,0 +1,152 @@
+package legend.process;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import legend.admin.objects.mail_setup;
+import legend.admin.handlers.AdminHandler;
+
+import audit.AuditTrailGen;
+
+import com.magbel.util.CheckIntegerityContraint;
+
+/**
+ * <p>
+ * Title:
+ * </p>
+ * 
+ * <p>
+ * Description:
+ * </p>
+ * 
+ * <p>
+ * Copyright: Copyright (c) 2006
+ * </p>
+ * 
+ * <p>
+ * Company:
+ * </p>
+ * 
+ * @author not attributable
+ * @version 1.0
+ */
+public class MailActionServlet extends HttpServlet {
+	public MailActionServlet() {
+	}
+
+	/**
+	 * Initializes the servlet.
+	 * 
+	 * @param config
+	 *            ServletConfig
+	 * @throws ServletException
+	 */
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+	}
+
+	/**
+	 * Destroys the servlet.
+	 */
+	public void destroy() {
+
+	}
+
+	/**
+	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+	 * methods.
+	 * 
+	 * @param request
+	 *            servlet request
+	 * @param response
+	 *            servlet response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException{
+
+		response.setContentType("text/html");
+		response.setDateHeader("Expires", -1);
+
+		HttpSession session = request.getSession();
+		PrintWriter out = response.getWriter();
+		
+		 String userId="";
+                 String branch = "";
+
+		
+		
+		String mailcode = request.getParameter("mail_code");
+		String maildesc = request.getParameter("mail_description");
+		String address = request.getParameter("mail_address");
+		String date = request.getParameter("create_date");
+		String trans_type = request.getParameter("transaction_type");
+		String userid = request.getParameter("user_id");
+		String active = request.getParameter("active");
+		//String operation = request.getParameter("operation");
+		
+                mail_setup bran = new  mail_setup();
+		bran.setMailcode(mailcode);
+		bran.setMaildescription(maildesc);
+		bran.setMailaddress(address);
+		bran.setDate(date);
+		bran.setTrans_type(trans_type);
+		bran.setUserid(userid);
+		bran.setStatus(active);
+		
+		AdminHandler admin = new AdminHandler();
+		
+		String message = admin.CheckMailSetup(mailcode,maildesc ,address,date,trans_type,userid,active);
+		
+		 //admin.CheckIfExist(code,name,contact,mail, status);
+		//boolean message = 
+		 legend.admin.objects.User user = null;
+	   	 if(session.getAttribute("_user")!=null) 
+	   	 { 
+	   		 user =(legend.admin.objects.User)session.getAttribute("_user"); 
+	   	     userId=user.getUserId(); 
+	   	     branch=user.getBranch();
+	   	     
+	   	 }
+		
+	
+
+		 try {		
+			 
+						if(admin.isCheckMailSetup(mailcode))
+						{
+							out.print("<script>alert('Record already exists');</script>");
+							out.print("<script>window.location = 'DocumentHelp.jsp?np=managemailsetup'</script>");
+							
+						}
+						else{
+							
+							
+							admin.SaveMailSetup( mailcode,maildesc,address,date,trans_type, userId,active);
+							out.print("<script>alert('Record saved successfully.');</script>");
+							out.print("<script>window.location = 'DocumentHelp.jsp?np=mailsetup'</script>");
+							
+						}
+						
+				
+			 	 			
+			}
+		 catch(Exception ex)
+		 {
+				ex.printStackTrace();
+			}
+			
+			
+		
+		
+	
+	
+	}
+}				

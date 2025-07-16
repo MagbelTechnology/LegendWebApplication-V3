@@ -1,0 +1,227 @@
+package magma.asset.dto;
+
+public class DepAdjustment {
+    public DepAdjustment(int id,String assetId,double accumDep,double newAccumDep,double nbv,double newNbv,
+                         String reason,String raiseEntry,String adjustDate,String effDate,int userId,
+                         int branchId,int deptId,int categoryId,String regNo,String desc,String assetUser,String assetStatus,String paymentStatus) {
+    
+    
+    setId(id);
+    setAssetId(assetId);
+    setAccumDep(accumDep);
+    setNewAccumDep(newAccumDep);
+    setNbv(nbv);
+    setNewNbv(newNbv);
+    setReason(reason);
+    setRaiseEntry(raiseEntry);
+    setAdjustDate(adjustDate);
+    setEffDate(effDate);
+    setUserId(userId);
+    setBranchId(branchId);
+    setDeptId(deptId);
+    setCategoryId(categoryId);
+    setRegNo(regNo);
+    setDesc(desc);
+    //setCost(cost);
+    setAssetUser(assetUser);
+    setAssetStatus(assetStatus);
+    setPaymentStatus(paymentStatus);
+    
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
+    }
+
+    public void setAccumDep(double accumDep) {
+
+        this.accumDep = accumDep;
+    }
+
+    public void setNewAccumDep(double newAccumDep) {
+
+        this.newAccumDep = newAccumDep;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public void setAdjustDate(String adjustDate) {
+        this.adjustDate = adjustDate;
+    }
+
+    public void setEffDate(String effDate) {
+        this.effDate = effDate;
+    }
+
+    public void setNbv(double nbv) {
+        this.nbv = nbv;
+    }
+
+    public void setNewNbv(double newNbv) {
+        this.newNbv = newNbv;
+    }
+
+    public void setRaiseEntry(String raiseEntry) {
+        this.raiseEntry = raiseEntry;
+    }
+
+    public void setUserId(int userId) {
+    this.userId = userId;
+    }
+
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public double getAccumDep() {
+
+        return accumDep;
+    }
+
+    public double getNewAccumDep() {
+
+        return newAccumDep;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public String getAdjustDate() {
+        return adjustDate;
+    }
+
+    public String getEffDate() {
+        return effDate;
+    }
+
+    public double getNbv() {
+        return nbv;
+    }
+
+    public double getNewNbv() {
+        return newNbv;
+    }
+
+    public String getRaiseEntry() {
+        return raiseEntry;
+    }
+
+    public int getUserId() {
+    return userId;
+    }
+
+    private String raiseEntry;
+    private String effDate;
+    private String assetId;
+    private double accumDep;
+    private double newAccumDep;
+    private String reason;
+    private String adjustDate;
+    private double nbv;
+    private double newNbv;
+  private int userId;
+  private int id;
+  private int branchId;
+  private int deptId;
+  private int categoryId;
+  private String regNo;
+  private String assetStatus;
+  private String desc;
+  private String assetUser;
+  private String paymentStatus;
+
+  public int getId()
+  {
+    return id;
+  }
+
+  public void setId(int id)
+  {
+    this.id = id;
+  }
+
+  public int getBranchId()
+  {
+    return branchId;
+  }
+
+  public void setBranchId(int branchId)
+  {
+    this.branchId = branchId;
+  }
+
+  public int getDeptId()
+  {
+    return deptId;
+  }
+
+  public void setDeptId(int deptId)
+  {
+    this.deptId = deptId;
+  }
+
+  public int getCategoryId()
+  {
+    return categoryId;
+  }
+
+  public void setCategoryId(int categoryId)
+  {
+    this.categoryId = categoryId;
+  }
+
+  public String getRegNo()
+  {
+    return regNo;
+  }
+
+  public void setRegNo(String regNo)
+  {
+    this.regNo = regNo;
+  }
+
+  public String getAssetStatus()
+  {
+    return assetStatus;
+  }
+
+  public void setAssetStatus(String assetStatus)
+  {
+    this.assetStatus = assetStatus;
+  }
+
+  public String getDesc()
+  {
+    return desc;
+  }
+
+  public void setDesc(String desc)
+  {
+    this.desc = desc;
+  }
+
+  public String getAssetUser()
+  {
+    return assetUser;
+  }
+
+  public void setAssetUser(String assetUser)
+  {
+    this.assetUser = assetUser;
+  }
+
+  public String getPaymentStatus()
+  {
+    return paymentStatus;
+  }
+
+  public void setPaymentStatus(String paymentStatus)
+  {
+    this.paymentStatus = paymentStatus;
+  }
+
+
+}

@@ -1,0 +1,132 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package magma;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.magbel.util.DataConnect;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+
+/**
+ *
+ * @author Olabo
+ */
+public class departmentservlet extends HttpServlet {
+    private static final String CONTENT_TYPE = "text/xml";
+    //@todo set DTD
+    private static final String DOC_TYPE = null;
+
+    //Initialize global variables
+    public void init() throws ServletException {
+    }
+
+    //Process the HTTP Get request
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        String branch_id = request.getParameter("branch_id");
+        if(branch_id == null)
+        {
+            branch_id = "0";
+        }
+        int branchID = Integer.parseInt(branch_id);
+        response.setContentType("text/xml");
+        PrintWriter out = response.getWriter();
+        out.write("<message>");
+ResultSet rs= null;
+Connection con = null;
+	     
+	     PreparedStatement ps = null;
+try
+        {
+            //System.out.println("this is the doGet() of the sbuservlet the value of branch _id is ============= " +branch_id+" ================");
+    //System.out.println("The value of branchID is LLLLLLLLLLLLLLLLLL"+branchID);
+        // String query = "select ATTACH_ID, SBU_NAME from AM_SBU_ATTACHEMENT where ATTACH_ID = ? order by sbu_name" ;
+           String query = "select d.dept_id, d.Dept_name from sbu_branch_dept s, am_ad_department d "+
+"where s.deptId = d.Dept_ID and s.branchId ="+branch_id+" order by d.Dept_name";
+//           System.out.println("getDeptInBranch query: "+query);
+              con = (new DataConnect("legendPlus")).getConnection();
+	      ps = con.prepareStatement(query);
+          ps.setInt(1, branchID);
+	      rs = ps.executeQuery();
+           while(rs.next()) {
+            out.write("<department>");
+                out.write("<id>");
+                out.write(rs.getString(1));
+//                System.out.println("getDeptInBranch String 1: "+rs.getString(1));
+                out.write("</id>");
+                out.write("<name>");
+                out.write(rs.getString(2).replaceAll("&", "&amp;"));
+//                System.out.println("getDeptInBranch String 2: "+rs.getString(2));
+                out.write("</name>");
+             out.write("</department>");
+//               System.out.println("The value of name is LLLLLLLLLLLLLLLLLL"+rs.getString(2));
+           }
+
+
+
+
+
+            /*
+            for( rs = (new ConnectionClass()).getStatement().executeQuery((new StringBuilder()).append("select ATTACH_ID, SBU_NAME from AM_SBU_ATTACHEMENT where ATTACH_ID = ").append(branch_id).toString()); rs.next(); out.write("</make>"))
+            {
+                System.out.println("==============foud the record ========================");
+                out.write("<make>");
+                out.write("<id>");
+                out.write(rs.getString(1));
+                out.write("</id>");
+                out.write("<name>");
+                out.write(rs.getString(2));
+                out.write("</name>");
+            }
+            */
+
+//rs.close();
+        }
+        catch(SQLException ex) { }
+        catch(Exception ex) { }
+        finally{
+       //out.close();
+            closeConnection(con,ps,rs);
+        }
+        out.write("</message>");
+        if(DOC_TYPE != null)
+        {
+            out.println(DOC_TYPE);
+        }
+    }
+
+    public void destroy()
+    {
+    }
+private void closeConnection(Connection con, PreparedStatement ps,
+                                 ResultSet rs) {
+        try {
+//System.out.println("=============inside closeConnection==========");
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+
+        } catch (Exception e) {
+            System.out.println("WANR: Error closing connection >>" + e);
+        }
+    }
+    
+}

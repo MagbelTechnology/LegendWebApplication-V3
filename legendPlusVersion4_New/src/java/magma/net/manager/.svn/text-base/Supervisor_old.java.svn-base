@@ -1,0 +1,494 @@
+package magma.net.manager;
+
+import com.magbel.util.*;
+import java.sql.*;
+import java.util.*;
+import magma.net.vao.Transaction;
+import magma.net.dao.MagmaDBConnection;
+import magma.net.vao.FleetTransaction;
+
+public class Supervisor extends MagmaDBConnection
+{
+  public Supervisor()
+  {
+  }
+  
+  //get transaction status for user
+     public ArrayList findTransactionStatusList(String query_) {
+    
+        String SELECT_QUERY = "SELECT a.USER_ID,a.SUPER_ID,b.full_name,a.POSTING_DATE,a.PROCESS_STATUS,a.SUPERVISOR, "+
+                              "a.REJECT_REASON,a.BATCH_ID,a.TRAN_TYPE,a.TRAN_SENT_TIME,c.ASSET_ID,c.CATEGORY_ID,c.REGISTRATION_NO, "+
+                              "c.DESCRIPTION,c.ASSET_STATUS FROM AM_ENTRY_TABLE a,AM_GB_USER b,AM_ASSET_MAIN c "+
+                              "WHERE a.ASSET_ID = c.ASSET_ID AND a.SUPER_ID = b.USER_ID "+query_+
+                              " GROUP BY a.USER_ID,a.BATCH_ID,c.ASSET_ID,a.SUPER_ID,b.full_name,a.POSTING_DATE,a.PROCESS_STATUS,a.SUPERVISOR, "+
+                              "a.REJECT_REASON,a.TRAN_TYPE,c.CATEGORY_ID,c.REGISTRATION_NO,c.DESCRIPTION,c.ASSET_STATUS,a.TRAN_SENT_TIME";
+                              
+        /* AND SUPER_ID = " + ;*/
+        ArrayList list = new ArrayList();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(SELECT_QUERY);
+            //ps.setInt(1,Integer.parseInt(superid));
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = "";
+                String debitAccount = "";
+                String creditAccount = "";
+                String drAcctType = "";
+                String crAcctType = "";
+                String drTranCode = "";
+                String crTranCode = "";
+                String creditNarration = "";
+                String debitNarration = "";
+                double amount = 0;
+                String userId = rs.getString("USER_ID");
+                String superId = rs.getString("SUPER_ID");
+                String legacyCode = "";
+                String code = "";//rs.getString("TRAN_CODE");
+                String postingDate = formatDate(rs.getDate("POSTING_DATE"));
+                String effectiveDate = "";
+                String status = rs.getString("PROCESS_STATUS");
+                String supervisor = "";
+                String rejectReason = rs.getString("REJECT_REASON");
+                String batchId = rs.getString("BATCH_ID");
+                String fullName = rs.getString("FULL_NAME");
+                String assetId = rs.getString("ASSET_ID");
+                int branchId = 0;
+                int deptId = 0;
+                int categoryId = rs.getInt("CATEGORY_ID");
+                String regNo = rs.getString("REGISTRATION_NO");
+                String desc = rs.getString("DESCRIPTION");
+                String assetStatus = rs.getString("ASSET_STATUS");
+                String tranType = rs.getString("TRAN_TYPE");
+                String sentTime = rs.getString("TRAN_SENT_TIME");
+
+                Transaction tran = new Transaction(id, debitAccount,
+                        creditAccount, creditNarration, debitNarration,
+                        amount, userId, superId, legacyCode, code, postingDate,
+                        effectiveDate, status, supervisor, rejectReason,
+                        batchId,fullName,assetId,drAcctType,crAcctType,drTranCode,crTranCode,branchId,
+                        deptId,categoryId,regNo,desc,assetStatus,tranType,sentTime);
+                        list.add(tran);
+
+            }
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error Fetching Transaction Status List" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return list;
+    }
+ public void deleteTransaction(String batchId,String tranType)
+ {
+  String query = "DELETE FROM AM_ENTRY_TABLE WHERE ASSET_ID = ? ";
+  
+  String updateTranType = "";      
+  
+  if(tranType.equalsIgnoreCase("DISPOSAL"))
+  {
+   updateTranType = "UPDATE AM_ASSETDISPOSAL SET RAISE_ENTRY = 'N' WHERE ASSET_ID ='"+batchId+"'";
+  }
+  else if(tranType.equalsIgnoreCase("TRANSFER"))
+  {
+   updateTranType = "UPDATE AM_ASSETTRANSFER SET RAISE_ENTRY = 'N' WHERE ASSET_ID ='"+batchId+"'";
+  }
+  else if(tranType.equalsIgnoreCase("REVALUE"))
+  {
+   updateTranType = "UPDATE AM_ASSETREVALUE SET RAISE_ENTRY = 'N' WHERE ASSET_ID ='"+batchId+"'";
+  }
+  else
+  {
+  }
+                          
+   Connection con = null;
+   PreparedStatement ps = null;
+   try 
+   {
+    con = getConnection("fixedasset");
+    ps = con.prepareStatement(query);
+    ps.setString(1,batchId);
+    ps.execute();
+    ps = con.prepareStatement(updateTranType);
+    int x = ps.executeUpdate();
+   } 
+   catch (Exception e) 
+   {
+     String warning = "WARNING:Error Deleting Transaction" +
+      " ->" + e.getMessage();
+     System.out.println(warning);
+   } 
+   finally 
+   {
+    closeConnection(con, ps);
+   }
+  }
+        
+  public void deleteTransaction(String[] batchId,String[] tranType) {
+        if (batchId != null) {
+            for (int x = 0; x < batchId.length; x++) {
+                deleteTransaction(batchId[x],tranType[x]);
+            }
+        }
+
+    }
+ 
+ public void approveTransaction(String batchId, String command,
+                                   String rReason) 
+    {
+        String UPDATE_QUERY = "UPDATE AM_ENTRY_TABLE SET PROCESS_STATUS = ?, " +
+                              "REJECT_REASON = ? WHERE ASSET_ID = ?";
+        String status = "P";
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(UPDATE_QUERY);
+
+            ps.setString(1, command);
+            ps.setString(2, rReason);
+            ps.setString(3, batchId);
+
+            ps.execute();
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error Approving Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+    public void approveTransaction(String[] batchId, String command,
+                                   String rReason) {
+        if (batchId != null) {
+            for (int x = 0; x < batchId.length; x++) {
+                approveTransaction(batchId[x], command, rReason);
+            }
+        }
+
+    }
+   
+   public ArrayList findTransactionForAuthorization(String query_) {
+    
+        String SELECT_QUERY = "SELECT a.TRANSACTION_ID,a.DR_ACCT,CR_ACCT,a.DR_ACCT_TYPE,a.CR_ACCT_TYPE," +
+                              "a.DR_TRAN_CODE,a.CR_TRAN_CODE,a.DR_NARRATION,a.CR_NARRATION,a.AMOUNT,a.USER_ID," +
+                              "a.SUPER_ID,a.LEGACY_ID,a.POSTING_DATE," +
+                              "a.EFFECTIVE_DATE,a.PROCESS_STATUS,a.SUPERVISOR," +
+                              "a.REJECT_REASON,a.BATCH_ID,a.TRAN_TYPE,a.TRAN_SENT_TIME,b.FULL_NAME,c.ASSET_ID,c.BRANCH_ID,c.DEPT_ID,"+
+                              "c.CATEGORY_ID,c.REGISTRATION_NO,c.DESCRIPTION,c.ASSET_STATUS " +
+                              "FROM AM_ENTRY_TABLE a,AM_GB_USER b,AM_ASSET_MAIN c " +
+                              "WHERE a.ASSET_ID = c.ASSET_ID AND a.USER_ID = b.USER_ID "+query_+" ORDER BY a.POSTING_DATE DESC,c.ASSET_ID,a.BATCH_ID";
+                              
+        /* AND SUPER_ID = " + ;*/
+        ArrayList list = new ArrayList();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(SELECT_QUERY);
+            //ps.setInt(1,Integer.parseInt(superid));
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("TRANSACTION_ID");
+               // System.out.println(id);
+                String debitAccount = rs.getString("DR_ACCT");
+                String creditAccount = rs.getString("CR_ACCT");
+                String drAcctType = rs.getString("DR_ACCT_TYPE");
+                String crAcctType = rs.getString("CR_ACCT_TYPE");
+                String drTranCode = rs.getString("DR_TRAN_CODE");
+                String crTranCode = rs.getString("CR_TRAN_CODE");
+                String creditNarration = rs.getString("CR_NARRATION");
+                String debitNarration = rs.getString("DR_NARRATION");
+                double amount = rs.getDouble("AMOUNT");
+                String userId = rs.getString("USER_ID");
+                String superId = rs.getString("SUPER_ID");
+                String legacyCode = rs.getString("LEGACY_ID");
+                String code = "";//rs.getString("TRAN_CODE");
+                String postingDate = formatDate(rs.getDate("POSTING_DATE"));
+                String effectiveDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+                String status = rs.getString("PROCESS_STATUS");
+                String supervisor = rs.getString("SUPERVISOR");
+                String rejectReason = rs.getString("REJECT_REASON");
+                String batchId = rs.getString("BATCH_ID");
+                String fullName = rs.getString("FULL_NAME");
+                String assetId = rs.getString("ASSET_ID");
+                int branchId = rs.getInt("BRANCH_ID");
+                int deptId = rs.getInt("DEPT_ID");
+                int categoryId = rs.getInt("CATEGORY_ID");
+                String regNo = rs.getString("REGISTRATION_NO");
+                String desc = rs.getString("DESCRIPTION");
+                //double cost = rs.getDouble("COST_PRICE");
+                //String assetUser = rs.getString("ASSET_USER");
+                String assetStatus = rs.getString("ASSET_STATUS");
+                String tranType = rs.getString("TRAN_TYPE");
+                String sentTime = rs.getString("TRAN_SENT_TIME");
+
+                Transaction tran = new Transaction(id, debitAccount,
+                        creditAccount, creditNarration, debitNarration,
+                        amount, userId, superId, legacyCode, code, postingDate,
+                        effectiveDate, status, supervisor, rejectReason,
+                        batchId,fullName,assetId,drAcctType,crAcctType,drTranCode,crTranCode,branchId,
+                        deptId,categoryId,regNo,desc,assetStatus,tranType,sentTime);
+
+                list.add(tran);
+
+            }
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error Fetching Transaction for Approval" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return list;
+    }
+  public void updateTransactionStatus(String batchId,String status) {
+        String UPDATE_QUERY = "UPDATE AM_ENTRY_TABLE SET PROCESS_STATUS = ? " +
+                              "WHERE ASSET_ID = ?";
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(UPDATE_QUERY);
+            ps.setString(1,status);
+            ps.setString(2,batchId);
+            ps.execute();
+
+        } catch (Exception e) {
+            String warning = "WARNING:Error updating time out Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+        } finally {
+            closeConnection(con, ps);
+        }
+
+    }
+    
+ public boolean isWaitingTimeUp(int waitTime_,String sentTime_)
+ {
+   String sYear, sMonth, sDate ,sHour, sMin ,sSec,sMilli;
+   Integer iYear, iMonth, iDate ,iHour, iMin ,iSec,iMilli;
+   int iAMPM,intYear,intMonth,intDate,intHour, intMin ,intSec,intMilli;
+   //boolean result = true;
+   int waitTime = waitTime_; //get this from company table
+   String sentTime = sentTime_.substring(0,19);
+   boolean result = false;
+   
+   java.util.Calendar calendar = java.util.Calendar.getInstance();
+   
+   iYear = new Integer (calendar.get(calendar.YEAR));
+   intMonth = calendar.get(calendar.MONTH) + 1;
+
+   iMonth = new Integer (intMonth); // Return value is zero based so add 1 to get correct value
+
+   intDate = calendar.get(calendar.DATE);
+
+   iDate = new Integer (intDate);
+   iHour = new Integer (calendar.get(calendar.HOUR));
+   iMin = new Integer (calendar.get(calendar.MINUTE));
+     
+   System.out.println("before "+iYear.toString()+"-"+iMonth.toString()+"-"+iDate.toString()+"-"+iHour.toString()+"-"+iMin.toString());
+   String currentTime = iYear.toString()+iMonth.toString()+iDate.toString()+iHour.toString()+iMin.toString();
+   
+   
+   intYear = new Integer(sentTime.substring(0,4)).intValue();
+   intMonth = new Integer (sentTime.substring(5,7)).intValue();
+   intDate = new Integer (sentTime.substring(8,10)).intValue();
+   intHour = new Integer (sentTime.substring(11,13)).intValue();
+   intMin = new Integer (sentTime.substring(14,16)).intValue();
+   intSec = new Integer (sentTime.substring(17,19)).intValue();
+
+   // Calendar calendar = Calendar.getInstance();
+   calendar.set(intYear,intMonth-1,intDate,intHour,intMin);
+   
+   calendar.add(calendar.MINUTE,waitTime);
+   
+   iYear = new Integer (calendar.get(calendar.YEAR));
+   intMonth = calendar.get(calendar.MONTH) + 1;
+
+   iMonth = new Integer (intMonth); // Return value is zero based so add 1 to get correct value
+
+   intDate = calendar.get(calendar.DATE);
+
+   iDate = new Integer (intDate);
+   iHour = new Integer (calendar.get(calendar.HOUR));
+   iMin = new Integer (calendar.get(calendar.MINUTE));
+   
+   String  sentTimeUp = iYear.toString()+iMonth.toString()+iDate.toString()+iHour.toString()+iMin.toString(); 
+   System.out.println("after "+iYear.toString()+"-"+iMonth.toString()+"-"+iDate.toString()+"-"+iHour.toString()+"-"+iMin.toString());
+   if(Double.parseDouble(currentTime) >= Double.parseDouble(sentTimeUp))
+   {
+     result = true;
+   }
+  
+   return  result;  
+  
+  }
+  
+  public void updateTransactionStatus(ArrayList tranids,String status) 
+  {
+        RaiseEntryManager raiseMan = new RaiseEntryManager();
+        int waitTime = Integer.parseInt(raiseMan.getCompanyInfo()[8]);
+        if (tranids != null) {
+            for (int x = 0; x < tranids.size(); x++) {
+            String assetId = ((Transaction) tranids.get(x)).getAssetId();
+            String tranType = ((Transaction) tranids.get(x)).getTranType();
+            String sentTime = ((Transaction) tranids.get(x)).getSentTime();
+            //String updateQuery = getOperationQuery(tranType,assetId);
+                if(isWaitingTimeUp(waitTime,sentTime))
+                {
+                 updateTransactionStatus(((Transaction) tranids.get(x)).getAssetId(),status);
+                 setOperationRaiseEntryStatus(assetId,tranType);
+                 //raiseMan.setRaiseEntryStatus(updateQuery);
+                }
+            }
+        }
+
+  }
+ private String getOperationQuery(String tranType,String assetId)
+ {
+   String result = "";
+   if(tranType.equalsIgnoreCase("DISPOSAL"))
+   {
+     result = "UPDATE AM_ASSETDISPOSAL SET RAISE_ENTRY = 'N' WHERE ASSET_ID ='"+assetId+"'";
+   }
+   else if(tranType.equalsIgnoreCase("TRANSFER"))
+   {
+     result = "UPDATE AM_ASSETTRANSFER SET RAISE_ENTRY = 'N' WHERE ASSET_ID ='"+assetId+"'";
+   }
+   else if(tranType.equalsIgnoreCase("REVALUE"))
+   {
+     result = "UPDATE AM_ASSETREVALUE SET RAISE_ENTRY = 'N' WHERE ASSET_ID ='"+assetId+"'";
+   }
+   else
+   {
+   }
+   System.out.println(result+".."+tranType+".."+assetId);
+   return result;
+ }
+   
+ public int countPendingTransaction(String superId)
+  {
+   String query = "SELECT ISNULL(count(*),0) FROM am_entry_table WHERE super_id ='"+superId+"' AND process_status = 'U'";
+                         
+   Connection con = null;
+   PreparedStatement ps = null;
+   ResultSet rs = null;
+   
+   ArrayList list = new ArrayList();
+   int rowNum = 0;
+   try 
+   {
+    con = getConnection("fixedasset");
+    ps = con.prepareStatement(query);
+    rs = ps.executeQuery();
+    while (rs.next()) 
+    {
+     rowNum = rs.getInt(1);
+    }
+   }
+   catch (Exception e) 
+   {
+     String warning = "WARNING:Error getting Number Of Pending Transaction" +
+                             " ->" + e.getMessage();
+            System.out.println(warning);
+   }
+   finally 
+   {
+    closeConnection(con, ps,rs);
+   }
+   return rowNum;     
+    
+  }
+  
+  public String getStatusName(String status)
+  {
+     
+   String result = "";
+   if(status.equalsIgnoreCase("U"))
+   {
+     result = "UNPROCESSED";
+   }
+   else if(status.equalsIgnoreCase("Q"))
+   {
+     result = "TIMED-OUT";
+   }
+   else
+   {
+     result = "REJECTED";
+   }
+    return result;
+  }   
+  
+ public void setOperationRaiseEntryStatus(String batchId,String tranType)
+ {
+  String updateTranType = "";      
+  
+  if(tranType.equalsIgnoreCase("DISPOSAL"))
+  {
+   updateTranType = "UPDATE AM_ASSETDISPOSAL SET RAISE_ENTRY = ? WHERE ASSET_ID = ?";
+  }
+  else if(tranType.equalsIgnoreCase("TRANSFER"))
+  {
+   updateTranType = "UPDATE AM_ASSETTRANSFER SET RAISE_ENTRY = ? WHERE ASSET_ID = ?";
+  }
+  else if(tranType.equalsIgnoreCase("REVALUATION"))
+  {
+   updateTranType = "UPDATE AM_ASSETREVALUE SET RAISE_ENTRY = ? WHERE ASSET_ID = ?";
+  }
+  else
+  {
+  }
+                          
+   Connection con = null;
+   PreparedStatement ps = null;
+   try 
+   {
+    con = getConnection("fixedasset");
+    ps = con.prepareStatement(updateTranType);
+    ps.setString(1,"Y");
+    ps.setString(2,batchId);
+    int x = ps.executeUpdate();
+   } 
+   catch (Exception e) 
+   {
+     String warning = "WARNING:Error setOperationRaiseEntryStatus(??) "+
+      " ->" + e.getMessage();
+     System.out.println(warning);
+   } 
+   finally 
+   {
+    closeConnection(con, ps);
+   }
+  }
+  
+  public String href(String status)
+  {
+   StringBuffer result = new StringBuffer(30);
+   if(status.equalsIgnoreCase("Q"))
+   {
+    result.append("<a href= \"javascript:newWindow('<%=tranType%>','<%=assetId_%>')\"><%=userName%></a>");
+   }
+   else
+   {
+     result.append("<%=userName%>");
+   }
+   return result.toString();      
+  }
+    
+}

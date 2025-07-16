@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT
+     HD_COMPLAINT."complain_category" AS HD_COMPLAINT_complain_category,
+     HD_COMPLAINT."complainant" AS HD_COMPLAINT_complainant,
+     HD_COMPLAINT."origin_branch" AS HD_COMPLAINT_origin_branch,
+     HD_COMPLAINT."origin_dept" AS HD_COMPLAINT_origin_dept,
+     HD_COMPLAIN_CATEGORY."complain_desc" AS HD_COMPLAIN_CATEGORY_complain_desc
+FROM
+     "dbo"."HD_COMPLAIN_CATEGORY" HD_COMPLAIN_CATEGORY INNER JOIN "dbo"."HD_COMPLAINT" HD_COMPLAINT ON HD_COMPLAIN_CATEGORY."category_code" = HD_COMPLAINT."complain_category"]]>
+	</queryString>
+	<field name="HD_COMPLAINT_complain_category" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_complainant" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_origin_branch" class="java.lang.String"/>
+	<field name="HD_COMPLAINT_origin_dept" class="java.lang.String"/>
+	<field name="HD_COMPLAIN_CATEGORY_complain_desc" class="java.lang.String"/>
+	<sortField name="HD_COMPLAINT_complain_category"/>
+	<variable name="Group_Count" class="java.lang.Number" resetType="Group" resetGroup="Complaint_Group" incrementType="Report" calculation="Count">
+		<variableExpression><![CDATA[$F{HD_COMPLAINT_complainant}]]></variableExpression>
+	</variable>
+	<group name="Complaint_Group">
+		<groupExpression><![CDATA[$F{HD_COMPLAINT_complain_category}]]></groupExpression>
+	</group>
+	<group name="Category_Group">
+		<groupExpression><![CDATA[$F{HD_COMPLAINT_complain_category}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="22">
+				<textField>
+					<reportElement x="227" y="0" width="100" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{Complaint_Group_COUNT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="13" y="0" width="100" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{HD_COMPLAIN_CATEGORY_complain_desc}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="184" splitType="Stretch">
+			<pieChart>
+				<chart>
+					<reportElement x="51" y="0" width="200" height="100"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{HD_COMPLAIN_CATEGORY_complain_desc}]]></keyExpression>
+					<valueExpression><![CDATA[$V{Complaint_Group_COUNT}]]></valueExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+				</piePlot>
+			</pieChart>
+		</band>
+	</summary>
+</jasperReport>

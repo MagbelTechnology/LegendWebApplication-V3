@@ -1,0 +1,2 @@
+datasource=http://192.168.10.10
+readerIP=192.168.10.101

@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report9CrossTab" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="138"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<queryString>
+		<![CDATA[SELECT b.BRANCH_CODE, b.DEPT_CODE, b.VENDOR_CODE, d.Vendor_Name,d.Contact_Address,d.Contact_Person,d.Vendor_Phone, b.SERVICE_TYPE, b.ASSESSMENT_DATE, b.STATUS, a.GROUP_ID, a.CRITERIA,c.GRADE AS A, a.CRITERIONB AS B, a.CRITERIONC AS C, a.CRITERIOND AS D, a.STATUS AS Expr1
+FROM VENDOR_ASSESSMENT_DETAILS a, VENDOR_ASSESSMENT b, VENDOR_GRADE c, am_ad_vendor d
+WHERE a.GROUP_ID = b.GROUP_ID AND b.VENDOR_CODE = d.Vendor_Code AND a.STATUS = 'A' AND b.STATUS = 'A' AND a.CRITERIONA = 'Y' AND 'A' = c.LEVEL_CODE
+AND b.BRANCH_CODE  = '999'
+AND b.VENDOR_CODE = '0012'
+UNION
+SELECT b.BRANCH_CODE, b.DEPT_CODE, b.VENDOR_CODE, d.Vendor_Name,d.Contact_Address,d.Contact_Person,d.Vendor_Phone, b.SERVICE_TYPE, b.ASSESSMENT_DATE, b.STATUS, a.GROUP_ID, a.CRITERIA, a.CRITERIONA AS A, c.GRADE AS B, a.CRITERIONC AS C, a.CRITERIOND AS D, a.STATUS AS Expr1
+FROM VENDOR_ASSESSMENT_DETAILS a, VENDOR_ASSESSMENT b, VENDOR_GRADE c, am_ad_vendor d
+WHERE a.GROUP_ID = b.GROUP_ID AND b.VENDOR_CODE = d.Vendor_Code AND a.STATUS = 'A' AND b.STATUS = 'A' AND a.CRITERIONB = 'Y' AND 'A' = c.LEVEL_CODE
+AND b.BRANCH_CODE  = '999'
+AND b.VENDOR_CODE = '0012'
+UNION
+SELECT b.BRANCH_CODE, b.DEPT_CODE, b.VENDOR_CODE, d.Vendor_Name,d.Contact_Address,d.Contact_Person,d.Vendor_Phone, b.SERVICE_TYPE, b.ASSESSMENT_DATE, b.STATUS, a.GROUP_ID, a.CRITERIA, a.CRITERIONA AS A,a.CRITERIONB AS B,c.GRADE AS C, a.CRITERIOND AS D, a.STATUS AS Expr1
+FROM VENDOR_ASSESSMENT_DETAILS a, VENDOR_ASSESSMENT b, VENDOR_GRADE c, am_ad_vendor d
+WHERE a.GROUP_ID = b.GROUP_ID AND b.VENDOR_CODE = d.Vendor_Code AND b.VENDOR_CODE = d.Vendor_Code AND a.STATUS = 'A' AND b.STATUS = 'A' AND a.CRITERIONC = 'Y' AND 'A' = c.LEVEL_CODE
+AND b.BRANCH_CODE  = '999'
+AND b.VENDOR_CODE = '0012'
+UNION
+SELECT b.BRANCH_CODE, b.DEPT_CODE, b.VENDOR_CODE, d.Vendor_Name,d.Contact_Address,d.Contact_Person,d.Vendor_Phone, b.SERVICE_TYPE, b.ASSESSMENT_DATE, b.STATUS, a.GROUP_ID, a.CRITERIA, a.CRITERIONA AS A,a.CRITERIONB AS B,a.CRITERIONC AS C,c.GRADE AS D, a.STATUS AS Expr1
+FROM VENDOR_ASSESSMENT_DETAILS a, VENDOR_ASSESSMENT b, VENDOR_GRADE c, am_ad_vendor d
+WHERE a.GROUP_ID = b.GROUP_ID AND b.VENDOR_CODE = d.Vendor_Code AND a.STATUS = 'A' AND b.STATUS = 'A' AND a.CRITERIOND= 'Y' AND 'A' = c.LEVEL_CODE
+AND b.BRANCH_CODE  = '999'
+AND b.VENDOR_CODE = '0012']]>
+	</queryString>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="DEPT_CODE" class="java.lang.String"/>
+	<field name="VENDOR_CODE" class="java.lang.String"/>
+	<field name="Vendor_Name" class="java.lang.String"/>
+	<field name="Contact_Address" class="java.lang.String"/>
+	<field name="Contact_Person" class="java.lang.String"/>
+	<field name="Vendor_Phone" class="java.lang.String"/>
+	<field name="SERVICE_TYPE" class="java.lang.String"/>
+	<field name="ASSESSMENT_DATE" class="java.lang.String"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="GROUP_ID" class="java.lang.String"/>
+	<field name="CRITERIA" class="java.lang.String"/>
+	<field name="A" class="java.lang.Integer"/>
+	<field name="B" class="java.lang.Integer"/>
+	<field name="C" class="java.lang.Integer"/>
+	<field name="D" class="java.lang.Integer"/>
+	<field name="Expr1" class="java.lang.String"/>
+	<group name="BRANCH_CODE">
+		<groupExpression><![CDATA[$F{BRANCH_CODE}]]></groupExpression>
+		<groupHeader>
+			<band height="50"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="50"/>
+		</groupFooter>
+	</group>
+	<group name="VENDOR_CODE">
+		<groupExpression><![CDATA[$F{VENDOR_CODE}]]></groupExpression>
+		<groupHeader>
+			<band height="50"/>
+		</groupHeader>
+		<groupFooter>
+			<band height="50"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<crosstab>
+				<reportElement x="0" y="0" width="555" height="125"/>
+				<rowGroup name="BRANCH_CODE" width="70">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{BRANCH_CODE}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="70" height="25"/>
+								<textElement/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{BRANCH_CODE}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="VENDOR_CODE" width="70">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{VENDOR_CODE}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="70" height="25"/>
+								<textElement/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{VENDOR_CODE}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="CRITERIA" height="30">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{CRITERIA}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="30"/>
+								<textElement/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{CRITERIA}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="A" height="30">
+					<bucket>
+						<bucketExpression class="java.lang.Integer"><![CDATA[$F{A}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="30"/>
+								<textElement/>
+								<textFieldExpression class="java.lang.Integer"><![CDATA[$V{A}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="CRITERIAMeasure" class="java.lang.Integer" calculation="Count">
+					<measureExpression><![CDATA[$F{CRITERIA}]]></measureExpression>
+				</measure>
+				<crosstabCell width="50" height="25">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell height="25" rowTotalGroup="BRANCH_CODE">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="CRITERIA">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="BRANCH_CODE" columnTotalGroup="CRITERIA">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="A">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="BRANCH_CODE" columnTotalGroup="A">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell height="25" rowTotalGroup="VENDOR_CODE">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="VENDOR_CODE" columnTotalGroup="CRITERIA">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="VENDOR_CODE" columnTotalGroup="A">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Integer"><![CDATA[$V{CRITERIAMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

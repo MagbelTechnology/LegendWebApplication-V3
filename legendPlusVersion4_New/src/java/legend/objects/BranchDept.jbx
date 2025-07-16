@@ -1,0 +1,13 @@
+[PropertyInfo]
+branchCode,String,false,false,branchCode,branchCode,true,<default>
+deptCode,String,false,false,deptCode,deptCode,true,<default>
+gl_prefix,String,false,false,gl_prefix,gl_prefix,true,<default>
+gl_suffix,String,false,false,gl_suffix,gl_suffix,true,<default>
+branchId,String,false,false,branchId,branchId,true,<default>
+deptId,String,false,false,deptId,deptId,true,<default>
+mtid,String,false,false,mtid,mtid,true,<default>
+[IconNames]
+
+
+
+

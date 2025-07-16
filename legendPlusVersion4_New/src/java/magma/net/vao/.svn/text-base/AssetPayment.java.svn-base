@@ -1,0 +1,105 @@
+package magma.net.vao;
+
+public class AssetPayment {
+	private String payId;
+	private String assetId;
+	private double payment;
+	private String payDate;
+	private String raised;
+	private String payDesc;
+	/**
+	 * @param assetId
+	 * @param payment
+	 * @param payDate
+	 * @param raised
+	 * @param payDesc
+	 */
+	public AssetPayment(String assetId, double payment, String payDate, String raised, String payDesc) {
+		this.assetId = assetId;
+		this.payment = payment;
+		this.payDate = payDate;
+		this.raised = raised;
+		this.payDesc = payDesc;
+	}
+	/**
+	 * 
+	 */
+	public AssetPayment() {
+		
+	}
+	/**
+	 * @return the assetId
+	 */
+	public String getAssetId() {
+		return assetId;
+	}
+	/**
+	 * @param assetId the assetId to set
+	 */
+	public void setAssetId(String assetId) {
+		this.assetId = assetId;
+	}
+	/**
+	 * @return the payDate
+	 */
+	public String getPayDate() {
+		return payDate;
+	}
+	/**
+	 * @param payDate the payDate to set
+	 */
+	public void setPayDate(String payDate) {
+		this.payDate = payDate;
+	}
+	/**
+	 * @return the payDesc
+	 */
+	public String getPayDesc() {
+		return payDesc;
+	}
+	/**
+	 * @param payDesc the payDesc to set
+	 */
+	public void setPayDesc(String payDesc) {
+		this.payDesc = payDesc;
+	}
+	/**
+	 * @return the payment
+	 */
+	public double getPayment() {
+		return payment;
+	}
+	/**
+	 * @param payment the payment to set
+	 */
+	public void setPayment(double payment) {
+		this.payment = payment;
+	}
+	/**
+	 * @return the raised
+	 */
+	public String getRaised() {
+		return raised;
+	}
+	/**
+	 * @param raised the raised to set
+	 */
+	public void setRaised(String raised) {
+		this.raised = raised;
+	}
+	/**
+	 * @return the payId
+	 */
+	public String getPayId() {
+		return payId;
+	}
+	/**
+	 * @param payId the payId to set
+	 */
+	public void setPayId(String payId) {
+		this.payId = payId;
+	}
+	
+	
+
+}

@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Xls_Posted_Transaction" pageWidth="1849" pageHeight="595" orientation="Landscape" columnWidth="1819" leftMargin="0" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT c.full_name AS initiatorName, d.full_name AS supervisorName, *FROM posted_transaction_view a, am_gb_User c, am_gb_User d
+WHERE a.initiatorId = c.User_id
+AND a.supervisorId = d.User_id
+$P!{filterClause}]]>
+	</queryString>
+	<field name="initiatorName" class="java.lang.String"/>
+	<field name="supervisorName" class="java.lang.String"/>
+	<field name="asset_id" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_gb_User_User_Name" class="java.lang.String"/>
+	<field name="am_gb_User_Full_Name" class="java.lang.String"/>
+	<field name="DEBITNGN" class="java.lang.String"/>
+	<field name="CREDITNGN" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_Description" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_debitAccount" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_creditAccountName" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_creditAccount" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_debitAccountName" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_amount" class="java.math.BigDecimal"/>
+	<field name="am_Raisentry_Transaction_iso" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_transaction_date" class="java.sql.Timestamp"/>
+	<field name="am_Raisentry_Transaction_asset_id" class="java.lang.String"/>
+	<field name="am_gb_User_User_id" class="java.lang.Integer"/>
+	<field name="am_Error_Description_Description" class="java.lang.String"/>
+	<field name="am_Raisentry_Transaction_page1" class="java.lang.String"/>
+	<field name="INTEGRIFY_ID" class="java.lang.String"/>
+	<field name="POSTED_BY" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_CODE" class="java.lang.String"/>
+	<field name="Trans_id" class="java.lang.String"/>
+	<field name="initiatorId" class="java.lang.Integer"/>
+	<field name="supervisorId" class="java.lang.Integer"/>
+	<field name="User_id" class="java.lang.Integer"/>
+	<field name="User_Name" class="java.lang.String"/>
+	<field name="Full_Name" class="java.lang.String"/>
+	<field name="Legacy_Sys_id" class="java.lang.String"/>
+	<field name="Class" class="java.lang.String"/>
+	<field name="Branch" class="java.lang.Integer"/>
+	<field name="Password" class="java.lang.String"/>
+	<field name="Phone_No" class="java.lang.String"/>
+	<field name="is_supervisor" class="java.lang.String"/>
+	<field name="must_change_pwd" class="java.lang.String"/>
+	<field name="Login_Status" class="java.lang.String"/>
+	<field name="User_Status" class="java.lang.String"/>
+	<field name="UserId" class="java.lang.Integer"/>
+	<field name="Create_Date" class="java.sql.Timestamp"/>
+	<field name="password_changed" class="java.lang.String"/>
+	<field name="password_expiry" class="java.sql.Timestamp"/>
+	<field name="login_date" class="java.sql.Timestamp"/>
+	<field name="Login_System" class="java.lang.String"/>
+	<field name="Fleet_admin" class="java.lang.String"/>
+	<field name="email" class="java.lang.String"/>
+	<field name="branch_restriction" class="java.lang.String"/>
+	<field name="Expiry_Days" class="java.math.BigDecimal"/>
+	<field name="Expiry_Date" class="java.sql.Timestamp"/>
+	<field name="approval_level" class="java.lang.String"/>
+	<field name="Approval_Limit" class="java.lang.String"/>
+	<field name="dept_code" class="java.lang.String"/>
+	<field name="token_required" class="java.lang.String"/>
+	<field name="dept_restriction" class="java.lang.String"/>
+	<field name="UnderTaker" class="java.lang.String"/>
+	<field name="is_StockAdministrator" class="java.lang.String"/>
+	<field name="is_Storekeeper" class="java.lang.String"/>
+	<field name="REGION_CODE" class="java.lang.String"/>
+	<field name="ZONE_CODE" class="java.lang.String"/>
+	<field name="REGION_RESTRICTION" class="java.lang.String"/>
+	<field name="ZONE_RESTRICTION" class="java.lang.String"/>
+	<field name="Facility_Admin" class="java.lang.String"/>
+	<field name="Store_Admin" class="java.lang.String"/>
+	<sortField name="am_gb_User_User_id"/>
+	<sortField name="am_Raisentry_Transaction_transaction_date"/>
+	<variable name="Record_Number" class="java.lang.Integer" resetType="Group" resetGroup="User" calculation="Count">
+		<variableExpression><![CDATA[$F{am_Raisentry_Transaction_asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Total_Record" class="java.lang.Integer" resetType="Column" incrementType="Column" calculation="Count">
+		<variableExpression><![CDATA[$F{am_Raisentry_Transaction_asset_id}]]></variableExpression>
+		<initialValueExpression><![CDATA[$V{Total_Record}]]></initialValueExpression>
+	</variable>
+	<variable name="Branch_Record" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{am_Raisentry_Transaction_asset_id}]]></variableExpression>
+	</variable>
+	<group name="User">
+		<groupExpression><![CDATA[$F{am_gb_User_User_id}]]></groupExpression>
+		<groupHeader>
+			<band splitType="Stretch"/>
+		</groupHeader>
+		<groupFooter>
+			<band splitType="Stretch"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="19" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText-1" x="0" y="1" width="107" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-2" x="107" y="1" width="269" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Transaction Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="376" y="1" width="119" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Debit Account]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-2" x="777" y="1" width="178" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Credit Account Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-15" x="955" y="1" width="56" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="1011" y="1" width="174" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Posted By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="495" y="1" width="144" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Debit Account Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-14" x="639" y="1" width="138" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Credit Account]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="17" splitType="Stretch">
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="0" y="0" width="107" height="17" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Raisentry_Transaction_asset_id}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="107" y="0" width="269" height="17" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Raisentry_Transaction_Description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="false">
+				<reportElement key="textField-33" x="376" y="0" width="119" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Raisentry_Transaction_debitAccount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="777" y="0" width="178" height="17" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Raisentry_Transaction_creditAccountName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField-32" x="955" y="0" width="56" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{am_Raisentry_Transaction_amount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-34" x="1011" y="0" width="175" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_gb_User_Full_Name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="false">
+				<reportElement key="textField-33" x="495" y="0" width="144" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Raisentry_Transaction_debitAccountName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="false">
+				<reportElement key="textField-37" x="639" y="0" width="138" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{am_Raisentry_Transaction_creditAccount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

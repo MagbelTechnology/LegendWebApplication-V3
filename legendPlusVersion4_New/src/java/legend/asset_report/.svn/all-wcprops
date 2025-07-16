@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report
+END
+fleet_fuel_by_branch_report.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_fuel_by_branch_report.jasper
+END
+fleet_insurance_by_branch.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_insurance_by_branch.jasper
+END
+fleet_asset_detail.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_asset_detail.jasper
+END
+fleet_asset_maintenance.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_asset_maintenance.jasper
+END
+fleet_allocation_by_region.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_allocation_by_region.jasper
+END
+fleet_fuel_by_region_report.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_fuel_by_region_report.jasper
+END
+fleet_asset_allocation.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_asset_allocation.jasper
+END
+systemHeader.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/systemHeader.jsp
+END
+fleet_asset_location.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_asset_location.jasper
+END
+fleet_asset_newrecord.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_asset_newrecord.jasper
+END
+report_menu.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/report_menu.jsp
+END
+Utilities.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/Utilities.java
+END
+fleet_asset_accident.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_asset_accident.jasper
+END
+fleet_allocation_by_branch.jasper
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/asset_report/fleet_allocation_by_branch.jasper
+END

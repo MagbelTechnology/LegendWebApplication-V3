@@ -1,0 +1,185 @@
+package magma.net.manager;
+
+import com.magbel.util.DataConnect;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
+
+import magma.net.dao.MagmaDBConnection;
+import magma.net.vao.GroupAsset;
+
+/**
+ * <p>Title: GroupAssetManager.java</p>
+ *
+ * <p>Description:  </p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class GroupAssetManager extends MagmaDBConnection {
+
+    SimpleDateFormat sdf;
+    private boolean overFlow;
+
+    public GroupAssetManager() {
+        super();
+        sdf = new SimpleDateFormat("dd-MM-yyyy");
+    }
+
+    /**
+     * createMaintenanceRecord
+     *
+     * @param type String
+     * @param dateOfRepair String
+     * @param technicianType String
+     * @param milleageBeforeMaintenace double
+     * @param milleageAfterMaintenace double
+     * @param details String
+     * @param cost double
+     * @param componentReplaced String
+     * @param lastPerformedDate String
+     * @param nextPerformedDate String
+     * @param maintenanceType String
+     */
+     //modified by olabo to add invoiceNo and hist_id columns
+    public void createGroupAsset() {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        String query = "INSERT INTO AM_GROUP_ASSET("+
+					"REGISTRATION_NO,BRANCH_ID,DEPT_ID,"+
+					"CATEGORY_ID,SECTION_ID,DESCRIPTION,"+
+					"VENDOR_AC,DATE_PURCHASED,DEP_RATE,"+
+					"ASSET_MAKE,ASSET_MODEL,ASSET_SERIAL_NO,"+
+					"ASSET_ENGINE_NO,SUPPLIER_NAME,"+
+					"ASSET_USER,ASSET_MAINTENANCE,"+
+					"COST_PRICE,DEP_END_DATE,RESIDUAL_VALUE,"+
+					"AUTHORIZED_BY,WH_TAX,WH_TAX_AMOUNT,"+
+					"POSTING_DATE,EFFECTIVE_DATE,"+
+					"PURCHASE_REASON,LOCATION,VATABLE_COST,"+
+					"VAT,REQ_DEPRECIATION,SUBJECT_TO_VAT,"+
+					"WHO_TO_REM,	EMAIL1,	WHO_TO_REM_2,"+
+					"EMAIL2,	STATE,DRIVER,SPARE_1,SPARE_2,[USER_ID]"+
+			")	VALUES(";
+
+
+            try {
+                con = getConnection("fixedasset");
+                ps = con.prepareStatement(query);
+
+
+                ps.execute();
+            } catch (Exception e) {
+                System.out.println("INFO:Error creating Group Asset ->" +
+                                   e.getMessage());
+            } finally {
+                closeConnection(con, ps);
+            }
+        }
+
+
+    public ArrayList findAllGroupAsset(){
+	    String queryFilter = "";
+	    return findGroupAssetByQuery(queryFilter);
+	}
+
+	public ArrayList findGroupAssetByCategoryId(String catId){
+
+		String queryFilter = " AND CATEGORY_ID = "+catId+"";
+		ArrayList list = findGroupAssetByQuery(queryFilter);
+
+		return list;
+
+	}
+
+	public GroupAsset findGroupAssetById(String id){
+		GroupAsset finder = null;
+		String queryFilter = " AND ASSET_ID = '"+id+"'";
+		ArrayList list = findGroupAssetByQuery(queryFilter);
+		if(list.size() > 0){
+			finder = (GroupAsset)list.get(0);
+		}
+
+		return finder;
+	}
+
+    /**
+     * findGroupAssetByQuery
+     *
+     * @param id String
+     * @return FleetManatainanceRecord
+     */
+    public ArrayList findGroupAssetByQuery(String queryFilter) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        GroupAsset groupAsset = null;
+        ArrayList finder = new ArrayList();
+        String selectQuery =
+        			"SELECT ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID,"+
+					"CATEGORY_ID,SECTION_ID,DESCRIPTION,"+
+					"VENDOR_AC,DATE_PURCHASED,DEP_RATE,"+
+					"ASSET_MAKE,ASSET_MODEL,ASSET_SERIAL_NO,"+
+					"ASSET_ENGINE_NO,SUPPLIER_NAME,"+
+					"ASSET_USER,ASSET_MAINTENANCE,"+
+					"COST_PRICE,DEP_END_DATE,RESIDUAL_VALUE,"+
+					"AUTHORIZED_BY,WH_TAX,WH_TAX_AMOUNT,"+
+					"POSTING_DATE,EFFECTIVE_DATE,"+
+					"PURCHASE_REASON,LOCATION,VATABLE_COST,"+
+					"VAT,REQ_DEPRECIATION,SUBJECT_TO_VAT,"+
+					"WHO_TO_REM,	EMAIL1,	WHO_TO_REM_2,"+
+					"EMAIL2,	STATE,DRIVER,SPARE_1,SPARE_2,[USER_ID]  "+
+					"FROM AM_GROUP_ASSET WHERE ASSET_ID != ''  " + queryFilter;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+				String id = rs.getString("ASSET_ID");
+				String registrationNo = rs.getString("REGISTRATION_NO");
+				String description = rs.getString("DESCRIPTION");
+
+			   String branchCode = rs.getString("BRANCH_ID");
+			   String deptCode = rs.getString("DEPT_ID");
+			   String sectionCode = rs.getString("SECTION_ID");
+			   String category = rs.getString("CATEGORY_ID");
+			   double costPrice = rs.getDouble("COST_PRICE");
+			   String dateCreated = formatDate(rs.getDate("POSTING_DATE"));
+			   double accumulatedDepreciation = 0.00d;//rs.getString("");
+			   String depreciationEndDate = formatDate(rs.getDate("DEP_END_DATE"));
+
+			   String make = rs.getString("ASSET_MAKE");
+			   String model = rs.getString("ASSET_MODEL");
+			   String tax = rs.getString("WH_TAX");
+			   String taxAmount = rs.getString("BRANCH_ID");
+  			   String maintainBy  = rs.getString("WH_TAX_AMOUNT");
+  			   String vat = rs.getString("VAT");
+  			   double vatableCost = rs.getDouble("VATABLE_COST");
+
+                groupAsset = new GroupAsset(id,registrationNo,description,branchCode,
+                deptCode,sectionCode, category,costPrice, dateCreated,
+                accumulatedDepreciation, depreciationEndDate, make,
+                model, tax, taxAmount,  maintainBy , vat, vatableCost);
+
+                finder.add(groupAsset);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error Fetching GroupAsset Records ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return finder;
+    }
+}

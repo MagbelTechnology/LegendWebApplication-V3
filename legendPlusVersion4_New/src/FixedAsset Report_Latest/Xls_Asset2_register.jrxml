@@ -1,0 +1,1279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Xls_Asset2_register" pageWidth="6151" pageHeight="595" orientation="Landscape" columnWidth="6121" leftMargin="0" rightMargin="30" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="2921"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     Asset2Register."company_name" AS Asset2Register_am_gb_company_company_name,
+     Asset2Register."Asset_id" AS Asset2Register_am_asset_Asset_id,
+     Asset2Register."Description" AS Asset2Register_am_asset_Description,
+     Asset2Register."BRANCH_CODE" AS Asset2Register_am_ad_branch_BRANCH_CODE,
+     Asset2Register."BRANCH_NAME" AS Asset2Register_am_ad_branch_BRANCH_NAME,
+     Asset2Register."category_name" AS Asset2Register_am_ad_category_category_name,
+     Asset2Register."Accum_dep" AS Asset2Register_am_asset_Accum_dep,
+     Asset2Register."monthly_dep" AS Asset2Register_am_asset_monthly_dep,
+     Asset2Register."Cost_Price" AS Asset2Register_am_asset_Cost_Price,
+     Asset2Register."NBV" AS Asset2Register_am_asset_NBV,
+     Asset2Register."IMPROV_COST" AS Asset2Register_am_asset_IMPROV_COST,
+     Asset2Register."IMPROV_ACCUMDEP" AS Asset2Register_am_asset_IMPROV_ACCUMDEP,
+     Asset2Register."IMPROV_MONTHLYDEP" AS Asset2Register_am_asset_IMPROV_MONTHLYDEP,
+     Asset2Register."IMPROV_NBV" AS Asset2Register_am_asset_IMPROV_NBV,
+     Asset2Register."Total_Cost_Price" AS Asset2Register_Total_Cost_Price,
+     Asset2Register."TOTAL_NBV" AS Asset2Register_am_asset_TOTAL_NBV,
+     Asset2Register."Date_purchased" AS Asset2Register_am_asset_Date_purchased,
+     Asset2Register."am_ad_category_Dep_rate" AS Asset2Register_am_ad_category_Dep_rate,
+     Asset2Register."Accum_Dep_ledger" AS Asset2Register_am_ad_category_Accum_Dep_ledger,
+     Asset2Register."Dep_ledger" AS Asset2Register_am_ad_category_Dep_ledger,
+     Asset2Register."Asset_Ledger" AS Asset2Register_am_ad_category_Asset_Ledger,
+     Asset2Register."gl_account" AS Asset2Register_am_ad_category_gl_account,
+     Asset2Register."dep_end_date" AS Asset2Register_am_asset_dep_end_date,
+     Asset2Register."effective_date" AS Asset2Register_am_asset_effective_date,
+     Asset2Register."Posting_Date" AS Asset2Register_am_asset_Posting_Date,
+     Asset2Register."Dept_name" AS Asset2Register_am_ad_department_Dept_name,
+     Asset2Register."Asset_User" AS Asset2Register_am_asset_Asset_User,
+     Asset2Register."Sbu_name" AS Asset2Register_Sbu_SetUp_Sbu_name,
+     Asset2Register."BRANCH_CODE" AS Asset2Register_am_asset_BRANCH_CODE,
+     Asset2Register."BAR_CODE" AS Asset2Register_am_asset_BAR_CODE,
+     Asset2Register."Asset_Serial_No" AS Asset2Register_am_asset_Asset_Serial_No,
+     Asset2Register."Spare_1" AS Asset2Register_am_asset_Spare_1,
+     Asset2Register."Spare_2" AS Asset2Register_am_asset_Spare_2,
+     Asset2Register."Purchase_Reason" AS Asset2Register_am_asset_Purchase_Reason,
+     Asset2Register."Registration_No" AS Asset2Register_am_asset_Registration_No,
+     Asset2Register."Asset_Make" AS Asset2Register_am_asset_Asset_Make,
+     Asset2Register."Asset_Model" AS Asset2Register_am_asset_Asset_Model,
+     Asset2Register."Asset_Engine_No" AS Asset2Register_am_asset_Asset_Engine_No,
+     Asset2Register."Supplier_Name" AS Asset2Register_am_asset_Supplier_Name,
+     Asset2Register."Wh_Tax" AS Asset2Register_am_asset_Wh_Tax,
+     Asset2Register."Wh_Tax_Amount" AS Asset2Register_am_asset_Wh_Tax_Amount,
+     Asset2Register."Req_Depreciation" AS Asset2Register_am_asset_Req_Depreciation,
+     Asset2Register."Vat" AS Asset2Register_am_asset_Vat,
+     Asset2Register."Subject_TO_Vat" AS Asset2Register_am_asset_Subject_TO_Vat,
+     Asset2Register."Asset_Status" AS Asset2Register_am_asset_Asset_Status,
+     Asset2Register."State" AS Asset2Register_am_asset_State,
+     Asset2Register."Driver" AS Asset2Register_am_asset_Driver,
+     Asset2Register."Vendor_AC" AS Asset2Register_am_asset_Vendor_AC,
+     Asset2Register."Branch_ID" AS Asset2Register_am_asset_Branch_ID,
+     Asset2Register."Dept_ID" AS Asset2Register_am_asset_Dept_ID,
+     Asset2Register."Category_ID" AS Asset2Register_am_asset_Category_ID,
+     Asset2Register."Section_id" AS Asset2Register_am_asset_Section_id,
+     Asset2Register."Dep_Rate" AS Asset2Register_am_asset_Dep_Rate,
+     Asset2Register."Asset_Maintenance" AS Asset2Register_am_asset_Asset_Maintenance,
+     Asset2Register."Residual_Value" AS Asset2Register_am_asset_Residual_Value,
+     Asset2Register."Authorized_By" AS Asset2Register_am_asset_Authorized_By,
+     Asset2Register."Req_Redistribution" AS Asset2Register_am_asset_Req_Redistribution,
+     Asset2Register."Useful_Life" AS Asset2Register_am_asset_Useful_Life,
+     Asset2Register."Total_Life" AS Asset2Register_am_asset_Total_Life,
+     Asset2Register."Location" AS Asset2Register_am_asset_Location,
+     Asset2Register."Remaining_Life" AS Asset2Register_am_asset_Remaining_Life,
+     Asset2Register."Vatable_Cost" AS Asset2Register_am_asset_Vatable_Cost,
+     Asset2Register."Who_TO_Rem" AS Asset2Register_am_asset_Who_TO_Rem,
+     Asset2Register."Email1" AS Asset2Register_am_asset_Email1,
+     Asset2Register."Who_To_Rem_2" AS Asset2Register_am_asset_Who_To_Rem_2,
+     Asset2Register."Email2" AS Asset2Register_am_asset_Email2,
+     Asset2Register."Raise_Entry" AS Asset2Register_am_asset_Raise_Entry,
+     Asset2Register."Dep_Ytd" AS Asset2Register_am_asset_Dep_Ytd,
+     Asset2Register."Section" AS Asset2Register_am_asset_Section,
+     Asset2Register."User_ID" AS Asset2Register_am_asset_User_ID,
+     Asset2Register."Date_Disposed" AS Asset2Register_am_asset_Date_Disposed,
+     Asset2Register."PROVINCE" AS Asset2Register_am_asset_PROVINCE,
+     Asset2Register."Multiple" AS Asset2Register_am_asset_Multiple,
+     Asset2Register."WAR_START_DATE" AS Asset2Register_am_asset_WAR_START_DATE,
+     Asset2Register."WAR_MONTH" AS Asset2Register_am_asset_WAR_MONTH,
+     Asset2Register."WAR_EXPIRY_DATE" AS Asset2Register_am_asset_WAR_EXPIRY_DATE,
+     Asset2Register."Last_Dep_Date" AS Asset2Register_am_asset_Last_Dep_Date,
+     Asset2Register."SECTION_CODE" AS Asset2Register_am_asset_SECTION_CODE,
+     Asset2Register."DEPT_CODE" AS Asset2Register_am_asset_DEPT_CODE,
+     Asset2Register."CATEGORY_CODE" AS Asset2Register_am_asset_CATEGORY_CODE,
+     Asset2Register."AMOUNT_PTD" AS Asset2Register_am_asset_AMOUNT_PTD,
+     Asset2Register."AMOUNT_REM" AS Asset2Register_am_asset_AMOUNT_REM,
+     Asset2Register."PART_PAY" AS Asset2Register_am_asset_PART_PAY,
+     Asset2Register."FULLY_PAID" AS Asset2Register_am_asset_FULLY_PAID,
+     Asset2Register."GROUP_ID" AS Asset2Register_am_asset_GROUP_ID,
+     Asset2Register."SBU_CODE" AS Asset2Register_am_asset_SBU_CODE,
+     Asset2Register."LPO" AS Asset2Register_am_asset_LPO,
+     Asset2Register."supervisor" AS Asset2Register_am_asset_supervisor,
+     Asset2Register."defer_pay" AS Asset2Register_am_asset_defer_pay,
+     Asset2Register."OLD_ASSET_ID" AS Asset2Register_am_asset_OLD_ASSET_ID,
+     Asset2Register."WHT_PERCENT" AS Asset2Register_am_asset_WHT_PERCENT,
+     Asset2Register."Post_reject_reason" AS Asset2Register_am_asset_Post_reject_reason,
+     Asset2Register."Finacle_Posted_Date" AS Asset2Register_am_asset_Finacle_Posted_Date,
+     Asset2Register."system_ip" AS Asset2Register_am_asset_system_ip,
+     Asset2Register."mac_address" AS Asset2Register_am_asset_mac_address,
+     Asset2Register."asset_code" AS Asset2Register_am_asset_asset_code,
+     Asset2Register."memo" AS Asset2Register_am_asset_memo,
+     Asset2Register."memovalue" AS Asset2Register_am_asset_memovalue,
+     Asset2Register."location" AS Asset2Register_AM_GB_LOCATION_location,
+     Asset2Register."state_name" AS Asset2Register_am_gb_states_state_name,
+     Asset2Register."Section_Name" AS Asset2Register_am_ad_section_Section_Name,
+     Asset2Register."Vendor_Name" AS Asset2Register_am_ad_vendor_Vendor_Name
+FROM
+     "dbo"."Asset2Register" Asset2Register
+WHERE Asset2Register."company_name" <> ''
+ $P!{filterClause}
+
+
+]]>
+	</queryString>
+	<field name="Asset2Register_am_gb_company_company_name" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Asset_id" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Description" class="java.lang.String"/>
+	<field name="Asset2Register_am_ad_branch_BRANCH_CODE" class="java.lang.String"/>
+	<field name="Asset2Register_am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="Asset2Register_am_ad_category_category_name" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Accum_dep" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_monthly_dep" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_NBV" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_IMPROV_COST" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_IMPROV_ACCUMDEP" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_IMPROV_MONTHLYDEP" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_IMPROV_NBV" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_Total_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_TOTAL_NBV" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_Date_purchased" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_ad_category_Dep_rate" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_ad_category_Accum_Dep_ledger" class="java.lang.String"/>
+	<field name="Asset2Register_am_ad_category_Dep_ledger" class="java.lang.String"/>
+	<field name="Asset2Register_am_ad_category_Asset_Ledger" class="java.lang.String"/>
+	<field name="Asset2Register_am_ad_category_gl_account" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_dep_end_date" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_asset_effective_date" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_asset_Posting_Date" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_ad_department_Dept_name" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Asset_User" class="java.lang.String"/>
+	<field name="Asset2Register_Sbu_SetUp_Sbu_name" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_BRANCH_CODE" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_BAR_CODE" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Asset_Serial_No" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Spare_1" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Spare_2" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Purchase_Reason" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Registration_No" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Asset_Make" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Asset_Model" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Asset_Engine_No" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Supplier_Name" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Wh_Tax" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Wh_Tax_Amount" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_Req_Depreciation" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Vat" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_Subject_TO_Vat" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Asset_Status" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_State" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Driver" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Vendor_AC" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Branch_ID" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Dept_ID" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Category_ID" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Section_id" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Dep_Rate" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_Asset_Maintenance" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Residual_Value" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_Authorized_By" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Req_Redistribution" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Useful_Life" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Total_Life" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Location" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Remaining_Life" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Vatable_Cost" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_Who_TO_Rem" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Email1" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Who_To_Rem_2" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Email2" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Raise_Entry" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Dep_Ytd" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_Section" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_User_ID" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Date_Disposed" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_asset_PROVINCE" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Multiple" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_WAR_START_DATE" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_asset_WAR_MONTH" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_WAR_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_asset_Last_Dep_Date" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_asset_SECTION_CODE" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_DEPT_CODE" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_AMOUNT_PTD" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_AMOUNT_REM" class="java.math.BigDecimal"/>
+	<field name="Asset2Register_am_asset_PART_PAY" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_FULLY_PAID" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_GROUP_ID" class="java.lang.Long"/>
+	<field name="Asset2Register_am_asset_SBU_CODE" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_LPO" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_supervisor" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_defer_pay" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_OLD_ASSET_ID" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_WHT_PERCENT" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_asset_Post_reject_reason" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_Finacle_Posted_Date" class="java.sql.Timestamp"/>
+	<field name="Asset2Register_am_asset_system_ip" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_mac_address" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_asset_code" class="java.lang.Long"/>
+	<field name="Asset2Register_am_asset_memo" class="java.lang.String"/>
+	<field name="Asset2Register_am_asset_memovalue" class="java.lang.String"/>
+	<field name="Asset2Register_AM_GB_LOCATION_location" class="java.lang.Integer"/>
+	<field name="Asset2Register_am_gb_states_state_name" class="java.lang.String"/>
+	<field name="Asset2Register_am_ad_section_Section_Name" class="java.lang.String"/>
+	<field name="Asset2Register_am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<sortField name="Asset2Register_am_ad_branch_BRANCH_NAME"/>
+	<sortField name="Asset2Register_am_ad_category_category_name"/>
+	<variable name="Total_Mon_Depr" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_monthly_dep}]]></variableExpression>
+	</variable>
+	<variable name="Total_Accum_Dep" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_Accum_dep}]]></variableExpression>
+	</variable>
+	<variable name="Total_NBV" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_NBV}]]></variableExpression>
+	</variable>
+	<variable name="Total_Cost_Price" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_Cost_Price}]]></variableExpression>
+	</variable>
+	<variable name="Record_Number" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_category_category_name" calculation="Count">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_Asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Month_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_monthly_dep}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Cost_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_Cost_Price}]]></variableExpression>
+	</variable>
+	<variable name="Branch_NBV_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_NBV}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Accum_Total" class="java.math.BigDecimal" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Sum">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_Accum_dep}]]></variableExpression>
+	</variable>
+	<variable name="Branch_Record_No" class="java.lang.Integer" resetType="Group" resetGroup="am_ad_branch_BRANCH_NAME" calculation="Count">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_Asset_id}]]></variableExpression>
+	</variable>
+	<variable name="Total_Record" class="java.lang.Integer" resetType="Column" incrementType="Column" calculation="Count">
+		<variableExpression><![CDATA[$F{Asset2Register_am_asset_Asset_id}]]></variableExpression>
+		<initialValueExpression><![CDATA[$V{Total_Record}]]></initialValueExpression>
+	</variable>
+	<group name="am_ad_branch_BRANCH_NAME">
+		<groupExpression><![CDATA[$F{Asset2Register_am_ad_branch_BRANCH_NAME}]]></groupExpression>
+	</group>
+	<group name="am_ad_category_category_name">
+		<groupExpression><![CDATA[$F{Asset2Register_am_ad_category_category_name}]]></groupExpression>
+	</group>
+	<title>
+		<band height="19" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText-1" x="0" y="1" width="145" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-2" x="145" y="1" width="886" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="1272" y="1" width="120" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" x="1739" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Cost Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-13" x="1506" y="1" width="117" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Depr. Start Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-14" x="2271" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[NBV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-15" x="3084" y="1" width="296" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[USER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="3494" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[SBU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="1392" y="1" width="114" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Purchase Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="3603" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[BarCode/Vehicle No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="3712" y="1" width="81" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Serial No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="4011" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Purchase Reason]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="4644" y="1" width="371" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Spare Field 1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="5015" y="1" width="318" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Spare Field 2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="2163" y="1" width="108" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Accum Depr.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="5333" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Registration No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="5442" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Vendor Account]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="5551" y="1" width="244" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Old Asset Id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-13" x="2061" y="1" width="102" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Depr. End Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="1031" y="1" width="120" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Branch Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="1151" y="1" width="121" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Category Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" x="1848" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Depr. Rate %]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" x="1957" y="1" width="104" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Monthly Depr.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-15" x="3380" y="1" width="114" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Engine No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="3793" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset Model]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="3902" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Asset Make]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="4120" y="1" width="89" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="4209" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[State]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="4318" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Section/Unit
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="4535" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Vendor
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="4427" y="1" width="108" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[LPO Number
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-13" x="1623" y="1" width="116" height="18" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Depr. End Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" x="2380" y="1" width="109" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Improv Cost Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" x="2489" y="1" width="133" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Improv Monthly Depr.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-16" x="2622" y="1" width="123" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Improv Accum Depr.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-14" x="2745" y="1" width="95" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Improve NBV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-14" x="2964" y="1" width="120" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total NBV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-14" x="2840" y="1" width="124" height="18"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Total Cost Price]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" x="0" y="1" width="145" height="17" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Asset_id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+				<reportElement key="textField" mode="Transparent" x="145" y="1" width="886" height="17" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" x="1739" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_Cost_Price}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-31" x="1392" y="1" width="114" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Asset2Register_am_asset_Date_purchased}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField-33" x="1272" y="1" width="120" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_ad_department_Dept_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-34" x="1506" y="1" width="117" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Asset2Register_am_asset_effective_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="false">
+				<reportElement key="textField-35" x="2271" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_NBV}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-38" x="3084" y="1" width="296" height="17" forecolor="#000000" backcolor="#FFFFFF">
+					<printWhenExpression><![CDATA[!$F{Asset2Register_am_asset_Asset_User}.equals(null)]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Asset_User}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="3494" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF">
+					<printWhenExpression><![CDATA[!$F{Asset2Register_Sbu_SetUp_Sbu_name}.equals(null)]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_Sbu_SetUp_Sbu_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="3603" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_BAR_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="3712" y="1" width="81" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Asset_Serial_No}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="4011" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Purchase_Reason}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="5015" y="1" width="318" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Spare_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="2163" y="1" width="108" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_Accum_dep}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="5333" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Registration_No}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="5442" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Vendor_AC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="5551" y="1" width="244" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_OLD_ASSET_ID}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-34" x="2061" y="1" width="102" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Asset2Register_am_asset_dep_end_date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField-33" x="1031" y="1" width="120" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField-33" x="1151" y="1" width="121" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_ad_category_category_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="false">
+				<reportElement key="textField" x="1848" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_ad_category_Dep_rate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement key="textField" x="1957" y="1" width="104" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_monthly_dep}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-38" x="3380" y="1" width="114" height="17" forecolor="#000000" backcolor="#FFFFFF">
+					<printWhenExpression><![CDATA[!$F{Asset2Register_am_asset_Asset_Engine_No}.equals(null)]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Asset_Engine_No}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="3793" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Asset_Model}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="3902" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Asset_Make}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="4120" y="1" width="89" height="17" forecolor="#000000" backcolor="#FFFFFF">
+					<printWhenExpression><![CDATA[!$F{Asset2Register_AM_GB_LOCATION_location}.equals(null)]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Asset2Register_AM_GB_LOCATION_location}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="4209" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_gb_states_state_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="4318" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF">
+					<printWhenExpression><![CDATA[!$F{Asset2Register_am_ad_section_Section_Name}.equals(null)]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_ad_section_Section_Name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="4427" y="1" width="108" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_LPO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement key="textField-39" x="4535" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF">
+					<printWhenExpression><![CDATA[!$F{Asset2Register_am_ad_vendor_Vendor_Name}.equals(null)]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="4644" y="1" width="371" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Asset2Register_am_asset_Spare_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-34" x="1623" y="1" width="116" height="17"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Asset2Register_am_asset_dep_end_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement key="textField" x="2380" y="1" width="109" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_IMPROV_COST}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement key="textField" x="2489" y="1" width="133" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_IMPROV_MONTHLYDEP}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement key="textField-39" x="2622" y="1" width="123" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_IMPROV_ACCUMDEP}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="2745" y="1" width="95" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_IMPROV_NBV}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="2964" y="1" width="120" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_am_asset_TOTAL_NBV}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement key="textField-35" x="2840" y="1" width="124" height="17" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Asset2Register_Total_Cost_Price}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

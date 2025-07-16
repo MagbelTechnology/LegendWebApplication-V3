@@ -1,0 +1,3927 @@
+package magma.net.manager;
+
+import com.magbel.util.DataConnect;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
+
+import magma.BarCodeHistoryBean;
+import magma.net.dao.MagmaDBConnection;
+import magma.net.vao.Asset;
+import magma.net.vao.AssetDetail;
+import magma.net.vao.FleetTransaction;
+import magma.net.vao.FleetManatainanceRecord;
+import magma.net.vao.FleetLicencePermit;
+import magma.net.vao.FleetInsurranceRecord;
+import magma.net.vao.FleetAccidentRecord;
+import magma.net.vao.FleetFuelRecord;
+import magma.net.vao.AccidentImage;
+
+/**
+ * <p>Title: FleetHistoryManager.java</p>
+ *
+ * <p>Description: Contains method for creating Fleet transactions<br>
+ * and retrievals. Also contains method for retrieving data types
+ * as defines in the system configuration</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class FleetHistoryManager extends MagmaDBConnection {
+
+    FleetTransactManager tranManager;
+    SimpleDateFormat sdf;
+    private boolean overFlow;
+
+
+
+    public FleetHistoryManager() {
+        super();
+        tranManager = new FleetTransactManager();
+        sdf = new SimpleDateFormat("dd-MM-yyyy");
+    }
+
+    public void setOverFlow(boolean overFlow) {
+        this.overFlow = overFlow;
+    }
+
+    public boolean isOverFlow() {
+        return overFlow;
+    }
+
+  private MagmaDBConnection dbConnection = new MagmaDBConnection();
+         Connection con1 = null;
+            PreparedStatement ps1 = null;
+            ResultSet rs1 = null;
+
+
+    /**
+     * createMaintenanceRecord
+     *
+     * @param type String
+     * @param dateOfRepair String
+     * @param technicianType String
+     * @param milleageBeforeMaintenace double
+     * @param milleageAfterMaintenace double
+     * @param details String
+     * @param cost double
+     * @param componentReplaced String
+     * @param lastPerformedDate String
+     * @param nextPerformedDate String
+     * @param maintenanceType String
+     */
+    //modified by olabo to add invoiceNo and hist_id columns
+    public void createMaintenanceRecord(String assetId, String registrationNo,
+                                        String branchId, String deptId,
+                                        String category, String assetMake,
+                                        String datePurchased,
+                                        String createDate, String effectiveDate,
+                                        String type, String dateOfRepair,
+                                        String technicianType, double fuelCost,
+                                        double milleageBeforeMaintenace,
+                                        double milleageAfterMaintenace,
+                                        String details, double cost,
+                                        String componentReplaced,
+                                        String lastPerformedDate,
+                                        String nextPerformedDate,
+                                        String techName,
+                                        String maintenanceType, String userid,
+                                        String firstNoticeDate, String freq,
+                                        String invoiceNo, String histId,
+                                        double vatAmt, double whtAmt) {
+        if (lastPerformedDate == null || lastPerformedDate.equals("")) {
+            lastPerformedDate = sdf.format(new Date());
+        }
+        if (nextPerformedDate == null || nextPerformedDate.equals("")) {
+            nextPerformedDate = sdf.format(new Date());
+        }
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        //if (freq == null) {
+        intFreq = Integer.parseInt(freq);
+        // }
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_MAINTENANCE_HISTORY( " +
+                             " TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                             " ,REPAIRED_DATE,TECHNICIAN_TYPE,TECHNICIAN_NAME " +
+                             ",MILLEAGE_BEFORE_MAINT,MILLEAGE_AFTER_MAINT " +
+                             ",DETAILS,COMPONENT_REPLACED,LAST_PM_DATE " +
+                             ",NEXT_PM_DATE,MAINTENANCE_TYPE,USER_ID," +
+                             "FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO,HIST_ID,VAT_AMT,WHT_AMT) " +
+                             "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+
+        if (isTransactionOverFlow(cost, assetMake, category)) {
+            setOverFlow(true);
+        } else {
+
+            try {
+                con = getConnection("fixedasset");
+                ps = con.prepareStatement(createQuery);
+
+                ps.setString(1, type);
+                ps.setDouble(2, cost);
+                ps.setString(3, assetId);
+                ps.setString(4, registrationNo);
+                ps.setDate(5, dateConvert(dateOfRepair));
+                ps.setString(6, technicianType);
+                ps.setString(7, techName);
+                ps.setDouble(8, milleageBeforeMaintenace);
+                ps.setDouble(9, milleageAfterMaintenace);
+                ps.setString(10, details);
+                ps.setString(11, componentReplaced);
+                ps.setDate(12, dateConvert(lastPerformedDate));
+                ps.setDate(13, dateConvert(nextPerformedDate));
+                ps.setString(14, maintenanceType);
+                ps.setString(15, userid);
+                ps.setDate(16, noticeDate);
+                ps.setInt(17, intFreq);
+                ps.setString(18, invoiceNo);
+                ps.setString(19, histId);
+                ps.setDouble(20, vatAmt);
+                ps.setDouble(21, whtAmt);
+
+                ps.execute();
+                int isCreated = ps.getUpdateCount();
+
+                String assetMaintenance = "";
+                String location = "";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = cost;
+                double premimumPeriodToDate = cost;
+                double maintLiveToDate = cost;
+                double maintPeriodToDate = cost;
+                double fuelLiveToDate = fuelCost;
+                double fuelPeriodToDate = fuelCost;
+                int accidentCount = 0;
+                double accidentCostLiveToDate = 0.00d;
+                double accidentCostPeriodToDate = 0.00d;
+                double licencePermitLiveToDate = 0.00d;
+                double licencePermitPeriodToDate = 0.00d;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+
+                tranManager.logFleetTransaction(fleetTran);
+
+            } catch (Exception e) {
+                System.out.println("INFO:Error creating MAINTENANCE_HISTORY ->" +
+                                   e.getMessage());
+            } finally {
+                closeConnection(con, ps);
+            }
+        }
+    }
+
+    public void reverseMaintenanceRecord(String assetId, String registrationNo,
+                                         String branchId, String deptId,
+                                         String category, String assetMake,
+                                         String datePurchased,
+                                         String createDate,
+                                         String effectiveDate,
+                                         String type, String dateOfRepair,
+                                         String technicianType, double fuelCost,
+                                         double milleageBeforeMaintenace,
+                                         double milleageAfterMaintenace,
+                                         String details, double cost,
+                                         String componentReplaced,
+                                         String lastPerformedDate,
+                                         String nextPerformedDate,
+                                         String techName,
+                                         String maintenanceType, String userid,
+                                         String firstNoticeDate, String freq,
+                                         String invoiceNo) {
+        if (lastPerformedDate == null || lastPerformedDate.equals("")) {
+            lastPerformedDate = sdf.format(new Date());
+        }
+        if (nextPerformedDate == null || nextPerformedDate.equals("")) {
+            nextPerformedDate = sdf.format(new Date());
+        }
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        if (freq == null) {
+            intFreq = Integer.parseInt(freq);
+        }
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_MAINTENANCE_HISTORY( " +
+                             " TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                             " ,REPAIRED_DATE,TECHNICIAN_TYPE,TECHNICIAN_NAME " +
+                             ",MILLEAGE_BEFORE_MAINT,MILLEAGE_AFTER_MAINT " +
+                             ",DETAILS,COMPONENT_REPLACED,LAST_PM_DATE " +
+                             ",NEXT_PM_DATE,MAINTENANCE_TYPE,USER_ID," +
+                             "FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO,STATUS) " +
+                             "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+
+        if (isTransactionOverFlow(cost, assetMake, category)) {
+            setOverFlow(true);
+        } else {
+            cost = cost * ( -1);
+            try {
+                con = getConnection("fixedasset");
+                ps = con.prepareStatement(createQuery);
+
+                ps.setString(1, type);
+                ps.setDouble(2, cost);
+                ps.setString(3, assetId);
+                ps.setString(4, registrationNo);
+                ps.setDate(5, dateConvert(dateOfRepair));
+                ps.setString(6, technicianType);
+                ps.setString(7, techName);
+                ps.setDouble(8, milleageBeforeMaintenace);
+                ps.setDouble(9, milleageAfterMaintenace);
+                ps.setString(10, details);
+                ps.setString(11, componentReplaced);
+                ps.setDate(12, dateConvert(lastPerformedDate));
+                ps.setDate(13, dateConvert(nextPerformedDate));
+                ps.setString(14, maintenanceType);
+                ps.setString(15, userid);
+                ps.setDate(16, noticeDate);
+                ps.setInt(17, intFreq);
+                ps.setString(18, invoiceNo);
+                ps.setString(19, "REVERSED");
+
+                ps.execute();
+                int isCreated = ps.getUpdateCount();
+
+                String assetMaintenance = "";
+                String location = "";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = cost;
+                double premimumPeriodToDate = cost;
+                double maintLiveToDate = cost;
+                double maintPeriodToDate = cost;
+                double fuelLiveToDate = fuelCost;
+                double fuelPeriodToDate = fuelCost;
+                int accidentCount = 0;
+                double accidentCostLiveToDate = 0.00d;
+                double accidentCostPeriodToDate = 0.00d;
+                double licencePermitLiveToDate = 0.00d;
+                double licencePermitPeriodToDate = 0.00d;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+
+                tranManager.logFleetTransaction(fleetTran);
+
+            } catch (Exception e) {
+                System.out.println("INFO:Error creating MAINTENANCE_HISTORY ->" +
+                                   e.getMessage());
+            } finally {
+                closeConnection(con, ps);
+            }
+        }
+    }
+
+
+    /**
+     * createInssuranceRecord
+     *
+     * @param registrationNo String
+     * @param company String
+     * @param cost double
+     * @param dateObtained String
+     * @param dateExpired String
+     */
+    public void createInssuranceRecord(String assetId, String registrationNo,
+                                       String branchId, String deptId,
+                                       String category, String assetMake,
+                                       String datePurchased,
+                                       String createDate, String effectiveDate,
+                                       String company,
+                                       double cost, String dateObtained,
+                                       String dateExpired, String userid,
+                                       String firstNoticeDate, String freq,
+                                       String tranId, String invoiceNo) {
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        if (freq == null) {
+            intFreq = 0;
+        } else {
+            intFreq = Integer.parseInt(freq);
+        }
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_INSURANCE_HISTORY(" +
+                             "TYPE,COST,ASSET_ID,REGISTRATION_NO" +
+                             ",COMPANY,DATE_OBTAINED,EXPIRY_DATE,USER_ID, " +
+                             " FIRST_NOT_DATE,NOTIFICATION_FREQ,NEXT_NOT_DATE,HIST_ID,INVOICE_NO) " +
+                             "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+
+            ps.setString(1, "I");
+            ps.setDouble(2, cost);
+            ps.setString(3, assetId);
+            ps.setString(4, registrationNo);
+            ps.setString(5, company);
+            ps.setDate(6, dateConvert(dateObtained));
+            ps.setDate(7, dateConvert(dateExpired));
+            ps.setString(8, userid);
+            ps.setDate(9, noticeDate);
+            ps.setInt(10, intFreq);
+            ps.setDate(11, noticeDate);
+            ps.setString(12, tranId);
+            ps.setString(13, invoiceNo);
+
+            ps.execute();
+            int isCreated = ps.getUpdateCount();
+            if (isCreated > 0) {
+
+                String assetMaintenance = "";
+                String location = "";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = cost;
+                double premimumPeriodToDate = cost;
+                double maintLiveToDate = 0.00d;
+                double maintPeriodToDate = 0.00d;
+                double fuelLiveToDate = 0.00d;
+                double fuelPeriodToDate = 0.00d;
+                int accidentCount = 0;
+                double accidentCostLiveToDate = 0.00d;
+                double accidentCostPeriodToDate = 0.00d;
+                double licencePermitLiveToDate = 0.00d;
+                double licencePermitPeriodToDate = 0.00d;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+                fleetTran.setInsuranceLiveToDate(cost);
+                fleetTran.setInsurancePremiumToDate(cost);
+
+                tranManager.logFleetTransaction(fleetTran);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating INSURANCE_HISTORY ->" +
+                               e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+    public void reverseInssuranceRecord(String assetId, String registrationNo,
+                                        String branchId, String deptId,
+                                        String category, String assetMake,
+                                        String datePurchased,
+                                        String createDate, String effectiveDate,
+                                        String company,
+                                        double cost, String dateObtained,
+                                        String dateExpired, String userid,
+                                        String firstNoticeDate, String freq,
+                                        String tranId) {
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        if (freq == null) {
+            intFreq = Integer.parseInt(freq);
+        }
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_INSURANCE_HISTORY(" +
+                             ",TYPE,COST,ASSET_ID,REGISTRATION_NO" +
+                             ",COMPANY,DATE_OBTAINED,EXPIRY_DATE,USER_ID, " +
+                             " FIRST_NOT_DATE,NOTIFICATION_FREQ,STATUS,NEXT_NOT_DATE,HIST_ID) " +
+                             "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        cost = cost * ( -1);
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+
+            ps.setString(1, "I");
+            ps.setDouble(2, cost);
+            ps.setString(3, assetId);
+            ps.setString(4, registrationNo);
+            ps.setString(5, company);
+            ps.setDate(6, dateConvert(dateObtained));
+            ps.setDate(7, dateConvert(dateExpired));
+            ps.setString(8, userid);
+            ps.setDate(9, noticeDate);
+            ps.setInt(10, intFreq);
+            ps.setString(11, "REVERSED");
+            ps.setDate(12, noticeDate);
+            ps.setString(13, tranId);
+
+            ps.execute();
+            int isCreated = ps.getUpdateCount();
+            if (isCreated > 0) {
+
+                String assetMaintenance = "";
+                String location = "";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = cost;
+                double premimumPeriodToDate = cost;
+                double maintLiveToDate = 0.00d;
+                double maintPeriodToDate = 0.00d;
+                double fuelLiveToDate = 0.00d;
+                double fuelPeriodToDate = 0.00d;
+                int accidentCount = 0;
+                double accidentCostLiveToDate = 0.00d;
+                double accidentCostPeriodToDate = 0.00d;
+                double licencePermitLiveToDate = 0.00d;
+                double licencePermitPeriodToDate = 0.00d;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+                fleetTran.setInsuranceLiveToDate(cost);
+                fleetTran.setInsurancePremiumToDate(cost);
+
+                tranManager.logFleetTransaction(fleetTran);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating INSURANCE_HISTORY ->" +
+                               e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+
+    /**
+     * createFuelRecord
+     *
+     * @param registrationNo String
+     * @param company String
+     * @param cost double
+     * @param dateObtained String
+     * @param dateExpired String
+     */
+    public void createFuelRecord(String assetId, String registrationNo,
+                                 String branchId, String deptId,
+                                 String category, String assetMake,
+                                 String datePurchased, String invoice,
+                                 String createDate, String effectiveDate,
+                                 double volume, double cost, String fuelType,
+                                 String entryDate, String userid,
+                                 String firstNoticeDate, String freq,
+                                 String tranId, double unitPrice) {
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        //if (freq == null) {
+        intFreq = Integer.parseInt(freq);
+        //}
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_FUEL_HISTORY(" +
+                             "TYPE,COST,ASSET_ID,REGISTRATION_NO," +
+                             "VOLUME,FUEL_TYPE,INVOICE_NO,EFFECTIVE_DATE,ENTRY_DATE," +
+                             "USER_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ,NEXT_NOT_DATE,HIST_ID,UNIT_PRICE)  " +
+                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+
+            ps.setString(1, "F");
+            ps.setDouble(2, cost);
+            ps.setString(3, assetId);
+            ps.setString(4, registrationNo);
+            ps.setDouble(5, volume);
+            ps.setString(6, fuelType);
+            ps.setString(7, invoice);
+            ps.setDate(8, dateConvert(effectiveDate));
+            ps.setDate(9, dateConvert(entryDate));
+            ps.setString(10, userid);
+            ps.setDate(11, noticeDate);
+            ps.setInt(12, intFreq);
+            ps.setDate(13, noticeDate);
+            ps.setString(14, tranId);
+            ps.setDouble(15, unitPrice);
+
+            ps.execute();
+            int isCreated = ps.getUpdateCount();
+            if (isCreated > 0) {
+
+                String assetMaintenance = "0";
+                String location = "0";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = cost;
+                double premimumPeriodToDate = cost;
+                double maintLiveToDate = 0.00d;
+                double maintPeriodToDate = 0.00d;
+                double fuelLiveToDate = cost;
+                double fuelPeriodToDate = cost;
+                int accidentCount = 0;
+                double accidentCostLiveToDate = 0.00d;
+                double accidentCostPeriodToDate = 0.00d;
+                double licencePermitLiveToDate = 0.00d;
+                double licencePermitPeriodToDate = 0.00d;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+
+                tranManager.logFleetTransaction(fleetTran);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating FUEL_RECORDS ->" +
+                               e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+    public void reverseFuelRecord(String assetId, String registrationNo,
+                                  String branchId, String deptId,
+                                  String category, String assetMake,
+                                  String datePurchased, String invoice,
+                                  String createDate, String effectiveDate,
+                                  double volume, double cost, String fuelType,
+                                  String entryDate, String userid,
+                                  String firstNoticeDate, String freq,
+                                  String tranId) {
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        if (freq == null) {
+            intFreq = Integer.parseInt(freq);
+        }
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_FUEL_HISTORY(" +
+                             "TYPE,COST,ASSET_ID,REGISTRATION_NO," +
+                             "VOLUME,FUEL_TYPE,INVOICE_NO,EFFECTIVE_DATE,ENTRY_DATE," +
+                             "USER_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ,STATUS,NEXT_NOT_DATE,HIST_ID)  " +
+                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+
+            ps.setString(1, "F");
+            ps.setDouble(2, cost);
+            ps.setString(3, assetId);
+            ps.setString(4, registrationNo);
+            ps.setDouble(5, volume);
+            ps.setString(6, fuelType);
+            ps.setString(7, invoice);
+            ps.setDate(8, dateConvert(effectiveDate));
+            ps.setDate(9, dateConvert(entryDate));
+            ps.setString(10, userid);
+            ps.setDate(11, noticeDate);
+            ps.setInt(12, intFreq);
+            ps.setString(13, "REVERSED");
+            ps.setDate(14, noticeDate);
+            ps.setString(15, tranId);
+
+            ps.execute();
+            int isCreated = ps.getUpdateCount();
+            if (isCreated > 0) {
+
+                String assetMaintenance = "--";
+                String location = "--";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = cost;
+                double premimumPeriodToDate = cost;
+                double maintLiveToDate = 0.00d;
+                double maintPeriodToDate = 0.00d;
+                double fuelLiveToDate = cost;
+                double fuelPeriodToDate = cost;
+                int accidentCount = 0;
+                double accidentCostLiveToDate = 0.00d;
+                double accidentCostPeriodToDate = 0.00d;
+                double licencePermitLiveToDate = 0.00d;
+                double licencePermitPeriodToDate = 0.00d;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+
+                tranManager.logFleetTransaction(fleetTran);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating FUEL_RECORDS ->" +
+                               e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+
+    /**
+     * createLicencePermitRecord
+     *
+     * @param registrationNo String
+     * @param type String
+     * @param cost double
+     * @param assetCode String
+     * @param dateObtained String
+     * @param dateExpired String
+     */
+    public void createLicencePermitRecord(String assetId, String registrationNo,
+                                          String branchId, String deptId,
+                                          String category, String assetMake,
+                                          String datePurchased,
+                                          String createDate,
+                                          String effectiveDate,
+                                          String type, double cost,
+                                          String dateObtained,
+                                          String dateExpired, String userid,
+                                          String firstNoticeDate, String freq,
+                                          String tranId, String invoiceNo) {
+        if (dateExpired == null || dateExpired.equals("")) {
+            dateExpired = sdf.format(new Date());
+        }
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        if (freq == null) {
+            intFreq = Integer.parseInt(freq);
+        } else {
+            intFreq = Integer.parseInt(freq);
+        }
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_LICENCE_HISTORY( " +
+                             " TYPE,COST,ASSET_ID " +
+                             ",REGISTRATION_NO,DATE_OBTAINED,EXPIRY_DATE," +
+                             "USER_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ,NEXT_NOT_DATE,HIST_ID,INVOICE_NO) " +
+                             "VALUES( ?,?,?,?,?,?,?,?,?,?,?,?) ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+
+            ps.setString(1, type);
+            ps.setDouble(2, cost);
+            ps.setString(3, assetId);
+            ps.setString(4, registrationNo);
+            ps.setDate(5, dateConvert(createDate));
+            ps.setDate(6, dateConvert(dateExpired));
+            ps.setString(7, userid);
+            ps.setDate(8, noticeDate);
+            ps.setInt(9, intFreq);
+            ps.setDate(10, noticeDate);
+            ps.setString(11, tranId);
+            ps.setString(12, invoiceNo);
+
+            ps.execute();
+            int isCreated = ps.getUpdateCount();
+
+            if (isCreated > 0) {
+                String assetMaintenance = "";
+                String location = "";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = cost;
+                double premimumPeriodToDate = cost;
+                double maintLiveToDate = 0.00d;
+                double maintPeriodToDate = 0.00d;
+                double fuelLiveToDate = 0.00d;
+                double fuelPeriodToDate = 0.00d;
+                int accidentCount = 0;
+                double accidentCostLiveToDate = 0.00d;
+                double accidentCostPeriodToDate = 0.00d;
+                double licencePermitLiveToDate = cost;
+                double licencePermitPeriodToDate = cost;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+
+                tranManager.logFleetTransaction(fleetTran);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating LICENCE_HISTORY ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+    public void reverseLicencePermitRecord(String assetId,
+                                           String registrationNo,
+                                           String branchId, String deptId,
+                                           String category, String assetMake,
+                                           String datePurchased,
+                                           String createDate,
+                                           String effectiveDate,
+                                           String type, double cost,
+                                           String dateObtained,
+                                           String dateExpired, String userid,
+                                           String firstNoticeDate, String freq) {
+        if (dateExpired == null || dateExpired.equals("")) {
+            dateExpired = sdf.format(new Date());
+        }
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        if (freq == null) {
+            intFreq = Integer.parseInt(freq);
+        }
+        cost = cost * ( -1);
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_LICENCE_HISTORY( " +
+                             " TYPE,COST,ASSET_ID " +
+                             ",REGISTRATION_NO,DATE_OBTAINED,EXPIRY_DATE," +
+                             "USER_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ,STATUS) " +
+                             "VALUES( ?,?,?,?,?,?,?,?,?,?) ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+
+            ps.setString(1, type);
+            ps.setDouble(2, cost);
+            ps.setString(3, assetId);
+            ps.setString(4, registrationNo);
+            ps.setDate(5, dateConvert(createDate));
+            ps.setDate(6, dateConvert(dateExpired));
+            ps.setString(7, userid);
+            ps.setDate(8, noticeDate);
+            ps.setInt(9, intFreq);
+            ps.setString(10, "REVERSED");
+
+            ps.execute();
+            int isCreated = ps.getUpdateCount();
+
+            if (isCreated > 0) {
+                String assetMaintenance = "";
+                String location = "";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = cost;
+                double premimumPeriodToDate = cost;
+                double maintLiveToDate = 0.00d;
+                double maintPeriodToDate = 0.00d;
+                double fuelLiveToDate = 0.00d;
+                double fuelPeriodToDate = 0.00d;
+                int accidentCount = 0;
+                double accidentCostLiveToDate = 0.00d;
+                double accidentCostPeriodToDate = 0.00d;
+                double licencePermitLiveToDate = cost;
+                double licencePermitPeriodToDate = cost;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+
+                tranManager.logFleetTransaction(fleetTran);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating LICENCE_HISTORY ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+    /**
+     * createAccidentRecord
+     *
+     * @param registrationNo String
+     * @param assetCode String
+     * @param driveInvolved String
+     * @param location String
+     * @param accidentDate String
+     * @param policeReportObtained String
+     * @param reportDate String
+     * @param repairCost double
+     * @param costBorneByCompany double
+     * @param costBorneByInssurance double
+     * @param duration int
+     * @param otherDetails String
+     * @param insurranceNotified String
+     * @param notificationDate String
+     * @param replaceRequired String
+     */
+    public void createAccidentRecord(String assetId, String registrationNo,
+                                     String branchId, String deptId,
+                                     String category, String assetMake,
+                                     String datePurchased,
+                                     String createDate, String effectiveDate,
+                                     String driverInvolved, String location,
+                                     String accidentDate,
+                                     String policeReportObtained,
+                                     String reportDate, double repairCost,
+                                     double costBorneByCompany,
+                                     double costBorneByInssurance, int duration,
+                                     String otherDetails,
+                                     String insurranceNotified,
+                                     String notificationDate,
+                                     String replaceRequired, String userid,
+                                     String firstNoticeDate, String freq,
+                                     String invoiceNo, String tranId,
+                                     String insurer) {
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        //if (freq == null) {
+        intFreq = Integer.parseInt(freq);
+        //}
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_ACCIDENT_HISTORY(" +
+                             " TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                             " ,DRIVER_INVOLVED,LOCATION,ACCIDENT_DATE " +
+                             " ,POLICE_REPORT_OBTAINED,POLICE_REPORT_DATE," +
+                             "COST_COMPANY_BORNE " +
+                             " ,COST_INSURANCE_BORNE,DURATION,OTHER_DETAILS " +
+                             ",NOTIFIED_INSURANCE,NOFTIFIED_DATE,REQUIRED_REPLACEMENT, " +
+                             "USER_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO,HIST_ID,INSURER  " +
+                             ") VALUES( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+
+            ps.setString(1, "A");
+            ps.setDouble(2, repairCost);
+            ps.setString(3, assetId);
+            ps.setString(4, registrationNo);
+            ps.setString(5, driverInvolved);
+            ps.setString(6, location);
+            ps.setDate(7, dateConvert(accidentDate));
+            ps.setString(8, policeReportObtained);
+            ps.setDate(9, dateConvert(reportDate));
+            ps.setDouble(10, costBorneByCompany);
+            ps.setDouble(11, costBorneByInssurance);
+            ps.setInt(12, duration);
+            ps.setString(13, otherDetails);
+            ps.setString(14, insurranceNotified);
+            ps.setDate(15, dateConvert(notificationDate));
+            ps.setString(16, replaceRequired);
+            ps.setString(17, userid);
+            ps.setDate(18, noticeDate);
+            ps.setInt(19, intFreq);
+            ps.setString(20, invoiceNo);
+            ps.setString(21, tranId);
+            ps.setString(22, insurer);
+
+            ps.execute();
+            int isCreated = ps.getUpdateCount();
+            if (isCreated > 0) {
+
+                String assetMaintenance = "";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = 0.00d;
+                double premimumPeriodToDate = 0.00d;
+                double maintLiveToDate = 0.00d;
+                double maintPeriodToDate = 0.00d;
+                double fuelLiveToDate = 0.00d;
+                double fuelPeriodToDate = 0.00d;
+                int accidentCount = 1;
+                double accidentCostLiveToDate = repairCost;
+                double accidentCostPeriodToDate = repairCost;
+                double licencePermitLiveToDate = 0.00d;
+                double licencePermitPeriodToDate = 0.00d;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+
+                tranManager.logFleetTransaction(fleetTran);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating ACCIDENT_HISTORY ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+    public void reverseAccidentRecord(String assetId, String registrationNo,
+                                      String branchId, String deptId,
+                                      String category, String assetMake,
+                                      String datePurchased,
+                                      String createDate, String effectiveDate,
+                                      String driverInvolved, String location,
+                                      String accidentDate,
+                                      String policeReportObtained,
+                                      String reportDate, double repairCost,
+                                      double costBorneByCompany,
+                                      double costBorneByInssurance,
+                                      int duration,
+                                      String otherDetails,
+                                      String insurranceNotified,
+                                      String notificationDate,
+                                      String replaceRequired, String userid,
+                                      String firstNoticeDate, String freq) {
+        java.sql.Date noticeDate = null;
+        int intFreq = 0;
+        if (firstNoticeDate == null) {
+            noticeDate = null;
+        } else {
+            noticeDate = dateConvert(firstNoticeDate);
+        }
+        //if (freq == null) {
+        intFreq = Integer.parseInt(freq);
+        //}
+        repairCost = repairCost * ( -1);
+        Connection con = null;
+        PreparedStatement ps = null;
+        FleetTransaction fleetTran = null;
+        String createQuery = "INSERT INTO FT_ACCIDENT_HISTORY( " +
+                             " TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                             " ,DRIVER_INVOLVED,LOCATION,ACCIDENT_DATE " +
+                             " ,POLICE_REPORT_OBTAINED,POLICE_REPORT_DATE," +
+                             "COST_COMPANY_BORNE " +
+                             " ,COST_INSURANCE_BORNE,DURATION,OTHER_DETAILS " +
+                             ",NOTIFIED_INSURANCE,NOFTIFIED_DATE,REQUIRED_REPLACEMENT, " +
+                             "USER_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ,STATUS  " +
+                             ") VALUES( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+
+            ps.setString(1, "A");
+            ps.setDouble(2, repairCost);
+            ps.setString(3, assetId);
+            ps.setString(4, registrationNo);
+            ps.setString(5, driverInvolved);
+            ps.setString(6, location);
+            ps.setDate(7, dateConvert(accidentDate));
+            ps.setString(8, policeReportObtained);
+            ps.setDate(9, dateConvert(reportDate));
+            ps.setDouble(10, costBorneByCompany);
+            ps.setDouble(11, costBorneByInssurance);
+            ps.setInt(12, duration);
+            ps.setString(13, otherDetails);
+            ps.setString(14, insurranceNotified);
+            ps.setDate(15, dateConvert(notificationDate));
+            ps.setString(16, replaceRequired);
+            ps.setString(17, userid);
+            ps.setDate(18, noticeDate);
+            ps.setInt(19, intFreq);
+            ps.setString(20, "REVERSED");
+
+            ps.execute();
+            int isCreated = ps.getUpdateCount();
+            if (isCreated > 0) {
+
+                String assetMaintenance = "";
+                boolean entryRaised = false;
+                double depreciation = 0.00d;
+                double premiumLiveToDate = 0.00d;
+                double premimumPeriodToDate = 0.00d;
+                double maintLiveToDate = 0.00d;
+                double maintPeriodToDate = 0.00d;
+                double fuelLiveToDate = 0.00d;
+                double fuelPeriodToDate = 0.00d;
+                int accidentCount = 1;
+                double accidentCostLiveToDate = repairCost;
+                double accidentCostPeriodToDate = repairCost;
+                double licencePermitLiveToDate = 0.00d;
+                double licencePermitPeriodToDate = 0.00d;
+                String lastUpdateDate = sdf.format(new java.util.Date());
+                String status = "A";
+
+                fleetTran = new FleetTransaction(assetId, registrationNo,
+                                                 branchId, deptId, category,
+                                                 datePurchased,
+                                                 assetMake, userid,
+                                                 assetMaintenance,
+                                                 createDate, effectiveDate,
+                                                 location, entryRaised,
+                                                 depreciation,
+                                                 premiumLiveToDate,
+                                                 premimumPeriodToDate,
+                                                 maintLiveToDate,
+                                                 maintPeriodToDate,
+                                                 fuelLiveToDate,
+                                                 fuelPeriodToDate,
+                                                 accidentCount,
+                                                 accidentCostLiveToDate,
+                                                 accidentCostPeriodToDate,
+                                                 licencePermitLiveToDate,
+                                                 licencePermitPeriodToDate,
+                                                 lastUpdateDate,
+                                                 status, userid);
+
+                tranManager.logFleetTransaction(fleetTran);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating ACCIDENT_HISTORY ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+
+    public void removeAccidentRecordById(String id) {
+        String query = "DELETE FROM FT_ACCIDENT_HISTORY WHERE LT_ID = " + id;
+        this.excuteSQLCode(query);
+    }
+
+    public void removeFuelRecordById(String id) {
+        String query = "DELETE FROM FT_FUEL_HISTORY WHERE LT_ID = " + id;
+        excuteSQLCode(query);
+    }
+
+    public void removeLicenseRecordById(String id) {
+        String query = "DELETE FROM FT_LICENCE_HISTORY WHERE LT_ID = " + id;
+        excuteSQLCode(query);
+    }
+
+    public void removeMaintenanceRecordById(String id) {
+        String query = "DELETE FROM FT_MAINTENANCE_HISTORY WHERE LT_ID = " + id;
+        excuteSQLCode(query);
+    }
+
+    public void removeInssuranceRecordById(String id) {
+        String query = "DELETE FROM FT_INSURANCE_HISTORY WHERE LT_ID = " + id;
+        excuteSQLCode(query);
+
+    }
+
+    private void excuteSQLCode(String sqlCode) {
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(sqlCode);
+            ps.execute();
+        } catch (Exception ex) {
+            System.out.println("Error executing SQL Code ->\n" + sqlCode + "\n" +
+                               ex);
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+    /**
+     * findAllMaintenaceRecord
+     *
+     * @return ArrayList
+     */
+    public ArrayList findAllMaintenaceRecord() {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                ",REPAIRED_DATE,TECHNICIAN_TYPE,TECHNICIAN_NAME " +
+                ",MILLEAGE_BEFORE_MAINT,MILLEAGE_AFTER_MAINT " +
+                ",DETAILS,COMPONENT_REPLACED,LAST_PERFORMED_DATE " +
+                ",NEXT_PERFORMED_DATE,MAINTENANCE_TYPE,USER_ID,STATUS,HIST_ID,INVOICE_NO,VAT_AMT,WHT_AMT " +
+                "FROM FT_MAINTENANCE_HISTORY ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String dateOfRepair = formatDate(rs.getDate("REPAIRED_DATE"));
+                String technicianType = rs.getString("TECHNICIAN_TYPE");
+                String technicianName = rs.getString("TECHNICIAN_NAME");
+                double milleageBeforeMaintenance = rs.getDouble(
+                        "MILLEAGE_BEFORE_MAINT");
+                double milleageAfterMaintenance = rs.getDouble(
+                        "MILLEAGE_AFTER_MAINT");
+                String details = rs.getString("DETAILS");
+                String componentReplaced = rs.getString("COMPONENT_REPLACED");
+                String lastPerformedDate = formatDate(rs.getDate(
+                        "LAST_PM_DATE"));
+                String nextPerformedDate = formatDate(rs.getDate(
+                        "NEXT_PM_DATE"));
+                String maintenanceType = rs.getString("MAINTENANCE_TYPE");
+                String status = rs.getString("STATUS");
+                String histId = rs.getString("HIST_ID");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                double vatAmt = rs.getDouble("VAT_AMT");
+                double whtAmt = rs.getDouble("WHT_AMT");
+                FleetManatainanceRecord fm = new FleetManatainanceRecord(id,
+                        type, cost,
+                        assetCode, registrationNo, dateOfRepair, technicianType,
+                        technicianName, milleageBeforeMaintenance,
+                        milleageAfterMaintenance, details, componentReplaced,
+                        lastPerformedDate, nextPerformedDate, maintenanceType,
+                        status, histId, invoiceNo, vatAmt, whtAmt);
+
+                list.add(fm);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println(
+                    "INFO:Error Fecthing Maintenance Record Details ->" +
+                    e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+    }
+
+    /**
+     * findFleetMaintenanceRecordByQuery
+     *
+     * @param queryFilter String
+     * @return ArrayList
+     */
+    public ArrayList findFleetMaintenanceRecordByQuery(String queryFilter) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                ",REPAIRED_DATE,TECHNICIAN_TYPE,TECHNICIAN_NAME " +
+                ",MILLEAGE_BEFORE_MAINT,MILLEAGE_AFTER_MAINT " +
+                ",DETAILS,COMPONENT_REPLACED,LAST_PERFORMED_DATE " +
+                ",NEXT_PERFORMED_DATE,MAINTENANCE_TYPE,STATUS,HIST_ID,INVOICE_NO,VAT_AMT,WHT_AMT " +
+                "FROM FT_MAINTENANCE_HISTORY " + queryFilter;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String dateOfRepair = formatDate(rs.getDate("REPAIRED_DATE"));
+                String technicianType = rs.getString("TECHNICIAN_TYPE");
+                String technicianName = rs.getString("TECHNICIAN_NAME");
+                double milleageBeforeMaintenance = rs.getDouble(
+                        "MILLEAGE_BEFORE_MAINT");
+                double milleageAfterMaintenance = rs.getDouble(
+                        "MILLEAGE_AFTER_MAINT");
+                String details = rs.getString("DETAILS");
+                String componentReplaced = rs.getString("COMPONENT_REPLACED");
+                String lastPerformedDate = formatDate(rs.getDate(
+                        "LAST_PM_DATE"));
+                String nextPerformedDate = formatDate(rs.getDate(
+                        "NEXT_PM_DATE"));
+                String maintenanceType = rs.getString("MAINTENANCE_TYPE");
+                String status = rs.getString("STATUS");
+                String histId = rs.getString("HIST_ID");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                double vatAmt = rs.getDouble("VAT_AMT");
+                double whtAmt = rs.getDouble("WHT_AMT");
+                FleetManatainanceRecord fm = new FleetManatainanceRecord(id,
+                        type, cost,
+                        assetCode, registrationNo, dateOfRepair, technicianType,
+                        technicianName, milleageBeforeMaintenance,
+                        milleageAfterMaintenance, details, componentReplaced,
+                        lastPerformedDate, nextPerformedDate,
+                        maintenanceType, status, histId, invoiceNo, vatAmt,
+                        whtAmt);
+
+                list.add(fm);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println(
+                    "INFO:Error Fecthing Maintenance Record Details ->" +
+                    e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+    }
+
+    /**
+     * findMaintenaceRecordById
+     *
+     * @param id String
+     * @return FleetManatainanceRecord
+     */
+    public FleetManatainanceRecord findMaintenaceRecordById(String id) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        FleetManatainanceRecord maintenanceRecord = null;
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                ",REPAIRED_DATE,TECHNICIAN_TYPE,TECHNICIAN_NAME " +
+                ",MILLEAGE_BEFORE_MAINT,MILLEAGE_AFTER_MAINT " +
+                ",DETAILS,COMPONENT_REPLACED,LAST_PM_DATE " +
+                ",NEXT_PM_DATE,MAINTENANCE_TYPE,STATUS,HIST_ID,INVOICE_NO,VAT_AMT,WHT_AMT " +
+                "FROM FT_MAINTENANCE_HISTORY WHERE LT_ID = ?";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String dateOfRepair = formatDate(rs.getDate("REPAIRED_DATE"));
+                String technicianType = rs.getString("TECHNICIAN_TYPE");
+                String technicianName = rs.getString("TECHNICIAN_NAME");
+                double milleageBeforeMaintenance = rs.getDouble(
+                        "MILLEAGE_BEFORE_MAINT");
+                double milleageAfterMaintenance = rs.getDouble(
+                        "MILLEAGE_AFTER_MAINT");
+                String details = rs.getString("DETAILS");
+                String componentReplaced = rs.getString("COMPONENT_REPLACED");
+                String lastPerformedDate = formatDate(rs.getDate(
+                        "LAST_PM_DATE"));
+                String nextPerformedDate = formatDate(rs.getDate(
+                        "NEXT_PM_DATE"));
+                String maintenanceType = rs.getString("MAINTENANCE_TYPE");
+                String status = rs.getString("STATUS");
+                String histId = rs.getString("HIST_ID");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                double vatAmt = rs.getDouble("VAT_AMT");
+                double whtAmt = rs.getDouble("WHT_AMT");
+                maintenanceRecord = new FleetManatainanceRecord(id, type, cost,
+                        assetCode, registrationNo, dateOfRepair, technicianType,
+                        technicianName, milleageBeforeMaintenance,
+                        milleageAfterMaintenance, details, componentReplaced,
+                        lastPerformedDate, nextPerformedDate, maintenanceType,
+                        status, histId, invoiceNo, vatAmt, whtAmt);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error Fetching Maintenace Records ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return maintenanceRecord;
+    }
+
+    public FleetManatainanceRecord findMaintenaceRecordById(String tranId,
+            String id) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        FleetManatainanceRecord maintenanceRecord = null;
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                ",REPAIRED_DATE,TECHNICIAN_TYPE,TECHNICIAN_NAME " +
+                ",MILLEAGE_BEFORE_MAINT,MILLEAGE_AFTER_MAINT " +
+                ",DETAILS,COMPONENT_REPLACED,LAST_PM_DATE " +
+                ",NEXT_PM_DATE,MAINTENANCE_TYPE,STATUS,HIST_ID,INVOICE_NO,VAT_AMT,WHT_AMT " +
+                "FROM FT_MAINTENANCE_HISTORY WHERE HIST_ID = ?";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, tranId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String ltId = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String dateOfRepair = formatDate(rs.getDate("REPAIRED_DATE"));
+                String technicianType = rs.getString("TECHNICIAN_TYPE");
+                String technicianName = rs.getString("TECHNICIAN_NAME");
+                double milleageBeforeMaintenance = rs.getDouble(
+                        "MILLEAGE_BEFORE_MAINT");
+                double milleageAfterMaintenance = rs.getDouble(
+                        "MILLEAGE_AFTER_MAINT");
+                String details = rs.getString("DETAILS");
+                String componentReplaced = rs.getString("COMPONENT_REPLACED");
+                String lastPerformedDate = formatDate(rs.getDate(
+                        "LAST_PM_DATE"));
+                String nextPerformedDate = formatDate(rs.getDate(
+                        "NEXT_PM_DATE"));
+                String maintenanceType = rs.getString("MAINTENANCE_TYPE");
+                String status = rs.getString("STATUS");
+                String histId = rs.getString("HIST_ID");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                double vatAmt = rs.getDouble("VAT_AMT");
+                double whtAmt = rs.getDouble("WHT_AMT");
+                maintenanceRecord = new FleetManatainanceRecord(ltId, type,
+                        cost,
+                        assetCode, registrationNo, dateOfRepair, technicianType,
+                        technicianName, milleageBeforeMaintenance,
+                        milleageAfterMaintenance, details, componentReplaced,
+                        lastPerformedDate, nextPerformedDate, maintenanceType,
+                        status, histId, invoiceNo, vatAmt, whtAmt);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error Fetching Maintenace Records ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return maintenanceRecord;
+    }
+
+    /**
+     * findMaintenaceRecordById
+     *
+     * @param id String
+     * @return FleetManatainanceRecord
+     */
+    public ArrayList findMaintenaceRecordByQuery(String queryFilter) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        FleetManatainanceRecord maintenanceRecord = null;
+        ArrayList finder = new ArrayList();
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                ",REPAIRED_DATE,TECHNICIAN_TYPE,TECHNICIAN_NAME " +
+                ",MILLEAGE_BEFORE_MAINT,MILLEAGE_AFTER_MAINT " +
+                ",DETAILS,COMPONENT_REPLACED,LAST_PM_DATE " +
+                ",NEXT_PM_DATE,MAINTENANCE_TYPE,STATUS,HIST_ID,INVOICE_NO,VAT_AMT,WHT_AMT " +
+                "FROM FT_MAINTENANCE_HISTORY WHERE LT_ID != ''  " + queryFilter;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String dateOfRepair = formatDate(rs.getDate("REPAIRED_DATE"));
+                String technicianType = rs.getString("TECHNICIAN_TYPE");
+                String technicianName = rs.getString("TECHNICIAN_NAME");
+                double milleageBeforeMaintenance = rs.getDouble(
+                        "MILLEAGE_BEFORE_MAINT");
+                double milleageAfterMaintenance = rs.getDouble(
+                        "MILLEAGE_AFTER_MAINT");
+                String details = rs.getString("DETAILS");
+                String componentReplaced = rs.getString("COMPONENT_REPLACED");
+                String lastPerformedDate = formatDate(rs.getDate(
+                        "LAST_PM_DATE"));
+                String nextPerformedDate = formatDate(rs.getDate(
+                        "NEXT_PM_DATE"));
+                String maintenanceType = rs.getString("MAINTENANCE_TYPE");
+                String status = rs.getString("STATUS");
+                String histId = rs.getString("HIST_ID");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                double vatAmt = rs.getDouble("VAT_AMT");
+                double whtAmt = rs.getDouble("WHT_AMT");
+                maintenanceRecord = new FleetManatainanceRecord(id, type, cost,
+                        assetCode, registrationNo, dateOfRepair, technicianType,
+                        technicianName, milleageBeforeMaintenance,
+                        milleageAfterMaintenance, details, componentReplaced,
+                        lastPerformedDate, nextPerformedDate, maintenanceType,
+                        status, histId, invoiceNo, vatAmt, whtAmt);
+                finder.add(maintenanceRecord);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error Fetching Maintenace Records ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return finder;
+    }
+
+    /**
+     * findAllLicencePermitRecord
+     *
+     * @return ArrayList
+     */
+    public ArrayList findLicencePermitRecordByQuery(String filter) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+        String selectQuery = "SELECT LT_ID,TYPE,COST,ASSET_ID,STATUS " +
+                             ",REGISTRATION_NO,DATE_OBTAINED,EXPIRY_DATE,INVOICE_NO " +
+                             "FROM FT_LICENCE_HISTORY WHERE ASSET_ID != '' " +
+                             filter;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String dateObtained = formatDate(rs.getDate("DATE_OBTAINED"));
+                String dateExpired = formatDate(rs.getDate("EXPIRY_DATE"));
+                String status = rs.getString("STATUS");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                FleetLicencePermit licence = new FleetLicencePermit(id, type,
+                        cost, assetCode, registrationNo, dateObtained,
+                        dateExpired, status, "", "", invoiceNo);
+                list.add(licence);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating Budget ->" + e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+    }
+
+    /**
+     * findLicencePermitById
+     *
+     * @param id String
+     * @return FleetLicencePermit
+     */
+    public FleetLicencePermit findLicencePermitById(String id) {
+        FleetLicencePermit licence = null;
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery = "SELECT LT_ID,TYPE,COST,ASSET_ID " +
+                             ",REGISTRATION_NO,LICENCE_NO,DATE_OBTAINED " +
+                             ",EXPIRY_DATE,STATUS,FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO " +
+                             "FROM FT_LICENCE_HISTORY WHERE LT_ID =?";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                //String id = rs.getString("LICENCE_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String dateObtained = formatDate(rs.getDate("DATE_OBTAINED"));
+                String dateExpired = formatDate(rs.getDate("EXPIRY_DATE"));
+                String status = rs.getString("STATUS");
+                String noteDate = formatDate(rs.getDate("FIRST_NOT_DATE"));
+                String freq = rs.getString("NOTIFICATION_FREQ");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                licence = new FleetLicencePermit(id, type, cost, assetCode,
+                                                 registrationNo, dateObtained,
+                                                 dateExpired, status, freq,
+                                                 noteDate, invoiceNo);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching license records ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return licence;
+    }
+
+    public FleetLicencePermit findLicencePermitById(String tranId, String id) {
+        FleetLicencePermit licence = null;
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery = "SELECT LT_ID,TYPE,COST,ASSET_ID " +
+                             ",REGISTRATION_NO,LICENCE_NO,DATE_OBTAINED " +
+                             ",EXPIRY_DATE,STATUS,FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO " +
+                             "FROM FT_LICENCE_HISTORY WHERE HIST_ID =?";
+        DataConnect connect = new DataConnect();
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, tranId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String ltId = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String dateObtained = formatDate(rs.getDate("DATE_OBTAINED"));
+                String dateExpired = formatDate(rs.getDate("EXPIRY_DATE"));
+                String status = rs.getString("STATUS");
+                String freq = rs.getString("NOTIFICATION_FREQ");
+                String noticeDate = formatDate(rs.getDate("FIRST_NOT_DATE"));
+                String invoiceNo = rs.getString("INVOICE_NO");
+
+                licence = new FleetLicencePermit(ltId, type, cost, assetCode,
+                                                 registrationNo, dateObtained,
+                                                 dateExpired, status, freq,
+                                                 noticeDate, invoiceNo);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching license records ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return licence;
+    }
+
+    /**
+     * findLicencePermitByRegNo
+     *
+     * @param registrationNo String
+     * @return FleetLicencePermit
+     */
+    public FleetLicencePermit findLicencePermitByRegNo(String registrationNo) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery = "SELECT LT_ID,TYPE,COST,ASSET_ID " +
+                             ",REGISTRATION_NO,LICENCE_NO,DATE_OBTAINED " +
+                             ",EXPIRY_DATE,STATUS,INVOICE_NO " +
+                             "FROM FT_LICENCE_HISTORY WHERE REGISTRATION_NO =?";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, registrationNo);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String dateObtained = formatDate(rs.getDate("DATE_OBTAINED"));
+                String dateExpired = formatDate(rs.getDate("EXPIRY_DATE"));
+                String status = rs.getString("STATUS");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                FleetLicencePermit licence = new FleetLicencePermit(id, type,
+                        cost, assetCode, registrationNo, dateObtained,
+                        dateExpired, status, "", "", invoiceNo);
+                //list.add(licence);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating Budget ->" + e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return null;
+    }
+
+    /**
+     * findAllAccidentRecord
+     *
+     * @return ArrayList
+     */
+    public ArrayList findAccidentRecordByQuery(String queryFilter) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+        String selectQuery = "SELECT LT_ID,TYPE,COST,ASSET_ID " +
+                             " ,REGISTRATION_NO,DRIVER_INVOLVED,LOCATION " +
+                             ",ACCIDENT_DATE,POLICE_REPORT_OBTAINED,POLICE_REPORT_DATE " +
+                             " ,COST_COMPANY_BORNE,COST_INSURANCE_BORNE " +
+                             " ,DURATION,OTHER_DETAILS,NOTIFIED_INSURANCE " +
+                             " ,NOFTIFIED_DATE,REQUIRED_REPLACEMENT,STATUS,INVOICE_NO " +
+                             "FROM FT_ACCIDENT_HISTORY   " +
+                             "WHERE ASSET_ID != '' " + queryFilter;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String driverInvolved = rs.getString("DRIVER_INVOLVED");
+                String location = rs.getString("LOCATION");
+                String accidentDate = formatDate(rs.getDate("ACCIDENT_DATE"));
+                String report = rs.getString("POLICE_REPORT_OBTAINED");
+                boolean policeReportObtained = ((report == null) ? true : false);
+                String reportDate = formatDate(rs.getDate("POLICE_REPORT_DATE"));
+                double costBorneByCompany = rs.getDouble("COST_COMPANY_BORNE");
+                double costBorneByInssurance = rs.getDouble(
+                        "COST_INSURANCE_BORNE");
+                int duration = rs.getInt("DURATION");
+                String otherDetails = rs.getString("OTHER_DETAILS");
+                String ins = rs.getString("NOTIFIED_INSURANCE");
+                boolean issuranceNotified = ((ins == null) ? true : false);
+                String notificationDate = formatDate(rs.getDate(
+                        "NOFTIFIED_DATE"));
+                String rep = rs.getString("REQUIRED_REPLACEMENT");
+                boolean replaceRequired = ((rep == null) ? true : false);
+                String status = rs.getString("STATUS");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                FleetAccidentRecord accident = new FleetAccidentRecord(id, type,
+                        cost,
+                        assetCode, registrationNo, driverInvolved, location,
+                        accidentDate, policeReportObtained, reportDate,
+                        costBorneByCompany, costBorneByInssurance, duration,
+                        otherDetails, issuranceNotified,
+                        notificationDate, replaceRequired, status, invoiceNo,
+                        "");
+                list.add(accident);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching Accident Records ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+    }
+
+
+    /**
+     * findAllAccidentRecord
+     *
+     * @return ArrayList
+     */
+    public ArrayList findAllAccidentRecord() {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+        String selectQuery = "SELECT LT_ID,TYPE,COST,ASSET_ID " +
+                             " ,REGISTRATION_NO,DRIVER_INVOLVED,LOCATION " +
+                             ",ACCIDENT_DATE,POLICE_REPORT_OBTAINED,POLICE_REPORT_DATE " +
+                             " ,COST_COMPANY_BORNE,COST_INSURANCE_BORNE " +
+                             " ,DURATION,OTHER_DETAILS,NOTIFIED_INSURANCE " +
+                             " ,NOFTIFIED_DATE,REQUIRED_REPLACEMENT,STATUS " +
+                             "FROM FT_ACCIDENT_HISTORY ";
+
+        ;
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String id = rs.getString("ACCIDENT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String driverInvolved = rs.getString("DRIVER_INVOLVED");
+                String location = rs.getString("LOCATION");
+                String accidentDate = formatDate(rs.getDate("ACCIDENT_DATE"));
+                String report = rs.getString("POLICE_REPORT_OBTAINED");
+                boolean policeReportObtained = ((report == null) ? true : false);
+                String reportDate = formatDate(rs.getDate("POLICE_REPORT_DATE"));
+                double costBorneByCompany = rs.getDouble("COST_COMPANY_BORNE");
+                double costBorneByInssurance = rs.getDouble(
+                        "COST_INSURANCE_BORNE");
+                int duration = rs.getInt("DURATION");
+                String otherDetails = rs.getString("OTHER_DETAILS");
+                String ins = rs.getString("NOTIFIED_INSURANCE");
+                boolean issuranceNotified = ((ins == null) ? true : false);
+                String notificationDate = formatDate(rs.getDate(
+                        "NOFTIFIED_DATE"));
+                String rep = rs.getString("REQUIRED_REPLACEMENT");
+                boolean replaceRequired = ((rep == null) ? true : false);
+                String status = rs.getString("STATUS");
+                FleetAccidentRecord accident = new FleetAccidentRecord(id, type,
+                        cost,
+                        assetCode, registrationNo, driverInvolved, location,
+                        accidentDate, policeReportObtained, reportDate,
+                        costBorneByCompany, costBorneByInssurance, duration,
+                        otherDetails, issuranceNotified,
+                        notificationDate, replaceRequired, status, "", "");
+                list.add(accident);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching accident history ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+    }
+
+    /**
+     * findAccidentRecordByRegCode
+     *
+     * @param registrationNo String
+     * @return FleetAccidentRecord
+     */
+    public FleetAccidentRecord findAccidentRecordById(String id) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery = "SELECT LT_ID,TYPE,COST,ASSET_ID " +
+                             " ,REGISTRATION_NO,DRIVER_INVOLVED,LOCATION " +
+                             ",ACCIDENT_DATE,POLICE_REPORT_OBTAINED,POLICE_REPORT_DATE " +
+                             " ,COST_COMPANY_BORNE,COST_INSURANCE_BORNE " +
+                             " ,DURATION,OTHER_DETAILS,NOTIFIED_INSURANCE " +
+                             " ,NOFTIFIED_DATE,REQUIRED_REPLACEMENT,STATUS,INVOICE_NO,INSURER " +
+                             "FROM FT_ACCIDENT_HISTORY WHERE LT_ID = '" + id +
+                             "'";
+
+        FleetAccidentRecord accidentRecord = null;
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                //String id = rs.getString("ACCIDENT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String driverInvolved = rs.getString("DRIVER_INVOLVED");
+                String location = rs.getString("LOCATION");
+                String accidentDate = formatDate(rs.getDate("ACCIDENT_DATE"));
+                String report = rs.getString("POLICE_REPORT_OBTAINED");
+                boolean policeReportObtained = ((report == null) ? true : false);
+                String reportDate = formatDate(rs.getDate("POLICE_REPORT_DATE"));
+                double costBorneByCompany = rs.getDouble("COST_COMPANY_BORNE");
+                double costBorneByInssurance = rs.getDouble(
+                        "COST_INSURANCE_BORNE");
+                int duration = rs.getInt("DURATION");
+                String otherDetails = rs.getString("OTHER_DETAILS");
+                String ins = rs.getString("NOTIFIED_INSURANCE");
+                boolean issuranceNotified = ((ins == null) ? true : false);
+                String notificationDate = formatDate(rs.getDate(
+                        "NOFTIFIED_DATE"));
+                String rep = rs.getString("REQUIRED_REPLACEMENT");
+                boolean replaceRequired = ((rep == null) ? true : false);
+                String status = rs.getString("STATUS");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                String insurer = rs.getString("INSURER");
+
+                accidentRecord = new FleetAccidentRecord(id, type, cost,
+                        assetCode, registrationNo, driverInvolved, location,
+                        accidentDate, policeReportObtained, reportDate,
+                        costBorneByCompany, costBorneByInssurance, duration,
+                        otherDetails, issuranceNotified, notificationDate,
+                        replaceRequired, status, invoiceNo, insurer);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fecthing accidents ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return accidentRecord;
+    }
+
+    public FleetAccidentRecord findAccidentRecordById(String tranId, String id) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery = "SELECT LT_ID,TYPE,COST,ASSET_ID " +
+                             " ,REGISTRATION_NO,DRIVER_INVOLVED,LOCATION " +
+                             ",ACCIDENT_DATE,POLICE_REPORT_OBTAINED,POLICE_REPORT_DATE " +
+                             " ,COST_COMPANY_BORNE,COST_INSURANCE_BORNE " +
+                             " ,DURATION,OTHER_DETAILS,NOTIFIED_INSURANCE " +
+                             " ,NOFTIFIED_DATE,REQUIRED_REPLACEMENT,STATUS,INVOICE_NO,INSURER " +
+                             "FROM FT_ACCIDENT_HISTORY WHERE HIST_ID = '" +
+                             tranId +
+                             "'";
+
+        FleetAccidentRecord accidentRecord = null;
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String ltId = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String driverInvolved = rs.getString("DRIVER_INVOLVED");
+                String location = rs.getString("LOCATION");
+                String accidentDate = formatDate(rs.getDate("ACCIDENT_DATE"));
+                String report = rs.getString("POLICE_REPORT_OBTAINED");
+                boolean policeReportObtained = ((report == null) ? true : false);
+                String reportDate = formatDate(rs.getDate("POLICE_REPORT_DATE"));
+                double costBorneByCompany = rs.getDouble("COST_COMPANY_BORNE");
+                double costBorneByInssurance = rs.getDouble(
+                        "COST_INSURANCE_BORNE");
+                int duration = rs.getInt("DURATION");
+                String otherDetails = rs.getString("OTHER_DETAILS");
+                String ins = rs.getString("NOTIFIED_INSURANCE");
+                boolean issuranceNotified = ((ins == null) ? true : false);
+                String notificationDate = formatDate(rs.getDate(
+                        "NOFTIFIED_DATE"));
+                String rep = rs.getString("REQUIRED_REPLACEMENT");
+                boolean replaceRequired = ((rep == null) ? true : false);
+                String status = rs.getString("STATUS");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                String insurer = rs.getString("INSURER");
+
+                accidentRecord = new FleetAccidentRecord(ltId, type, cost,
+                        assetCode, registrationNo, driverInvolved, location,
+                        accidentDate, policeReportObtained, reportDate,
+                        costBorneByCompany, costBorneByInssurance, duration,
+                        otherDetails, issuranceNotified, notificationDate,
+                        replaceRequired, status, invoiceNo, insurer);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fecthing accidents ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return accidentRecord;
+    }
+
+
+    /**
+     * findAccidentRecordByRegCode
+     *
+     * @param registrationNo String
+     * @return FleetAccidentRecord
+     */
+    public FleetInsurranceRecord findInsurranceRecordById(String id) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                " ,COMPANY,DATE_OBTAINED,EXPIRY_DATE,STATUS,HIST_ID " +
+                ",FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO " +
+                " FROM FT_INSURANCE_HISTORY WHERE LT_ID = ?";
+
+        FleetInsurranceRecord insRecord = null;
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String company = rs.getString("COMPANY");
+                String dateObtained = formatDate(rs.getDate("DATE_OBTAINED"));
+                String dateExpired = formatDate(rs.getDate("EXPIRY_DATE"));
+                String status = rs.getString("STATUS");
+                String tranId = rs.getString("HIST_ID");
+                String noteDate = formatDate(rs.getDate("FIRST_NOT_DATE"));
+                String freq = rs.getString("NOTIFICATION_FREQ");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                insRecord = new FleetInsurranceRecord(id, type, cost,
+                        assetCode, registrationNo, company, dateObtained,
+                        dateExpired, status, tranId, noteDate, freq, invoiceNo);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching insurance record ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return insRecord;
+    }
+
+    //added by Olabo
+    public FleetInsurranceRecord findInsurranceRecordById(String tranId,
+            String id) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                " ,COMPANY,DATE_OBTAINED,EXPIRY_DATE,STATUS,HIST_ID " +
+                ",FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO " +
+                " FROM FT_INSURANCE_HISTORY WHERE HIST_ID = ?";
+
+        FleetInsurranceRecord insRecord = null;
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, tranId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String ltId = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String company = rs.getString("COMPANY");
+                String dateObtained = formatDate(rs.getDate("DATE_OBTAINED"));
+                String dateExpired = formatDate(rs.getDate("EXPIRY_DATE"));
+                String status = rs.getString("STATUS");
+                String noteDate = formatDate(rs.getDate("FIRST_NOT_DATE"));
+                String freq = rs.getString("NOTIFICATION_FREQ");
+                String invoiceNo = rs.getString("INVOICE_NO");
+
+                insRecord = new FleetInsurranceRecord(ltId, type, cost,
+                        assetCode, registrationNo, company, dateObtained,
+                        dateExpired, status, tranId, noteDate, freq, invoiceNo);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching insurance record ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return insRecord;
+    }
+
+    /**
+     * findInsuranceRecordByQuery
+     *
+     * @param queryFilter String
+     * @return ArrayList
+     */
+    public ArrayList findInsuranceRecordByQuery(String queryFilter) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO " +
+                " ,COMPANY,DATE_OBTAINED,EXPIRY_DATE,STATUS,HIST_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ " +
+                " FROM FT_INSURANCE_HISTORY WHERE LT_ID !='' " + queryFilter;
+
+        ArrayList list = new ArrayList();
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String company = rs.getString("COMPANY");
+                String dateObtained = formatDate(rs.getDate("DATE_OBTAINED"));
+                String dateExpired = formatDate(rs.getDate("EXPIRY_DATE"));
+                String status = rs.getString("STATUS");
+                String tranId = rs.getString("HIST_ID");
+                String noteDate = rs.getString("FIRST_NOT_DATE");
+                String freq = rs.getString("NOTIFICATION_FREQ");
+                FleetInsurranceRecord fir = new FleetInsurranceRecord(id, type,
+                        cost,
+                        assetCode, registrationNo, company, dateObtained,
+                        dateExpired, status, tranId, noteDate, freq, "");
+
+                list.add(fir);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching all Insurance Record ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+
+    }
+
+    /**
+     * findAllInsurrancetRecord
+     * @return ArrayList
+     */
+    public ArrayList findAllInsurranceRecordByQuery(String queryFilter) {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery =
+                "SELECT a.LT_ID,a.TYPE,a.COST,a.ASSET_ID,a.REGISTRATION_NO " +
+                " ,b.INSURANCE_NAME AS COMPANY,a.DATE_OBTAINED,a.EXPIRY_DATE,a.STATUS,a.INVOICE_NO " +
+                " FROM FT_INSURANCE_HISTORY a,AM_AD_INSURANCE b WHERE a.COMPANY = b.INSURANCE_ID AND a.ASSET_ID != '' " +
+                queryFilter;
+
+        ArrayList list = new ArrayList();
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String company = rs.getString("COMPANY");
+                String dateObtained = formatDate(rs.getDate("DATE_OBTAINED"));
+                String dateExpired = formatDate(rs.getDate("EXPIRY_DATE"));
+                String status = rs.getString("STATUS");
+                //String tranId = rs.getString("HIST_ID");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                FleetInsurranceRecord fir = new FleetInsurranceRecord(id, type,
+                        cost, assetCode, registrationNo, company, dateObtained,
+                        dateExpired, status, "", "", "", invoiceNo);
+
+                list.add(fir);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching all Insurance Record ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+    }
+
+    /**
+     * findAllFuelRecords
+     *
+     * @return ArrayList
+     */
+    public ArrayList findFuelRecordsByQuery(String filter) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO," +
+                "VOLUME,FUEL_TYPE,INVOICE_NO,EFFECTIVE_DATE,ENTRY_DATE,STATUS,UNIT_PRICE  " +
+                "FROM FT_FUEL_HISTORY WHERE ASSET_ID != ''  " + filter;
+
+        ArrayList list = new ArrayList();
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                double volume = rs.getDouble("VOLUME");
+                String fuelType = rs.getString("FUEL_TYPE");
+                String invoice = rs.getString("INVOICE_NO");
+                String effectiveDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+                String entryDate = formatDate(rs.getDate("ENTRY_DATE"));
+                String status = rs.getString("STATUS");
+                double unitPrice = rs.getDouble("UNIT_PRICE");
+                FleetFuelRecord fuelRecord = new FleetFuelRecord(id, type, cost,
+                        assetCode, registrationNo, volume, fuelType, invoice,
+                        effectiveDate, entryDate, status, unitPrice);
+                list.add(fuelRecord);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching Fuel ALL Records  ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+    }
+
+    /**
+     * findFuelRecordById
+     *
+     * @param id String
+     * @return FleetFuelRecord
+     */
+    public FleetFuelRecord findFuelRecordById(String id) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        FleetFuelRecord fuelRecord = null;
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO," +
+                "VOLUME,FUEL_TYPE,INVOICE_NO,EFFECTIVE_DATE,ENTRY_DATE,STATUS,UNIT_PRICE  " +
+                "FROM FT_FUEL_HISTORY WHERE LT_ID = '" + id + "'";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                //String id = rs.getString("MT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                double volume = rs.getDouble("VOLUME");
+                String fuelType = rs.getString("FUEL_TYPE");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                String effectiveDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+                String entryDate = formatDate(rs.getDate("ENTRY_DATE"));
+                String status = rs.getString("STATUS");
+                double unitPrice = rs.getDouble("UNIT_PRICE");
+                fuelRecord = new FleetFuelRecord(id, type, cost, assetCode,
+                                                 registrationNo, volume,
+                                                 fuelType, invoiceNo,
+                                                 effectiveDate, entryDate,
+                                                 status, unitPrice);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching Fuel Record By ID ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return fuelRecord;
+    }
+
+    //added by Olabo
+    public FleetFuelRecord findFuelRecordById(String tranId, String id) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        FleetFuelRecord fuelRecord = null;
+        String selectQuery =
+                "SELECT LT_ID,TYPE,COST,ASSET_ID,REGISTRATION_NO," +
+                "VOLUME,FUEL_TYPE,INVOICE_NO,EFFECTIVE_DATE,ENTRY_DATE,STATUS,UNIT_PRICE  " +
+                "FROM FT_FUEL_HISTORY WHERE HIST_ID = '" + tranId + "'";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String ltId = rs.getString("LT_ID");
+                String type = rs.getString("TYPE");
+                double cost = rs.getDouble("COST");
+                String assetCode = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                double volume = rs.getDouble("VOLUME");
+                String fuelType = rs.getString("FUEL_TYPE");
+                String invoiceNo = rs.getString("INVOICE_NO");
+                String effectiveDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+                String entryDate = formatDate(rs.getDate("ENTRY_DATE"));
+                String status = rs.getString("STATUS");
+                double unitPrice = rs.getDouble("UNIT_PRICE");
+                fuelRecord = new FleetFuelRecord(ltId, type, cost, assetCode,
+                                                 registrationNo, volume,
+                                                 fuelType, invoiceNo,
+                                                 effectiveDate, entryDate,
+                                                 status, unitPrice);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching Fuel Record By ID ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return fuelRecord;
+    }
+
+    public void createAsset(String assetid, String regno, String branchId,
+                            String deptId,
+                            String sectionId, String categoryId, String descr,
+                            String vendorAccount, String datePurchased,
+                            String depRate, String assetMake, String assetModel,
+                            String serialNo, String engineNo,
+                            String supplierName, String assetUser,
+                            String maintenance, String accumDep, String monDep,
+                            String costPrice, String nbv, String depEnddate,
+                            String residualVal, String authorizedBy,
+                            String postDate, String effDate,
+                            String purchaseReason, String usefulLife,
+                            String totalLife,
+                            String location, String remLife, String vatCost,
+                            String vat, String whTax, String whTaxAmount,
+                            String reqDep, String reqDist, String subToTax,
+                            String toRemind1, String email1, String toRemind2,
+                            String email2, String raiseEntry, String depYTD,
+                            String section, String state, String driver,
+                            String spare1, String spare2, String status,
+                            String userId) {
+
+        if (datePurchased.equals("")) {
+            datePurchased = null;
+        }
+        if (depRate.equals("")) {
+            depRate = "0.00";
+        }
+        if (assetMake.equals("")) {
+            assetMake = "0";
+        }
+        if (supplierName.equals("")) {
+            supplierName = "0";
+        }
+        if (accumDep.equals("")) {
+            accumDep = "0.00";
+        }
+        if (monDep.equals("")) {
+            monDep = "0.00";
+        }
+        if (costPrice.equals("")) {
+            costPrice = "0.00";
+        }
+        if (nbv.equals("")) {
+            nbv = "0.00";
+        }
+        if (depEnddate.equals("")) {
+            depEnddate = null;
+        }
+        if (residualVal.equals("")) {
+            residualVal = "0.00";
+        }
+        if (postDate.equals("")) {
+            postDate = null;
+        }
+        if (effDate.equals("")) {
+            effDate = null;
+        }
+        if (usefulLife.equals("")) {
+            usefulLife = "0";
+        }
+        if (totalLife.equals("")) {
+            totalLife = "0";
+        }
+        if (location.equals("")) {
+            location = "0";
+        }
+        if (remLife.equals("")) {
+            remLife = "0";
+        }
+        if (vatCost.equals("")) {
+            vatCost = "0";
+        }
+        if (whTaxAmount.equals("")) {
+            whTaxAmount = "0.00";
+        }
+        if (depYTD.equals("")) {
+            depYTD = "0.00";
+        }
+        accumDep = accumDep.replaceAll(",", "");
+        monDep = monDep.replaceAll(",", "");
+        costPrice = costPrice.replaceAll(",", "");
+        nbv = nbv.replaceAll(",", "");
+        residualVal = residualVal.replaceAll(",", "");
+        vatCost = vatCost.replaceAll(",", "");
+        whTaxAmount = whTaxAmount.replaceAll(",", "");
+        depYTD = depYTD.replaceAll(",", "");
+
+        String CREATE_QUERY =
+                "INSERT INTO AM_ASSET" +
+                "(" +
+                "ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID," +
+                "SECTION_ID,CATEGORY_ID,DESCRIPTION,VENDOR_AC," +
+                "DATE_PURCHASED,DEP_RATE,ASSET_MAKE," +
+                "ASSET_MODEL,ASSET_SERIAL_NO,ASSET_ENGINE_NO," +
+                "SUPPLIER_NAME,ASSET_USER,ASSET_MAINTENANCE," +
+                "ACCUM_DEP,MONTHLY_DEP,COST_PRICE,NBV," +
+                "DEP_END_DATE,RESIDUAL_VALUE,AUTHORIZED_BY," +
+                "POSTING_DATE,EFFECTIVE_DATE,PURCHASE_REASON," +
+                "USEFUL_LIFE,TOTAL_LIFE,LOCATION,REMAINING_LIFE," +
+                "VATABLE_COST,VAT,WH_TAX,WH_TAX_AMOUNT," +
+                "REQ_DEPRECIATION,REQ_REDISTRIBUTION," +
+                "SUBJECT_TO_VAT,WHO_TO_REM,EMAIL1,WHO_TO_REM_2," +
+                "EMAIL2,RAISE_ENTRY,DEP_YTD,SECTION," +
+                "STATE,DRIVER,SPARE_1,SPARE_2,ASSET_STATUS," +
+                "USER_ID" +
+                ") VALUES(" +
+                "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
+                "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
+                "?,?,?,?,?,?,?,?,?,?,?" +
+                ")";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        if (assetid == null || assetid.equals("")) {
+            try {
+
+                new legend.ConnectionClass().getIdentity().substring(24);
+
+            } catch (Exception er) {
+                System.out.println("WARN: Error Creating assetid " + er);
+            }
+        }
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(CREATE_QUERY);
+
+            ps.setString(1, assetid);
+            ps.setString(2, regno);
+            ps.setInt(3, Integer.parseInt(branchId));
+            ps.setInt(4, Integer.parseInt(deptId));
+            ps.setInt(5, Integer.parseInt(sectionId));
+            ps.setInt(6, Integer.parseInt(categoryId));
+            ps.setString(7, descr);
+            ps.setString(8, vendorAccount);
+            ps.setDate(9, dateConvert(datePurchased));
+            ps.setDouble(10, Double.parseDouble(depRate));
+            ps.setInt(11, Integer.parseInt(assetMake));
+            ps.setString(12, assetModel);
+            ps.setString(13, serialNo);
+            ps.setString(14, engineNo);
+            ps.setInt(15, Integer.parseInt(supplierName));
+            ps.setString(16, assetUser);
+            ps.setInt(17, Integer.parseInt(maintenance));
+            ps.setDouble(18, Double.parseDouble(accumDep));
+            ps.setDouble(19, Double.parseDouble(monDep));
+            ps.setDouble(20, Double.parseDouble(costPrice));
+            ps.setDouble(21, Double.parseDouble(nbv));
+            ps.setDate(22, dateConvert(depEnddate));
+            ps.setDouble(23, Double.parseDouble(residualVal));
+            ps.setString(24, authorizedBy);
+            ps.setDate(25, dateConvert(postDate));
+            ps.setDate(26, dateConvert(effDate));
+            ps.setString(27, purchaseReason);
+            ps.setInt(28, Integer.parseInt(usefulLife));
+            ps.setInt(29, Integer.parseInt(totalLife));
+            ps.setInt(30, Integer.parseInt(location));
+            ps.setInt(31, Integer.parseInt(remLife));
+            ps.setDouble(32, Double.parseDouble(vatCost));
+            ps.setString(33, vat);
+            ps.setString(34, whTax);
+            ps.setDouble(35, Double.parseDouble(whTaxAmount));
+            ps.setString(36, reqDep);
+            ps.setString(37, reqDist);
+            ps.setString(38, subToTax);
+            ps.setString(39, toRemind1);
+            ps.setString(40, email1);
+            ps.setString(41, toRemind2);
+            ps.setString(42, email2);
+            ps.setString(43, raiseEntry);
+            ps.setDouble(44, Double.parseDouble(depYTD));
+            ps.setString(45, section);
+            ps.setInt(46, Integer.parseInt(state));
+            ps.setInt(47, Integer.parseInt(driver));
+            ps.setString(48, spare1);
+            ps.setString(49, spare2);
+            ps.setString(50, status);
+            ps.setInt(51, Integer.parseInt(userId));
+
+            System.out.println(ps.toString());
+
+            ps.execute();
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error creating Asset ->" +
+                               e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+    }
+
+
+    /**
+     * findAllAsset
+     *
+     * @return ArrayList
+     */
+    public ArrayList findAllAsset() {
+
+        String selectQuery =
+                "SELECT ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID," +
+                "CATEGORY_ID, DESCRIPTION,DATE_PURCHASED,DEP_RATE," +
+                "ASSET_MAKE,ASSET_USER,ASSET_MAINTENANCE," +
+                "ACCUM_DEP,MONTHLY_DEP,COST_PRICE,DEP_END_DATE," +
+                "RESIDUAL_VALUE,POSTING_DATE,RAISE_ENTRY,DEP_YTD,SECTION , " +
+                "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE   " +
+                "FROM AM_ASSET  ";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String branchId = rs.getString("BRANCH_ID");
+                String departmentId = rs.getString("DEPT_ID");
+                String section = rs.getString("SECTION");
+                String category = rs.getString("CATEGORY_ID");
+                String description = rs.getString("DESCRIPTION");
+                String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+                double depreciationRate = rs.getDouble("DEP_RATE");
+                String assetMake = rs.getString("ASSET_MAKE");
+                String assetUser = rs.getString("ASSET_USER");
+                String assetMaintenance = rs.getString("ASSET_MAINTENANCE");
+                double accumulatedDepreciation = rs.getDouble("ACCUM_DEP");
+                double monthlyDepreciation = rs.getDouble("MONTHLY_DEP");
+                double cost = rs.getDouble("COST_PRICE");
+                String depreciationEndDate = formatDate(rs.getDate(
+                        "DEP_END_DATE"));
+                double residualValue = rs.getDouble("RESIDUAL_VALUE");
+                String postingDate = rs.getString("POSTING_DATE");
+                String entryRaised = rs.getString("RAISE_ENTRY");
+                double depreciationYearToDate = rs.getDouble("DEP_YTD");
+                double nbv = rs.getDouble("NBV");
+                int remainingLife = rs.getInt("REMAINING_LIFE");
+                int totalLife = rs.getInt("TOTAL_LIFE");
+                java.util.Date effectiveDate = rs.getDate("EFFECTIVE_DATE");
+
+                Asset aset = new Asset(id, registrationNo, branchId,
+                                       departmentId, section, category,
+                                       description,
+                                       datePurchased, depreciationRate,
+                                       assetMake,
+                                       assetUser, assetMaintenance,
+                                       accumulatedDepreciation,
+                                       monthlyDepreciation, cost,
+                                       depreciationEndDate,
+                                       residualValue, postingDate, entryRaised,
+                                       depreciationYearToDate);
+                aset.setNbv(nbv);
+                aset.setRemainLife(remainingLife);
+                aset.setTotalLife(totalLife);
+                aset.setEffectiveDate(effectiveDate);
+                list.add(aset);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching ALL Asset ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+
+    }
+
+    public ArrayList findAssetForDepreciation() {
+
+        String selectQuery =
+                "SELECT ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID," +
+                "CATEGORY_ID, DESCRIPTION,DATE_PURCHASED,DEP_RATE," +
+                "ASSET_MAKE,ASSET_USER,ASSET_MAINTENANCE," +
+                "ACCUM_DEP,MONTHLY_DEP,COST_PRICE,DEP_END_DATE," +
+                "RESIDUAL_VALUE,POSTING_DATE,RAISE_ENTRY,DEP_YTD,SECTION_ID , " +
+                "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE, Asset_Status,REQ_REDISTRIBUTION   " +
+                "FROM AM_ASSET  WHERE Req_Depreciation = 'Y'";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String branchId = rs.getString("BRANCH_ID");
+                String departmentId = rs.getString("DEPT_ID");
+                String section = rs.getString("SECTION_ID");
+                String category = rs.getString("CATEGORY_ID");
+                String description = rs.getString("DESCRIPTION");
+                String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+                double depreciationRate = rs.getDouble("DEP_RATE");
+                String assetMake = rs.getString("ASSET_MAKE");
+                String assetUser = rs.getString("ASSET_USER");
+                String assetMaintenance = rs.getString("ASSET_MAINTENANCE");
+                double accumulatedDepreciation = rs.getDouble("ACCUM_DEP");
+                double monthlyDepreciation = rs.getDouble("MONTHLY_DEP");
+                double cost = rs.getDouble("COST_PRICE");
+                String depreciationEndDate = formatDate(rs.getDate(
+                        "DEP_END_DATE"));
+                double residualValue = rs.getDouble("RESIDUAL_VALUE");
+                String postingDate = rs.getString("POSTING_DATE");
+                String entryRaised = rs.getString("RAISE_ENTRY");
+                double depreciationYearToDate = rs.getDouble("DEP_YTD");
+                double nbv = rs.getDouble("NBV");
+                int remainingLife = rs.getInt("REMAINING_LIFE");
+                int totalLife = rs.getInt("TOTAL_LIFE");
+                java.util.Date effectiveDate = rs.getDate("EFFECTIVE_DATE");
+                String astatus = rs.getString("Asset_Status");
+                String req_distribution = rs.getString("REQ_REDISTRIBUTION");
+
+                Asset aset = new Asset(id, registrationNo, branchId,
+                                       departmentId, section, category,
+                                       description,
+                                       datePurchased, depreciationRate,
+                                       assetMake,
+                                       assetUser, assetMaintenance,
+                                       accumulatedDepreciation,
+                                       monthlyDepreciation, cost,
+                                       depreciationEndDate,
+                                       residualValue, postingDate, entryRaised,
+                                       depreciationYearToDate);
+                aset.setNbv(nbv);
+                aset.setRemainLife(remainingLife);
+                aset.setTotalLife(totalLife);
+                aset.setEffectiveDate(effectiveDate);
+                aset.setAsset_status(astatus);
+                aset.setReq_distribution(req_distribution);
+
+                list.add(aset);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching ALL Asset ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+
+    }
+
+
+    /**
+     * findAllAsset
+     *
+     * @return ArrayList
+     */
+    public ArrayList findAssetByCategory(String categoryCode) {
+
+        String selectQuery =
+                "SELECT ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID," +
+                "CATEGORY_ID, DESCRIPTION,DATE_PURCHASED,DEP_RATE," +
+                "ASSET_MAKE,ASSET_USER,ASSET_MAINTENANCE," +
+                "ACCUM_DEP,MONTHLY_DEP,COST_PRICE,DEP_END_DATE," +
+                "RESIDUAL_VALUE,POSTING_DATE,RAISE_ENTRY,DEP_YTD,SECTION , " +
+                "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE   " +
+                "FROM AM_ASSET WHERE CATEGORY_ID = ? ";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, categoryCode);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String branchId = rs.getString("BRANCH_ID");
+                String departmentId = rs.getString("DEPT_ID");
+                String section = rs.getString("SECTION");
+                String category = rs.getString("CATEGORY_ID");
+                String description = rs.getString("DESCRIPTION");
+                String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+                double depreciationRate = rs.getDouble("DEP_RATE");
+                String assetMake = rs.getString("ASSET_MAKE");
+                String assetUser = rs.getString("ASSET_USER");
+                String assetMaintenance = rs.getString("ASSET_MAINTENANCE");
+                double accumulatedDepreciation = rs.getDouble("ACCUM_DEP");
+                double monthlyDepreciation = rs.getDouble("MONTHLY_DEP");
+                double cost = rs.getDouble("COST_PRICE");
+                String depreciationEndDate = formatDate(rs.getDate(
+                        "DEP_END_DATE"));
+                double residualValue = rs.getDouble("RESIDUAL_VALUE");
+                String postingDate = rs.getString("POSTING_DATE");
+                String entryRaised = rs.getString("RAISE_ENTRY");
+                double depreciationYearToDate = rs.getDouble("DEP_YTD");
+                double nbv = rs.getDouble("NBV");
+                int remainingLife = rs.getInt("REMAINING_LIFE");
+                int totalLife = rs.getInt("TOTAL_LIFE");
+                java.util.Date effectiveDate = rs.getDate("EFFECTIVE_DATE");
+
+                Asset aset = new Asset(id, registrationNo, branchId,
+                                       departmentId, section, category,
+                                       description,
+                                       datePurchased, depreciationRate,
+                                       assetMake,
+                                       assetUser, assetMaintenance,
+                                       accumulatedDepreciation,
+                                       monthlyDepreciation, cost,
+                                       depreciationEndDate,
+                                       residualValue, postingDate, entryRaised,
+                                       depreciationYearToDate);
+                aset.setNbv(nbv);
+                aset.setRemainLife(remainingLife);
+                aset.setTotalLife(totalLife);
+                aset.setEffectiveDate(effectiveDate);
+                list.add(aset);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching ALL Asset ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+
+    }
+
+
+    /**
+     * findAssetByMakeCategory
+     *
+     * @param categoryCode String
+     * @param makeCode String
+     * @return ArrayList
+     */
+    public ArrayList findAssetByMakeCategory(String categoryCode,
+                                             String makeCode) {
+
+        String selectQuery =
+                "SELECT A.ASSET_ID,A.REGISTRATION_NO,A.BRANCH_ID,A.DEPT_ID," +
+                "A.CATEGORY_ID, A.DESCRIPTION,A.DATE_PURCHASED,A.DEP_RATE," +
+                "A.ASSET_MAKE,A.ASSET_USER,A.ASSET_MAINTENANCE," +
+                "A.ACCUM_DEP,A.MONTHLY_DEP,A.COST_PRICE,A.DEP_END_DATE," +
+                "A.RESIDUAL_VALUE,A.POSTING_DATE,A.RAISE_ENTRY,A.DEP_YTD,A.SECTION , " +
+                "A.NBV,A.REMAINING_LIFE,A.TOTAL_LIFE,A.EFFECTIVE_DATE,   " +
+                "C.REQUIRED_FOR_FLEET " +
+                "FROM AM_ASSET A,AM_AD_CATEGORY C " +
+                "WHERE A.CATEGORY_ID = C.CATEGORY_ID " +
+                " AND A.CATEGORY_ID = ? AND A.ASSET_MAKE = ?";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setInt(1, Integer.parseInt(categoryCode));
+            ps.setInt(2, Integer.parseInt(makeCode));
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String branchId = rs.getString("BRANCH_ID");
+                String departmentId = rs.getString("DEPT_ID");
+                String section = rs.getString("SECTION");
+                String category = rs.getString("CATEGORY_ID");
+                String description = rs.getString("DESCRIPTION");
+                String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+                double depreciationRate = rs.getDouble("DEP_RATE");
+                String assetMake = rs.getString("ASSET_MAKE");
+                String assetUser = rs.getString("ASSET_USER");
+                String assetMaintenance = rs.getString("ASSET_MAINTENANCE");
+                double accumulatedDepreciation = rs.getDouble("ACCUM_DEP");
+                double monthlyDepreciation = rs.getDouble("MONTHLY_DEP");
+                double cost = rs.getDouble("COST_PRICE");
+                String depreciationEndDate = formatDate(rs.getDate(
+                        "DEP_END_DATE"));
+                double residualValue = rs.getDouble("RESIDUAL_VALUE");
+                String postingDate = rs.getString("POSTING_DATE");
+                String entryRaised = rs.getString("RAISE_ENTRY");
+                double depreciationYearToDate = rs.getDouble("DEP_YTD");
+                double nbv = rs.getDouble("NBV");
+                int remainingLife = rs.getInt("REMAINING_LIFE");
+                int totalLife = rs.getInt("TOTAL_LIFE");
+                java.util.Date effectiveDate = rs.getDate("EFFECTIVE_DATE");
+                String isFleetEnabled = rs.getString("REQUIRED_FOR_FLEET");
+
+                Asset aset = new Asset(id, registrationNo, branchId,
+                                       departmentId, section, category,
+                                       description,
+                                       datePurchased, depreciationRate,
+                                       assetMake,
+                                       assetUser, assetMaintenance,
+                                       accumulatedDepreciation,
+                                       monthlyDepreciation, cost,
+                                       depreciationEndDate,
+                                       residualValue, postingDate, entryRaised,
+                                       depreciationYearToDate);
+                aset.setNbv(nbv);
+                aset.setRemainLife(remainingLife);
+                aset.setTotalLife(totalLife);
+                aset.setEffectiveDate(effectiveDate);
+                aset.setIsFleetEnabled(isFleetEnabled);
+                list.add(aset);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println(
+                    "INFO:Error fetching ALL Asset By Make Category\n ->" +
+                    e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+
+    }
+
+
+    /**
+     * findAssetById
+     *
+     * @param id String
+     * @return Asset
+     */
+    public Asset findAssetById(String id) {
+
+        Asset finder = null;
+        String selectQuery =
+                "SELECT ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID," +
+                "CATEGORY_ID, DESCRIPTION,DATE_PURCHASED,DEP_RATE," +
+                "ASSET_MAKE,ASSET_USER,ASSET_MAINTENANCE," +
+                "ACCUM_DEP,MONTHLY_DEP,COST_PRICE,DEP_END_DATE," +
+                "RESIDUAL_VALUE,POSTING_DATE,RAISE_ENTRY,DEP_YTD,SECTION," +
+                "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE,REQ_REDISTRIBUTION   " +
+                "FROM AM_ASSET  WHERE ASSET_ID = ?";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String branchId = rs.getString("BRANCH_ID");
+                String departmentId = rs.getString("DEPT_ID");
+                String section = rs.getString("SECTION");
+                String category = rs.getString("CATEGORY_ID");
+                String description = rs.getString("DESCRIPTION");
+                String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+                double depreciationRate = rs.getDouble("DEP_RATE");
+                String assetMake = rs.getString("ASSET_MAKE");
+                String assetUser = rs.getString("ASSET_USER");
+                String assetMaintenance = rs.getString("ASSET_MAINTENANCE");
+                double accumulatedDepreciation = rs.getDouble("ACCUM_DEP");
+                double monthlyDepreciation = rs.getDouble("MONTHLY_DEP");
+                double cost = rs.getDouble("COST_PRICE");
+                String depreciationEndDate = formatDate(rs.getDate(
+                        "DEP_END_DATE"));
+                double residualValue = rs.getDouble("RESIDUAL_VALUE");
+                String postingDate = formatDate(rs.getDate("POSTING_DATE"));
+                String entryRaised = rs.getString("RAISE_ENTRY");
+                double depreciationYearToDate = rs.getDouble("DEP_YTD");
+                double nbv = rs.getDouble("NBV");
+                int remainingLife = rs.getInt("REMAINING_LIFE");
+                int totalLife = rs.getInt("TOTAL_LIFE");
+                java.util.Date effectiveDate = rs.getDate("EFFECTIVE_DATE");
+                String req_distribution = rs.getString("REQ_REDISTRIBUTION");
+                finder = new Asset(id, registrationNo, branchId,
+                                   departmentId, section, category,
+                                   description,
+                                   datePurchased, depreciationRate,
+                                   assetMake,
+                                   assetUser, assetMaintenance,
+                                   accumulatedDepreciation,
+                                   monthlyDepreciation, cost,
+                                   depreciationEndDate,
+                                   residualValue, postingDate, entryRaised,
+                                   depreciationYearToDate);
+                finder.setNbv(nbv);
+                finder.setRemainLife(remainingLife);
+                finder.setTotalLife(totalLife);
+                finder.setEffectiveDate(effectiveDate);
+                finder.setReq_distribution(req_distribution);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching assetDetail ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return finder;
+    }
+
+    /**
+     * findAllAsset
+     *
+     * @return ArrayList
+     */
+    public ArrayList findAssetByQuery(String queryFilter) {
+        //System.out.println("the value of filter is ]]]]]]]]]]]]]]]]]]" +queryFilter);
+        String selectQuery =
+                "SELECT ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID," +
+                "CATEGORY_ID, DESCRIPTION,DATE_PURCHASED,DEP_RATE," +
+                "ASSET_MAKE,ASSET_USER,ASSET_MAINTENANCE," +
+                "ACCUM_DEP,MONTHLY_DEP,COST_PRICE,DEP_END_DATE," +
+                "RESIDUAL_VALUE,POSTING_DATE,RAISE_ENTRY,DEP_YTD,SECTION , " +
+                "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE   " +
+                "FROM AM_ASSET  WHERE ASSET_ID IS NOT NULL " + queryFilter;
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList list = new ArrayList();
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String id = rs.getString("ASSET_ID");
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String branchId = rs.getString("BRANCH_ID");
+                String departmentId = rs.getString("DEPT_ID");
+                String section = rs.getString("SECTION");
+                String category = rs.getString("CATEGORY_ID");
+                String description = rs.getString("DESCRIPTION");
+                String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+                double depreciationRate = rs.getDouble("DEP_RATE");
+                String assetMake = rs.getString("ASSET_MAKE");
+                String assetUser = rs.getString("ASSET_USER");
+                String assetMaintenance = rs.getString("ASSET_MAINTENANCE");
+                double accumulatedDepreciation = rs.getDouble("ACCUM_DEP");
+                double monthlyDepreciation = rs.getDouble("MONTHLY_DEP");
+                double cost = rs.getDouble("COST_PRICE");
+                String depreciationEndDate = formatDate(rs.getDate(
+                        "DEP_END_DATE"));
+                double residualValue = rs.getDouble("RESIDUAL_VALUE");
+                String postingDate = rs.getString("POSTING_DATE");
+                String entryRaised = rs.getString("RAISE_ENTRY");
+                double depreciationYearToDate = rs.getDouble("DEP_YTD");
+                double nbv = rs.getDouble("NBV");
+                int remainingLife = rs.getInt("REMAINING_LIFE");
+                int totalLife = rs.getInt("TOTAL_LIFE");
+                java.util.Date effectiveDate = rs.getDate("EFFECTIVE_DATE");
+
+                Asset aset = new Asset(id, registrationNo, branchId,
+                                       departmentId, section, category,
+                                       description,
+                                       datePurchased, depreciationRate,
+                                       assetMake,
+                                       assetUser, assetMaintenance,
+                                       accumulatedDepreciation,
+                                       monthlyDepreciation, cost,
+                                       depreciationEndDate,
+                                       residualValue, postingDate, entryRaised,
+                                       depreciationYearToDate);
+                aset.setNbv(nbv);
+                aset.setRemainLife(remainingLife);
+                aset.setTotalLife(totalLife);
+                aset.setEffectiveDate(effectiveDate);
+                list.add(aset);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching ALL Asset ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return list;
+
+    }
+
+
+    /**
+     * findAccidentImagesByRegistration
+     *
+     * @param registrationNo String
+     * @return AccidentImage
+     */
+    public AccidentImage findAccidentImagesByRegistration(String registrationNo) {
+        AccidentImage finder = null;
+        String selectQuery =
+                "SELECT ASSET_ID,REGISTRATION_NO,IMAGE_ID," +
+                "FRONT_VIEW,SIDE_VIEW,AREA_VIEW,BACK_VIEW   " +
+                "FROM FT_ACCIDENT_IMAGE  WHERE REGISTRATION_NO = ?";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, registrationNo);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String branchId = rs.getString("BRANCH_ID");
+                String assetId = rs.getString("ASSET_ID");
+                String imageId = rs.getString("IMAGE_ID");
+                byte[] frontView = rs.getBytes("FRONT_VIEW");
+                byte[] sideView = rs.getBytes("SIDE_VIEW");
+                byte[] areaView = rs.getBytes("AREA_VIEW");
+                byte[] backView = rs.getBytes("BACK_VIEW");
+
+                finder = new AccidentImage(assetId, registrationNo, imageId,
+                                           frontView, sideView, areaView,
+                                           backView);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching Accident Image ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return finder;
+
+    }
+
+    /**
+     * findAssetDetailById
+     *
+     * @param id String
+     * @return AssetDetail
+     */
+    public AssetDetail findAssetDetailById(String id) {
+        AssetDetail finder = null;
+        String selectQuery =
+                "SELECT A.ASSET_ID,A.REGISTRATION_NO,B.BRANCH_NAME," +
+                "A.DESCRIPTION,A.COST_PRICE,A.DATE_PURCHASED,A.Accum_dep," +
+                "A.dep_end_date,F.MAINT_PTD,F.FUEL_PTD," +
+                "F.ACCIDENT_COST_PTD,F.LICENCE_PERMIT_PTD,F.INSURANCE_COST_PTD," +
+                "F.MAINT_LTD,F.FUEL_LTD,F.ACCIDENT_COST_LTD,F.LICENCE_PERMIT_LTD," +
+                "F.INSURANCE_COST_LTD   " +
+                "FROM AM_ASSET A,FT_FLEET_MASTER F,AM_AD_BRANCH B   " +
+                "WHERE A.ASSET_ID = F.ASSET_ID   " +
+                "AND A.BRANCH_ID = B.BRANCH_ID   " +
+                "AND A.ASSET_ID = ? ";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                String registrationNo = rs.getString("REGISTRATION_NO");
+                String description = rs.getString("DESCRIPTION");
+                String branchName = rs.getString("BRANCH_NAME");
+                double costPrice = rs.getDouble("COST_PRICE");
+                String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+                double maintenancePTD = rs.getDouble("MAINT_PTD");
+                double fuelPTD = rs.getDouble("FUEL_PTD");
+                double accidentPTD = rs.getDouble("ACCIDENT_COST_PTD");
+                double licencePTD = rs.getDouble("LICENCE_PERMIT_PTD");
+                double insurancePTD = rs.getDouble("INSURANCE_COST_PTD");
+                double maintenanceLTD = rs.getDouble("MAINT_LTD");
+                double fuelLTD = rs.getDouble("FUEL_LTD");
+                double accidentLTD = rs.getDouble("ACCIDENT_COST_LTD");
+                double licenceLTD = rs.getDouble("LICENCE_PERMIT_LTD");
+                double insuranceLTD = rs.getDouble("INSURANCE_COST_LTD");
+                double accumulatedDepreciation = rs.getDouble("Accum_dep");
+                String depreciationEndDate = formatDate(rs.getDate(
+                        "dep_end_date"));
+
+                finder = new AssetDetail(id, registrationNo,
+                                         description,
+                                         branchName, costPrice,
+                                         datePurchased,
+                                         maintenancePTD, fuelPTD,
+                                         accidentPTD,
+                                         licencePTD, insurancePTD,
+                                         maintenanceLTD, fuelLTD,
+                                         accidentLTD,
+                                         licenceLTD, insuranceLTD,
+                                         accumulatedDepreciation,
+                                         depreciationEndDate);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching AssetDetail ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return finder;
+    }
+
+    /**
+     * findAssetDetailById
+     *
+     * @param id String
+     * @return AssetDetail
+     */
+    public void copyAssetDataToFleet(String id) {
+
+        String selectQuery = this.getDataMigrationQuery();
+
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, id);
+            ps.execute();
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error Copying Asset Data to Fleet ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
+    /**
+     * findAssetDetailById
+     *
+     * @param id String
+     * @return AssetDetail
+     */
+    public boolean isRequiredForFleet(String id) {
+
+        String selectQuery = "SELECT B.REQUIRED_FOR_FLEET        " +
+                             "FROM AM_ASSET A, AM_AD_CATEGORY B " +
+                             "WHERE A.CATEGORY_ID = B.CATEGORY_ID  " +
+                             "AND A.ASSET_ID = ?";
+
+        boolean isRequired = false;
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String required = rs.getString(1);
+                isRequired = (required != null && required.equalsIgnoreCase("Y")) ? true : false;
+            }
+
+        } catch (Exception e) {
+            System.out.println(
+                    "INFO:Error validating fleet requirement for asset ->" +
+                    e.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+
+        return isRequired;
+    }
+
+    private boolean isTransactionOverFlow(double amount, String makeId,
+                                          String categoryId) {
+        return ((getTransactionBalance(amount, makeId, categoryId) < 0.00) ? true : false);
+    }
+
+
+    private double getTransactionBalance(double amount, String makeId,
+                                         String categoryId) {
+        double balance = 0.00d;
+        int qaurter = 0;
+        GregorianCalendar date = new GregorianCalendar();
+        int month = date.get(Calendar.MONTH);
+        if (month < 4) {
+            qaurter = 1;
+        } else if (month < 7) {
+            qaurter = 2;
+        } else if (month < 10) {
+            qaurter = 3;
+        } else {
+            qaurter = 4;
+        }
+        String TRANS_QUERY = getTransactionQuery(qaurter);
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String query = "SELECT " + TRANS_QUERY + " FROM FT_FLEET_MASTER " +
+                       "WHERE CATEGORY_ID = ? AND ASSET_MAKE = ?";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            ps.setDouble(1, amount);
+            ps.setString(2, categoryId);
+            ps.setString(3, makeId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                balance = rs.getDouble(1);
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error getting transaction Balance " + ex);
+        } finally {
+            closeConnection(con, ps, rs);
+            System.out.println(query);
+        }
+
+        return balance;
+    }
+
+    private String getTransactionQuery(int qaurter) {
+
+        String query = "MAINT_BUDGET - MAINT_ACTUAL + ?";
+        final int FIRST_QAURTER = 1;
+        final int SECOND_QAURTER = 2;
+        final int THIRD_QAURTER = 3;
+        final int FOURTH_QAURTER = 4;
+
+        if (isQaurterlyRequired()) {
+
+            if (isQaurterlyOverFlowAllowed()) {
+                if (qaurter == FIRST_QAURTER) {
+                    query = "MAINT_Q1 - MAINT_A1 + ?";
+                } else if (qaurter == SECOND_QAURTER) {
+                    query = "(MAINT_Q2 - MAINT_A2 + ?";
+                } else if (qaurter == THIRD_QAURTER) {
+                    query = "MAINT_Q3 - MAINT_A3 + ?";
+                } else {
+                    query = "MAINT_Q4 - MAINT_A4 + ?";
+                }
+            }
+        } else {
+            if (qaurter == FIRST_QAURTER) {
+                query = "MAINT_Q1 - MAINT_A1 + ?";
+            } else if (qaurter == SECOND_QAURTER) {
+                query =
+                        "  MAINT_Q1 + MAINT_Q2 - MAINT_A1 + MAINT_A2 + ?";
+            } else if (qaurter == THIRD_QAURTER) {
+                query = "   MAINT_Q1 + MAINT_Q2 + MAINT_Q3 -  " +
+                        " MAINT_Q1 + MAINT_Q2 + MAINT_A3 + ? ";
+            } else {
+                query = "MAINT_Q1 + MAINT_Q2 + MAINT_Q3 +" +
+                        " MAINT_Q4 - MAINT_Q1 + MAINT_Q2 + " +
+                        "MAINT_Q3 + MAINT_A4 + ?  ";
+            }
+        }
+
+        return query;
+    }
+
+    public boolean isQaurterlyRequired() {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean isAllowedQuarter = false;
+
+        String query = "SELECT require_quarterly_pm FROM am_gb_company ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                isAllowedQuarter = (rs.getString(1).equalsIgnoreCase("Y")) ? true : false;
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error validing qaurterly PM " + ex);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return true;
+    }
+
+    public boolean isQaurterlyOverFlowAllowed() {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean isAllowedOverFlow = false;
+
+        String query = "SELECT quarterly_surplus_cf FROM am_gb_company ";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                isAllowedOverFlow = (rs.getString(1).equalsIgnoreCase("Y")) ? true : false;
+            }
+
+        } catch (Exception ex) {
+            System.out.println(
+                    "WARN: Error getting isQaurterlyOverFlowAllowed() " + ex);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return true;
+    }
+
+
+    public String[] getPMCycleParams(String category) {
+        String[] notificationParams = new String[3];
+        String SELECT_QUERY = "SELECT PM_CYCLE_PERIOD,NOTIFY_MAINT_DAYS,   " +
+                              "NOTIFY_EVERY_DAYS  " +
+                              "FROM AM_AD_CATEGORY     " +
+                              "WHERE CATEGORY_ID = ?    ";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(SELECT_QUERY);
+            ps.setString(1, category);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                notificationParams[0] = rs.getString(1);
+                notificationParams[1] = rs.getString(2);
+                notificationParams[2] = rs.getString(3);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching PMCycleParams ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return notificationParams;
+    }
+
+    public String[] getLicenseCycleParams(String licenseid) {
+        String[] notificationParams = new String[3];
+        String SELECT_QUERY =
+                "SELECT '0' AS PM_CYCLE_PERIOD,NOTIFY_DAYS,EVERY_DAYS  " +
+                "FROM AM_AD_LICENSETYPE     " +
+                "WHERE LICENSE_ID = ?  ";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(SELECT_QUERY);
+            ps.setString(1, licenseid);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                notificationParams[0] = rs.getString(1);
+                notificationParams[1] = rs.getString(2);
+                notificationParams[2] = rs.getString(3);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching PMCycleParams ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return notificationParams;
+    }
+
+    public String[] getInsuranceCycleParams(String insuranceid) {
+        String[] notificationParams = new String[3];
+        String SELECT_QUERY =
+                "SELECT '0' AS PM_CYCLE_PERIOD,NOTIFY_DAYS,EVERY_DAYS   " +
+                "FROM AM_AD_INSURANCE    " +
+                "WHERE INSURANCE_ID = ?    ";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(SELECT_QUERY);
+            ps.setString(1, insuranceid);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                notificationParams[0] = rs.getString(1);
+                notificationParams[1] = rs.getString(2);
+                notificationParams[2] = rs.getString(3);
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching InsuranceCycleParams ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return notificationParams;
+    }
+
+    public String getAssetStatusForCombo(String status) {
+        String comboString = "";
+        StringBuffer comboBuffer = new StringBuffer();
+        String SELECT_QUERY = "SELECT DISTINCT(ASSET_STATUS) FROM AM_ASSET";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String val = "";
+        String desc = "";
+        String sel = "";
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(SELECT_QUERY);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                val = rs.getString(1);
+                if (val.equalsIgnoreCase("A")) {
+                    desc = "Active";
+                } else if (val.equalsIgnoreCase("Z")) {
+                    desc = "Distribution";
+                } else if (val.equalsIgnoreCase("C")) {
+                    desc = "Closed";
+                } else if (val.equalsIgnoreCase("D")) {
+                    desc = "Disposed";
+                } else {
+                    desc = "Stolen";
+                }
+
+                if (val.equalsIgnoreCase(status)) {
+                    sel = " selected";
+                }
+
+                comboString = "<option value='" + val + "' " + sel + ">" + desc +
+                              "</option>";
+                comboBuffer.append(comboString);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching AssetStatusForCombo ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return comboBuffer.toString();
+    }
+
+    private String getDataMigrationQuery() {
+        return "INSERT INTO FT_FLEET_MASTER(" +
+                "ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID" +
+                ",CATEGORY_ID,DATE_PURCHASED,ASSET_MAKE,ASSET_USER" +
+                ",ASSET_MAINTENANCE,CREATE_DATE,EFFECTIVE_DATE,LOCATION" +
+                ",RAISE_ENTRY,DEP_YTD,PREMIUM_LTD,PREMIUM_PTD,MAINT_LTD" +
+                ",MAINT_PTD,FUEL_LTD,FUEL_PTD,ACCIDENT_COUNT,ACCIDENT_COST_LTD" +
+                ",ACCIDENT_COST_PTD,LICENCE_PERMIT_LTD,LICENCE_PERMIT_PTD" +
+                ",INSURANCE_COST_LTD,INSURANCE_COST_PTD,LAST_UPDATE_DATE" +
+                ",STATUS,USER_ID,BRANCH_CODE,SECTION_CODE,DEPT_CODE,CATEGORY_CODE" +
+                ")      " +
+
+                "SELECT ASSET_ID,REGISTRATION_NO,BRANCH_ID " +
+                ",DEPT_ID,CATEGORY_ID,DATE_PURCHASED ,ASSET_MAKE,ASSET_USER," +
+                "ASSET_MAINTENANCE,POSTING_DATE AS CREATE_DATE,EFFECTIVE_DATE," +
+                "LOCATION,RAISE_ENTRY,DEP_YTD,0.00 AS PREMIUM_LTD,0.00 ASPREMIUM_PTD," +
+                "0.00 AS MAINT_LTD,0.00 AS MAINT_PTD,0.00 AS FUEL_LTD,0.00 AS FUEL_PTD," +
+                "0 AS ACCIDENT_COUNT,0.00 AS ACCIDENT_COST_LTD,0.00 AS ACCIDENT_COST_PTD," +
+                "0.00 AS LICENCE_PERMIT_LTD,0.00 AS LICENCE_PERMIT_PTD, " +
+                "0.00 AS INSURANCE_COST_LTD,0.00 AS INSURANCE_COST_PTD," +
+                "POSTING_DATE AS LAST_UPDATE_DATE,ASSET_STATUS,USER_ID,BRANCH_CODE" +
+                ",SECTION_CODE,DEPT_CODE,CATEGORY_CODE   FROM AM_ASSET    " +
+                "WHERE ASSET_ID = ?";
+
+    }
+
+    public static void main(String[] args) {
+        FleetHistoryManager ft = new FleetHistoryManager();
+        //FleetLicencePermit maint = ft.findLicencePermitById("MAG/SFT/MV/HO/FIN/10/LI/1","");
+        //System.out.println(maint.getDateObtained());
+        //ft.removeMaintenanceRecordById("56");
+    }
+
+
+
+    
+    public ArrayList findBarCodeByQuery(String queryFilter) {
+
+        String selectQuery =
+                "SELECT ASSET_ID,DESCRIPTION,BRANCH_CODE,BAR_CODE," +
+                "category_code" +
+                "FROM AM_BARCODE_HISTORY WHERE ASSET_ID IS NOT NULL && PRINT_FLD = 'N'" + queryFilter;
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ArrayList barcodelist = new ArrayList();
+
+        try {
+            con = getConnection("fixedasset");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                   BarCodeHistoryBean bhb = new BarCodeHistoryBean();
+          
+
+            bhb.setAsset_id((rs.getString(1) == null)?"":rs.getString(1));
+            bhb.setDescription((rs.getString(2) == null)?"":rs.getString(2));
+            bhb.setBar_code((rs.getString(3) == null)?"":rs.getString(3));
+            bhb.setBranch_code((rs.getString(4) == null)?"":getBranchName(rs.getString(4)));
+            //bhb.setBranch_code((rs.getString(4) == null)?"":rs.getString(4));
+            bhb.setCategory((rs.getString(5) == null)?"":getCategoryName(rs.getString(5)));
+            //bhb.setCategory((rs.getString(5) == null)?"":rs.getString(5));
+            //bhb.setCreate_date((rs.getDate(6) == null)?"":rs.getDate(6).toString());
+            barcodelist.add(bhb);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error fetching ALL Asset ->" +
+                               e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+
+        return barcodelist;
+
+    }
+
+    
+      public String getBranchName(String id){
+String branch_name= "";
+ try {
+     //System.out.println("the value of id received by getBranchName() is " +id);
+            con1 = dbConnection.getConnection("fixedasset");
+
+            String query = "select BRANCH_NAME from am_ad_branch where BRANCH_CODE ='"+id+"'";
+
+            ps1 = con1.prepareStatement(query);
+            rs1 = ps1.executeQuery();
+             //int counter =0;
+            while(rs1.next()){
+
+
+
+            branch_name = ((rs1.getString(1) == null)?"":rs1.getString(1));
+
+
+            }//while
+            //}//for
+        } catch (Exception e) {
+            System.out.println("BarCodePrintServlet:=== DB erorr occured in method getBranchName()" +e);
+        }
+    finally{
+      dbConnection.closeConnection(con1, ps1,rs1);
+    }
+
+    return branch_name;
+
+}//getBranchName()
+
+
+
+   public String getCategoryName(String id){
+String category_name= "";
+ try {
+     //System.out.println("the value of id received by getBranchName() is " +id);
+            con1 = dbConnection.getConnection("fixedasset");
+
+            String query = "select category_name from am_ad_category where category_code ='"+id+"'";
+
+            ps1 = con1.prepareStatement(query);
+            rs1 = ps1.executeQuery();
+             //int counter =0;
+            while(rs1.next()){
+
+
+
+            category_name = ((rs1.getString(1) == null)?"":rs1.getString(1));
+
+
+            }//while
+            //}//for
+        } catch (Exception e) {
+            System.out.println("BarCodePrintServlet:=== DB erorr occured in method getCategoryName()" +e);
+        }
+    finally{
+      dbConnection.closeConnection(con1, ps1,rs1);
+    }
+
+    return category_name;
+
+}//getCategoryName()
+//modification by lanre
+   public ArrayList findAssetForDepreciation(String filter) {
+
+		String selectQuery =
+			"SELECT ASSET_ID,REGISTRATION_NO,BRANCH_ID,DEPT_ID," +
+			"CATEGORY_ID, DESCRIPTION,DATE_PURCHASED,DEP_RATE," +
+			"ASSET_MAKE,ASSET_USER,ASSET_MAINTENANCE," +
+			"ACCUM_DEP,MONTHLY_DEP,COST_PRICE,DEP_END_DATE," +
+			"RESIDUAL_VALUE,POSTING_DATE,RAISE_ENTRY,DEP_YTD,SECTION_ID , " +
+			"NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE, " +
+			"Asset_Status,REQ_REDISTRIBUTION   " +
+			"FROM AM_ASSET  WHERE Req_Depreciation = 'Y' " + filter;
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ArrayList list = new ArrayList();
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(selectQuery);
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+
+				String id = rs.getString("ASSET_ID");
+				String registrationNo = rs.getString("REGISTRATION_NO");
+				String branchId = rs.getString("BRANCH_ID");
+				String departmentId = rs.getString("DEPT_ID");
+				String section = rs.getString("SECTION_ID");
+				String category = rs.getString("CATEGORY_ID");
+				String description = rs.getString("DESCRIPTION");
+				String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+				double depreciationRate = rs.getDouble("DEP_RATE");
+				String assetMake = rs.getString("ASSET_MAKE");
+				String assetUser = rs.getString("ASSET_USER");
+				String assetMaintenance = rs.getString("ASSET_MAINTENANCE");
+				double accumulatedDepreciation = rs.getDouble("ACCUM_DEP");
+				double monthlyDepreciation = rs.getDouble("MONTHLY_DEP");
+				double cost = rs.getDouble("COST_PRICE");
+				String depreciationEndDate = formatDate(rs.getDate("DEP_END_DATE"));
+				String depreciationEndDate2 = rs.getString("DEP_END_DATE");
+				double residualValue = rs.getDouble("RESIDUAL_VALUE");
+				String postingDate = rs.getString("POSTING_DATE");
+				String entryRaised = rs.getString("RAISE_ENTRY");
+				double depreciationYearToDate = rs.getDouble("DEP_YTD");
+				double nbv = rs.getDouble("NBV");
+				int remainingLife = rs.getInt("REMAINING_LIFE");
+				int totalLife = rs.getInt("TOTAL_LIFE");
+				java.util.Date effectiveDate = rs.getDate("EFFECTIVE_DATE");
+				String astatus = rs.getString("Asset_Status");
+				String req_distribution = rs.getString("REQ_REDISTRIBUTION");
+
+				Asset aset = new Asset(id, registrationNo, branchId,
+						departmentId, section, category,
+						description,
+						datePurchased, depreciationRate,
+						assetMake,
+						assetUser, assetMaintenance,
+						accumulatedDepreciation,
+						monthlyDepreciation, cost,
+						depreciationEndDate,
+						residualValue, postingDate, entryRaised,
+						depreciationYearToDate);
+				aset.setNbv(nbv);
+				aset.setRemainLife(remainingLife);
+				aset.setTotalLife(totalLife);
+				aset.setEffectiveDate(effectiveDate);
+				aset.setAsset_status(astatus);
+				aset.setReq_distribution(req_distribution);
+				aset.setDepreciationEndDate(depreciationEndDate2);
+
+				list.add(aset);
+
+			}
+
+		} catch (Exception e) {
+			System.out.println("INFO:Error fetching ALL Asset ->" +
+					e.getMessage());
+		} finally {
+			closeConnection(con, ps, rs);
+		}
+
+		return list;
+
+	}
+
+}

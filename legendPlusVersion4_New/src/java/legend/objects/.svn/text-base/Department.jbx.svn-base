@@ -1,0 +1,13 @@
+[PropertyInfo]
+dept_id,String,false,false,dept_id,dept_id,true,<default>
+dept_code,String,false,false,dept_code,dept_code,true,<default>
+dept_name,String,false,false,dept_name,dept_name,true,<default>
+dept_acronym,String,false,false,dept_acronym,dept_acronym,true,<default>
+glprefix,String,false,false,glprefix,glprefix,true,<default>
+dept_status,String,false,false,dept_status,dept_status,true,<default>
+user_id,String,false,false,user_id,user_id,true,<default>
+[IconNames]
+
+
+
+

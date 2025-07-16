@@ -1,0 +1,194 @@
+package com.magbel.legend.servlet;
+
+
+
+import com.magbel.legend.bus.ApprovalRecords;
+import com.magbel.legend.vao.Approval;
+
+import java.io.*;
+
+import magma.AssetRecordsBean;
+import magma.net.manager.DepreciationProcessingManager;
+import magma.AssetRecordsBean;
+
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.*;
+
+import java.util.*;
+
+public class ComponentCreateAction extends HttpServlet
+{
+
+	private AssetRecordsBean service;
+	
+    public ComponentCreateAction()
+    {
+    }
+
+    public void init(ServletConfig config)
+        throws ServletException
+    {
+        super.init(config);
+        try
+        {
+        service = new AssetRecordsBean();
+     
+        }
+        catch(Exception et)
+        {et.printStackTrace();}
+    }
+    public void destroy()
+    {
+    }
+
+    public void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        response.setContentType("text/html");
+       
+        HttpSession session = request.getSession();
+        PrintWriter out = response.getWriter();
+        String userClass = (String) session.getAttribute("UserClass");
+        String assetId =request.getParameter("asset_id");
+        String parentAssetId =request.getParameter("parentAssetId");
+        String parentCompId =request.getParameter("parentCompId");
+        String category2 =request.getParameter("category2");
+        String description2 =request.getParameter("description");
+        String serialNumber =request.getParameter("serialNumber");
+        String make2 =request.getParameter("make2");
+        String model =request.getParameter("model");
+        String additionalField =request.getParameter("additionalField"); 
+        String description =request.getParameter("description");
+        String cost =request.getParameter("depAccumValue");
+        String COST2 =request.getParameter("COST");
+        
+        if (cost == null || cost.equals("")) {
+        	cost = "0";
+        }
+        
+        
+        
+        String assigned =request.getParameter("depValue"); 
+        
+        if (assigned == null || assigned.equals("")) {
+        	assigned = "0";
+        }
+        
+        
+        String depreciation =request.getParameter("depreciationValue");
+        
+        if (depreciation == null || depreciation.equals("")) {
+        	depreciation = "0";
+        }
+        
+        
+        
+        
+        String branch_id =request.getParameter("branch_id");
+        String location =request.getParameter("location");
+        String state =request.getParameter("state");
+        String multiple =request.getParameter("multiple");
+        String province =request.getParameter("province");
+        String department_id =request.getParameter("department_id");
+        String section_id =request.getParameter("section_id");
+        String sbu_code =request.getParameter("sbu_code");
+        String lpo =request.getParameter("lpo");
+        String registration_no =request.getParameter("registration_no");
+        String serial_number =request.getParameter("serial_number");
+        String engine_number =request.getParameter("engine_number");
+        String make =request.getParameter("make");
+        String model2 =request.getParameter("model2");
+        String driver =request.getParameter("driver");
+        String vatable_cost =request.getParameter("vatable_cost");
+        String vat_amount =request.getParameter("vat_amount");
+        String depreciation_rate =request.getParameter("depreciation_rate");
+        String residual_value =request.getParameter("residual_value");
+        String subject_to_vat =request.getParameter("subject_to_vat");
+        String wh_tax_cb =request.getParameter("wh_tax_cb");
+        String accum_dep =request.getParameter("accum_dep");
+        String cost_price =request.getParameter("cost_price");
+        String wh_tax_amount =request.getParameter("wh_tax_amount");
+        
+        if (wh_tax_amount == null || wh_tax_amount.equals("")) {
+        	wh_tax_amount = "0";
+        }
+        
+        
+        
+        String nbv =request.getParameter("nbv");
+        String partPAY =request.getParameter("partPAY");
+        String fullyPAID =request.getParameter("fullyPAID");
+        String date_of_purchase =request.getParameter("date_of_purchase");
+        String depreciation_start_date =request.getParameter("depreciation_start_date");
+        String depreciation_end_date =request.getParameter("depreciation_end_date");
+        String posting_date =request.getParameter("posting_date");
+        String reason =request.getParameter("reason");
+        String sb =request.getParameter("sb");
+        String vendor_account =request.getParameter("vendor_account");
+        String maintained_by =request.getParameter("maintained_by");
+        String authorized_by =request.getParameter("authorized_by");
+        String spare_1 =request.getParameter("spare_1");
+        String who_to_remind =request.getParameter("who_to_remind");
+        String email_1 =request.getParameter("email_1");
+        String who_to_remind_2 =request.getParameter("who_to_remind_2");
+        String email2 =request.getParameter("email2");
+        String spare_2 =request.getParameter("spare_2");
+        String user =request.getParameter("user");
+        String warrantyStartDate =request.getParameter("warrantyStartDate");
+        String require_redistribution =request.getParameter("require_redistribution");
+        String supervisor =request.getParameter("supervisor");
+        String noOfMonths =request.getParameter("noOfMonths");
+        
+        if (noOfMonths == null || noOfMonths.equals("")) {
+        	noOfMonths = "0";
+        }
+        
+        
+        String require_depreciation =request.getParameter("require_depreciation");
+        String expiryDate =request.getParameter("expiryDate");
+        String raise_entry =request.getParameter("raise_entry");
+        String user_id =request.getParameter("user_id");
+        String threshold =request.getParameter("threshold");
+        String lposet =request.getParameter("lposet");
+        String _date_of_purchase =request.getParameter("_date_of_purchase");
+        String supplied_by =request.getParameter("supplied_by");
+        String amountPTD =request.getParameter("amountPTD");
+        String DepSeqValue = request.getParameter("DepSeqValue");
+        if (amountPTD == null || amountPTD.equals("")) {
+        	amountPTD = "0";
+        }
+        
+      
+     
+	   
+     try {
+ 		
+		 if (!userClass.equals("NULL") || userClass!=null){
+	           boolean done = service.insertComponent(parentAssetId, parentCompId, category2, description2, serialNumber, make, model2, additionalField, 
+	    		description, Double.parseDouble(cost), Double.parseDouble(assigned), Double.parseDouble(depreciation), registration_no, branch_id, department_id, section_id, vendor_account, 
+	    		date_of_purchase, depreciation_end_date, engine_number, sb, user, maintained_by, 0, 0, cost_price, 
+	    		Double.parseDouble(wh_tax_amount), depreciation_end_date, residual_value, authorized_by, wh_tax_cb, wh_tax_amount, require_depreciation, 
+	    		depreciation_start_date, reason, "", category2, location, category2, vatable_cost, vat_amount,
+	    		require_redistribution, subject_to_vat, who_to_remind, email_1, who_to_remind_2, email2, raise_entry, "", section_id,
+	    		state, driver, spare_2, user_id, province, multiple, warrantyStartDate, Integer.parseInt(noOfMonths), expiryDate, branch_id, 
+	    		section_id, department_id, category2, amountPTD, Double.parseDouble(amountPTD), partPAY, fullyPAID, "", "", 
+	    		sbu_code, lpo, supervisor);
+	            if(done){service.updateComponentStatus(parentAssetId,description2,Double.parseDouble(cost),DepSeqValue);}
+	            out.println("<script>");
+	     	   out.println("window.location='DocumentHelp.jsp?np=componenetSetupDetail&ASSET_ID="+parentAssetId+"&CAT="+category2+"&COST="+COST2+"';");
+	     	   
+	     	   out.println("</script>");
+     }
+        }
+     catch (Throwable e)
+     {e.printStackTrace();}
+     finally{}
+
+  }   
+  
+    public String getServletInfo()
+    {
+        return "Confirmation Action Servlet";
+    }
+}

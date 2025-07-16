@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="FM_Maintenance_Activities"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="850"
+		 pageHeight="842"
+		 columnWidth="790"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<queryString><![CDATA[SELECT
+     FM_MAINTENANCE_HISTORY."COST" AS FM_MAINTENANCE_HISTORY_COST,
+     FM_MAINTENANCE_HISTORY."INVOICE_NO" AS FM_MAINTENANCE_HISTORY_INVOICE_NO,
+     FM_MAINTENANCE_HISTORY."REQNID" AS FM_MAINTENANCE_HISTORY_REQNID,
+     FM_MAINTENANCE_HISTORY."WORK_ORDER_CODE" AS FM_MAINTENANCE_HISTORY_WORK_ORDER_CODE,
+     AM_ASSET."Description" AS AM_ASSET_Description,
+     FM_Requisition."ReqnBranch" AS FM_Requisition_ReqnBranch,
+     FM_Requisition."ReqnSection" AS FM_Requisition_ReqnSection,
+     FM_Requisition."ReqnDepartment" AS FM_Requisition_ReqnDepartment,
+     FM_Requisition."ReqnUserID" AS FM_Requisition_ReqnUserID,
+     FM_MAINTENANCE_HISTORY."ASSET_ID" AS FM_MAINTENANCE_HISTORY_ASSET_ID,
+     FM_COMPLETED_WORK."Status" AS FM_COMPLETED_WORK_Status,
+     FM_COMPLETED_WORK."RECEIVE_DATE" AS FM_COMPLETED_WORK_RECEIVE_DATE,
+     FM_COMPLETED_WORK."RECEIVE_TIME" AS FM_COMPLETED_WORK_RECEIVE_TIME,
+     FM_COMPLETED_WORK."RECEIVE_BY" AS FM_COMPLETED_WORK_RECEIVE_BY,
+     FM_Requisition."ReqnDate" AS FM_Requisition_ReqnDate,
+     FM_Requisition."Request_Time" AS FM_Requisition_Request_Time,
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     am_ad_branch."BRANCH_NAME" AS am_ad_branch_BRANCH_NAME
+FROM
+     "dbo"."AM_ASSET" AM_ASSET INNER JOIN "dbo"."FM_MAINTENANCE_HISTORY" FM_MAINTENANCE_HISTORY ON AM_ASSET."Asset_id" = FM_MAINTENANCE_HISTORY."ASSET_ID"
+     INNER JOIN "dbo"."FM_Requisition" FM_Requisition ON FM_MAINTENANCE_HISTORY."REQNID" = FM_Requisition."ReqnID"
+     INNER JOIN "dbo"."FM_COMPLETED_WORK" FM_COMPLETED_WORK ON FM_MAINTENANCE_HISTORY."WORK_ORDER_CODE" = FM_COMPLETED_WORK."WORK_ORDER_CODE"
+     INNER JOIN "dbo"."am_ad_branch" am_ad_branch ON FM_Requisition."ReqnBranch" = am_ad_branch."BRANCH_CODE",
+     "dbo"."am_gb_company" am_gb_company
+where 
+      $P!{filterClause}]]></queryString>
+
+	<field name="FM_MAINTENANCE_HISTORY_COST" class="java.math.BigDecimal"/>
+	<field name="FM_MAINTENANCE_HISTORY_INVOICE_NO" class="java.lang.String"/>
+	<field name="FM_MAINTENANCE_HISTORY_REQNID" class="java.lang.String"/>
+	<field name="FM_MAINTENANCE_HISTORY_WORK_ORDER_CODE" class="java.lang.String"/>
+	<field name="AM_ASSET_Description" class="java.lang.String"/>
+	<field name="FM_Requisition_ReqnBranch" class="java.lang.String"/>
+	<field name="FM_Requisition_ReqnSection" class="java.lang.String"/>
+	<field name="FM_Requisition_ReqnDepartment" class="java.lang.String"/>
+	<field name="FM_Requisition_ReqnUserID" class="java.lang.String"/>
+	<field name="FM_MAINTENANCE_HISTORY_ASSET_ID" class="java.lang.String"/>
+	<field name="FM_COMPLETED_WORK_Status" class="java.lang.String"/>
+	<field name="FM_COMPLETED_WORK_RECEIVE_DATE" class="java.sql.Timestamp"/>
+	<field name="FM_COMPLETED_WORK_RECEIVE_TIME" class="java.lang.String"/>
+	<field name="FM_COMPLETED_WORK_RECEIVE_BY" class="java.lang.Integer"/>
+	<field name="FM_Requisition_ReqnDate" class="java.sql.Timestamp"/>
+	<field name="FM_Requisition_Request_Time" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+
+	<sortField name="FM_Requisition_ReqnBranch" />
+	<sortField name="FM_MAINTENANCE_HISTORY_ASSET_ID" />
+	<sortField name="FM_MAINTENANCE_HISTORY_REQNID" />
+
+
+		<group  name="Branch" >
+			<groupExpression><![CDATA[$F{FM_Requisition_ReqnBranch}]]></groupExpression>
+			<groupHeader>
+			<band height="30"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="-23"
+						y="2"
+						width="183"
+						height="24"
+						key="textField-9"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="165"
+						y="2"
+						width="61"
+						height="24"
+						key="textField-10"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{FM_Requisition_ReqnBranch}]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="33"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="130"
+						y="5"
+						width="60"
+						height="24"
+						key="textField-11"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$V{Branch_COUNT}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="-23"
+						y="3"
+						width="151"
+						height="29"
+						key="staticText-8"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Branch Total = ]]></text>
+				</staticText>
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="12"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="71"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="145"
+						y="7"
+						width="389"
+						height="30"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-8"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="18" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_gb_company_company_name}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="145"
+						y="41"
+						width="398"
+						height="19"
+						key="staticText-9"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<text><![CDATA[FACILITY MAINTENANCE ACTIVITIES]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="618"
+						y="11"
+						width="78"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-12"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Report" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="700"
+						y="11"
+						width="36"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-13"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="541"
+						y="11"
+						width="73"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-14"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+				</textField>
+				<image  evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="9"
+						y="9"
+						width="122"
+						height="44"
+						key="image-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<graphicElement stretchType="NoStretch"/>
+					<imageExpression class="java.io.File"><![CDATA[new File($P{BaseDir}, "../images/client.gif")]]></imageExpression>
+				</image>
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="20"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="-21"
+						y="1"
+						width="137"
+						height="19"
+						key="staticText-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Left">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Asset ID]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="121"
+						y="1"
+						width="168"
+						height="19"
+						key="staticText-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Asset Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="289"
+						y="1"
+						width="91"
+						height="19"
+						key="staticText-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Cost]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="380"
+						y="1"
+						width="66"
+						height="19"
+						key="staticText-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Invoice No.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="446"
+						y="1"
+						width="78"
+						height="19"
+						key="staticText-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Request By]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="524"
+						y="1"
+						width="84"
+						height="19"
+						key="staticText-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Order No.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="613"
+						y="1"
+						width="83"
+						height="19"
+						key="staticText-7"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Left">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Req. No.]]></text>
+				</staticText>
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="25"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="-23"
+						y="2"
+						width="120"
+						height="23"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{FM_MAINTENANCE_HISTORY_ASSET_ID}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="100"
+						y="4"
+						width="189"
+						height="21"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_ASSET_Description}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="₦#,##0.00" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="289"
+						y="4"
+						width="91"
+						height="21"
+						key="textField-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$F{FM_MAINTENANCE_HISTORY_COST}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="380"
+						y="5"
+						width="66"
+						height="20"
+						key="textField-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{FM_MAINTENANCE_HISTORY_INVOICE_NO}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="446"
+						y="5"
+						width="78"
+						height="20"
+						key="textField-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{FM_Requisition_ReqnUserID}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="524"
+						y="4"
+						width="84"
+						height="21"
+						key="textField-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{FM_MAINTENANCE_HISTORY_WORK_ORDER_CODE}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="614"
+						y="4"
+						width="82"
+						height="21"
+						key="textField-7"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{FM_MAINTENANCE_HISTORY_REQNID}]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="1"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

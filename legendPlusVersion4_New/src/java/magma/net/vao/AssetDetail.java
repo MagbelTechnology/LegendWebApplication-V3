@@ -1,0 +1,222 @@
+package magma.net.vao;
+
+import java.io.Serializable;
+
+/**
+ * <p>Title: AssetDetail.java</p>
+ *
+ * <p>Description: Holds details of an Asset.</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class AssetDetail implements Serializable {
+
+    private String id;
+    private String registrationNo;
+    private String description;
+    private String branchName;
+    private double costPrice;
+    private String datePurchased;
+    private double maintenancePTD;
+    private double maintenanceLTD;
+    private double fuelPTD;
+    private double fuelLTD;
+    private double accidentPTD;
+    private double accidentLTD;
+    private double licencePTD;
+    private double licenceLTD;
+    private double insurancePTD;
+    private double insuranceLTD;
+    private double accumulatedDepreciation;
+    private String depreciationEndDate;
+    private String memo;
+
+    public AssetDetail(String id, String registrationNo, String description,
+                       String branchName, double costPrice,
+                       String datePurchased,
+                       double maintenancePTD, double fuelPTD,
+                       double accidentPTD, double licencePTD,
+                       double insurancePTD,
+                       double maintenanceLTD, double fuelLTD,
+                       double accidentLTD, double licenceLTD,
+                       double insuranceLTD,
+                       double accumulatedDepreciation,
+                       String depreciationEndDate) {
+
+        setId(id);
+        setRegistrationNo(registrationNo);
+        setDescription(description);
+        setBranchName(branchName);
+        setCostPrice(costPrice);
+        setDatePurchased(datePurchased);
+        setMaintenancePTD(maintenancePTD);
+        setFuelPTD(fuelPTD);
+        setAccidentPTD(accidentPTD);
+        setLicencePTD(licencePTD);
+        setInsurancePTD(insurancePTD);
+        setMaintenanceLTD(maintenanceLTD);
+        setFuelLTD(fuelLTD);
+        setAccidentLTD(accidentLTD);
+        setLicenceLTD(licenceLTD);
+        setInsuranceLTD(insuranceLTD);
+        setAccumulatedDepreciation(accumulatedDepreciation);
+        setDepreciationEndDate(depreciationEndDate);
+
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setRegistrationNo(String registrationNo) {
+        this.registrationNo = registrationNo;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCostPrice(double costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public void setDatePurchased(String datePurchased) {
+        this.datePurchased = datePurchased;
+    }
+
+    public void setMaintenancePTD(double maintenancePTD) {
+        this.maintenancePTD = maintenancePTD;
+    }
+
+    public void setFuelPTD(double fuelPTD) {
+        this.fuelPTD = fuelPTD;
+    }
+
+    public void setAccidentPTD(double accidentPTD) {
+        this.accidentPTD = accidentPTD;
+    }
+
+    public void setLicencePTD(double licencePTD) {
+        this.licencePTD = licencePTD;
+    }
+
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
+    }
+
+    public void setInsurancePTD(double insurancePTD) {
+        this.insurancePTD = insurancePTD;
+    }
+
+    public void setMaintenanceLTD(double maintenaceLTD) {
+        this.maintenanceLTD = maintenaceLTD;
+    }
+
+    public void setFuelLTD(double fuelLTD) {
+        this.fuelLTD = fuelLTD;
+    }
+
+    public void setAccidentLTD(double accidentLTD) {
+        this.accidentLTD = accidentLTD;
+    }
+
+    public void setLicenceLTD(double licenceLTD) {
+        this.licenceLTD = licenceLTD;
+    }
+
+    public void setInsuranceLTD(double insuranceLTD) {
+        this.insuranceLTD = insuranceLTD;
+    }
+
+    public void setAccumulatedDepreciation(double accumulatedDepreciation) {
+        this.accumulatedDepreciation = accumulatedDepreciation;
+    }
+
+    public void setDepreciationEndDate(String depreciationEndDate) {
+        this.depreciationEndDate = depreciationEndDate;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getRegistrationNo() {
+        return registrationNo;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public double getCostPrice() {
+        return costPrice;
+    }
+
+    public String getDatePurchased() {
+        return datePurchased;
+    }
+
+    public double getMaintenancePTD() {
+        return maintenancePTD;
+    }
+
+    public double getFuelPTD() {
+        return fuelPTD;
+    }
+
+    public double getAccidentPTD() {
+        return accidentPTD;
+    }
+
+    public double getLicencePTD() {
+        return licencePTD;
+    }
+
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public double getInsurancePTD() {
+        return insurancePTD;
+    }
+
+    public double getMaintenanceLTD() {
+        return maintenanceLTD;
+    }
+
+    public double getFuelLTD() {
+        return fuelLTD;
+    }
+
+    public double getAccidentLTD() {
+        return accidentLTD;
+    }
+
+    public double getLicenceLTD() {
+        return licenceLTD;
+    }
+
+    public double getInsuranceLTD() {
+        return insuranceLTD;
+    }
+
+    public double getAccumulatedDepreciation() {
+        return accumulatedDepreciation;
+    }
+
+    public String getDepreciationEndDate() {
+        return depreciationEndDate;
+    }
+    public String getMemo() {
+        return memo;
+    }    
+}

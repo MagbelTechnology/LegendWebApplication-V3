@@ -1,0 +1,13 @@
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\x86\Release\UHFDemo.exe
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\x86\Release\UHFDemo.pdb
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\x86\Release\CustomControl.dll
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\x86\Release\Reader.dll
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\x86\Release\CustomControl.pdb
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\x86\Release\Reader.pdb
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\x86\Release\ResolveAssemblyReference.cache
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\x86\Release\UHFDemo.Form1.resources
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\x86\Release\UHFDemo.R2000UartDemo.resources
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\x86\Release\UHFDemo.Properties.Resources.resources
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\x86\Release\UHFDemo.csproj.GenerateResource.Cache
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\x86\Release\UHFDemo.exe
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\x86\Release\UHFDemo.pdb

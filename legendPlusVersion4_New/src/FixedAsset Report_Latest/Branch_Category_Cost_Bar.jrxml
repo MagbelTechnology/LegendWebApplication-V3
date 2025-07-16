@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Branch_Category_Cost_Bar"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="1020"
+		 pageHeight="842"
+		 columnWidth="960"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="filterClause" isForPrompting="true" class="java.lang.String"/>
+	<queryString><![CDATA[SELECT
+     AM_ASSET."Asset_id" AS AM_ASSET_Asset_id,
+     AM_ASSET."Description" AS AM_ASSET_Description,
+     AM_ASSET."Cost_Price" AS AM_ASSET_Cost_Price,
+     AM_ASSET."NBV" AS AM_ASSET_NBV,
+     AM_ASSET."Monthly_Dep" AS AM_ASSET_Monthly_Dep,
+     AM_ASSET."Accum_Dep" AS AM_ASSET_Accum_Dep,
+     AM_ASSET."Asset_User" AS AM_ASSET_Asset_User,
+     AM_ASSET."BRANCH_CODE" AS AM_ASSET_BRANCH_CODE,
+     am_ad_branch."BRANCH_NAME" AS am_ad_branch_BRANCH_NAME,
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     am_gb_company."company_code" AS am_gb_company_company_code,
+     AM_ASSET."CATEGORY_CODE" AS AM_ASSET_CATEGORY_CODE,
+     am_ad_category."category_name" AS am_ad_category_category_name
+FROM
+     "dbo"."AM_ASSET" AM_ASSET INNER JOIN "dbo"."am_ad_branch" am_ad_branch ON AM_ASSET."BRANCH_CODE" = am_ad_branch."BRANCH_CODE"
+     INNER JOIN "dbo"."am_ad_category" am_ad_category ON AM_ASSET."CATEGORY_CODE" = am_ad_category."category_code",
+     "dbo"."am_gb_company" am_gb_company
+where 
+     am_Asset."Asset_Status" = 'ACTIVE' and upper(am_Asset."Req_Depreciation") = 'Y' $P!{filterClause}
+ORDER BY
+     AM_ASSET."BRANCH_CODE" ASC,
+     AM_ASSET."CATEGORY_CODE" asc]]></queryString>
+
+	<field name="AM_ASSET_Asset_id" class="java.lang.String"/>
+	<field name="AM_ASSET_Description" class="java.lang.String"/>
+	<field name="AM_ASSET_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_NBV" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_Accum_Dep" class="java.math.BigDecimal"/>
+	<field name="AM_ASSET_Asset_User" class="java.lang.String"/>
+	<field name="AM_ASSET_BRANCH_CODE" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_gb_company_company_code" class="java.lang.String"/>
+	<field name="AM_ASSET_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="am_ad_category_category_name" class="java.lang.String"/>
+
+	<sortField name="am_ad_branch_BRANCH_NAME" />
+	<sortField name="am_ad_category_category_name" />
+
+	<variable name="Total_Cost" class="java.math.BigDecimal" resetType="Group" resetGroup="Category_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{AM_ASSET_Cost_Price}]]></variableExpression>
+	</variable>
+
+		<group  name="Branch_Group" isStartNewPage="true" isReprintHeaderOnEachPage="true" >
+			<groupExpression><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></groupExpression>
+			<groupHeader>
+			<band height="54"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="Branch_Group"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="38"
+						y="9"
+						width="214"
+						height="27"
+						forecolor="#3300FF"
+						key="textField-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-BoldOblique" size="14" isBold="true" isItalic="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="4"
+						y="40"
+						width="187"
+						height="14"
+						key="staticText-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Category Name]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="198"
+						y="39"
+						width="148"
+						height="12"
+						key="staticText-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Cateory Total Cost]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="Branch_Group"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="5"
+						y="9"
+						width="33"
+						height="27"
+						forecolor="#3300FF"
+						key="textField-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-BoldOblique" size="14" isBold="true" isItalic="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{AM_ASSET_BRANCH_CODE}]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="286"  isSplitAllowed="true" >
+				<bar3DChart>
+					<chart evaluationTime="Group" evaluationGroup="Branch_Group"  hyperlinkTarget="Self" >
+					<reportElement
+						x="16"
+						y="2"
+						width="529"
+						height="261"
+						key="element-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+						<chartLegend textColor="#000000" backgroundColor="#FFFFFF" >
+					<font fontName="SansSerif" pdfFontName="Helvetica" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="false" pdfEncoding="Cp1252"/>
+					</chartLegend>
+					</chart>
+					<categoryDataset>
+						<dataset resetType="Group" resetGroup="Branch_Group" >
+						</dataset>
+						<categorySeries>
+							<seriesExpression><![CDATA[$F{am_ad_category_category_name}]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{am_ad_category_category_name}]]></categoryExpression>
+							<valueExpression><![CDATA[$V{Total_Cost}]]></valueExpression>
+							<labelExpression><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></labelExpression>
+				<itemHyperlink >
+				</itemHyperlink>
+						</categorySeries>
+					</categoryDataset>
+					<bar3DPlot >
+						<plot backgroundAlpha="0.5" />
+						<categoryAxisFormat>
+							<axisFormat >
+								<labelFont>
+					<font fontName="SansSerif" pdfFontName="Helvetica" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" isPdfEmbedded="false" pdfEncoding="Cp1252"/>
+								</labelFont>
+								<tickLabelFont>
+								</tickLabelFont>
+							</axisFormat>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat >
+							</axisFormat>
+						</valueAxisFormat>
+					</bar3DPlot>
+				</bar3DChart>
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="Category_group" >
+			<groupExpression><![CDATA[$F{am_ad_category_category_name}]]></groupExpression>
+			<groupHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="18"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="Category_group"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="4"
+						y="4"
+						width="187"
+						height="13"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_category_name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="Category_group"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="194"
+						y="4"
+						width="161"
+						height="13"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$V{Total_Cost}]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="50"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="119"
+						y="12"
+						width="381"
+						height="32"
+						key="textField-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_gb_company_company_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

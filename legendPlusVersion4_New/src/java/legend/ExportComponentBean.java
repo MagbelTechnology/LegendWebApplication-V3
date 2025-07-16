@@ -1,0 +1,286 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package legend;
+import java.beans.*;
+import java.io.Serializable;
+//import legend.ConnectionClass;
+/**
+ *
+ * @author Olabo
+ */
+public class ExportComponentBean implements Serializable {
+
+    public static final String PROP_SAMPLE_PROPERTY = "sampleProperty";
+
+    private String sampleProperty;
+
+    private PropertyChangeSupport propertySupport;
+
+    private  String dr_acct;
+    private String cr_acct;
+    private double amount;
+    private String narration;
+    private String narration2;
+    private String sbuCode;
+    private String branchCode;
+    private int id;
+    private String idColumnName;
+    private String drColumnName;
+    private String crColumnName;
+    private String amountColumnName;
+    private String narrationColumnName;
+    private String narration2ColumnName;
+    private String record_processed;
+    private String valueDate;
+
+    public ExportComponentBean(){
+        propertySupport = new PropertyChangeSupport(this);
+    }
+   
+    public String getSampleProperty() {
+        return sampleProperty;
+    }
+  
+    public void setSampleProperty(String value) {
+        String oldValue = sampleProperty;
+        sampleProperty = value;
+        propertySupport.firePropertyChange(PROP_SAMPLE_PROPERTY, oldValue, sampleProperty);
+    }
+
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * @return the dr_acct
+     */
+    public String getDr_acct() {
+        return dr_acct;
+    }
+
+    /**
+     * @param dr_acct the dr_acct to set
+     */
+    public void setDr_acct(String dr_acct) {
+        this.dr_acct = dr_acct;
+    }
+
+    /**
+     * @return the cr_acct
+     */
+    public String getCr_acct() {
+        return cr_acct;
+    }
+
+    /**
+     * @param cr_acct the cr_acct to set
+     */
+    public void setCr_acct(String cr_acct) {
+        this.cr_acct = cr_acct;
+    }
+
+    /**
+     * @return the amount
+     */
+    public double getAmount() {
+        return amount;
+    }
+
+    /**
+     * @param amount the amount to set
+     */
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    /**
+     * @return the narration
+     */
+    public String getNarration() {
+        return narration;
+    }
+
+    /**
+     * @param narration the narration to set
+     */
+    public void setNarration(String narration) {
+        this.narration = narration;
+    }
+
+    /**
+     * @return the narration2
+     */
+    public String getNarration2() {
+        return narration2;
+    }
+
+    /**
+     * @param narration2 the narration2 to set
+     */
+    public void setNarration2(String narration2) {
+        this.narration2 = narration2;
+    }
+
+    /**
+     * @return the sbuCode
+     */
+    public String getSbuCode() {
+        return sbuCode;
+    }
+
+    /**
+     * @param sbuCode the sbuCode to set
+     */
+    public void setSbuCode(String sbuCode) {
+        this.sbuCode = sbuCode;
+    }
+
+    /**
+     * @return the branchCode
+     */
+    public String getBranchCode() {
+        return branchCode;
+    }
+
+    /**
+     * @param branchCode the branchCode to set
+     */
+    public void setBranchCode(String branchCode) {
+        this.branchCode = branchCode;
+    }
+    
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the idColumnName
+     */
+    public String getIdColumnName() {
+        return idColumnName;
+    }
+
+    /**
+     * @return the drColumnName
+     */
+    public String getDrColumnName() {
+        return drColumnName;
+    }
+
+    /**
+     * @return the crColumnName
+     */
+    public String getCrColumnName() {
+        return crColumnName;
+    }
+
+    /**
+     * @return the amountColumnName
+     */
+    public String getAmountColumnName() {
+        return amountColumnName;
+    }
+
+    /**
+     * @return the narrationColumnName
+     */
+    public String getNarrationColumnName() {
+        return narrationColumnName;
+    }
+
+    /**
+     * @return the narration2ColumnName
+     */
+    public String getNarration2ColumnName() {
+        return narration2ColumnName;
+    }
+
+    /**
+     * @param idColumnName the idColumnName to set
+     */
+    public void setIdColumnName(String idColumnName) {
+        this.idColumnName = idColumnName;
+    }
+
+    /**
+     * @param drColumnName the drColumnName to set
+     */
+    public void setDrColumnName(String drColumnName) {
+        this.drColumnName = drColumnName;
+    }
+
+    /**
+     * @param crColumnName the crColumnName to set
+     */
+    public void setCrColumnName(String crColumnName) {
+        this.crColumnName = crColumnName;
+    }
+
+    /**
+     * @param amountColumnName the amountColumnName to set
+     */
+    public void setAmountColumnName(String amountColumnName) {
+        this.amountColumnName = amountColumnName;
+    }
+
+    /**
+     * @param narrationColumnName the narrationColumnName to set
+     */
+    public void setNarrationColumnName(String narrationColumnName) {
+        this.narrationColumnName = narrationColumnName;
+    }
+
+    /**
+     * @param narration2ColumnName the narration2ColumnName to set
+     */
+    public void setNarration2ColumnName(String narration2ColumnName) {
+        this.narration2ColumnName = narration2ColumnName;
+    }
+
+    /**
+     * @return the record_processed
+     */
+    public String getRecord_processed() {
+        return record_processed;
+    }
+
+    /**
+     * @param record_processed the record_processed to set
+     */
+    public void setRecord_processed(String record_processed) {
+        this.record_processed = record_processed;
+    }
+
+    
+    /**
+     * @return the record_processed  
+     */
+    public String getValueDate() {
+        return valueDate;
+    }
+
+    /**
+     * @param record_processed the record_processed to set
+     */
+    public void setValueDate(String valueDate) {
+        this.valueDate = valueDate;
+    }
+
+}

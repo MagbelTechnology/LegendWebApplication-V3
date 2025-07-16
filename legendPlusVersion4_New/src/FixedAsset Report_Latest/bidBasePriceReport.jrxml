@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bidBasePriceReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="575" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT Description,a.LOCATION_CODE,b.LOCATION,BID_TAG,BASE_PRICE FROM AM_ASSET_BID a, AM_GB_LOCATION b, AM_BID_Period_SetUp c
+WHERE a.LOCATION_CODE = b.LOCATION_CODE AND a.BID_START_DATE = c.BID_START_DATE AND a.BID_END_DATE = c.BID_END_DATE  AND c.STATUS = 'ACTIVE'
+]]>
+	</queryString>
+	<field name="Description" class="java.lang.String"/>
+	<field name="LOCATION_CODE" class="java.lang.String"/>
+	<field name="LOCATION" class="java.lang.String"/>
+	<field name="BID_TAG" class="java.lang.String"/>
+	<field name="BASE_PRICE" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="51" y="0" width="490" height="35"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ASSET BID BASE PRICE REPORT]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="51" y="0" width="202" height="20"/>
+				<textElement/>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="253" y="0" width="110" height="20"/>
+				<textElement/>
+				<text><![CDATA[LOCATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="363" y="0" width="78" height="20"/>
+				<textElement/>
+				<text><![CDATA[BID_TAG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="441" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[BASE_PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="51" height="20"/>
+				<textElement/>
+				<text><![CDATA[S/No.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="51" y="0" width="202" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="253" y="0" width="110" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{LOCATION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="363" y="0" width="78" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BID_TAG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="441" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{BASE_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="51" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

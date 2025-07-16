@@ -1,0 +1,233 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/legend-repos/!svn/ver/3/Legend/src/java/magma/net/vao
+END
+CategoryComponent.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/CategoryComponent.java
+END
+BranchCategoryAllocation.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/BranchCategoryAllocation.java
+END
+Component.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Component.java
+END
+FleetLicencePermit.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FleetLicencePermit.java
+END
+Department.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Department.java
+END
+BranchAllocation.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/BranchAllocation.java
+END
+ClassFunction.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/ClassFunction.java
+END
+Category.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Category.java
+END
+Disposal.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Disposal.java
+END
+Asset.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/net/vao/Asset.java
+END
+AssetDistribution.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/AssetDistribution.java
+END
+AcquisitionBudget.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/AcquisitionBudget.java
+END
+AssetTransaction.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/AssetTransaction.java
+END
+Transaction.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Transaction.java
+END
+ComponentDetail.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/legend-repos/!svn/ver/4/Legend/src/java/magma/net/vao/ComponentDetail.java
+END
+FleetInsurranceRecord.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FleetInsurranceRecord.java
+END
+ReclassifiedAsset.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/ReclassifiedAsset.java
+END
+FuelAllocation.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FuelAllocation.java
+END
+AssetDetail.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/AssetDetail.java
+END
+DistributionDetail.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/DistributionDetail.java
+END
+Technician.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Technician.java
+END
+ProcesingInfo.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/ProcesingInfo.java
+END
+FleetTransaction.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FleetTransaction.java
+END
+Company.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Company.java
+END
+FleetFuelRecord.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FleetFuelRecord.java
+END
+AssetPayment.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/AssetPayment.java
+END
+AccidentImage.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/AccidentImage.java
+END
+GroupAssets.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/GroupAssets.java
+END
+ComponentViewDetail.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/legend-repos/!svn/ver/3/Legend/src/java/magma/net/vao/ComponentViewDetail.java
+END
+Asset.jbx
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Asset.jbx
+END
+BarCodeDetail.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/BarCodeDetail.java
+END
+AssetMakeAllocation.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/AssetMakeAllocation.java
+END
+Function.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/Function.java
+END
+FleetAccidentRecord_old.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FleetAccidentRecord_old.java
+END
+FleetAccidentRecord.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FleetAccidentRecord.java
+END
+GroupAsset.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/GroupAsset.java
+END
+FleetRecord.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FleetRecord.java
+END
+FleetManatainanceRecord.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/legend-repos/!svn/ver/2/Legend/src/java/magma/net/vao/FleetManatainanceRecord.java
+END

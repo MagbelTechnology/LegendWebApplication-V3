@@ -1,0 +1,38 @@
+[PropertyInfo]
+accumulatedDepreciation,double,false,false, , ,true,<default>
+asset_status,String,false,false, , ,true,<default>
+assetMaintenance,String,false,false, , ,true,<default>
+assetMake,String,false,false, , ,true,<default>
+assetUser,String,false,false, , ,true,<default>
+branchId,String,false,false, , ,true,<default>
+category,String,false,false, , ,true,<default>
+classifyDate,String,false,false, , ,true,<default>
+cost,double,false,false, , ,true,<default>
+datePurchased,String,false,false, , ,true,<default>
+departmentId,String,false,false, , ,true,<default>
+depreciationEndDate,String,false,false, , ,true,<default>
+depreciationRate,double,false,false, , ,true,<default>
+depreciationYearToDate,double,false,false, , ,true,<default>
+description,String,false,false, , ,true,<default>
+effectiveDate,java.util.Date,false,false, , ,true,<default>
+entryRaised,String,false,false, , ,true,<default>
+id,String,false,false, , ,true,<default>
+isFleetEnabled,String,false,false, , ,true,<default>
+monthlyDepreciation,double,false,false, , ,true,<default>
+nbv,double,false,false, , ,true,<default>
+postingDate,String,false,false, , ,true,<default>
+reclassify_id,String,false,false, , ,true,<default>
+registrationNo,String,false,false, , ,true,<default>
+remainingLife,int,false,false, , ,true,<default>
+remainLife,int,false,false, , ,true,<default>
+residualValue,double,false,false, , ,true,<default>
+section,String,false,false, , ,true,<default>
+sectionId,String,false,false, , ,true,<default>
+sectionId,int,false,false, , ,true,<default>
+totalLife,int,false,false, , ,true,<default>
+req_distribution,String,false,false,req_distribution,req_distribution,true,<default>
+[IconNames]
+
+
+
+

@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Asset_Additions_Pie"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="1020"
+		 pageHeight="842"
+		 columnWidth="960"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="filterClause" isForPrompting="true" class="java.lang.String"/>
+	<queryString><![CDATA[select distinct t.asset_id, a.Description, b.BRANCH_NAME, c.category_name, a.Accum_dep, a.monthly_dep,
+a.Cost_Price, a.NBV, a.Date_purchased, c.Dep_rate, c.Accum_Dep_ledger, c.Dep_ledger, c.Asset_Ledger, 
+c.gl_account, a.dep_end_date, a.effective_date, a.Posting_Date, d.Dept_name, a.Finacle_Posted_Date,
+amount,transaction_date,page1, z.processing_date, z.company_name, a.BRANCH_CODE, a.CATEGORY_CODE, a.branch_id
+from am_asset a, dbo.am_Raisentry_Transaction t, am_ad_branch b, am_ad_category c, 
+am_ad_department d, am_gb_company z
+where a.asset_id = t.asset_id
+and b.BRANCH_CODE = a.BRANCH_CODE
+and a.CATEGORY_CODE = c.category_code
+and a.DEPT_CODE = d.Dept_code
+and t.page1 = 'ASSET CREATION RAISE ENTRY'
+and a.cost_price = amount
+and t.iso ='000' and transactionId =1
+$P!{filterClause}
+union
+select distinct t.asset_id, a.Description, b.BRANCH_NAME, c.category_name, a.Accum_dep, a.monthly_dep,
+a.Cost_Price, a.NBV, a.Date_purchased, c.Dep_rate, c.Accum_Dep_ledger, c.Dep_ledger, c.Asset_Ledger, 
+c.gl_account, a.dep_end_date, a.effective_date, a.Posting_Date, d.Dept_name, a.Finacle_Posted_Date,
+amount,transaction_date,page1, z.processing_date, z.company_name, a.BRANCH_CODE, a.CATEGORY_CODE, a.branch_id
+from am_asset a, dbo.am_Raisentry_Transaction t, am_ad_branch b, am_ad_category c, 
+am_ad_department d, am_gb_company z
+where a.asset_id = t.asset_id
+and b.BRANCH_CODE = a.BRANCH_CODE
+and a.CATEGORY_CODE = c.category_code
+and a.DEPT_CODE = d.Dept_code
+and t.page1 = 'ASSET CREATION RAISE ENTRY'
+and a.cost_price = amount
+and t.iso ='000' and transactionId =24
+$P!{filterClause}
+union
+select distinct t.asset_id, a.Description, b.BRANCH_NAME, c.category_name, a.Accum_dep, a.monthly_dep,
+a.Cost_Price, a.NBV, a.Date_purchased, c.Dep_rate, c.Accum_Dep_ledger, c.Dep_ledger, c.Asset_Ledger, 
+c.gl_account, a.dep_end_date, a.effective_date, a.Posting_Date, d.Dept_name, a.Finacle_Posted_Date,
+amount,transaction_date,page1, z.processing_date, z.company_name, a.BRANCH_CODE, a.CATEGORY_CODE, a.branch_id
+from am_asset a, dbo.am_Raisentry_Transaction t, am_ad_branch b, am_ad_category c, 
+am_ad_department d, am_gb_company z
+where a.asset_id = t.asset_id
+and b.BRANCH_CODE = a.BRANCH_CODE
+and a.CATEGORY_CODE = c.category_code
+and a.DEPT_CODE = d.Dept_code
+and t.page1 = 'ASSET CREATION RAISE ENTRY'
+and a.cost_price = amount
+and t.iso ='000' and transactionId =30
+$P!{filterClause}
+union
+select distinct t.asset_id, a.Description, b.BRANCH_NAME, c.category_name, a.Accum_dep, a.monthly_dep,
+a.Cost_Price, a.NBV, a.Date_purchased, c.Dep_rate, c.Accum_Dep_ledger, c.Dep_ledger, c.Asset_Ledger, 
+c.gl_account, a.dep_end_date, a.effective_date, a.Posting_Date, d.Dept_name, a.Finacle_Posted_Date, 
+amount,transaction_date,page1, z.processing_date, z.company_name, a.BRANCH_CODE, a.CATEGORY_CODE, a.branch_id
+from am_asset a, dbo.am_Raisentry_Transaction t, am_asset_improvement m, am_ad_branch b, am_ad_category c, 
+am_ad_department d, am_gb_company z
+where a.asset_id = t.asset_id
+and b.BRANCH_CODE = a.BRANCH_CODE
+and a.CATEGORY_CODE = c.category_code
+and a.DEPT_CODE = d.Dept_code
+and t.asset_id = m.asset_id
+and t.page1 = 'ASSET IMPROVEMENT RAISE ENTRY'
+and m.cost_price = amount
+and t.iso ='000'and transactionId =26
+$P!{filterClause}
+
+order by 
+     a.BRANCH_CODE ASC,
+     a.CATEGORY_CODE ASC,
+	page1 ASC]]></queryString>
+
+	<field name="asset_id" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="category_name" class="java.lang.String"/>
+	<field name="Accum_dep" class="java.math.BigDecimal"/>
+	<field name="monthly_dep" class="java.math.BigDecimal"/>
+	<field name="Cost_Price" class="java.math.BigDecimal"/>
+	<field name="NBV" class="java.math.BigDecimal"/>
+	<field name="Date_purchased" class="java.sql.Timestamp"/>
+	<field name="Dep_rate" class="java.math.BigDecimal"/>
+	<field name="Accum_Dep_ledger" class="java.lang.String"/>
+	<field name="Dep_ledger" class="java.lang.String"/>
+	<field name="Asset_Ledger" class="java.lang.String"/>
+	<field name="gl_account" class="java.lang.String"/>
+	<field name="dep_end_date" class="java.sql.Timestamp"/>
+	<field name="effective_date" class="java.sql.Timestamp"/>
+	<field name="Posting_Date" class="java.sql.Timestamp"/>
+	<field name="Dept_name" class="java.lang.String"/>
+	<field name="Finacle_Posted_Date" class="java.sql.Timestamp"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="transaction_date" class="java.sql.Timestamp"/>
+	<field name="page1" class="java.lang.String"/>
+	<field name="processing_date" class="java.sql.Timestamp"/>
+	<field name="company_name" class="java.lang.String"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="CATEGORY_CODE" class="java.lang.String"/>
+	<field name="branch_id" class="java.lang.Integer"/>
+
+	<sortField name="BRANCH_NAME" />
+	<sortField name="category_name" />
+
+	<variable name="Total_Cost" class="java.math.BigDecimal" resetType="Group" resetGroup="Category_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{Cost_Price}]]></variableExpression>
+	</variable>
+
+		<group  name="Branch_Group" isStartNewPage="true" isReprintHeaderOnEachPage="true" >
+			<groupExpression><![CDATA[$F{BRANCH_NAME}]]></groupExpression>
+			<groupHeader>
+			<band height="44"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="4"
+						y="28"
+						width="187"
+						height="14"
+						key="staticText-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="10" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Category Name]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="198"
+						y="27"
+						width="148"
+						height="12"
+						key="staticText-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Cateory Total Cost]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="Branch_Group"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="38"
+						y="1"
+						width="214"
+						height="27"
+						forecolor="#3300FF"
+						key="textField-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-BoldOblique" size="14" isBold="true" isItalic="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="Branch_Group"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="5"
+						y="1"
+						width="33"
+						height="27"
+						forecolor="#3300FF"
+						key="textField-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-BoldOblique" size="14" isBold="true" isItalic="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{BRANCH_CODE}]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="280"  isSplitAllowed="true" >
+				<pieChart>
+					<chart evaluationGroup="Branch_Group"  hyperlinkTarget="Self" >
+					<reportElement
+						x="4"
+						y="6"
+						width="733"
+						height="261"
+						key="element-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+						<chartLegend textColor="#000000" backgroundColor="#FFFFFF" >
+					</chartLegend>
+					</chart>
+					<pieDataset>
+						<dataset resetType="Group" resetGroup="Branch_Group" >
+						</dataset>
+						<keyExpression><![CDATA[$F{category_name}]]></keyExpression>
+						<valueExpression><![CDATA[$V{Total_Cost}]]></valueExpression>
+						<labelExpression><![CDATA[$F{category_name}]]></labelExpression>
+				<sectionHyperlink >
+				</sectionHyperlink>
+					</pieDataset>
+					<piePlot>
+						<plot backgroundAlpha="0.5" foregroundAlpha="0.2" />
+					</piePlot>
+				</pieChart>
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="Category_group" >
+			<groupExpression><![CDATA[$F{category_name}]]></groupExpression>
+			<groupHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="19"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="Category_group"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="4"
+						y="4"
+						width="187"
+						height="13"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{category_name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="false" evaluationTime="Group" evaluationGroup="Category_group"  hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="194"
+						y="4"
+						width="161"
+						height="13"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.math.BigDecimal"><![CDATA[$V{Total_Cost}]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="50"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="125"
+						y="14"
+						width="389"
+						height="32"
+						key="textField-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{company_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

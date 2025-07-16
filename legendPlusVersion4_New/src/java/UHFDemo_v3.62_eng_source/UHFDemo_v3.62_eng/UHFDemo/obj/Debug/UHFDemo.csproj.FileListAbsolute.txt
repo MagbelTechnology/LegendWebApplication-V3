@@ -1,0 +1,27 @@
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\Debug\UHFDemo.exe
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\Debug\UHFDemo.pdb
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\Debug\CustomControl.dll
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\Debug\CustomControl.pdb
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\Debug\UHFDemo.R2000UartDemo.resources
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\Debug\UHFDemo.Properties.Resources.resources
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\Debug\UHFDemo.csproj.GenerateResource.Cache
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\Debug\UHFDemo.exe
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\Debug\UHFDemo.pdb
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\Debug\Reader.dll
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\bin\Debug\Reader.pdb
+D:\Project\Luo\R2000Project\UHFDemo\UHFDemo\obj\Debug\UHFDemo.Form1.resources
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\bin\Debug\UHFDemo.exe.config
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\bin\Debug\UHFDemo.exe
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\bin\Debug\UHFDemo.pdb
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\bin\Debug\CustomControl.dll
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\bin\Debug\Reader.dll
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\bin\Debug\CustomControl.pdb
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\bin\Debug\Reader.pdb
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\obj\Debug\UHFDemo.csprojResolveAssemblyReference.cache
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\obj\Debug\UHFDemo.Form1.resources
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\obj\Debug\UHFDemo.R2000UartDemo.resources
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\obj\Debug\UHFDemo.Properties.Resources.resources
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\obj\Debug\UHFDemo.csproj.GenerateResource.Cache
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\obj\Debug\UHFDemo.exe
+C:\Projects\Magbel\PHCN\Impinj r2000\UHFDemo_v3.62_eng_source\UHFDemo_v3.62_eng\UHFDemo\obj\Debug\UHFDemo.pdb

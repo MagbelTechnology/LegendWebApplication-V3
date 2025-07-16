@@ -1,0 +1,209 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/admin/objects
+END
+mail_setup.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/mail_setup.java
+END
+Department.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Department.java
+END
+Section.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Section.java
+END
+BranchDept.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/BranchDept.java
+END
+ClassPrivilege.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/ClassPrivilege.java
+END
+AssetMake.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/AssetMake.java
+END
+Category.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Category.java
+END
+User.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/User.java
+END
+DeptSection.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/DeptSection.java
+END
+CurrencyCode.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/CurrencyCode.java
+END
+Insurance.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Insurance.java
+END
+Locations.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Locations.java
+END
+Vendor.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Vendor.java
+END
+FuelType.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/FuelType.java
+END
+Branch.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/admin/objects/Branch.java
+END
+ExchangeRate.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/ExchangeRate.java
+END
+Aproval_limit.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Aproval_limit.java
+END
+MandatoryField.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/MandatoryField.java
+END
+CategoryClass.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/CategoryClass.java
+END
+Company.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Company.java
+END
+Sbu_branch.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Sbu_branch.java
+END
+AssetManagerInfo_1.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/admin/objects/AssetManagerInfo_1.java
+END
+Approval_Level.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Approval_Level.java
+END
+DisposableReasons.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/DisposableReasons.java
+END
+State.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/State.java
+END
+Region.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Region.java
+END
+LicenseType.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/LicenseType.java
+END
+Province.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Province.java
+END
+AssetManagerInfo.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/admin/objects/AssetManagerInfo.java
+END
+Privilege.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Privilege.java
+END
+Driver.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/Driver.java
+END
+SecurityClass.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/SecurityClass.java
+END
+User.java_27_01_09
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/User.java_27_01_09
+END
+AssignSbu.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/objects/AssignSbu.java
+END

@@ -1,0 +1,10 @@
+[PropertyInfo]
+processid,String,false,false,processid,processid,true,<default>
+errorDescription,String,false,false,errorDescription,errorDescription,true,<default>
+errorDate,String,false,false,errorDate,errorDate,true,<default>
+mtid,String,false,false,mtid,mtid,true,<default>
+[IconNames]
+
+
+
+

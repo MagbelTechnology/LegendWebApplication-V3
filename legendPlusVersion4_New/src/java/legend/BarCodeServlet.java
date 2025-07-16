@@ -1,0 +1,271 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package legend;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import magma.net.dao.MagmaDBConnection;
+import magma.BarCodeHistoryBean;
+import com.magbel.util.ApplicationHelper;
+/**
+ *
+ * @author Olabo
+ */
+public class BarCodeServlet extends HttpServlet {
+   
+    /** 
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    private MagmaDBConnection dbConnection = new MagmaDBConnection();
+            Connection con = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+//boolean barCode_status =false;
+    public void init(ServletConfig config) throws ServletException{
+
+    super.init(config);
+         dbConnection = new MagmaDBConnection();
+    }
+
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        String id =request.getParameter("id");
+        String description = request.getParameter("description");
+        String bar_code = request.getParameter("bar_code");
+        String branch_id1 = request.getParameter("branch_id1");
+        String department_id1 = request.getParameter("department_id1");
+        String posting_date = request.getParameter("posting_date");
+        String user = request.getParameter("user");
+        String prt_fld = request.getParameter("prt_fld");
+
+
+
+        //Connection con = null;
+            //PreparedStatement ps = null;
+            //ResultSet rs = null;
+            
+
+            //System.out.println("========================in barcode servlet =====================");
+
+
+        //if(!(barCodeSaved(id))){
+        try {
+            //System.out.println("the bar code id is " + id);
+            if((barCodeSaved(id))!=true){
+                //System.out.println("==============about to insert=====================");
+            String query ="insert into am_barcode_history (asset_id,description,BAR_CODE,BRANCH_CODE,DEPT_CODE,CREATE_DATE,CREATE_USER,PRINT_FLD,mtid) values(?,?,?,?,?,?,?,?,?)";
+            con = dbConnection.getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+
+            ps.setString(1,id);
+            ps.setString(2, description);
+            ps.setString(3, bar_code);
+            ps.setString(4, branch_id1);
+            ps.setString(5, department_id1);
+            ps.setDate(6,dbConnection.dateConvert(posting_date) );
+            ps.setString(7, user);
+            ps.setString(8, prt_fld);
+            ps.setInt(9,Integer.parseInt( new ApplicationHelper().getGeneratedId("am_barcode_history")));
+
+            ps.execute();
+            //barCode_status = false;
+            out.println("1");
+
+            } else{
+            // TODO output your page here
+           // out.println("<html>");
+           // out.println("<head>");
+            //out.println("<title>Bar Code History</title>");
+            //out.println("</head>");
+           // out.println("<body>");
+            //out.println("<h1>Servlet BarCodeServlet at " + request.getContextPath () + "</h1>");
+            //out.println("</body>");
+           // out.println("</html>");
+            out.println("2");
+            
+            }
+           // System.out.println("outcome of existence test "+ );
+        }
+
+        catch(Exception ex){
+            System.out.println("Exception occured in BarCodeServlet>>" +ex);
+        }
+        finally {
+            out.close();
+            dbConnection.closeConnection(con, ps);
+        }
+    } 
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /** 
+     * Handles the HTTP <code>GET</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        processRequest(request, response);
+    } 
+
+    /** 
+     * Handles the HTTP <code>POST</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /** 
+     * Returns a short description of the servlet.
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+
+    private boolean barCodeSaved(String asset_id){
+boolean barCode_status =false;
+        int found = 0;
+        //System.out.println("in barcodesaved method with id number" + asset_id);
+        //String query ="select count(*) from am_barcode_history where ASSET_ID = '"+asset_id+"'";
+    String query ="select ASSET_ID from am_barcode_history ";
+        //String result ="";
+    try {
+
+             con = dbConnection.getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+            while(rs.next()){
+            //result = rs.getString("PRINT_FLD");
+
+                if(rs.getString(1).equalsIgnoreCase(asset_id))barCode_status = true;
+                //System.out.println("====barcode status is " + barCode_status);
+               // found = rs.getInt(1);
+            }
+
+           // if(result.equalsIgnoreCase("Y")){
+            //barCode_status = true;
+            //}
+
+           // if(found >= 1){barCode_status = true;
+                //System.out.println("the value of int found is ===" + found);
+           // }
+        } catch (Exception e) {
+        //System.out.println("==the error occured in barCodeSaved() method of BarCodeServlet==" + e);
+        }finally{
+        dbConnection.closeConnection(con, ps);
+        }
+
+       // System.out.println("about to return boolean value " + barCode_status);
+    return barCode_status;
+    }
+
+
+
+    public ArrayList getAssetList(){
+
+    ArrayList barcodelist = new ArrayList();
+    //BarCodeHistoryBean bhb = new BarCodeHistoryBean();
+
+        try {
+            String query = "select ASSET_ID,DESCRIPTION,BAR_CODE,BRANCH_CODE,CREATE_USER,CREATE_DATE from am_barcode_history ";
+             con = dbConnection.getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+             //int counter =0;
+            while(rs.next()){
+                 BarCodeHistoryBean bhb = new BarCodeHistoryBean();
+            //result = rs.getString("PRINT_FLD");
+               // if(rs.getString(1).equalsIgnoreCase(asset_id))barCode_status = true;
+                //System.out.println("====barcode status is " + barCode_status);
+               // found = rs.getInt(1);
+
+            bhb.setAsset_id((rs.getString(1) == null)?"":rs.getString(1));
+            bhb.setDescription((rs.getString(2) == null)?"":rs.getString(2));
+            bhb.setBar_code((rs.getString(3) == null)?"":rs.getString(3));
+            bhb.setBranch_code((rs.getString(4) == null)?"":rs.getString(4));
+            bhb.setCreat_user((rs.getString(5) == null)?"":rs.getString(5));
+            bhb.setCreate_date((rs.getDate(6) == null)?"":rs.getDate(6).toString());
+            barcodelist.add(bhb);
+          
+            }
+
+        } catch (Exception e) {
+            System.out.println("BarCodeServlet:=== DB erorr occured in method getAssetList()" +e);
+        }
+    finally{
+      dbConnection.closeConnection(con, ps);
+    }
+
+    return barcodelist;
+    }//getAssetList();
+
+
+/*
+public void setPrtField(ArrayList alist){
+
+    ArrayList barcodelist = alist;
+    BarCodeHistoryBean bhb = null;
+   // for(int j =0; j<barcodelist.size();j++)
+
+try {
+
+             con = dbConnection.getConnection("fixedasset");
+for(int j =0; j<barcodelist.size();j++){
+   bhb = ( BarCodeHistoryBean)barcodelist.get(j);
+   String query = "update am_barcode_history set PRINT_FLD = 'Y' where ASSET_ID ='"+ bhb.getAsset_id() +"'";
+   if(bhb.getChecked().equalsIgnoreCase("Y")){
+
+            ps = con.prepareStatement(query);
+            ps.execute();
+    }//if
+}//for
+
+        } catch (Exception e) {
+            System.out.println("BarCodeServlet:=== DB erorr occured in method setPrtField()" +e);
+        }
+    finally{
+      dbConnection.closeConnection(con, ps);
+    }
+
+
+
+
+
+}//setPrtField()
+
+*/
+
+
+
+}

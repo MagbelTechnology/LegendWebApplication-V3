@@ -1,0 +1,103 @@
+package magma.net.image;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+import magma.net.vao.Function;
+
+/**
+ * <p>Title: AjaxMenuFactoryServlet.java</p>
+ *
+ * <p>Description: This servlets retrives menu items <br>
+ * for a user in a particular role.</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class AjaxMenuFactoryServlet extends HttpServlet {
+
+    private ServletContext context;
+    private HashMap users = new HashMap();
+
+    public void init(ServletConfig config) throws ServletException {
+        this.context = config.getServletContext();
+    }
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws
+            IOException, ServletException {
+        /*
+         * First obtain the process request
+         */
+        String menuType = request.getParameter("MT");
+
+        HttpSession session = request.getSession(true);
+        ArrayList functionList = (ArrayList) session.getAttribute("priviledges");
+
+        if (functionList != null) {
+            processUserMenuRequest(request, response, functionList, menuType);
+        } else {
+            reportSessionTerminated(request, response);
+        }
+    }
+
+    private void processUserMenuRequest(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        ArrayList list, String menuSelected) throws
+            IOException, ServletException {
+        StringBuffer sb = new StringBuffer();
+        response.setContentType("text/xml");
+        response.setHeader("Cache-Control", "no-cache");
+
+        sb.append("<USERMENU>\n");
+        for (int x = 0; x < list.size(); x++) {
+
+            Function selFunction = (Function) list.get(x);
+            if (selFunction.getType().equalsIgnoreCase(menuSelected)) {
+
+                sb.append("<MenuItem>\n");
+                sb.append("<ID>" + selFunction.getId() + "</ID>\n");
+                sb.append("<CODE>" + selFunction.getCode() + "</CODE>\n");
+                sb.append("<TYPE>" + selFunction.getType() + "</TYPE>\n");
+                sb.append("<URL>" + selFunction.getUrl() + "</URL>\n");
+                sb.append("<DESC>" + selFunction.getDescription() + "</DESC>\n");
+                sb.append("</MenuItem>\n");
+
+            }
+        }
+
+        sb.append("</USERMENU>");
+
+        response.getWriter().write(sb.toString());
+
+    }
+
+    private void reportSessionTerminated(HttpServletRequest request,
+                                         HttpServletResponse response) throws
+            IOException, ServletException {
+        StringBuffer sb = new StringBuffer();
+        response.setContentType("text/xml");
+        response.setHeader("Cache-Control", "no-cache");
+        sb.append("<USERMENU>\n");
+        sb.append("<MenuItem>\n");
+        sb.append("<ID>sessionexpired</ID>\n");
+        sb.append("<CODE>sessionexpired</CODE>\n");
+        sb.append("<TYPE>sessionexpired</TYPE>\n");
+        sb.append("<URL>signOut.jsp?STATUS=F</URL>\n");
+        sb.append("<DESC>Session Expired</DESC>\n");
+        sb.append("</MenuItem>\n");
+        sb.append("</USERMENU>");
+
+        response.getWriter().write(sb.toString());
+
+    }
+
+
+}

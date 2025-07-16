@@ -1,0 +1,39 @@
+C:\Projects\Magbel\PHCN\workspace-legend-api\legend-api\target>java -jar legend-api-0.0.1-SNAPSHOT.jar
+Jun 19, 2018 3:27:31 PM org.apache.cxf.endpoint.ServerImpl initDestination
+INFO: Setting the server's publish address to be http://localhost:8080/
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ After Starting.......
+Starts at Tue Jun 19 15:27:32 WAT 2018
+ The sent parameters ==3388836663i9322 and location ==65,56
+ The JDBC_URL is now==jdbc:jtds:sqlserver://192.168.6.27:1433;databaseName=InventoryDB;user=inventoryusr;password=Inventory#123
+ conn==net.sourceforge.jtds.jdbc.JtdsConnection@4e89b20
+Driver Name?= jTDS Type 4 JDBC Driver for MS SQL Server and Sybase, Driver Version?= 1.3.1, Product Name?= Microsoft SQL Server, Product Version?= 10.50.1600
+ 0 2018/06/19 15:27:41
+2 The Date Today ===Tue Jun 19 15:27:41 WAT 2018
+ The Date Today ===Tue Jun 19 15:27:41 WAT 2018
+ inserted Records Here ===1
+
+C:\Projects\Magbel\PHCN\workspace-legend-api\legend-api\target>
+
+
+
+
+
+
+
+C:\>nssm install LegendAPIServices
+Service "LegendAPIServices" installed successfully!
+
+C:\>nssm install LegendAPIServices
+
+
+C:\Projects\Magbel\PHCN\workspace-legend-api\legend-api\target>java -jar legend-api-0.0.1-SNAPSHOT.jar
+ Service IP ==192.168.8.103:8081
+ The publishURL==192.168.8.103:8081/
+Jun 20, 2018 11:35:38 PM org.apache.cxf.endpoint.ServerImpl initDestination
+INFO: Setting the server's publish address to be 192.168.8.103:8081/
+ After Starting.......
+Starts at Wed Jun 20 23:35:39 WAT 2018
+

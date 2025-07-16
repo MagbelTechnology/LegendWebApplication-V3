@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TransactionAudit" language="groovy" pageWidth="2035" pageHeight="842" columnWidth="2015" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT LTRIM(RTRIM(SUPERVISORNAME1))+',  '+LTRIM(RTRIM(SUPERVISORNAME2))+',  '+LTRIM(RTRIM(SUPERVISORNAME3))+',  '+LTRIM(RTRIM(SUPERVISORNAME4)) AS APPROVEDBY, *FROM REPORT_TABLE
+ $P!{filterClause}
+ORDER BY TRANS_DATE]]>
+	</queryString>
+	<field name="APPROVEDBY" class="java.lang.String"/>
+	<field name="ReqnID" class="java.lang.String"/>
+	<field name="UserID" class="java.lang.String"/>
+	<field name="ReqnBranch" class="java.lang.String"/>
+	<field name="ReqnDepartment" class="java.lang.String"/>
+	<field name="workStationIP" class="java.lang.String"/>
+	<field name="ItemRequested" class="java.lang.String"/>
+	<field name="FAULT_ID" class="java.lang.String"/>
+	<field name="RequestedBY" class="java.lang.String"/>
+	<field name="TRANS_DATE" class="java.sql.Timestamp"/>
+	<field name="Approvalstatus" class="java.lang.String"/>
+	<field name="STATUS_NAME" class="java.lang.String"/>
+	<field name="Collector" class="java.lang.String"/>
+	<field name="Quantity" class="java.lang.String"/>
+	<field name="REMARKS" class="java.lang.String"/>
+	<field name="SUPERVISOR1" class="java.lang.String"/>
+	<field name="SUPERVISOR2" class="java.lang.String"/>
+	<field name="SUPERVISOR3" class="java.lang.String"/>
+	<field name="SUPERVISOR4" class="java.lang.String"/>
+	<field name="SUPERVISORNAME1" class="java.lang.String"/>
+	<field name="SUPERVISORNAME2" class="java.lang.String"/>
+	<field name="SUPERVISORNAME3" class="java.lang.String"/>
+	<field name="SUPERVISORNAME4" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="POSTEDBY" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="118" height="20"/>
+				<textElement/>
+				<text><![CDATA[ReqnID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="118" y="0" width="115" height="20"/>
+				<textElement/>
+				<text><![CDATA[workStationIP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="233" y="0" width="117" height="20"/>
+				<textElement/>
+				<text><![CDATA[ItemRequested]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="0" width="133" height="20"/>
+				<textElement/>
+				<text><![CDATA[FAULT_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="483" y="0" width="126" height="20"/>
+				<textElement/>
+				<text><![CDATA[RequestedBY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="609" y="0" width="95" height="20"/>
+				<textElement/>
+				<text><![CDATA[TRANS_DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="704" y="0" width="92" height="20"/>
+				<textElement/>
+				<text><![CDATA[Approvalstatus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="796" y="0" width="121" height="20"/>
+				<textElement/>
+				<text><![CDATA[STATUS_NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="917" y="0" width="198" height="20"/>
+				<textElement/>
+				<text><![CDATA[Collector]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1115" y="0" width="93" height="20"/>
+				<textElement/>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1208" y="0" width="422" height="20"/>
+				<textElement/>
+				<text><![CDATA[REMARKS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1630" y="0" width="301" height="20"/>
+				<textElement/>
+				<text><![CDATA[APPROVEDBY]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="32" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="118" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ReqnID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="118" y="0" width="115" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{workStationIP}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="233" y="0" width="117" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ItemRequested}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="350" y="0" width="133" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{FAULT_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="483" y="0" width="126" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{RequestedBY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="609" y="0" width="95" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{TRANS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="704" y="0" width="92" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Approvalstatus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="796" y="0" width="121" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{STATUS_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="917" y="0" width="198" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Collector}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1115" y="0" width="93" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Quantity}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1208" y="0" width="422" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{REMARKS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1630" y="0" width="301" height="32"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{APPROVEDBY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

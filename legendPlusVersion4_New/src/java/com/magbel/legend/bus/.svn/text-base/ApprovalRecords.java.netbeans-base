@@ -1,0 +1,591 @@
+package com.magbel.legend.bus;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.io.BufferedInputStream;
+//import oracle.jdbc.OracleResultSet;
+//import oracle.sql.BLOB;
+
+
+import com.magbel.util.DatetimeFormat;
+import com.magbel.util.CurrencyNumberformat;
+import com.magbel.util.CurrentDateTime;
+import magma.net.dao.MagmaDBConnection;
+
+import com.magbel.legend.vao.Approval;
+
+public class ApprovalRecords extends MagmaDBConnection
+{
+	  
+	    private CurrencyNumberformat formata;
+	    private SimpleDateFormat sdf;
+	    private DatetimeFormat df;
+	  
+	    ArrayList Alist = new ArrayList();
+		public ApprovalRecords() {
+			super();
+		}
+	
+	   
+		
+		 public ArrayList findApproval(String assetId,String filter) {
+
+		        Connection con = null;
+		        PreparedStatement ps = null;
+		        ResultSet rs = null;
+		        Approval app = null;
+		        ArrayList collection = new ArrayList();
+		        String FINDER_QUERY = "SELECT  Id,Description,Page,Flag,partPay,UserId,Branch,subjectToVat,whTax,operation1,exitPage,url from am_raisentry_post WHERE ID = ? AND FLAG=?" + filter;
+
+		        try {
+		            con = getConnection("fixedasset");
+		            ps = con.prepareStatement(FINDER_QUERY);
+		            ps.setString(1, assetId);
+		            ps.setString(2, "Y");
+		            rs = ps.executeQuery();
+
+		            while (rs.next()) {
+
+		                String id = rs.getString("Id");
+		                String Description = rs.getString("Description");
+		                String Page = rs.getString("Page");
+		                String Flag = rs.getString("Flag");
+		                String partPay = rs.getString("partPay");
+		                String UserId =rs.getString("UserId");
+			            String Branch = rs.getString("Branch");
+			            String subjectToVat = rs.getString("subjectToTax");
+			            String whTax = rs.getString("whTax");
+			            String operation1 = rs.getString("operation1");
+			            String exitPage = rs.getString("exitPage");
+			            String url = rs.getString("url");
+			            
+			                app = new Approval(id,Description,Page,Flag,partPay,UserId,Branch,subjectToVat,whTax,operation1,exitPage,url);
+		                collection.add(app);
+		            }
+
+		        } catch (Exception ex) {
+		            System.out.println("WARNING: cannot fetch [am_raisentry_post]->" +
+		                    ex.getMessage());
+		        } finally {
+		            closeConnection(con, ps, rs);
+		        }
+
+		        return collection;
+
+		    }
+		 public ArrayList findApproval(String filter) {
+
+		        Connection con = null;
+		        PreparedStatement ps = null;
+		        ResultSet rs = null;
+		        Approval app = null;
+		        ArrayList collection = new ArrayList();
+		        String FINDER_QUERY = "SELECT Id,Description,Page,Flag,partPay,UserId,Branch,subjectToVat,whTax,operation1,exitPage,url from am_raisentry_post WHERE  FLAG=? " + filter;
+
+		        try {
+		            con = getConnection("fixedasset");
+		            ps = con.prepareStatement(FINDER_QUERY);
+		        
+		            ps.setString(1, "Y");
+		            rs = ps.executeQuery();
+
+		            while (rs.next()) {
+
+		                String id = rs.getString("Id");
+		                String Description = rs.getString("Description");
+		                String Page = rs.getString("Page");
+		                String Flag = rs.getString("Flag");
+		                String partPay = rs.getString("partPay");
+		               String UserId =rs.getString("UserId");
+		               String Branch = rs.getString("Branch");
+		               String subjectToVat= rs.getString("subjectToVat");
+		               String whTax = rs.getString("whTax");
+		               String operation1 = rs.getString("operation1");
+		               String exitPage = rs.getString("exitPage");
+		               String url = rs.getString("url");
+		               
+		                app = new Approval(id,Description,Page,Flag,partPay,UserId,Branch,subjectToVat,whTax,operation1,exitPage,url);
+		                collection.add(app);
+		            }
+
+		        } catch (Exception ex) {
+		            System.out.println("WARNING: cannot fetch [am_raisentry_post]->" +
+		                    ex.getMessage());
+		        } finally {
+		            closeConnection(con, ps, rs);
+		        }
+
+		        return collection;
+
+		    }
+		 public boolean isApprovalExisting(String assetId,String page) {
+			 	boolean done=false;
+		        Connection con = null;
+		        PreparedStatement ps = null;
+		        ResultSet rs = null;
+		       
+		       
+		        String FINDER_QUERY = "SELECT Id,Description,Page,Flag,partPay from am_raisentry_post WHERE ID = ? and page=?";
+
+		        try {
+		            con = getConnection("fixedasset");
+		            ps = con.prepareStatement(FINDER_QUERY);
+		            ps.setString(1, assetId);
+		            ps.setString(2,page);
+		            rs = ps.executeQuery();
+
+		            while (rs.next()) 
+		            {
+		               done=true;
+		            }
+
+		        } catch (Exception ex) {
+		            System.out.println("WARNING: cannot fetch [am_raisentry_post]->" +
+		                    ex.getMessage());
+		        } finally {
+		            closeConnection(con, ps, rs);
+		        }
+
+		        return done;
+
+		    }
+		 public boolean isApprovalExisting(String assetId) {
+			 	boolean done=false;
+		        Connection con = null;
+		        PreparedStatement ps = null;
+		        ResultSet rs = null;
+		       
+		       
+		        String FINDER_QUERY = "SELECT Id,Description,Page,Flag,partPay from am_raisentry_post WHERE ID = ?";
+
+		        try {
+		            con = getConnection("fixedasset");
+		            ps = con.prepareStatement(FINDER_QUERY);
+		            ps.setString(1, assetId);
+		          
+		            rs = ps.executeQuery();
+
+		            while (rs.next()) 
+		            {
+		               done=true;
+		            }
+
+		        } catch (Exception ex) {
+		            System.out.println("WARNING: cannot fetch [am_raisentry_post]->" +
+		                    ex.getMessage());
+		        } finally {
+		            closeConnection(con, ps, rs);
+		        }
+
+		        return done;
+
+		    }
+		  public void updateApproval(String assetid) {
+			  
+		       Connection con = null;
+		       PreparedStatement ps = null;
+		       String NOTIFY_QUERY ="UPDATE am_raisentry_post SET flag = ? WHERE ID = ?  ";
+
+		       try {
+		           con = getConnection("fixedasset");
+		           ps = con.prepareStatement(NOTIFY_QUERY);
+		           ps.setString(1, "N");
+		           ps.setString(2, assetid);
+		           ps.executeUpdate();
+
+		       } catch (Exception ex) {
+		           System.out.println("WARNING: cannot update am_raisentry_post+"+ex.getMessage());
+		       } finally {
+		           closeConnection(con, ps);
+		       }
+
+		   }
+		  public void updateRaiseEntry(String assetid) {
+			  
+		       Connection con = null;
+		       PreparedStatement ps = null;
+		       String NOTIFY_QUERY ="UPDATE am_asset SET raise_entry = ? WHERE ASSET_ID = ?  ";
+
+		       try {
+		           con = getConnection("fixedasset");
+		           ps = con.prepareStatement(NOTIFY_QUERY);
+		           ps.setString(1, "Y");
+		           ps.setString(2, assetid);
+		           ps.executeUpdate();
+
+		       } catch (Exception ex) {
+		           System.out.println("WARNING: cannot update am_asset+"+ex.getMessage());
+		       } finally {
+		           closeConnection(con, ps);
+		       }
+
+		   }
+		   public boolean insertApproval(String id,String description,String page,String flag,String partPay,String UserId,String Branch,String subjectToVat,String whTax,String url ) {
+	           boolean done=true;
+			   flag="Y"; 
+			   Connection con = null;
+	           PreparedStatement ps = null;
+	           String query = "INSERT INTO [am_raisentry_post](Id,Description,Page,Flag,partPay,UserId,Branch,subjectToVat,whTax,url)" +
+	                          " VALUES(?,?,?,?,?,?,?,?,?,?)";
+	           try {
+	               con = getConnection("fixedasset");
+	               ps = con.prepareStatement(query);
+	               ps.setString(1,id);
+	               ps.setString(2,description);
+	               ps.setString(3, page);
+	               ps.setString(4,flag);
+	               ps.setString(5,partPay);
+	               ps.setString(6,UserId);
+	               ps.setString(7,Branch);
+	               ps.setString(8, subjectToVat);
+	               ps.setString(9, whTax);
+	               ps.setString(10, url);
+	               ps.execute();
+	               
+	           } 
+	           catch (Exception ex) 
+	           {
+	        	   done = false;
+	               System.out.println(
+	                       "WARNING:cannot insert am_raisentry_post->" +
+	                       ex.getMessage());
+	           } finally {
+	               closeConnection(con, ps);
+	           }
+	           return done;
+	       }
+		   
+		   public String getCodeName(String query)
+		    {
+		     String result = "";
+		     Connection con = null;
+		     ResultSet rs = null; 
+		     PreparedStatement ps = null;
+		  
+		     try
+		     {
+		      con = getConnection("fixedasset");
+		      ps = con.prepareStatement(query);
+		      rs = ps.executeQuery();
+		      
+		      
+		      while(rs.next())
+		      {
+		       result = rs.getString(1) == null ? "" : rs.getString(1);
+		     
+		      }
+		     }
+		     catch(Exception er)
+		     {
+		        System.out.println("Error in Query- getCodeName()... ->"+er);
+		        er.printStackTrace();
+		     }finally{
+		        closeConnection(con,ps);
+		      }   
+		      return result;
+		     }
+		  
+		 //for inserting image into sqlserver
+		   public boolean insertBlob(String assetId,String userId ,String pageName, String fileName)
+			{   
+			   boolean done=true;
+				Connection conn = null;  
+				try { 
+					conn = getConnection("fixedasset");
+					if (!fileName.equals("")) 
+					    {     
+						PreparedStatement ps = conn.prepareStatement("INSERT INTO am_ad_image VALUES(?,?,?,?,?)");      
+						ps.setString(1,assetId); 
+						ps.setString(2,userId);     
+						ps.setDate(3, dateConvert(new java.util.Date()));   
+						FileInputStream fis = new FileInputStream(fileName);      
+						ps.setBinaryStream(4, fis, fis.available());  
+						ps.setString(5,pageName);  
+						ps.execute();      
+						ps.close();    
+						}
+					 conn.close();  
+					} 
+				catch (Exception e) 
+				    {    
+					e.printStackTrace();
+					done=false;
+					} 
+				return done;
+				}
+
+//for checking against duplicate
+		   public boolean isImageExisting(String assetId,String pageName) {
+			 	boolean done=false;
+		        Connection con = null;
+		        PreparedStatement ps = null;
+		        ResultSet rs = null;
+		       
+		       
+		        String FINDER_QUERY = "select image from am_ad_image where assetId=? and pageName=?";
+
+		        try {
+		            con = getConnection("fixedasset");
+		            ps = con.prepareStatement(FINDER_QUERY);
+		            ps.setString(1, assetId);
+		            ps.setString(2, pageName);
+		            rs = ps.executeQuery();
+
+		            while (rs.next()) 
+		            {
+		               done=true;
+		            }
+
+		        } catch (Exception ex) {
+		            System.out.println("WARNING: cannot fetch [am_ad_image]->" +
+		                    ex.getMessage());
+		        } finally {
+		            closeConnection(con, ps, rs);
+		        }
+
+		        return done;
+
+		    }
+	
+
+	public byte[] retrieveImageData(String pathname) {
+			   ArrayList imageArray = new ArrayList();
+			   File file;
+			   BufferedInputStream bis;
+			   byte[] imageData = null;
+
+			   file = new File(pathname);
+			   try {
+				   bis = new BufferedInputStream(new FileInputStream(file));
+			   } catch (FileNotFoundException fe) {
+				   System.out.println("INFO: <<CheckImageDAO:retrieveImageData>>\n" +
+									  " Image file does not Exist.");
+				   return null;
+			   }
+
+			   int data;
+			   try {
+				   while ((data = bis.read()) != -1) {
+					   imageArray.add(new Byte((byte) data));
+				   }
+
+				   imageData = new byte[imageArray.size()];
+				   for (int i = 0; i < imageData.length; i++) {
+					   imageData[i] = ((Byte) imageArray.get(i)).byteValue();
+				   }
+			   } catch (Exception ioe) {
+				   System.out.println(
+						   "INFORMATION, <<CheckImageDAO:retrieveImageData>> Could not retrieve image.");
+				   System.out.println(ioe);
+			   }
+
+			   return imageData;
+		    }
+	
+	
+	 public void getImageData(String assetId,String pageName)
+     {
+             
+              byte[] fileBytes;
+             // File file;
+             // file = new File(pathname);
+              Connection conn = null;  
+              conn = getConnection("fixedasset");
+              String query;
+              try
+              {
+                      query = "select image from am_ad_image where assetId='"+assetId+"' and pageName='"+pageName+"'";
+                      Statement state = conn.createStatement();
+                      ResultSet rs = state.executeQuery(query);
+                      if (rs.next())
+                     {
+                               fileBytes = rs.getBytes(1);
+                               OutputStream targetFile = new FileOutputStream("d://filepath//new.JPG");
+//                               OutputStream targetFile = new FileOutputStream(file);
+                               
+                               targetFile.write(fileBytes);
+                               targetFile.close();
+                     }        
+                     
+              }
+              catch (Exception e)
+              {
+                      e.printStackTrace();
+              }
+     }
+
+
+
+     public String[] raiseEntryInfo(String asset_id)
+		    {
+		     String[] result = new String[4];
+		     Connection con = null;
+		     ResultSet rs = null;
+		     PreparedStatement ps = null;
+		  String query = "select description, branch_id, subject_to_vat, wh_tax from am_asset where asset_id = '"+asset_id+" '";
+		     try
+		     {
+		      con = getConnection("fixedasset");
+		      ps = con.prepareStatement(query);
+		      rs = ps.executeQuery();
+
+
+		      while(rs.next())
+		      {
+		       result[0] = rs.getString(1) == null ? "" : rs.getString(1);
+               result[1] = rs.getString(2) == null ? "" : rs.getString(2);
+               result[2] = rs.getString(3) == null ? "" : rs.getString(3);
+               result[3] = rs.getString(4) == null ? "" : rs.getString(4);
+
+
+		      }
+		     }
+		     catch(Exception er)
+		     {
+		        System.out.println("Error in Query- raiseEntryInfo() in class ApprovalRecords... ->"+er);
+		        er.printStackTrace();
+		     }finally{
+		        closeConnection(con,ps);
+		      }
+		      return result;
+		     }
+
+     public String userToEmail(String assetId) 
+	   {
+		 	
+	        Connection con = null;
+	        PreparedStatement ps = null;
+	        ResultSet rs = null;
+	        String user_id = "";
+	       
+	        String FINDER_QUERY = "SELECT user_Id from am_asset WHERE asset_Id = ? ";
+
+	        try {
+	            con = getConnection("fixedasset");
+	            ps = con.prepareStatement(FINDER_QUERY);
+	            ps.setString(1, assetId);
+	            
+	            rs = ps.executeQuery();
+
+	            while (rs.next()) 
+	            {
+	            	 user_id = rs.getString("user_Id");
+	            }
+
+	        } catch (Exception ex) {
+	            System.out.println("WARNING: cannot fetch user id ->" +
+	                    ex.getMessage());
+	        } finally {
+	            closeConnection(con, ps, rs);
+	        }
+
+	        return user_id;
+
+	    }
+	 
+	 public String userEmail(String user_id) 
+	   {
+		 	
+	        Connection con = null;
+	        PreparedStatement ps = null;
+	        ResultSet rs = null;
+	        String email = "";
+	       
+	        String FINDER_QUERY = "SELECT email from am_gb_user WHERE user_id = ? ";
+
+	        try {
+	            con = getConnection("fixedasset");
+	            ps = con.prepareStatement(FINDER_QUERY);
+	            ps.setString(1, user_id);
+	            
+	            rs = ps.executeQuery();
+
+	            while (rs.next()) 
+	            {
+	            	email = rs.getString("email");
+	            }
+
+	        } catch (Exception ex) {
+	            System.out.println("WARNING: cannot fetch email->" +
+	                    ex.getMessage());
+	        } finally {
+	            closeConnection(con, ps, rs);
+	        }
+
+	        return email;
+
+	    }
+	  //delete record from raise entry list base on asset id and page name
+	 public boolean deleteRaiseEntry(String assetid,String page1) {
+		  boolean done;
+	       Connection con = null;
+	       PreparedStatement ps = null;
+	       String NOTIFY_QUERY ="delete from  am_raisentry_post  WHERE ID = ? and page=? ";
+
+	       try {
+	           con = getConnection("fixedasset");
+	           ps = con.prepareStatement(NOTIFY_QUERY);
+	           ps.setString(1, assetid);
+	           ps.setString(2, page1);
+	           ps.executeUpdate();
+                done=true;
+	       } catch (Exception ex) {done=false;
+	           System.out.println("WARNING: cannot delete am_raisentry_post+"+ex.getMessage());
+	       } finally {
+	           closeConnection(con, ps);
+	       }
+	       return done;
+	   }
+	 
+	 public void updateRaiseEntry(String assetid,String status) {
+		  
+	       Connection con = null;
+	       PreparedStatement ps = null;
+	       String NOTIFY_QUERY ="UPDATE am_asset SET raise_entry = ? WHERE ASSET_ID = ?  ";
+
+	       try {
+	           con = getConnection("fixedasset");
+	           ps = con.prepareStatement(NOTIFY_QUERY);
+	           ps.setString(1, status);
+	           ps.setString(2, assetid);
+	           ps.executeUpdate();
+
+	       } catch (Exception ex) {
+	           System.out.println("WARNING: cannot update am_asset+"+ex.getMessage());
+	       } finally {
+	           closeConnection(con, ps);
+	       }
+
+	   }
+	 public void updateAssetStatus(String assetid,String status) {
+		  
+	       Connection con = null;
+	       PreparedStatement ps = null;
+	       String NOTIFY_QUERY =" update am_asset_approval set process_status=? where asset_id=? ";
+
+	       try {
+	           con = getConnection("fixedasset");
+	           ps = con.prepareStatement(NOTIFY_QUERY);
+	           ps.setString(1, status);
+	           ps.setString(2, assetid);
+	           ps.executeUpdate();
+
+	       } catch (Exception ex) {
+	           System.out.println("WARNING: cannot update am_asset_approval+"+ex.getMessage());
+	       } finally {
+	           closeConnection(con, ps);
+	       }
+
+	   }
+}

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="plotCategory_Cost" language="groovy" pageWidth="2035" pageHeight="842" columnWidth="2015" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     LEGEND_INTEGRIFY_DETAILS."ID" AS LEGEND_INTEGRIFY_DETAILS_ID,
+     LEGEND_INTEGRIFY_DETAILS."STAFF_ID" AS LEGEND_INTEGRIFY_DETAILS_STAFF_ID,
+     LEGEND_INTEGRIFY_DETAILS."STAFF_NAME" AS LEGEND_INTEGRIFY_DETAILS_STAFF_NAME,
+     LEGEND_INTEGRIFY_DETAILS."BRANCH_CODE" AS LEGEND_INTEGRIFY_DETAILS_BRANCH_CODE,
+     LEGEND_INTEGRIFY_DETAILS."CATEGORY_CODE" AS LEGEND_INTEGRIFY_DETAILS_CATEGORY_CODE,
+     LEGEND_INTEGRIFY_DETAILS."DEPT_CODE" AS LEGEND_INTEGRIFY_DETAILS_DEPT_CODE,
+     LEGEND_INTEGRIFY_DETAILS."DESCRIPTION" AS LEGEND_INTEGRIFY_DETAILS_DESCRIPTION,
+     LEGEND_INTEGRIFY_DETAILS."START_DATE" AS LEGEND_INTEGRIFY_DETAILS_START_DATE,
+     LEGEND_INTEGRIFY_DETAILS."QUANTITY" AS LEGEND_INTEGRIFY_DETAILS_QUANTITY,
+     LEGEND_INTEGRIFY_DETAILS."COST_PRICE" AS LEGEND_INTEGRIFY_DETAILS_COST_PRICE,
+     LEGEND_INTEGRIFY_DETAILS."VENDOR_CODE" AS LEGEND_INTEGRIFY_DETAILS_VENDOR_CODE,
+     LEGEND_INTEGRIFY_DETAILS."APPROVED_BY_ID" AS LEGEND_INTEGRIFY_DETAILS_APPROVED_BY_ID,
+     LEGEND_INTEGRIFY_DETAILS."APPROVED_BY_NAME" AS LEGEND_INTEGRIFY_DETAILS_APPROVED_BY_NAME,
+     LEGEND_INTEGRIFY_DETAILS."STATUS" AS LEGEND_INTEGRIFY_DETAILS_STATUS,
+     LEGEND_INTEGRIFY_DETAILS."PROCESS_STATUS" AS LEGEND_INTEGRIFY_DETAILS_PROCESS_STATUS,
+     LEGEND_INTEGRIFY_DETAILS."CATEGORY_CODE" AS LEGEND_INTEGRIFY_DETAILS_CATEGORY_CODE,
+     LEGEND_INTEGRIFY_DETAILS."SUB_CATEGORY_CODE" AS LEGEND_INTEGRIFY_DETAILS_SUB_CATEGORY_CODE,
+     am_ad_category."category_name" AS am_ad_category_category_name,
+     am_ad_branch."BRANCH_NAME" AS am_ad_branch_BRANCH_NAME,
+     am_ad_department."DEPT_NAME" AS am_ad_department_DEPT_NAME,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     am_ad_sub_category."sub_category_name" AS am_ad_sub_category_sub_category_name
+FROM
+     "dbo"."am_ad_category" am_ad_category INNER JOIN "dbo"."LEGEND_INTEGRIFY_DETAILS" LEGEND_INTEGRIFY_DETAILS ON am_ad_category."category_code" = LEGEND_INTEGRIFY_DETAILS."CATEGORY_CODE"
+     INNER JOIN "dbo"."am_ad_branch" am_ad_branch ON LEGEND_INTEGRIFY_DETAILS."BRANCH_CODE" = am_ad_branch."BRANCH_CODE"
+INNER JOIN "dbo"."am_ad_department" am_ad_department ON LEGEND_INTEGRIFY_DETAILS."DEPT_CODE" = am_ad_department."Dept_Code"
+     INNER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON LEGEND_INTEGRIFY_DETAILS."VENDOR_CODE" = am_ad_vendor."Vendor_Code"
+     INNER JOIN "dbo"."am_ad_sub_category" am_ad_sub_category ON LEGEND_INTEGRIFY_DETAILS."SUB_CATEGORY_CODE" = am_ad_sub_category."sub_category_code"
+$P!{filterClause}
+ORDER BY  LEGEND_INTEGRIFY_DETAILS."PROCESS_STATUS",COST_PRICE]]>
+	</queryString>
+	<field name="LEGEND_INTEGRIFY_DETAILS_ID" class="java.lang.Integer"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_STAFF_ID" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_STAFF_NAME" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_BRANCH_CODE" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_DEPT_CODE" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_DESCRIPTION" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_START_DATE" class="java.sql.Timestamp"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_QUANTITY" class="java.lang.Integer"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_COST_PRICE" class="java.math.BigDecimal"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_VENDOR_CODE" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_APPROVED_BY_ID" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_APPROVED_BY_NAME" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_STATUS" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_PROCESS_STATUS" class="java.lang.String"/>
+	<field name="LEGEND_INTEGRIFY_DETAILS_SUB_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="am_ad_category_category_name" class="java.lang.String"/>
+	<field name="am_ad_branch_BRANCH_NAME" class="java.lang.String"/>
+	<field name="am_ad_department_DEPT_NAME" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="am_ad_sub_category_sub_category_name" class="java.lang.String"/>
+	<variable name="subCatTotal" class="java.lang.Integer" resetType="Group" resetGroup="Branch" calculation="Sum">
+		<variableExpression><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_QUANTITY}]]></variableExpression>
+	</variable>
+	<variable name="subCatSummartyTot" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_QUANTITY}]]></variableExpression>
+	</variable>
+	<variable name="subCatCost" class="java.math.BigDecimal" resetType="Group" resetGroup="Branch" calculation="Sum">
+		<variableExpression><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_COST_PRICE}]]></variableExpression>
+	</variable>
+	<group name="Branch">
+		<groupExpression><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_PROCESS_STATUS}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<textField>
+					<reportElement x="1421" y="0" width="80" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$V{subCatTotal}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="693" y="0" width="79" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_sub_category_sub_category_name}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1204" y="0" width="117" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_sub_category_sub_category_name}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1088" y="0" width="115" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_SUB_CATEGORY_CODE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="1325" y="0" width="91" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{subCatCost}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="0" width="100" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_BRANCH_CODE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="">
+					<reportElement x="100" y="0" width="269" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_branch_BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="472" y="0" width="71" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_DEPT_CODE}]]></textFieldExpression>
+				</textField>
+				<textField pattern="dd/MM/yyyy">
+					<reportElement x="1505" y="0" width="100" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.util.Date"><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_START_DATE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="369" y="0" width="100" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_CATEGORY_CODE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="543" y="0" width="150" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_department_DEPT_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="888" y="0" width="200" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="772" y="0" width="116" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_VENDOR_CODE}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="693" y="0" width="79" height="20"/>
+				<textElement/>
+				<text><![CDATA[Category Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1204" y="0" width="117" height="20"/>
+				<textElement/>
+				<text><![CDATA[SUB CATEGORY NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1421" y="0" width="80" height="20"/>
+				<textElement/>
+				<text><![CDATA[QUANTITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1505" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[START DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1088" y="0" width="115" height="20"/>
+				<textElement/>
+				<text><![CDATA[SUB CATEGORY CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1325" y="0" width="91" height="20"/>
+				<textElement/>
+				<text><![CDATA[COST PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[BRANCH CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="269" height="20"/>
+				<textElement/>
+				<text><![CDATA[BRANCH NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="472" y="0" width="71" height="20"/>
+				<textElement/>
+				<text><![CDATA[Dept Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="369" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Category Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="543" y="0" width="150" height="20"/>
+				<textElement/>
+				<text><![CDATA[DEPARTMENT NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="888" y="0" width="200" height="20"/>
+				<textElement/>
+				<text><![CDATA[VENDOR  NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="772" y="0" width="116" height="20"/>
+				<textElement/>
+				<text><![CDATA[VENDOR CODE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="259" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="368" height="20"/>
+				<textElement/>
+				<text><![CDATA[Pie Chart Representation of Process Status Against Cost Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="369" y="0" width="519" height="20"/>
+				<textElement/>
+				<text><![CDATA[Bar Chart Representation of Process Status Against Cost Price]]></text>
+			</staticText>
+			<pieChart>
+				<chart>
+					<reportElement x="1" y="20" width="368" height="239"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_PROCESS_STATUS}]]></keyExpression>
+					<valueExpression><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_COST_PRICE}]]></valueExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+				</piePlot>
+			</pieChart>
+			<bar3DChart>
+				<chart>
+					<reportElement x="369" y="20" width="519" height="239"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Process Status"]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_PROCESS_STATUS}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{LEGEND_INTEGRIFY_DETAILS_COST_PRICE}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<bar3DPlot>
+					<plot/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+					<categoryAxisFormat>
+						<axisFormat>
+							<labelFont/>
+							<tickLabelFont/>
+						</axisFormat>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat>
+							<labelFont/>
+							<tickLabelFont/>
+						</axisFormat>
+					</valueAxisFormat>
+				</bar3DPlot>
+			</bar3DChart>
+		</band>
+	</pageFooter>
+</jasperReport>

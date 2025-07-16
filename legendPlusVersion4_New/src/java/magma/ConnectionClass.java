@@ -1,0 +1,126 @@
+package magma;
+
+import java.security.MessageDigest;
+import java.sql.Connection;
+import java.sql.Statement;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
+
+//import java.util.UUID;
+import sun.misc.BASE64Encoder;
+
+/**
+ * <p>Title: Magma.net System</p>
+ *
+ * <p>Description: Fixed Assets Manager</p>
+ *
+ * <p>Copyright: Copyright (c) 2006. All rights reserved.</p>
+ *
+ * <p>Company: Magbel Technologies Limited.</p>
+ *
+ * @author Charles Ayoola Ayodele-Peters.
+ * @version 1.0
+ */
+
+public class ConnectionClass {
+    private Connection conn = null;
+    private String jndiName = "fixedasset";
+
+    public ConnectionClass() throws Exception {
+        Context ic = new InitialContext();
+        String dsJndi = "java:/FixedAsset";
+        DataSource ds = (DataSource) ic.lookup(dsJndi);
+        conn = ds.getConnection();
+    }
+
+    /**
+     * getConnection
+     *
+     * @return Connection
+     * @throws Exception
+     */
+    public Connection getConnection() throws Exception {
+        return conn;
+    }
+
+    /**
+     * getConnection
+     *
+     * @return Statement
+     * @throws Exception
+     */
+    public Statement getStatement() throws Exception {
+
+        return conn.createStatement();
+    }
+
+    /**
+     * getIdentity
+     *
+     * @return String
+     */
+    public String getIdentity() {
+        return ""; //UUID.randomUUID().toString();
+    }
+
+    /**
+     * getProperties
+     *
+     * @param sele String
+     * @param vals String[][]
+     * @return String
+     */
+    public String getProperties(String sele, String[][] vals) {
+        String html = new String();
+        if (sele == null) {
+            sele = " ";
+        }
+        for (int i = 0; i < vals.length; i++) {
+            html = html + "<option value='" + vals[i][0] + "' " +
+                   (vals[i][0].equalsIgnoreCase(sele) ? " selected " : "") +
+                   ">" + vals[i][2] + "</option> ";
+        }
+
+        return html;
+    }
+
+    /**
+     * getProperties
+     *
+     * @param sele String
+     * @param iden String[]
+     * @param vals String[]
+     * @return String
+     */
+    public String getProperties(String sele, String[] iden, String[] vals) {
+        String html = new String();
+        if (sele == null) {
+            sele = " ";
+        }
+        for (int i = 0; i < iden.length; i++) {
+            html = html + "<option value='" + iden[i] + "' " +
+                   (iden[i].equalsIgnoreCase(sele) ? " selected " : "") + ">" +
+                   vals[i] + "</option> ";
+        }
+
+        return html;
+    }
+
+    /**
+     * getEncrypted
+     *
+     * @param input String
+     * @throws Throwable
+     * @return String
+     */
+    public String getEncrypted(String input) throws Throwable {
+
+        MessageDigest md = MessageDigest.getInstance("SHA-512");
+        md.update(input.toString().getBytes("UTF-16"));
+
+        return new BASE64Encoder().encode(md.digest());
+    }
+}

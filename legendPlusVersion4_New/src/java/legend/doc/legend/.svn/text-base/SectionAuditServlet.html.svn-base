@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML><!--JBuilder QuickDoc-->
+<HEAD>
+<TITLE>Class legend.SectionAuditServlet</TITLE><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+</HEAD>
+<BODY>
+
+<H2>
+<FONT SIZE="-1">legend</FONT>
+<BR>Class SectionAuditServlet</H2>
+<DL>
+<DT>public class <B>SectionAuditServlet</B><DT>extends javax.servlet.http.HttpServlet
+</DL>
+<DL><DD><p>Title: </p> <p>Description: </p> <p>Copyright: Copyright (c) 2006</p> <p>Company: </p><DL><DD></DD></DL></DD>
+</DL>
+<DL><DT><B>Version:</B><DD>1.0</DD>
+<DT><B>Author:</B><DD>not attributable</DD>
+</DL>
+<TABLE BORDER="1" CELLPADDING="3" CELLSPACING="0" WIDTH="100%">
+<TR BGCOLOR="#CCCCFF"><TD COLSPAN=1><FONT SIZE="+2">
+<B>Method Detail</B>
+</FONT></TD></TR></TABLE>
+
+<A NAME="init(javax.servlet.ServletConfig)"></A>
+
+<H3>init</H3>
+<PRE>
+public void <B>init</B>(javax.servlet.ServletConfig&nbsp;config)</PRE>
+<DL><DD>Initializes the servlet.<DL><DD></DD></DL></DD>
+</DL>
+<DL><DT><B>Parameters:</B><DD><CODE>config</CODE> - ServletConfig</DD>
+<DT><B>Throws:</B><DD><CODE>ServletException</CODE> - </DD>
+</DL>
+<HR>
+
+<A NAME="destroy()"></A>
+
+<H3>destroy</H3>
+<PRE>
+public void <B>destroy</B>()</PRE>
+<DL><DD>Destroys the servlet.<DL><DD></DD></DL></DD>
+</DL>
+<DL></DL>
+<HR>
+
+<A NAME="service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)"></A>
+
+<H3>service</H3>
+<PRE>
+public void <B>service</B>(javax.servlet.http.HttpServletRequest&nbsp;request,
+                    javax.servlet.http.HttpServletResponse&nbsp;response)</PRE>
+<DL><DD>Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.<DL><DD></DD></DL></DD>
+</DL>
+<DL><DT><B>Parameters:</B><DD><CODE>request</CODE> - servlet request</DD>
+<DD><CODE>response</CODE> - servlet response</DD>
+<DT><B>Throws:</B><DD><CODE>ServletException</CODE> - </DD>
+<DD><CODE>IOException</CODE> - </DD>
+</DL>
+<HR>
+
+</BODY>
+</HTML>

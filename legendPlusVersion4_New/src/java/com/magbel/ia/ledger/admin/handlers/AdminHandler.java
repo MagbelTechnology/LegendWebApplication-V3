@@ -1,0 +1,5280 @@
+/**
+ * 
+ */
+package com.magbel.ia.ledger.admin.handlers;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+
+import com.magbel.util.DataConnect;
+import  com.magbel.ia.legend.admin.objects.*;
+
+import audit.*;
+
+//import the ApplicationHelper class
+ import com.magbel.util.ApplicationHelper;
+import com.magbel.util.DatetimeFormat;
+
+import java.util.Date;
+
+import com.magbel.ia.legend.admin.objects.Branch;
+
+ //Declaration
+
+
+
+
+public class AdminHandler {
+
+	/**
+	 * @Entities Department,Branch,Section,States,Category,Region,Province
+	 */
+	AdminHandler handler;
+    Connection con = null;
+
+	Statement stmt = null;
+
+	PreparedStatement ps = null;
+
+	ResultSet rs = null;
+
+	DataConnect dc;
+
+	SimpleDateFormat sdf;
+
+	final String space = "  ";
+
+	final String comma = ",";
+
+	java.util.Date date;
+
+	com.magbel.util.DatetimeFormat df;
+     ApplicationHelper  help ;
+     // AdminHandler handler;
+
+      ApplicationHelper apph;
+
+
+	public AdminHandler() {
+
+		sdf = new SimpleDateFormat("dd-MM-yyyy");
+		df = new com.magbel.util.DatetimeFormat();
+		System.out.println("USING_ " + this.getClass().getName());
+       help = new ApplicationHelper();
+	}
+
+
+    /*
+    public boolean createBranch(legend.admin.objects.Branch branch) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "INSERT INTO am_ad_branch(BRANCH_CODE,BRANCH_NAME"
+				+ ",BRANCH_ACRONYM,GL_PREFIX,BRANCH_ADDRESS"
+				+ " ,STATE,PHONE_NO,FAX_NO,REGION,PROVINCE"
+				+ " ,BRANCH_STATUS,USER_ID,CREATE_DATE,GL_SUFFIX,BRANCH_ID) "
+				+ " VALUES(?,?,? ,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, branch.getBranchCode());
+			ps.setString(2, branch.getBranchName());
+			ps.setString(3, branch.getBranchAcronym());
+			ps.setString(4, branch.getGlPrefix());
+			ps.setString(5, branch.getBranchAddress());
+			ps.setString(6, branch.getState());
+			ps.setString(7, branch.getPhoneNo());
+			ps.setString(8, branch.getFaxNo());
+			ps.setString(9, branch.getRegion());
+			ps.setString(10, branch.getProvince());
+			ps.setString(11, branch.getBranchStatus());
+			ps.setString(12, branch.getUsername());
+			ps.setDate(13, df.dateConvert(new java.util.Date()));
+			ps.setString(14, branch.getGlSuffix());
+			ps.setLong(15,System.currentTimeMillis()); 
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error Creating Branch ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+*/
+	public boolean createCategory(com.magbel.ia.legend.admin.objects.Category category) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "INSERT INTO am_ad_category"
+				+ "(category_code,category_name"
+				+ ",category_acronym,Required_for_fleet"
+				+ ",Category_Class ,PM_Cycle_Period,mileage"
+				+ ",Notify_Maint_Days ,notify_every_days,residual_value"
+				+ ",Dep_rate ,Asset_Ledger,Dep_ledger"
+				+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
+				+ ",license_ledger ,fuel_ledger,accident_ledger"
+				+ ",Category_Status ,user_id,create_date"
+				+ ",acct_type ,currency_Id, category_id,enforceBarcode,category_Type)"
+		+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			//ps.setLong(1, System.currentTimeMillis());
+			ps.setString(1, category.getCategoryCode());
+			ps.setString(2, category.getCategoryName()); 
+			ps.setString(3, category.getCategoryAcronym());
+			ps.setString(4, category.getRequiredforFleet());
+			ps.setString(5, category.getCategoryClass());
+			ps.setString(6, category.getPmCyclePeriod());
+			ps.setString(7, category.getMileage());
+			ps.setString(8, category.getNotifyMaintdays());
+			ps.setString(9, category.getNotifyEveryDays());
+			ps.setString(10, category.getResidualValue());
+			ps.setString(11, category.getDepRate());
+			ps.setString(12, category.getAssetLedger());
+			ps.setString(13, category.getDepLedger());
+			ps.setString(14, category.getAccumDepLedger());
+			ps.setString(15, category.getGlAccount());
+			ps.setString(16, category.getInsuranceAcct());
+			ps.setString(17, category.getLicenseLedger());
+			ps.setString(18, category.getFuelLedger());
+			ps.setString(19, category.getAccidentLedger());
+			ps.setString(20, category.getCategoryStatus());
+			ps.setString(21, category.getUserId());
+			ps.setDate(22, df.dateConvert(new java.util.Date()));
+			ps.setString(23, category.getAcctType());
+			ps.setString(24, category.getCurrencyId());
+			ps.setString(25, new ApplicationHelper().getGeneratedId("am_ad_category"));
+			
+                        ps.setString(26, category.getEnforceBarcode());
+                        ps.setString(27, category.getCategoryType());
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error creating category ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+	public boolean createDepartment(com.magbel.ia.legend.admin.objects.Department dept) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "INSERT INTO am_ad_department(Dept_code,Dept_name"
+				+ " ,Dept_acronym,Dept_Status,user_id ,CREATE_DATE,Dept_ID)"
+				+ " VALUES (?,?,?,?,?,?,?)";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, dept.getDept_code());
+			ps.setString(2, dept.getDept_name());
+			ps.setString(3, dept.getDept_acronym());
+			ps.setString(4, dept.getDept_status());
+			ps.setString(5, dept.getUser_id());
+			ps.setDate(6, df.dateConvert(new java.util.Date()));
+			ps.setString(7, new ApplicationHelper().getGeneratedId("am_ad_department"));
+		done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error creating Department ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+	public boolean createSection(com.magbel.ia.legend.admin.objects.Section section) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "INSERT INTO am_ad_section(Section_ID,Section_Code,Section_Name"
+				+ "  ,section_acronym,Section_Status,User_ID,Create_Date)"
+				+ "  VALUES (?,?,?,?,?,?,?)";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, new ApplicationHelper().getGeneratedId("am_ad_section"));
+			ps.setString(2, section.getSection_code());
+			ps.setString(3, section.getSection_name());
+			ps.setString(4, section.getSection_acronym());
+			ps.setString(5, section.getSection_status());
+			ps.setString(6, section.getUserid());
+			ps.setDate(7, df.dateConvert(new java.util.Date()));
+
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error creating Section ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+        /*
+
+	public boolean createState(legend.admin.objects.State state) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "INSERT INTO am_gb_states(state_code,state_name"
+				+ "  ,state_status,user_id,create_date,state_id)"
+				+ "   VALUES (?,?,?,?,?))";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, state.getStateCode());
+			ps.setString(2, state.getStateName());
+			ps.setString(3, state.getStateStatus());
+			ps.setString(4, state.getUserId());
+			ps.setDate(5, df.dateConvert(new java.util.Date()));
+			ps.setLong(6, Integer.parseInt(new ApplicationHelper().getGeneratedId("am_gb_states")));
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error creating State ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+*/
+	public boolean createRegion(com.magbel.ia.legend.admin.objects.Region region) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "INSERT INTO AM_AD_REGION( Region_Code, Region_Name"
+				+ ", Region_Acronym, Region_Address"
+				+ ",Region_Phone , Region_Fax, Region_Status, User_Id,Create_Date,Region_iD) "
+				+ " VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			//ps.setLong(1, System.currentTimeMillis());
+			ps.setString(1, region.getRegionCode());
+			ps.setString(2, region.getRegionName());
+			ps.setString(3, region.getRegionAcronym());
+			ps.setString(4, region.getRegionAddress());
+			ps.setString(5, region.getRegionPhone());
+			ps.setString(6, region.getRegionFax());
+			ps.setString(7, region.getRegionStatus());
+			ps.setString(8, region.getUserId());
+			ps.setDate(9, df.dateConvert(new java.util.Date()));
+			ps.setString(10, new ApplicationHelper().getGeneratedId("AM_AD_REGION"));
+			
+			done=( ps.executeUpdate()!=-1);
+		} catch (Exception e) {
+			System.out.println("WARNING:Error creating Region ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+	public boolean createProvince(com.magbel.ia.legend.admin.objects.Province ccode) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "INSERT INTO am_gb_Province"
+				+ "(Province_Code, Province"
+				+ ",Status, User_id, create_date,Province_ID)"
+				+ " VALUES (?,?,?,?,?,?)";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, ccode.getProvinceCode());
+			ps.setString(2, ccode.getProvince());
+			ps.setString(3, ccode.getStatus());
+			ps.setString(4, ccode.getUserId());
+			ps.setDate(5, df.dateConvert(ccode.getCreateDate()));
+			ps.setString(6, new ApplicationHelper().getGeneratedId("am_gb_Province"));
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error creating Province ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+    /*
+	public boolean updateBranch(legend.admin.objects.Branch branch) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "UPDATE am_ad_branch SET BRANCH_CODE =?,BRANCH_NAME = ?,BRANCH_ACRONYM = ?"
+				+ " ,GL_PREFIX = ?,BRANCH_ADDRESS = ?,STATE = ?"
+				+ " ,PHONE_NO = ?,FAX_NO = ?,REGION = ?,PROVINCE = ?"
+				+ " ,BRANCH_STATUS = ?,GL_SUFFIX = ?"
+				+ " WHERE BRANCH_ID =?";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, branch.getBranchCode());
+			ps.setString(2, branch.getBranchName());
+			ps.setString(3, branch.getBranchAcronym());
+			ps.setString(4, branch.getGlPrefix());
+			ps.setString(5, branch.getBranchAddress());
+			ps.setString(6, branch.getState());
+			ps.setString(7, branch.getPhoneNo());
+			ps.setString(8, branch.getFaxNo());
+			ps.setString(9, branch.getRegion());
+			ps.setString(10, branch.getProvince());
+			ps.setString(11, branch.getBranchStatus());
+			ps.setString(12, branch.getGlSuffix());
+			ps.setString(13, branch.getBranchId());
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error executing Query ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+*/
+	public boolean updateCategory(com.magbel.ia.legend.admin.objects.Category category) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+
+		String query = "UPDATE am_ad_category"
+				+ " SET category_code = ?,category_name = ?,category_acronym = ?"
+				+ " , Required_for_fleet = ?,Category_Class = ?,PM_Cycle_Period = ?"
+				+ " , mileage = ?,Notify_Maint_Days = ?,notify_every_days = ?"
+				+ " , residual_value = ?,Dep_rate = ?,Asset_Ledger = ?"
+				+ " , Dep_ledger = ?,Accum_Dep_ledger = ?,gl_account = ?"
+				+ " , insurance_acct = ?,license_ledger = ?,fuel_ledger = ?"
+				+ " , accident_ledger = ?,Category_Status = ?,user_id = ?"
+				+ " , create_date = ?,acct_type = ?,currency_Id = ?,enforceBarcode=?,category_Type=?"
+				+ " WHERE category_ID =?";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+
+			ps.setString(1, category.getCategoryCode());
+			ps.setString(2, category.getCategoryName());
+			ps.setString(3, category.getCategoryAcronym());
+			ps.setString(4, category.getRequiredforFleet());
+			ps.setString(5, category.getCategoryClass());
+			ps.setString(6, category.getPmCyclePeriod());
+			ps.setString(7, category.getMileage());
+			ps.setString(8, category.getNotifyMaintdays());
+			ps.setString(9, category.getNotifyEveryDays());
+			ps.setString(10, category.getResidualValue());
+			ps.setString(11, category.getDepRate());
+			ps.setString(12, category.getAssetLedger());
+			ps.setString(13, category.getDepLedger());
+			ps.setString(14, category.getAccumDepLedger());
+			ps.setString(15, category.getGlAccount());
+			ps.setString(16, category.getInsuranceAcct());
+			ps.setString(17, category.getLicenseLedger());
+			ps.setString(18, category.getFuelLedger());
+			ps.setString(19, category.getAccidentLedger());
+			ps.setString(20, category.getCategoryStatus());
+			ps.setString(21, category.getUserId());
+			ps.setDate(22, df.dateConvert(new java.util.Date()));
+			ps.setString(23, category.getAcctType());
+			ps.setString(24, category.getCurrencyId());
+                        ps.setString(25, category.getEnforceBarcode());
+                    //    System.out.println("----------->--------------------------------->"+category.getCategoryType());
+			ps.setString(26, category.getCategoryType());
+			ps.setString(27, category.getCategoryId());
+		//	System.out.println("----------->"+query);
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error executing Query ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+
+	public boolean updateDepartment(com.magbel.ia.legend.admin.objects.Department dept) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "UPDATE am_ad_department SET Dept_code = ?,Dept_name = ?"
+				+ " ,Dept_acronym = ?,Dept_Status = ?"
+				+ "  WHERE Dept_ID=?";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, dept.getDept_code());
+			ps.setString(2, dept.getDept_name());
+			ps.setString(3, dept.getDept_acronym());
+			ps.setString(4, dept.getDept_status());
+			ps.setString(5, dept.getDept_id());
+
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error Updating Query ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+	public boolean updateSection(com.magbel.ia.legend.admin.objects.Section section) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "UPDATE am_ad_section SET Section_Code = ?,Section_Name = ?"
+				+ "  ,section_acronym = ?,Section_Status = ?"
+				+ "  WHERE Section_ID = ?";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, section.getSection_code());
+			ps.setString(2, section.getSection_name());
+			ps.setString(3, section.getSection_acronym());
+			ps.setString(4, section.getSection_status());
+			ps.setString(5, section.getSection_id());
+
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error Updating Section ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+	public boolean updateState(com.magbel.ia.legend.admin.objects.State state) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "UPDATE am_gb_states SET state_code = ?,state_name = ?"
+				+ "   ,state_status = ?" + "   WHERE state_ID=?";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, state.getStateCode());
+			ps.setString(2, state.getStateName());
+			ps.setString(3, state.getStateStatus());
+			ps.setString(4, state.getStateId());
+
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error Updating State ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+	public boolean updateRegion(com.magbel.ia.legend.admin.objects.Region region) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+                /*
+		String query = "UPDATE AM_AD_REGION"
+				+ " SET Region_Name = ?, Region_Acronym = ?"
+				+ ",Region_Address = ?,Region_Phone = ?, Region_Fax = ?"
+				+ ",Region_Status = ?, User_Id = ?"
+				// + ",Create_Date = ?"
+				+ " WHERE Region_Code = ?";
+*/
+                String query = "Update AM_AD_REGION SET Region_Name=?,Region_Acronym=?,Region_Address=?," +
+                        "Region_Phone=?,Region_Fax=?,Region_Status=? WHERE Region_Code=?";
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, region.getRegionName());
+			ps.setString(2, region.getRegionAcronym());
+			ps.setString(3, region.getRegionAddress());
+			ps.setString(4, region.getRegionPhone());
+			ps.setString(5, region.getRegionFax());
+			// ps.setDate(6,df.dateConvert(new java.util.Date()));
+			ps.setString(6, region.getRegionStatus());
+			//ps.setString(7, region.getUserId());
+			ps.setString(7, region.getRegionCode());
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error executing Query ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+	public boolean updateProvince(com.magbel.ia.legend.admin.objects.Province ccode) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "UPDATE am_gb_Province" + " SET Province_Code = ?"
+				+ ",Province = ?,Status = ?" + "  WHERE Province_ID = ?";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			// ps.setString(1, ccode.getProvinceId());
+			ps.setString(1, ccode.getProvinceCode());
+			ps.setString(2, ccode.getProvince());
+			ps.setString(3, ccode.getStatus());
+			ps.setString(4, ccode.getProvinceId());
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error Updating Province ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+	public java.util.List<Branch> getBranchesByQuery(String filter) {
+		java.util.List<Branch> _list = new java.util.ArrayList<Branch>();
+		com.magbel.ia.legend.admin.objects.Branch branch = null;
+		String query = "SELECT BRANCH_ID,BRANCH_CODE"
+				+ " ,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX"
+				+ ",BRANCH_ADDRESS,STATE,PHONE_NO"
+				+ ",FAX_NO,REGION,PROVINCE"
+				+ ",BRANCH_STATUS,USER_ID,GL_SUFFIX"
+				+ ",CREATE_DATE  FROM am_ad_branch";
+
+		//query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String branchId = rs.getString("BRANCH_ID");
+				String branchCode = rs.getString("BRANCH_CODE");
+				String branchName = rs.getString("BRANCH_NAME");
+				String branchAcronym =rs.getString("BRANCH_ACRONYM");
+				String glPrefix = rs.getString("GL_PREFIX");
+				String branchAddress = rs.getString("BRANCH_ADDRESS");
+				String state = rs.getString("STATE");
+				String phoneNo = rs.getString("PHONE_NO");
+				String faxNo = rs.getString("FAX_NO");
+				String province = rs.getString("PROVINCE");
+				String region = rs.getString("REGION");
+				String branchStatus = rs.getString("BRANCH_STATUS");
+				String username = rs.getString("USER_ID");
+				String glSuffix = rs.getString("GL_SUFFIX");
+				String createDate = rs.getString("CREATE_DATE");
+				branch = new com.magbel.ia.legend.admin.objects.Branch(branchId, branchCode,
+						branchName, branchAcronym, glPrefix, glSuffix,
+						branchAddress, state, phoneNo, faxNo, region, province,
+						branchStatus, username, createDate);
+
+				_list.add(branch);
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error Selecting branches ->" + e.getMessage());
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+
+
+    /*
+	private legend.admin.objects.Branch getABranch(String filter) {
+		legend.admin.objects.Branch branch = null;
+		String query = "SELECT BRANCH_ID,BRANCH_CODE"
+				+ " ,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX"
+				+ ",BRANCH_ADDRESS,STATE,PHONE_NO"
+				+ ",FAX_NO,REGION,PROVINCE"
+				+ ",BRANCH_STATUS,USER_ID,GL_SUFFIX"
+				+ ",CREATE_DATE  FROM am_ad_branch ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c= getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String branchId = rs.getString("BRANCH_ID");
+				String branchCode = rs.getString("BRANCH_CODE");
+				String branchName = rs.getString("BRANCH_NAME");
+				String branchAcronym = rs.getString("BRANCH_ACRONYM");
+				String glPrefix = rs.getString("GL_PREFIX");
+				String branchAddress = rs.getString("BRANCH_ADDRESS");
+				String state = rs.getString("STATE");
+				String phoneNo = rs.getString("PHONE_NO");
+				String faxNo = rs.getString("FAX_NO");
+				String province = rs.getString("PROVINCE");
+				String region = rs.getString("REGION");
+				String branchStatus = rs.getString("BRANCH_STATUS");
+				String username = rs.getString("USER_ID");
+				String glSuffix = rs.getString("GL_SUFFIX");
+				String createDate = rs.getString("CREATE_DATE");
+				branch = new legend.admin.objects.Branch(branchId, branchCode,
+						branchName, branchAcronym, glPrefix, glSuffix,
+						branchAddress, state, phoneNo, faxNo, region, province,
+						branchStatus, username, createDate);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return branch;
+
+	}
+
+     */
+    
+	public com.magbel.ia.legend.admin.objects.Branch getBranchByBranchID(String branchid) {
+		String filter = " WHERE BRANCH_ID = " + branchid;
+		com.magbel.ia.legend.admin.objects.Branch branch = getABranch(filter);
+		return branch;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Branch getBranchByBranchCode(String branchcode) {
+		String filter = " WHERE BRANCH_CODE = '" + branchcode + "'";
+		com.magbel.ia.legend.admin.objects.Branch branch = getABranch(filter);
+		return branch;
+
+	}
+
+	public java.util.List<Department> getDeparmentsByQuery(String filter) {
+		java.util.List<Department> _list = new java.util.ArrayList<Department>();
+		com.magbel.ia.legend.admin.objects.Department dept = null;
+		String query = "SELECT Dept_ID,Dept_code,Dept_name"
+				+ "  ,Dept_acronym,Dept_Status"
+				+ " ,user_id,CREATE_DATE" + " FROM am_ad_department ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String dept_id = rs.getString("Dept_ID");
+				String dept_code = rs.getString("Dept_code");
+				String dept_name = rs.getString("Dept_name");
+				String dept_acronym = rs.getString("Dept_acronym");
+				String dept_status = rs.getString("Dept_Status");
+				String user_id = rs.getString("user_id");
+				dept = new com.magbel.ia.legend.admin.objects.Department(dept_id, dept_code,
+						dept_name, dept_acronym, dept_status, user_id);
+
+				_list.add(dept);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+	private com.magbel.ia.legend.admin.objects.Department getADepartment(String filter) {
+		com.magbel.ia.legend.admin.objects.Department dept = null;
+		String query = "SELECT Dept_ID,Dept_code,Dept_name"
+				+ "  ,Dept_acronym,Dept_Status"
+				+ " ,user_id,CREATE_DATE" + " FROM am_ad_department ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String dept_id = rs.getString("Dept_ID");
+				String dept_code = rs.getString("Dept_code");
+				String dept_name = rs.getString("Dept_name");
+				String dept_acronym = rs.getString("Dept_acronym");
+				String dept_status = rs.getString("Dept_Status");
+				String user_id = rs.getString("user_id");
+				dept = new com.magbel.ia.legend.admin.objects.Department(dept_id, dept_code,
+						dept_name, dept_acronym, dept_status, user_id);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return dept;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Department getDeptByDeptID(String deptid) {
+		String filter = " WHERE Dept_ID=" + deptid;
+		com.magbel.ia.legend.admin.objects.Department dept = getADepartment(filter);
+		return dept;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Department getDeptByDeptCode(String deptcode) {
+		String filter = " WHERE Dept_Code='" + deptcode + "'";
+		com.magbel.ia.legend.admin.objects.Department dept = getADepartment(filter);
+		return dept;
+
+	}
+
+	public java.util.List<Section> getSectionByQuery(String filter) {
+		java.util.List<Section> _list = new java.util.ArrayList<Section>();
+		com.magbel.ia.legend.admin.objects.Section section = null;
+		String query = "SELECT Section_ID,Section_Code,Section_Name"
+				+ " ,section_acronym,Section_Status"
+				+ " ,user_id,CREATE_DATE" + "  FROM am_ad_section ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String section_id = rs.getString("Section_ID");
+				String section_code = rs.getString("Section_Code");
+				String section_acromyn = rs.getString("section_acronym");
+				String section_name = rs.getString("Section_Name");
+				String section_status = rs.getString("Section_Status");
+				String userid = rs.getString("user_id");
+				section = new com.magbel.ia.legend.admin.objects.Section(section_id,
+						section_code, section_acromyn, section_name,
+						section_status, userid);
+
+				_list.add(section);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+	private com.magbel.ia.legend.admin.objects.Section getASection(String filter) {
+		com.magbel.ia.legend.admin.objects.Section section = null;
+		String query = "SELECT Section_ID,Section_Code,Section_Name"
+				+ " ,section_acronym,Section_Status"
+				+ ",user_id,CREATE_DATE" + "  FROM am_ad_section ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String section_id = rs.getString("Section_ID");
+				String section_code = rs.getString("Section_Code");
+				String section_acromyn = rs.getString("section_acronym");
+				String section_name = rs.getString("Section_Name");
+				String section_status = rs.getString("Section_Status");
+				String userid = rs.getString("user_id");
+				section = new com.magbel.ia.legend.admin.objects.Section(section_id,
+						section_code, section_acromyn, section_name,
+						section_status, userid);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return section;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Section getSectionByID(String sectionid) {
+		String filter = " WHERE Section_ID=" + sectionid;
+		com.magbel.ia.legend.admin.objects.Section section = getASection(filter);
+		return section;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Section getSectionByCode(String sectioncode) {
+		String filter = " WHERE Section_Code='" + sectioncode + "'";
+		com.magbel.ia.legend.admin.objects.Section section = getASection(filter);
+		return section;
+
+	}
+
+	public java.util.List<State> getStatesByQuery(String filter) {
+		java.util.List<State> _list = new java.util.ArrayList<State>();
+		com.magbel.ia.legend.admin.objects.State state = null;
+		String query = "SELECT state_ID,state_code,state_name"
+				+ "  ,state_status,user_id,create_date"
+				+ " FROM am_gb_states ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String stateId = rs.getString("state_ID");
+				String stateCode = rs.getString("state_code");
+				String stateName = rs.getString("state_name");
+				String stateStatus = rs.getString("state_status");
+				String userId = rs.getString("user_id");
+				String createDate = rs.getString("create_date");
+				state = new com.magbel.ia.legend.admin.objects.State(stateId, stateCode,
+						stateName, stateStatus, userId, createDate);
+
+				_list.add(state);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+	private com.magbel.ia.legend.admin.objects.State getAState(String filter) {
+		java.util.ArrayList _list = new java.util.ArrayList();
+		com.magbel.ia.legend.admin.objects.State state = null;
+		String query = "SELECT state_ID,state_code,state_name"
+				+ "  ,state_status,user_id,create_date"
+				+ " FROM am_gb_states ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String stateId = rs.getString("state_ID");
+				String stateCode = rs.getString("state_code");
+				String stateName = rs.getString("state_name");
+				String stateStatus = rs.getString("state_status");
+				String userId = rs.getString("user_id");
+				String createDate = rs.getString("create_date");
+				state = new com.magbel.ia.legend.admin.objects.State(stateId, stateCode,
+						stateName, stateStatus, userId, createDate);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return state;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.State getStateByID(String stateid) {
+		String filter = " WHERE state_ID=" + stateid;
+		com.magbel.ia.legend.admin.objects.State state = getAState(filter);
+		return state;
+
+	}
+/*
+	private com.magbel.ia.legend.admin.objects.Region getARegion(String filter)
+    {
+        Connection c = null;
+		//ResultSet rs = null;
+		Statement s = null;
+        PreparedStatement ps = null;
+
+		com.magbel.ia.legend.admin.objects.Region region = null;
+		String query = "SELECT Region_Id, Region_Code, Region_Name"
+				+ ", Region_Acronym, Region_Address"
+				+ ",Region_Phone , Region_Fax, Region_Status, User_Id, Create_Date"
+				+ " FROM AM_AD_REGION";
+
+		query = query + filter;
+		
+
+		try {
+
+           c = getConnection();
+	        ps = con.prepareStatement(query);
+
+
+	            rs = ps.executeQuery();
+
+
+
+
+
+
+
+
+			//c = getConnection();
+			//s = c.createStatement();
+			//rs = s.executeQuery(query);
+			while (rs.next()) {
+                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+				String regionId = rs.getString("Region_Id");
+				String regionCode = rs.getString("Region_Code");
+				String regionName = rs.getString("Region_Name");
+				String regionAcronym = rs.getString("Region_Acronym");
+				String regionAddress = rs.getString("Region_Address");
+				String regionPhone = rs.getString("Region_Phone");
+				String regionFax = rs.getString("Region_Fax");
+				String regionStatus = rs.getString("Region_Status");
+				String userId = rs.getString("User_Id");
+				String createDate = rs.getString("Create_Date");
+
+				region = new com.magbel.ia.legend.admin.objects.Region();
+				region.setRegionId(regionId);
+				region.setRegionCode(regionCode);
+				region.setRegionName(regionName);
+				region.setRegionAcronym(regionAcronym);
+				region.setRegionAddress(regionAddress);
+				region.setRegionStatus(regionStatus);
+				region.setRegionPhone(regionPhone);
+				region.setRegionFax(regionFax);
+				region.setUserId(userId);
+				region.setCreateDate(createDate);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return region;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Region getRegionByID(String RegID) {
+		com.magbel.ia.legend.admin.objects.Region region = null;
+
+		String filter = "WHERE Region_Id = '" + RegID + "'";
+		region = getARegion(filter);
+		return region;
+
+	}
+    */
+//NEW CATEGORY FROM LANRE
+    private com.magbel.ia.legend.admin.objects.Region getARegion(String filter) {
+		com.magbel.ia.legend.admin.objects.Region region = null;
+		String query = "SELECT Region_Id, Region_Code, Region_Name"
+				+ ", Region_Acronym, Region_Address"
+				+ ",Region_Phone , Region_Fax, Region_Status, User_Id, Create_Date"
+				+ " FROM AM_AD_REGION";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String regionId = rs.getString("Region_Id");
+				String regionCode = rs.getString("Region_Code");
+				String regionName = rs.getString("Region_Name");
+				String regionAcronym = rs.getString("Region_Acronym");
+				String regionAddress = rs.getString("Region_Address");
+				String regionPhone = rs.getString("Region_Phone");
+				String regionFax = rs.getString("Region_Fax");
+				String regionStatus = rs.getString("Region_Status");
+				String userId = rs.getString("User_Id");
+				String createDate = rs.getString("Create_Date");
+
+				region = new com.magbel.ia.legend.admin.objects.Region();
+				region.setRegionId(regionId);
+				region.setRegionCode(regionCode);
+				region.setRegionName(regionName);
+				region.setRegionAcronym(regionAcronym);
+				region.setRegionAddress(regionAddress);
+				region.setRegionStatus(regionStatus);
+				region.setRegionPhone(regionPhone);
+				region.setRegionFax(regionFax);
+				region.setUserId(userId);
+				region.setCreateDate(createDate);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return region;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Region getRegionByID(String RegID) {
+		com.magbel.ia.legend.admin.objects.Region region = null;
+
+		String filter = " WHERE Region_Id = "+ RegID ;
+		region = getARegion(filter);
+		return region;
+
+	}
+
+
+
+
+	public com.magbel.ia.legend.admin.objects.Region getRegionByCode(String Regcode) {
+		com.magbel.ia.legend.admin.objects.Region region = null;
+
+		String filter = "WHERE  Region_Code = '" + Regcode + "'";
+		region = getARegion(filter);
+		return region;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.State getStateByCode(String statecode) {
+		String filter = " WHERE state_code='" + statecode + "'";
+		com.magbel.ia.legend.admin.objects.State state = getAState(filter);
+		return state;
+
+	}
+
+	public java.util.List<Category> getCategoryByQuery(String filter) {
+		java.util.List<Category> _list = new java.util.ArrayList<Category>();
+		com.magbel.ia.legend.admin.objects.Category category = null;
+		String query = "SELECT category_ID,category_code,category_name"
+				+ ",category_acronym,Required_for_fleet"
+				+ ",Category_Class ,PM_Cycle_Period,mileage"
+				+ ",Notify_Maint_Days ,notify_every_days,residual_value"
+				+ ",Dep_rate ,Asset_Ledger,Dep_ledger"
+				+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
+				+ ",license_ledger ,fuel_ledger,accident_ledger"
+				+ ",Category_Status ,user_id,create_date"
+				+ ",acct_type ,currency_Id,enforceBarcode" + " FROM am_ad_category  ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String categoryId = rs.getString("category_ID");
+				String categoryCode = rs.getString("category_code");
+				String categoryName = rs.getString("category_name");
+				String categoryAcronym = rs.getString("category_acronym");
+				String requiredforFleet = rs.getString("Required_for_fleet");
+				String categoryClass = rs.getString("Category_Class");
+				String pmCyclePeriod = rs.getString("PM_Cycle_Period");
+				String mileage = rs.getString("mileage");
+				String notifyMaintdays = rs.getString("Notify_Maint_Days");
+				String notifyEveryDays = rs.getString("notify_every_days");
+				String residualValue = rs.getString("residual_value");
+				String depRate = rs.getString("Dep_rate");
+				String assetLedger = rs.getString("Asset_Ledger");
+				String depLedger = rs.getString("Dep_ledger");
+				String accumDepLedger = rs.getString("Accum_Dep_ledger");
+				String glAccount = rs.getString("gl_account");
+				String insuranceAcct = rs.getString("insurance_acct");
+				String licenseLedger = rs.getString("license_ledger");
+				String fuelLedger = rs.getString("fuel_ledger");
+				String accidentLedger = rs.getString("accident_ledger");
+				String categoryStatus = rs.getString("Category_Status");
+				String userId = rs.getString("user_id");
+				String createDate = sdf.format(rs.getDate("create_date"));
+				String acctType = rs.getString("acct_type");
+				String currencyId = rs.getString("currency_Id");
+                                String enforeBarcode = rs.getString("enforceBarcode");
+				category = new com.magbel.ia.legend.admin.objects.Category(categoryId,
+						categoryCode, categoryName, categoryAcronym,
+						requiredforFleet, categoryClass, pmCyclePeriod,
+						mileage, notifyMaintdays, notifyEveryDays,
+						residualValue, depRate, assetLedger, depLedger,
+						accumDepLedger, glAccount, insuranceAcct,
+						licenseLedger, fuelLedger, accidentLedger,
+						categoryStatus, userId, createDate, acctType,
+						currencyId,enforeBarcode);
+				_list.add(category);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+	private com.magbel.ia.legend.admin.objects.Category getACategory(String filter) {
+		com.magbel.ia.legend.admin.objects.Category category = null;
+		String query = "SELECT category_ID,category_code,category_name"
+				+ ",category_acronym,Required_for_fleet"
+				+ ",Category_Class ,PM_Cycle_Period,mileage"
+				+ ",Notify_Maint_Days ,notify_every_days,residual_value"
+				+ ",Dep_rate ,Asset_Ledger,Dep_ledger"
+				+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
+				+ ",license_ledger ,fuel_ledger,accident_ledger"
+				+ ",Category_Status ,user_id,create_date"
+				+ ",acct_type ,currency_Id,enforceBarcode" + " FROM am_ad_category ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String categoryId = rs.getString("category_ID");
+				String categoryCode = rs.getString("category_code");
+				String categoryName = rs.getString("category_name");
+				String categoryAcronym = rs.getString("category_acronym");
+				String requiredforFleet = rs.getString("Required_for_fleet");
+				String categoryClass = rs.getString("Category_Class");
+				String pmCyclePeriod = rs.getString("PM_Cycle_Period");
+				String mileage = rs.getString("mileage");
+				String notifyMaintdays = rs.getString("Notify_Maint_Days");
+				String notifyEveryDays = rs.getString("notify_every_days");
+				String residualValue = rs.getString("residual_value");
+				String depRate = rs.getString("Dep_rate");
+				String assetLedger = rs.getString("Asset_Ledger");
+				String depLedger = rs.getString("Dep_ledger");
+				String accumDepLedger = rs.getString("Accum_Dep_ledger");
+				String glAccount = rs.getString("gl_account");
+				String insuranceAcct = rs.getString("insurance_acct");
+				String licenseLedger = rs.getString("license_ledger");
+				String fuelLedger = rs.getString("fuel_ledger");
+				String accidentLedger = rs.getString("accident_ledger");
+				String categoryStatus = rs.getString("Category_Status");
+				String userId = rs.getString("user_id");
+				String createDate = sdf.format(rs.getDate("create_date"));
+				String acctType = rs.getString("acct_type");
+				String currencyId = rs.getString("currency_Id");
+                                String enforeBarcode = rs.getString("enforceBarcode");
+				category = new com.magbel.ia.legend.admin.objects.Category(categoryId,
+						categoryCode, categoryName, categoryAcronym,
+						requiredforFleet, categoryClass, pmCyclePeriod,
+						mileage, notifyMaintdays, notifyEveryDays,
+						residualValue, depRate, assetLedger, depLedger,
+						accumDepLedger, glAccount, insuranceAcct,
+						licenseLedger, fuelLedger, accidentLedger,
+						categoryStatus, userId, createDate, acctType,
+						currencyId,enforeBarcode);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return category;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Category getCategoryByID(String categoryid) {
+		String filter = " WHERE category_ID=" + categoryid;
+		com.magbel.ia.legend.admin.objects.Category category = getACategory(filter);
+		return category;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.Category getCategoryByCode(String categorycode) {
+		String filter = " WHERE category_code='" + categorycode + "'";
+		com.magbel.ia.legend.admin.objects.Category category = getACategory(filter);
+		return category;
+
+	}
+
+	public java.util.List<Region> getRegionByQuery(String filter) {
+		java.util.List<Region> _list = new java.util.ArrayList<Region>();
+		com.magbel.ia.legend.admin.objects.Region region = null;
+		String query = "SELECT Region_Id, Region_Code, Region_Name"
+				+ ", Region_Acronym, Region_Address"
+				+ ",Region_Phone , Region_Fax, Region_Status, User_Id, Create_Date"
+				+ " FROM AM_AD_REGION ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String regionId = rs.getString("Region_Id");
+				String regionCode = rs.getString("Region_Code");
+				String regionName = rs.getString("Region_Name");
+				String regionAcronym = rs.getString("Region_Acronym");
+				String regionAddress = rs.getString("Region_Address");
+				String regionPhone = rs.getString("Region_Phone");
+				String regionFax = rs.getString("Region_Fax");
+				String regionStatus = rs.getString("Region_Status");
+				String userId = rs.getString("User_Id");
+				String createDate = rs.getString("Create_Date");
+
+				region = new com.magbel.ia.legend.admin.objects.Region(regionId, regionCode,
+						regionName, regionAcronym, regionAddress, regionPhone,
+						regionFax, regionStatus, userId, createDate);
+				_list.add(region);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+	public java.util.List<BranchDept> getAllDeptInBranch(String branchid) {
+		java.util.List<BranchDept> _list = new java.util.ArrayList<BranchDept>();
+		com.magbel.ia.legend.admin.objects.BranchDept dept = null;
+
+		String query = "SELECT branchCode,deptCode,gl_prefix"
+				+ ",gl_suffix,branchId,deptId,mtid"
+				+ " FROM sbu_branch_dept WHERE branchId='" + branchid + "'";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				String branchcode = rs.getString("branchCode");
+				String deptcode = rs.getString("deptCode");
+				String glprefix = rs.getString("gl_prefix");
+				String glsuffix = rs.getString("gl_suffix");
+				String branchId = rs.getString("branchId");
+				String deptid = rs.getString("branchId");
+				String mtid = rs.getString("mtid");
+
+				dept = new com.magbel.ia.legend.admin.objects.BranchDept();
+				dept.setBranchCode(branchcode);
+				dept.setBranchId(branchId);
+				dept.setDeptId(deptid);
+				dept.setDeptCode(deptcode);
+				dept.setGl_prefix(glprefix);
+				dept.setGl_suffix(glsuffix);
+				dept.setMtid(mtid);
+
+				_list.add(dept);
+			}
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps,rs);
+		}
+		return _list;
+
+	}
+
+	public java.util.List<DeptSection> getAllSectionInDept(String branchid, String deptId) {
+		com.magbel.ia.legend.admin.objects.DeptSection dept = null;
+		java.util.ArrayList<DeptSection> _list = new java.util.ArrayList<DeptSection>();
+		String query = "SELECT branchCode,deptCode,gl_prefix,sectionCode"
+				+ ",gl_suffix,branchId,deptId,sectionId,mtid"
+				+ " FROM sbu_dept_section WHERE branchId='"
+				+ branchid
+				+ "' AND deptId='" + deptId + "'";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				String branchcode = rs.getString("branchCode");
+				String deptcode = rs.getString("deptCode");
+				String glprefix = rs.getString("gl_prefix");
+				String glsuffix = rs.getString("gl_suffix");
+				String branchId = rs.getString("branchId");
+				String deptid = rs.getString("branchId");
+				String mtid = rs.getString("mtid");
+				String sectioncode = rs.getString("sectionCode");
+				String sectiondi = rs.getString("sectionId");
+
+				dept = new com.magbel.ia.legend.admin.objects.DeptSection();
+				dept.setBranchCode(branchcode);
+				dept.setBranchId(branchId);
+				dept.setDeptId(deptid);
+				dept.setDeptCode(deptcode);
+				dept.setGl_prefix(glprefix);
+				dept.setGl_suffix(glsuffix);
+				dept.setMtid(mtid);
+				dept.setSectionCode(sectioncode);
+				dept.setSectionId(sectiondi);
+				_list.add(dept);
+			}
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+		return _list;
+
+	}
+
+	public java.util.List<Province> getProvinceByQuery(String filter) {
+		java.util.List<Province> _list = new java.util.ArrayList<Province>();
+		com.magbel.ia.legend.admin.objects.Province province = null;
+		String query = "SELECT Province_ID, Province_Code, Province"
+				+ ",Status, User_id, create_date"
+				+ " FROM am_gb_Province ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String provinceid = rs.getString("Province_ID");
+				String provincecode = rs.getString("Province_Code");
+				String provincename = rs.getString("Province");
+				String status = rs.getString("Status");
+				String userid = rs.getString("User_id");
+				String createdt = df.formatDate(rs.getDate("create_date"));
+
+				province = new com.magbel.ia.legend.admin.objects.Province();
+				province.setProvinceId(provinceid);
+				province.setProvinceCode(provincecode);
+				province.setProvince(provincename);
+				province.setStatus(status);
+				province.setUserId(userid);
+				province.setCreateDate(createdt);
+				_list.add(province);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+                
+		return _list;
+
+	}
+
+	private com.magbel.ia.legend.admin.objects.Province getAProvince(String filter) {
+		com.magbel.ia.legend.admin.objects.Province province = null;
+		String query = "SELECT Province_ID, Province_Code, Province"
+				+ ",Status, User_id, create_date"
+				+ " FROM am_gb_Province ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String provinceid = rs.getString("Province_ID");
+				String provincecode = rs.getString("Province_Code");
+				String provincename = rs.getString("Province");
+				String status = rs.getString("Status");
+				String userid = rs.getString("User_id");
+				String createdt = df.formatDate(rs.getDate("create_date"));
+
+				province = new com.magbel.ia.legend.admin.objects.Province();
+				province.setProvinceId(provinceid);
+				province.setProvinceCode(provincecode);
+				province.setProvince(provincename);
+				province.setStatus(status);
+				province.setUserId(userid);
+				province.setCreateDate(createdt);
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return province;
+
+	}
+	public com.magbel.ia.legend.admin.objects.Province getProvinceByID(String provinceid) {
+		String filter = " WHERE Province_ID=" + provinceid;
+		com.magbel.ia.legend.admin.objects.Province province = getAProvince(filter);
+		return province;
+
+	}
+	public com.magbel.ia.legend.admin.objects.Province getProvinceByCode(String provincecode) {
+		String filter = " WHERE Province_Code='" + provincecode+"'";
+		com.magbel.ia.legend.admin.objects.Province province = getAProvince(filter);
+		return province;
+
+	}
+	
+	public boolean removeDeptFromBranch(java.util.ArrayList list) {
+		String query = "DELETE FROM sbu_branch_dept" + " WHERE branchId=?"
+				+ " AND deptId=?";
+		String query2 = "DELETE FROM sbu_dept_section"
+				+ " WHERE branchId=?" + " AND deptId=?";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		PreparedStatement ps2 = null;
+		ResultSet rs = null;
+		com.magbel.ia.legend.admin.objects.BranchDept bd = null;
+		int[] d = null;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps2 = con.prepareStatement(query2);
+			for (int i = 0; i < list.size(); i++) {
+				bd = (com.magbel.ia.legend.admin.objects.BranchDept) list.get(i);
+
+				ps.setString(1, bd.getBranchId());
+				ps.setString(2, bd.getDeptId());
+
+				ps.addBatch();
+				ps2.setString(1, bd.getBranchId());
+				ps2.setString(2, bd.getDeptId());
+				ps2.addBatch();
+
+			}
+
+			d = ps.executeBatch();
+			ps2.addBatch();
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+
+		return (d.length > 0);
+	}
+
+	public com.magbel.ia.legend.admin.objects.BranchDept getDeptInBranch(String branchid,
+			String deptId) {
+		com.magbel.ia.legend.admin.objects.BranchDept dept = null;
+
+		String query = "SELECT branchCode,deptCode,gl_prefix"
+				+ ",gl_suffix,branchId,deptId,mtid"
+				+ " FROM sbu_branch_dept WHERE branchId='" + branchid
+				+ "' AND deptId='" + deptId + "'";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				String branchcode = rs.getString("branchCode");
+				String deptcode = rs.getString("deptCode");
+				String glprefix = rs.getString("gl_prefix");
+				String glsuffix = rs.getString("gl_suffix");
+				String branchId = rs.getString("branchId");
+				String deptid = rs.getString("branchId");
+				String mtid = rs.getString("mtid");
+
+				dept = new com.magbel.ia.legend.admin.objects.BranchDept();
+				dept.setBranchCode(branchcode);
+				dept.setBranchId(branchId);
+				dept.setDeptId(deptid);
+				dept.setDeptCode(deptcode);
+				dept.setGl_prefix(glprefix);
+				dept.setGl_suffix(glsuffix);
+				dept.setMtid(mtid);
+
+				// _list.add(dept);
+			}
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+		return dept;
+
+	}
+
+	public com.magbel.ia.legend.admin.objects.DeptSection getSectionInDept(String branchid,
+			String deptId, String sectionId) {
+		com.magbel.ia.legend.admin.objects.DeptSection dept = null;
+
+		String query = "SELECT branchCode,deptCode,gl_prefix,sectionCode"
+				+ ",gl_suffix,branchId,deptId,sectionId,mtid"
+				+ " FROM sbu_dept_section WHERE branchId='"
+				+ branchid
+				+ "' AND deptId='"
+				+ deptId
+				+ "'"
+				+ " AND sectionId='"
+				+ sectionId + "'";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				String branchcode = rs.getString("branchCode");
+				String deptcode = rs.getString("deptCode");
+				String glprefix = rs.getString("gl_prefix");
+				String glsuffix = rs.getString("gl_suffix");
+				String branchId = rs.getString("branchId");
+				String deptid = rs.getString("branchId");
+				String mtid = rs.getString("mtid");
+				String sectioncode = rs.getString("sectionCode");
+				String sectiondi = rs.getString("sectionId");
+
+				dept = new com.magbel.ia.legend.admin.objects.DeptSection();
+				dept.setBranchCode(branchcode);
+				dept.setBranchId(branchId);
+				dept.setDeptId(deptid);
+				dept.setDeptCode(deptcode);
+				dept.setGl_prefix(glprefix);
+				dept.setGl_suffix(glsuffix);
+				dept.setMtid(mtid);
+				dept.setSectionCode(sectioncode);
+				dept.setSectionId(sectiondi);
+				// _list.add(dept);
+			}
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+		return dept;
+
+	}
+
+	public boolean removeSectionsFromDept(java.util.ArrayList list) {
+		String query = "DELETE FROM sbu_dept_section" + " WHERE branchId=?"
+				+ " AND deptId=?" + " AND sectionId=?";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		com.magbel.ia.legend.admin.objects.DeptSection bd = null;
+		int[] d = null;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			for (int i = 0; i < list.size(); i++) {
+				bd = (com.magbel.ia.legend.admin.objects.DeptSection) list.get(i);
+
+				ps.setString(1, bd.getBranchId());
+				ps.setString(2, bd.getDeptId());
+				ps.setString(3, bd.getSectionId());
+
+				ps.addBatch();
+			}
+			d = ps.executeBatch();
+
+		} catch (Exception ex) {
+			System.out.println("WARN: Error removing Section From Department ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+
+		return (d.length > 0);
+	}
+
+    /*
+	public boolean insertDeptForBranch(java.util.ArrayList list) {
+
+		String query = "INSERT INTO sbu_branch_dept(branchCode"
+				+ ",deptCode,branchId" + ",deptId,gl_prefix"
+				+ ",gl_suffix,mtid)" + " VALUES(?,?,?,?,?,?,?)";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		com.magbel.ia.legend.admin.objects.BranchDept bd = null;
+		int[] d = null;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+
+			for (int i = 0; i < list.size(); i++) {
+				bd = (com.magbel.ia.legend.admin.objects.BranchDept) list.get(i);
+				ps.setString(1, bd.getBranchCode());
+				ps.setString(2, bd.getDeptCode());
+				ps.setString(3, bd.getBranchId());
+				ps.setString(4, bd.getDeptId());
+				ps.setString(5, bd.getGl_prefix());
+				ps.setString(6, bd.getGl_suffix());
+				ps.setLong(7, System.currentTimeMillis());
+				ps.addBatch();
+			}
+			d = ps.executeBatch();
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+		return (d.length > 0);
+	}
+*/
+	public boolean updateDeptForBranch(java.util.ArrayList list) {
+		String query = "UPDATE sbu_branch_dept SET branchCode = ?"
+				+ ",deptCode = ?,gl_prefix = ?,gl_suffix = ?"
+				+ " WHERE branchId=?" + " AND deptId=?";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		com.magbel.ia.legend.admin.objects.BranchDept bd = null;
+		int[] d = null;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+
+			for (int i = 0; i < list.size(); i++) {
+				bd = (com.magbel.ia.legend.admin.objects.BranchDept) list.get(i);
+				ps.setString(1, bd.getBranchCode());
+				ps.setString(2, bd.getDeptCode());
+				ps.setString(3, bd.getGl_prefix());
+				ps.setString(4, bd.getGl_suffix());
+				ps.setString(5, bd.getBranchId());
+				ps.setString(6, bd.getDeptId());
+
+				ps.addBatch();
+			}
+			d = ps.executeBatch();
+
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+
+		return (d.length > 0);
+	}
+
+	public boolean insertSectionForDept(java.util.ArrayList list) {
+		String query = "INSERT INTO sbu_dept_section(branchCode"
+				+ ",deptCode,sectionCode,branchId"
+				+ ",deptId,sectionId,gl_prefix" + ",gl_suffix,mtid)"
+				+ " VALUES(?,?,?,?,?,?,?,?,?)";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		com.magbel.ia.legend.admin.objects.DeptSection bd = null;
+		int[] d = null;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+
+			for (int i = 0; i < list.size(); i++) {
+				bd = (com.magbel.ia.legend.admin.objects.DeptSection) list.get(i);
+				ps.setString(1, bd.getBranchCode());
+				ps.setString(2, bd.getDeptCode());
+				ps.setString(3, bd.getSectionCode());
+				ps.setString(4, bd.getBranchId());
+				ps.setString(5, bd.getDeptId());
+				ps.setString(6, bd.getSectionId());
+				ps.setString(7, bd.getGl_prefix());
+				ps.setString(8, bd.getGl_suffix());
+				ps.setLong(9, System.currentTimeMillis());
+				ps.addBatch();
+			}
+			d = ps.executeBatch();
+
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+
+		return (d.length > 0);
+	}
+
+	public boolean updateSectionForDept(java.util.ArrayList list) {
+		String query = "UPDATE sbu_dept_section SET branchCode = ?"
+				+ ",deptCode = ?,sectionCode=?,gl_prefix = ?"
+				+ ",gl_suffix = ?" + " WHERE branchId=?"
+				+ " AND deptId=?" + " AND sectionId=?";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		com.magbel.ia.legend.admin.objects.DeptSection bd = null;
+		int[] d = null;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			for (int i = 0; i < list.size(); i++) {
+				bd = (com.magbel.ia.legend.admin.objects.DeptSection) list.get(i);
+
+				ps.setString(1, bd.getBranchCode());
+				ps.setString(2, bd.getDeptCode());
+				ps.setString(3, bd.getSectionCode());
+				ps.setString(4, bd.getGl_prefix());
+				ps.setString(5, bd.getGl_suffix());
+				ps.setString(6, bd.getBranchId());
+				ps.setString(7, bd.getDeptId());
+				ps.setString(8, bd.getSectionId());
+
+				ps.addBatch();
+			}
+			d = ps.executeBatch();
+
+		} catch (Exception ex) {
+			System.out.println("WARN: Error updating SectionFOrDept ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+
+		return (d.length > 0);
+	}
+
+	private Connection getConnection() {
+		Connection con = null;
+		dc = new DataConnect("fixedasset");
+              
+		try {
+			con = dc.getConnection();
+		} catch (Exception e) {
+			System.out.println("WARNING: Error getting connection ->"
+					+ e.getMessage());
+		}
+		return con;
+	}
+
+	private void closeConnection(Connection con, Statement s) {
+		try {
+			if (s != null) {
+				s.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		} catch (Exception e) {
+			System.out.println("WARNING: Error getting connection ->"
+					+ e.getMessage());
+		}
+
+	}
+
+	private void closeConnection(Connection con, PreparedStatement ps) {
+		try {
+			if (ps != null) {
+				ps.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		} catch (Exception e) {
+			System.out.println("WARNING: Error closing connection ->"
+					+ e.getMessage());
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param con
+	 *            Connection
+	 * @param s
+	 *            Statement
+	 * @param rs
+	 *            ResultSet
+	 */
+	private void closeConnection(Connection con, Statement s, ResultSet rs) {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (s != null) {
+				s.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		} catch (Exception e) {
+			System.out.println("WARNING: Error closing connection ->"
+					+ e.getMessage());
+		}
+	}
+
+	/**
+	 * 
+	 * @param con
+	 *            Connection
+	 * @param ps
+	 *            PreparedStatement
+	 * @param rs
+	 *            ResultSet
+	 */
+	private void closeConnection(Connection con, PreparedStatement ps,
+			ResultSet rs) {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			if (ps != null) {
+				ps.close();
+			}
+			if (con != null) {
+				con.close();
+			}
+		} catch (Exception e) {
+			System.out.println("WARNING: Error closing connection ->"
+					+ e.getMessage());
+		}
+	}
+
+	private boolean executeQuery(String query) {
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			done = ps.execute();
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error executing Query ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+	}
+	   public String getProperties(String sele, String[] iden, String[] vals) {
+	        String html = new String();
+	        if (sele == null) {
+	            sele = " ";
+	        }
+	        for (int i = 0; i < iden.length; i++) {
+	            html = html + "<option value='" + iden[i] + "' " +
+	                   (iden[i].equalsIgnoreCase(sele) ? " selected " : "") + ">" +
+	                   vals[i] + "</option> ";
+	        }
+
+	        return html;
+	    }
+	   public String getProperties(String sele, String[][] vals) {
+	        String html = new String();
+	        if (sele == null) {
+	            sele = " ";
+	        }
+
+	        if (vals != null) {
+	            for (int i = 0; i < vals.length; i++) {
+	                html = html + "<option value='" + vals[i][0] + "' " +
+	                       (vals[i][0].equalsIgnoreCase(sele) ? " selected " : "") +
+	                       ">" + vals[i][2] + "</option> ";
+	            }
+
+	        }
+
+	        return html;
+	    }
+	   public java.util.ArrayList<State> getStateByStatus(String status){
+			String filter = " WHERE state_status='" + status +"'";
+			java.util.ArrayList<State> _list = (java.util.ArrayList<State>)getStatesByQuery(filter);
+			return _list;
+		} 
+
+	public java.util.ArrayList<Category> getCategoryByStatus(String categorystatus){
+			String filter = " WHERE Category_Status='" + categorystatus + "'";
+			java.util.ArrayList<Category> category = (java.util.ArrayList<Category>) getCategoryByQuery(filter);
+			return category;
+		}
+	public java.util.ArrayList<Province> getProvinceByStatus(String status){
+			String filter = " WHERE Status='" + status + "'";
+			java.util.ArrayList<Province> _list = (java.util.ArrayList<Province>) getProvinceByQuery(filter);
+			return _list;
+		}
+	public java.util.ArrayList<Branch> getBranchByBranchStatus(String status) {
+			java.util.ArrayList<Branch> _list = null;
+			String filter = " WHERE BRANCH_STATUS ='" + status + "'";
+			_list = (java.util.ArrayList<Branch>) getBranchesByQuery(filter);
+			return _list;
+		}
+		public java.util.ArrayList<Department> getDeptByDeptStatus(String status) {
+			java.util.ArrayList<Department> _list = null;
+			String filter = " WHERE Dept_Status='" + status + "'";
+			_list = (java.util.ArrayList<Department>)getDeparmentsByQuery(filter);
+			return _list;
+
+        }
+
+
+
+
+
+public String createsave2(String sbcode, String sbname, String sbcontact, String sbstatus, String contactmail)
+	{
+					 Connection c = null;
+					 Statement s = null;
+					 ResultSet  r = null;
+					 int rowcount;
+					String message ="No Duplicate Found";
+						try
+						{
+									c = getConnection();
+									s = c.createStatement();
+									System.out.println("established connection...");
+
+									r = s.executeQuery("select * from Sbu_SetUp where [Sbu_code] = '"+sbcode+"' AND [Sbu_name] ='"+sbname+"' AND [Sbu_contact]='"+sbcontact+"' AND [Status]='"+sbstatus+"' AND [Contact_email]='"+contactmail+"'");
+									if(r.next())
+									{
+										message = "Duplicates Found";
+										System.out.println("FOUND >>>>>>>>>>>>>>>>>>>"+message);
+									}
+
+
+						}catch(Exception ex){ex.printStackTrace();}
+						finally
+						{
+							closeConnection(con, s,r);
+						}
+						return message;
+	}
+
+public boolean SaveSbuSetup(String sbcode, String sbname, String sbcontact, String sbstatus, String contactmail)
+	{
+					boolean done = false;
+					 Connection con = null;
+					 Statement s = null;
+					 ResultSet  r = null;
+					 PreparedStatement ps = null;
+					 String query = "INSERT INTO Sbu_SetUp"
+							+ "(Sbu_code, Sbu_name"
+							+ ",Sbu_contact, Status,Contact_email)"
+							+ " VALUES (?,?,?,?,?)";
+
+					//int rowcount;
+					//String message = "";
+						try
+						{
+									con = getConnection();
+									System.out.println("established connection...");
+									ps = con.prepareStatement(query);
+									ps.setString(1, sbcode);
+									ps.setString(2, sbname);
+									ps.setString(3, sbcontact);
+									ps.setString(4, sbstatus);
+									ps.setString(5, contactmail);
+									done=(ps.executeUpdate()!=-1);
+									System.out.println("output "+done);
+
+						}catch(Exception ex){ex.printStackTrace();}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+						return done;
+	}
+
+public String UpdateSbu(String sbucode,String sbuname, String sbucontact, String status, String contactmail)
+		{
+					System.out.print(sbucode);
+					System.out.print(sbuname);
+					System.out.print(sbucontact);
+					System.out.print(status);
+
+
+
+					String mess ="";
+					Connection con = null;
+					Statement s = null;
+					PreparedStatement ps = null;
+					ResultSet rs = null;
+
+
+						try
+						{
+								con = getConnection();
+
+								    String updatequery = "UPDATE Sbu_SetUp SET Sbu_name =?,Sbu_contact =?,Status = ?,Contact_email= ? WHERE Sbu_code=?";
+									ps = con.prepareStatement(updatequery);
+									ps.setString(1,sbuname);
+									System.out.print("wetin dey happen self"+sbuname);
+									ps.setString(2,sbucontact);
+									System.out.print("wetin dey happen self"+sbucontact);
+									ps.setString(3,status);
+									System.out.print("wetin dey happen self"+status);
+									ps.setString(4,contactmail);
+									ps.setString(5,sbucode);
+
+									System.out.print("wetin dey happen self"+sbucode);
+									System.out.print("wetin dey happen self checkpoint 1");
+									int cnt=ps.executeUpdate();
+									mess = "Success_update";
+									System.out.print("wetin dey happen self checkpoint 2"+mess);
+									if(cnt>0)
+									{
+										mess = "Success_update";
+										System.out.println("*********************"+mess);
+									}
+
+
+						}catch(Exception ex)
+						{
+								ex.printStackTrace();
+						}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+
+						return mess;
+
+		}
+public String UpdateMailStatement(String mailcode,String maildescription, String mailaddress, String createdate, String transactiontype, String userid, String status)
+		{
+					System.out.print(mailcode);
+					System.out.print(maildescription);
+					System.out.print(mailaddress);
+					System.out.print(createdate);
+
+                    handler = new AdminHandler();
+
+					String mess ="";
+					Connection con = null;
+					Statement s = null;
+					PreparedStatement ps = null;
+					ResultSet rs = null;
+
+
+						try
+						{
+								con = getConnection();
+
+								    String updatequery = "UPDATE am_mail_statement SET Mail_description=?, Mail_address = ?,Create_date= ? , Transaction_type=?, User_id =?, Status = ? WHERE Mail_code=?";
+									ps = con.prepareStatement(updatequery);
+									ps.setString(1,maildescription);
+									System.out.print("wetin dey happen self"+maildescription);
+									ps.setString(2,mailaddress);
+									System.out.print("wetin dey happen self"+mailaddress);
+									ps.setString(3,createdate);
+									System.out.print("wetin dey happen self"+createdate);
+									ps.setString(4,transactiontype);
+									ps.setString(5,userid);
+									ps.setString(6,status);
+									ps.setString(7,mailcode);
+
+									System.out.print("wetin dey happen self"+mailcode);
+									System.out.print("wetin dey happen self checkpoint 1");
+									int cnt=ps.executeUpdate();
+									mess = "Success_update";
+									System.out.print("wetin dey happen self checkpoint 2"+mess);
+									if(cnt>0)
+									{
+										mess = "Success_update";
+										System.out.println("*********************"+mess);
+									}
+
+
+						}catch(Exception ex)
+						{
+								ex.printStackTrace();
+						}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+
+						return mess;
+
+		}
+
+
+
+public java.util.List<Sbu_branch> getsbuByQuery(String filter) {
+		java.util.List<Sbu_branch> _list = new java.util.ArrayList<Sbu_branch>();
+		com.magbel.ia.legend.admin.objects.Sbu_branch sbu = null;
+		String query = "SELECT Sbu_code,Sbu_name,Sbu_contact"
+				+ "  ,Status "
+				+ " ,Contact_email" + " FROM Sbu_SetUp ";
+
+		query = query + filter;
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while (rs.next()) {
+				String code = rs.getString("Sbu_code");
+				String name = rs.getString("Sbu_name");
+				String contact = rs.getString("Sbu_contact");
+				String status = rs.getString("Status");
+				String email= rs.getString("Contact_email");
+				//String user_id = rs.getString("user_id");
+				sbu = new com.magbel.ia.legend.admin.objects.Sbu_branch(code, name,
+						contact, status, email);
+
+				_list.add(sbu);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+/*
+public com.magbel.ia.legend.admin.objects.AssignSbu getClassPrivilegeSbu(String sbuName) {
+	com.magbel.ia.legend.admin.objects.AssignSbu classprivilege = null;
+
+	String query = "Select MTID,ATTACH_ID,SBU_NAME,GL_PREFIX,GL_SUFIX,CREATE_DATE,CREATE_USER,SBU_CODE from AM_SBU_ATTACHEMENT WHERE SBU_NAME = ?";
+	//String query1 = "SELECT Sbu_code,Sbu_name,Sbu_contact,Status,Contact_email  FROM Sbu_SetUp WHERE Sbu_name= ?";
+
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+
+	//ApplicationHelper help = new ApplicationHelper();
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+
+		ps.setString(1, sbuName);
+		//ps.setString(2, roleuuid);
+		rs = ps.executeQuery();
+		while (rs.next()) {
+		//	 String id = help.getGeneratedId("AM_SBU_ATTACHEMENT");
+
+
+			String id = rs.getString("MTID");
+			String branchName = rs.getString("ATTACH_ID");
+
+			String branchAcronym = rs.getString("SBU_NAME");
+
+			String glPrefix = rs.getString("GL_PREFIX");
+
+			String userid = rs.getString("GL_SUFIX");
+
+			String date = rs.getString("CREATE_DATE");
+
+			String createuser = rs.getString("CREATE_USER");
+
+			String sbucode = rs.getString("SBU_CODE");
+
+
+			//System.out.println(branchCode);
+
+
+			 classprivilege = new com.magbel.ia.legend.admin.objects.AssignSbu();
+			System.out.println("11");
+
+			classprivilege.setMitd(id);
+			classprivilege.setAttachid(branchName);
+			classprivilege.setSbuname(branchAcronym);
+			classprivilege.setGlprifix(glPrefix);
+			classprivilege.setGlsurfix(userid);
+			classprivilege.setCreatedate(date);
+			classprivilege.setCreateuser(createuser);
+			classprivilege.setSbucode(sbucode);
+
+
+		}
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching Class Privileges ->" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+	return classprivilege;
+}
+
+*/
+
+public com.magbel.ia.legend.admin.objects.AssignSbu getSbuPrivilege(String classid) {
+	com.magbel.ia.legend.admin.objects.AssignSbu classprivilege = null;
+
+	String query = "SELECT SBU_NAME,GL_PREFIX,GL_SUFIX"
+			+ " FROM AM_SBU_ATTACHEMENT"
+			+ " WHERE SBU_NAME=? ";
+
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+		ps.setString(1, classid);
+		//ps.setString(2, roleuuid);
+		rs = ps.executeQuery();
+		while (rs.next()) {
+			String clss_uuid = rs.getString("SBU_NAME");
+
+			String role_uuid = rs.getString("GL_PREFIX");
+
+			String role_view = rs.getString("GL_SUFIX");
+
+			//String role_addn = rs.getString("role_addn");
+
+			//String role_edit = rs.getString("role_edit");
+			//classprivilege = new com.magbel.ia.legend.admin.objects.AssignSbu(
+					//clss_uuid, role_uuid, role_view);
+		}
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching Class Privileges ->" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+	return classprivilege;
+}
+
+
+public boolean insertAssignSbuPrivileges2(java.util.ArrayList list) {
+
+
+
+	 String query = "INSERT INTO AM_SBU_ATTACHEMENT"
+				+ "(MTID, ATTACH_ID"
+				+ ",SBU_NAME,GL_PREFIX,GL_SUFIX,CREATE_DATE,CREATE_USER,SBU_CODE)"
+				+ " VALUES (?,?,?,?,?,?,?,?)";
+
+
+
+
+			Connection con = null;
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+
+
+
+	        com.magbel.ia.legend.admin.objects.AssignSbu cp = null;
+	        com.magbel.ia.legend.admin.objects.User user = null;
+		    ApplicationHelper help = new ApplicationHelper();
+
+
+			int[] d = null;
+			try {
+				con = getConnection();
+				ps = con.prepareStatement(query);
+	                        String id = String.valueOf(help.getGeneratedId("AM_SBU_ATTACHEMENT"));
+				for (int i = 0; i < list.size(); i++) {
+					cp = (com.magbel.ia.legend.admin.objects.AssignSbu) list.get(i);
+
+					user = new com.magbel.ia.legend.admin.objects.User();
+                   // int branchID = getBranchIDforSBU(cp.getAttachid());
+				ps.setString(1, id);
+				System.out.println("james bon1");
+				ps.setString(2,cp.getAttachid());
+				System.out.println("james bon2");
+				ps.setString(3, cp.getSbuname());
+				System.out.println("james bon3");
+				ps.setString(4, cp.getGlprifix());
+				System.out.println("james bon4");
+				ps.setString(5, cp.getGlsurfix());
+				System.out.println("james bon5");
+				ps.setDate(6, df.dateConvert(new java.util.Date()));
+				System.out.println("james bon6");
+				ps.setString(7, user.getUserId());
+				System.out.println("james bon7");
+				ps.setString(8, cp.getSbucode());
+				System.out.println("james bon8");
+				
+                //ps.setInt(9, branchID);
+                    //System.out.println("the value of branch id from am_sbu_attach is.........." + branchID);
+                ps.addBatch();
+				System.out.println("james bon9");
+				
+                //int branchID = getBranchIDforSBU(cp.getAttachid());
+
+                }
+				d = ps.executeBatch();
+				System.out.println("james bon10");
+			} catch (Exception ex) {
+				System.out.println("WARN: Error fetching all asset ->" + ex);
+			} finally {
+				closeConnection(con, ps);
+			}
+			return (d.length > 0);
+		}
+
+
+public boolean updateAvaliableSbu(java.util.ArrayList list) {
+	String query = "UPDATE AM_SBU_ATTACHEMENT SET ATTACH_ID=?"
+		+",SBU_NAME= ?,GL_PREFIX = ?,GL_SUFIX = ?,CREATE_DATE =?,CREATE_USER =?,SBU_CODE=?"
+			+ " WHERE SBU_NAME=?";
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+	com.magbel.ia.legend.admin.objects.AssignSbu bd = null;
+	int[] d = null;
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+
+		for (int i = 0; i < list.size(); i++) {
+			bd = (com.magbel.ia.legend.admin.objects.AssignSbu) list.get(i);
+			System.out.println("*********b4************");
+			System.out.println(bd.getAttachid());
+			System.out.println(bd.getSbuname());
+			System.out.println(bd.getGlprifix());
+			System.out.println(bd.getGlsurfix());
+
+			System.out.println(bd.getCreateuser());
+			System.out.println(bd.getSbucode());
+			System.out.println(bd.getMitd());
+			System.out.println("*********f4*************");
+			ps.setString(1, bd.getAttachid());
+			ps.setString(2, bd.getSbuname());
+			ps.setString(3, bd.getGlprifix());
+			ps.setString(4, bd.getGlsurfix());
+			ps.setDate(5, df.dateConvert(new java.util.Date()));
+			ps.setString(6, bd.getCreateuser());
+			ps.setString(7, bd.getSbucode());
+			ps.setString(8, bd.getSbuname());
+
+			ps.addBatch();
+		}
+		d = ps.executeBatch();
+
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching all asset ->" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+
+	return (d.length > 0);
+}
+public boolean updateAvaliableSbu(java.util.ArrayList list,int userid, String branchCode,int loginId,String eff_date) {
+	String query = "UPDATE AM_SBU_ATTACHEMENT SET ATTACH_ID=?"
+		+",SBU_NAME= ?,GL_PREFIX = ?,GL_SUFIX = ?,CREATE_DATE =?,CREATE_USER =?,SBU_CODE=?"
+			+ " WHERE SBU_NAME=?";
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+	com.magbel.ia.legend.admin.objects.AssignSbu bd = null;
+	int[] d = null;
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+
+		for (int i = 0; i < list.size(); i++) {
+			bd = (com.magbel.ia.legend.admin.objects.AssignSbu) list.get(i);
+			//System.out.println("*********b4************");
+			System.out.println(bd.getAttachid());
+			System.out.println(bd.getSbuname());
+			System.out.println(bd.getGlprifix());
+			System.out.println(bd.getGlsurfix());
+
+			System.out.println(bd.getCreateuser());
+			System.out.println(bd.getSbucode());
+			System.out.println(bd.getMitd());
+			//System.out.println("*********f4*************");
+			ps.setString(1, bd.getAttachid());
+			ps.setString(2, bd.getSbuname());
+			ps.setString(3, bd.getGlprifix());
+			ps.setString(4, bd.getGlsurfix());
+			ps.setDate(5, df.dateConvert(new java.util.Date()));
+			ps.setString(6, bd.getCreateuser());
+			ps.setString(7, bd.getSbucode());
+			ps.setString(8, bd.getSbuname());
+
+			//compareAuditValues(bd.getGl_prefix(),bd.getGl_suffix(),bd.getBranchId(),bd.getDeptCode(),String.valueOf(userid),branchCode,loginId,eff_date);
+			compareAuditValuesSbu(bd.getGlprifix(),bd.getGlsurfix(),bd.getAttachid(),bd.getSbucode(),String.valueOf(userid),branchCode,loginId,eff_date);
+
+			ps.addBatch();
+		}
+			d = ps.executeBatch();
+
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching all asset ->" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+
+	return (d.length > 0);
+}
+
+/*
+public boolean removeAvaliableSbu(java.util.ArrayList list) {
+	String query = "DELETE FROM AM_SBU_ATTACHEMENT" + " WHERE Sbu_Code=?"
+			+ " AND Sbu_name=?";
+	String query2 = "DELETE FROM Sbu_SetUp"
+			+ " WHERE Sbu_Code=?" + " AND Sbu_name=?";
+
+	Connection con = null;
+	PreparedStatement ps = null;
+	PreparedStatement ps2 = null;
+	ResultSet rs = null;
+	com.magbel.ia.legend.admin.objects.AssignSbu bd = null;
+	int[] d = null;
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+		ps2 = con.prepareStatement(query2);
+		for (int i = 0; i < list.size(); i++) {
+			bd = (com.magbel.ia.legend.admin.objects.AssignSbu) list.get(i);
+
+			ps.setString(1, bd.getSbucode());
+			ps.setString(2, bd.getSbuname());
+
+			ps.addBatch();
+			ps2.setString(1, bd.getSbucode());
+			ps2.setString(2, bd.getSbuname());
+			ps2.addBatch();
+
+		}
+
+		d = ps.executeBatch();
+		ps2.addBatch();
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching all asset ->" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+
+	return (d.length > 0);
+}
+
+
+*/
+
+public String getBranchesByQuery2()
+	{
+		String cv = "";
+
+		String query = "SELECT Sbu_code,Sbu_name,Sbu_contact, Status, Contact_email  FROM Sbu_SetUp" ;
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+
+				cv = rs.getString("Sbu_code");
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting branches ->" + e.getMessage());
+			System.out.print("i don no waiting dey happenn o!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return cv;
+
+	}
+
+
+public java.util.ArrayList<Sbu_branch> getBranchesByQuery2(String filter)
+	{
+		java.util.ArrayList<Sbu_branch> _list = new java.util.ArrayList<Sbu_branch>();
+		com.magbel.ia.legend.admin.objects.Sbu_branch branch = null;
+		String query = "SELECT Sbu_code,Sbu_name,Sbu_contact, Status, Contact_email FROM Sbu_SetUp"  + filter;
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				System.out.println("i dey here o! 333333333");
+				String branchCode = rs.getString("Sbu_code");
+				String branchName = rs.getString("Sbu_name");
+				String branchAcronym = rs.getString("Sbu_contact");
+				String glPrefix = rs.getString("Status");
+				String email = rs.getString("Contact_email");
+				System.out.print("joshua !");
+				branch = new com.magbel.ia.legend.admin.objects.Sbu_branch(branchCode, branchName, branchAcronym, glPrefix,email);
+
+				_list.add(branch);
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting branches ->" + e.getMessage());
+			System.out.print("i don no waiting dey happenn o!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+
+public java.util.ArrayList<Sbu_branch> getBranchesBysbucode(String filter)
+	{
+		java.util.ArrayList<Sbu_branch> _list = new java.util.ArrayList<Sbu_branch>();
+		com.magbel.ia.legend.admin.objects.Sbu_branch branch = null;
+		String query = "SELECT Sbu_code,Sbu_name,Sbu_code ,Contact_email FROM Sbu_SetUP where Sbu_code ='"+filter+"'";
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				System.out.println("i dey here o! 333333333");
+				String branchCode = rs.getString("Sbu_code");
+				String branchName = rs.getString("Sbu_name");
+				String branchAcronym = rs.getString("Sbu_contact");
+				String glPrefix = rs.getString("Status");
+				String mail = rs.getString("Contact_email");
+				System.out.print("joshua !");
+				branch = new com.magbel.ia.legend.admin.objects.Sbu_branch(branchCode, branchName, branchAcronym, glPrefix,mail);
+
+				_list.add(branch);
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting branches ->" + e.getMessage());
+			System.out.print("i don no waiting dey happenn o!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+public java.util.ArrayList<Aproval_limit> getApprovalByQuery2(String filter)
+	{
+		java.util.ArrayList<Aproval_limit> _list = new java.util.ArrayList<Aproval_limit>();
+		com.magbel.ia.legend.admin.objects.Aproval_limit branch = null;
+		String query = "Select * from Approval_Limit"+filter;
+		System.out.println(""+query);
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				System.out.println("i dey here o! 333333333");
+				String branchCode = rs.getString("Level_Code");
+				System.out.println(branchCode);
+				double branchName = rs.getDouble("Min_Amount");
+				System.out.println(branchName);
+				double branchAcronym = rs.getDouble("Max_Amount");
+				System.out.println(branchAcronym);
+				String glPrefix = rs.getString("Description");
+				System.out.println(glPrefix);
+
+				System.out.print("joshua  na u bi dis...!");
+
+				Aproval_limit condition = new Aproval_limit(branchCode,branchName,branchAcronym,glPrefix);
+				//condition.setCode(branchCode);
+				//condition.setMinAmt(branchName);
+				//condition.setMaxAmt(branchAcronym);
+				//condition.setDesc(glPrefix);
+
+				System.out.println("Flash me d object >>>>>>>>>>>>>"+condition);
+				_list.add(condition);
+				System.out.println("e dey work na .....JOSHUA");
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting branches ->" + e.getMessage());
+			System.out.print("i don no waiting dey happenn o!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+public java.util.ArrayList<Aproval_limit> getApprovalByQuery2()
+	{
+		java.util.ArrayList<Aproval_limit> _list = new java.util.ArrayList<Aproval_limit>();
+		com.magbel.ia.legend.admin.objects.Aproval_limit branch = null;
+		String query = "Select * from Approval_Limit ";
+		System.out.println(""+query);
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				System.out.println("i dey here o! 333333333");
+				String branchCode = rs.getString("Level_Code");
+				System.out.println(branchCode);
+				double branchName = rs.getDouble("Min_Amount");
+				System.out.println(branchName);
+				double branchAcronym = rs.getDouble("Max_Amount");
+				System.out.println(branchAcronym);
+				String glPrefix = rs.getString("Description");
+				System.out.println(glPrefix);
+
+				System.out.print("joshua  na u bi dis...!");
+
+				Aproval_limit condition = new Aproval_limit(branchCode,branchName,branchAcronym,glPrefix);
+				//condition.setCode(branchCode);
+				//condition.setMinAmt(branchName);
+				//condition.setMaxAmt(branchAcronym);
+				//condition.setDesc(glPrefix);
+
+				System.out.println("Flash me d object >>>>>>>>>>>>>"+condition);
+				_list.add(condition);
+				System.out.println("e dey work na .....JOSHUA");
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting branches ->" + e.getMessage());
+			System.out.print("i don no waiting dey happenn o!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+    public String Approval_Duplicate(String sbcode, double  min, double max, String des)
+		{
+						 Connection c = null;
+						 Statement s = null;
+						 ResultSet  r = null;
+						 int rowcount;
+						String message ="No Duplicate Found";
+							try
+							{
+										c = getConnection();
+										s = c.createStatement();
+										r = s.executeQuery("select * from Approval_Limit where [Level_Code] = '"+sbcode+"' AND [Min_Amount] ='"+min+"' AND [Max_Amount]='"+max+"' AND [Description]='"+des+"'");
+										System.out.println("i don't know if it is working parker .....");
+										if(r.next())
+										{
+											System.out.println("i don't know if it is working parker 2 .....");
+											message = "Duplicates Found";
+											System.out.println("FOUND >>>>>>>>>>>>>>>>>>>"+message);
+											
+										}else{
+											message ="Message can not be display....";
+										}
+										
+								
+							}catch(Exception ex){ex.printStackTrace();}
+							finally
+							{
+								closeConnection(con, s,r);
+							}
+							return message;
+		}
+        public String Approval_Level_Duplicate(String code, String trans_type, String level, String date, String userid)
+		{
+						 Connection c = null;
+						 Statement s = null;
+						 ResultSet  r = null;
+						 int rowcount;
+						String message ="No Duplicate Found";
+							try
+							{
+										c = getConnection();
+										s = c.createStatement();
+										System.out.println("established connection...");
+
+										r = s.executeQuery("select * from Approval_Level_setup where [Code] = '"+code+"' AND [Transaction_type] ='"+trans_type+"' AND [Level]='"+level+"' AND [Date]='"+date+"' AND [User_id]='"+userid+"'");
+										if(r.next())
+										{
+											message = "Duplicates Found";
+											System.out.println("FOUND >>>>>>>>>>>>>>>>>>>"+message);
+										}
+										
+								
+							}catch(Exception ex){ex.printStackTrace();}
+							finally
+							{
+								closeConnection(con, s,r);
+							}
+							return message;
+		}
+        public boolean isApprovalExisting(String code) {
+ 	boolean done=false;
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+
+    String FINDER_QUERY = "SELECT Level_Code,Min_Amount,Max_Amount,Description from Approval_Limit WHERE Level_Code = ?";
+
+    try {
+        con = getConnection();
+        ps = con.prepareStatement(FINDER_QUERY);
+        ps.setString(1, code);
+       // ps.setString(2,page);
+        rs = ps.executeQuery();
+        System.out.println("Yes o...............!");
+
+        while (rs.next())
+        {
+           done=true;
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARNING: cannot fetch [am_raisentry_post_josh]->" +
+                ex.getMessage());
+    } finally {
+        closeConnection(con, ps, rs);
+    }
+
+    return done;
+
+}
+
+  /*
+        public boolean SaveApproval_level(String code, String trans_type, String  level, String date,String userid)
+{
+				boolean done = false;
+				 Connection con = null;
+				 Statement s = null;
+				 ResultSet  r = null;
+				 PreparedStatement ps = null;
+				 String query = "INSERT INTO Approval_Level_setup"
+						+ "(code, Transaction_type"
+						+ ",Level,Date,User_id)"
+						+ " VALUES (?,?,?,?,?)";
+
+				//int rowcount;
+				//String message = "";
+					try
+					{
+								con = getConnection();
+								System.out.println("established connection...");
+								ps = con.prepareStatement(query);
+								ps.setString(1, code);
+								ps.setString(2, trans_type);
+								ps.setString(3, level);
+								ps.setDate(4, df.dateConvert(new java.util.Date()));
+								ps.setString(5,userid);
+
+								done=(ps.executeUpdate()!=-1);
+								System.out.println("output "+done);
+
+					}catch(Exception ex){ex.printStackTrace();}
+					finally
+					{
+						closeConnection(con, ps);
+					}
+					return done;
+}
+
+*/
+        public boolean isApproval_Level_Existing(String codee) {
+ 	boolean done=false;
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+
+    String FINDER_QUERY = "SELECT Code,Transaction_type,Level from Approval_Level_setup where Code = ?";
+
+    try {
+        con = getConnection();
+        ps = con.prepareStatement(FINDER_QUERY);
+        ps.setString(1, codee);
+       // ps.setString(2,Transaction_Type);
+       // ps.setString(3,Transaction_Type);
+        rs = ps.executeQuery();
+        System.out.println("Yes o...............!");
+
+        while (rs.next())
+        {
+           done=true;
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARNING: cannot fetch [am_raisentry_post_josh]->" +
+                ex.getMessage());
+    } finally {
+        closeConnection(con, ps, rs);
+    }
+
+    return done;
+
+}
+public String UpdateApproval_Limit(String code,double min_amount, double max_amount,  String describ)
+		{
+					System.out.print(code);
+					System.out.print(min_amount);
+					System.out.print(max_amount);
+					System.out.print(describ);
+
+
+
+					String mess ="";
+					Connection con = null;
+					Statement s = null;
+					PreparedStatement ps = null;
+					ResultSet rs = null;
+
+
+						try
+						{
+								con = getConnection();
+
+								    String updatequery = "UPDATE Approval_Limit SET Min_Amount=?, Max_Amount=?,Description=? WHERE Level_Code=?";
+									ps = con.prepareStatement(updatequery);
+									ps.setDouble(1, min_amount);
+									System.out.print("wetin dey happen self"+min_amount);
+									ps.setDouble(2,max_amount);
+									System.out.print("wetin dey happen self"+max_amount);
+									//ps.setDate(4, df.dateConvert(new java.util.Date()));
+									//System.out.print("wetin dey happen self"+createdate);
+									ps.setString(3,describ);
+									ps.setString(4,code);
+
+									System.out.print("wetin dey happen self____"+code);
+									System.out.print("wetin dey happen self checkpoint 1");
+									int cnt=ps.executeUpdate();
+									mess = "Success_update";
+									System.out.print("wetin dey happen self checkpoint 2"+mess);
+									if(cnt>0)
+									{
+										mess = "Success_update";
+										System.out.println("*********************"+mess);
+									}
+
+
+						}catch(Exception ex)
+						{
+								ex.printStackTrace();
+						}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+
+						return mess;
+
+		}
+public java.util.ArrayList<AssignSbu> getApprovalLevelByQueryGprifix()
+{
+	java.util.ArrayList<AssignSbu> _list = new java.util.ArrayList<AssignSbu>();
+	com.magbel.ia.legend.admin.objects.AssignSbu branch = null;
+	String query = "Select * from AM_SBU_ATTACHEMENT ";
+	System.out.println(""+query);
+
+
+	Connection c = null;
+	ResultSet rs = null;
+	Statement s = null;
+
+	try {
+		c = getConnection();
+		s = c.createStatement();
+		rs = s.executeQuery(query);
+		while(rs.next())
+		{
+			 String id = String.valueOf(help.getGeneratedId("AM_SBU_ATTACHEMENT"));
+			System.out.println("i dey here o! 333333333");
+			String branchCode = rs.getString("MTID");
+			System.out.println(branchCode);
+			String branchName = rs.getString("ATTACH_ID");
+			System.out.println(branchName);
+			String branchAcronym = rs.getString("SBU_NAME");
+			System.out.println(branchAcronym);
+			String glPrefix = rs.getString("GL_PREFIX");
+			System.out.println(glPrefix);
+			String userid = rs.getString("GL_SUFIX");
+			System.out.println(userid);
+			String date = rs.getString("CREATE_DATE");
+			System.out.println(userid);
+			String createuser = rs.getString("CREATE_USER");
+			System.out.println(userid);
+			String sbucode = rs.getString("SBU_CODE");
+			System.out.println(userid);
+			int y = 6;
+			int u =0;
+			int t =(y < u)? 6 : 9;
+
+			System.out.print("joshua  na u bi dis...!");
+
+			AssignSbu condition = new AssignSbu();
+			condition.setSbuname(branchAcronym);
+			condition.setGlprifix(glPrefix);
+			condition.setGlsurfix(userid);
+			//condition.setDesc(glPrefix);
+
+			System.out.println("Flash me d object >>>>>>>>>>>>>"+condition);
+			_list.add(condition);
+			System.out.println("e dey work na .....JOSHUA");
+
+		}
+
+	} catch (Exception e) {
+		System.out.println(this.getClass().getName()
+				+ " Error Selecting branches ->" + e.getMessage());
+		System.out.print("i don no waiting dey happenn o!");
+	}
+
+	finally {
+		closeConnection(c, s, rs);
+	}
+	return _list;
+
+}
+public java.util.ArrayList<Approval_Level> getApprovalLevelByQuery(String filter)
+	{
+		java.util.ArrayList<Approval_Level> _list = new java.util.ArrayList<Approval_Level>();
+		com.magbel.ia.legend.admin.objects.Aproval_limit branch = null;
+		String query = "Select * from Approval_Level_setup "+filter;
+		System.out.println(""+query);
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				System.out.println("i dey here o! 333333333");
+				String branchCode = rs.getString("Code");
+				System.out.println(branchCode);
+				String branchName = rs.getString("Transaction_type");
+				System.out.println(branchName);
+				String branchAcronym = rs.getString("Level");
+				System.out.println(branchAcronym);
+				String glPrefix = rs.getString("Date");
+				System.out.println(glPrefix);
+				String userid = rs.getString("User_id");
+				System.out.println(userid);
+
+				System.out.print("joshua  na u bi dis...!");
+
+				Approval_Level condition = new Approval_Level(branchCode,branchName,branchAcronym,glPrefix,userid);
+				//condition.setCode(branchCode);
+				//condition.setMinAmt(branchName);
+				//condition.setMaxAmt(branchAcronym);
+				//condition.setDesc(glPrefix);
+
+				System.out.println("Flash me d object >>>>>>>>>>>>>"+condition);
+				_list.add(condition);
+				System.out.println("e dey work na .....JOSHUA");
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting branches ->" + e.getMessage());
+			System.out.print("i don no waiting dey happenn o!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+public java.util.ArrayList<Approval_Level> getApprovalLevelByQuery()
+	{
+		java.util.ArrayList<Approval_Level> _list = new java.util.ArrayList<Approval_Level>();
+		com.magbel.ia.legend.admin.objects.Aproval_limit branch = null;
+		String query = "Select * from Approval_Level_setup ";
+		System.out.println(""+query);
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				System.out.println("i dey here o! 333333333");
+				String branchCode = rs.getString("Code");
+				System.out.println(branchCode);
+				String branchName = rs.getString("Transaction_type");
+				System.out.println(branchName);
+				String branchAcronym = rs.getString("Level");
+				System.out.println(branchAcronym);
+				String glPrefix = rs.getString("Date");
+				System.out.println(glPrefix);
+				String userid = rs.getString("User_id");
+				System.out.println(userid);
+
+				System.out.print("joshua  na u bi dis...!");
+
+				Approval_Level condition = new Approval_Level(branchCode,branchName,branchAcronym,glPrefix,userid);
+				//condition.setCode(branchCode);
+				//condition.setMinAmt(branchName);
+				//condition.setMaxAmt(branchAcronym);
+				//condition.setDesc(glPrefix);
+
+				System.out.println("Flash me d object >>>>>>>>>>>>>"+condition);
+				_list.add(condition);
+				System.out.println("e dey work na .....JOSHUA");
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting branches ->" + e.getMessage());
+			System.out.print("i don no waiting dey happenn o!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+public java.util.ArrayList<mail_setup> getBranchesByMail(String filter)
+	{
+		java.util.ArrayList<mail_setup> _list = new java.util.ArrayList<mail_setup>();
+		com.magbel.ia.legend.admin.objects.mail_setup branch = null;
+		String query = "SELECT Mail_code,Mail_description,Mail_address,Creation_date, Transaction_type," +
+                        "User_id,Status FROM am_mail_statement "+ filter;
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				System.out.println("i dey here o! jjoshua");
+				String branchCode = rs.getString("Mail_code");
+				String branchName = rs.getString("Mail_description");
+				String branchAcronym = rs.getString("Mail_address");
+				String glPrefix = rs.getString("Creation_date");
+				System.out.println("coming to mama ...."+glPrefix );
+				String email = rs.getString("Transaction_type");
+				String userid = rs.getString("User_id");
+				String status= rs.getString("Status");
+				System.out.print("joshua !");
+				branch = new com.magbel.ia.legend.admin.objects.mail_setup(branchCode, branchName, branchAcronym, glPrefix,email,userid,status);
+
+				_list.add(branch);
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting branches ->" + e.getMessage());
+			System.out.print("i don no waiting dey happenn o! i want to know");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+
+
+
+public String CheckMailSetup(String mailcode, String description, String address, String date, String trans_type, String userid, String status)
+	{
+					 Connection c = null;
+					 Statement s = null;
+					 ResultSet  r = null;
+					 int rowcount;
+					String message ="No Duplicate Found";
+						try
+{
+    c = getConnection();
+    s = c.createStatement();
+    System.out.println("established connection...");
+
+    r = s.executeQuery("select * from am_mail_statement_view where [Mail_code]='"+mailcode+"' AND [Mail_description]" +
+            "='"+description+"' AND [Mail_address]='"+address+"' AND [Create_date]='"+date+"' AND" +
+            " [Transaction_type]='"+trans_type+"' AND [User_id]='"+userid+"' AND [Status] ='"+status+"'");
+    if(r.next())
+    {
+            message = "Duplicates Found";
+            System.out.println("FOUND >>>>>>>>>>>>>>>>>>>"+message);
+    }
+
+
+                }catch(Exception ex){ex.printStackTrace();}
+                finally
+                {
+                        closeConnection(con, s,r);
+                }
+                return message;
+	}
+
+
+/*
+public boolean SaveMailSetup(String mailcode, String description, String address, String date, String trans_type, String userid, String status)
+	{
+					boolean done = false;
+					 Connection con = null;
+					 Statement s = null;
+					 ResultSet  r = null;
+					 PreparedStatement ps = null;
+					 String query = "INSERT INTO am_mail_statement"
+							+ "(Mail_code, Mail_description"
+							+ ",Mail_address,Creation_date,Transaction_type,User_id,Status)"
+							+ " VALUES (?,?,?,?,?,?,?)";
+
+					//int rowcount;
+					//String message = "";
+						try
+						{
+									con = getConnection();
+									System.out.println("established connection...");
+									ps = con.prepareStatement(query);
+									ps.setString(1, mailcode);
+									ps.setString(2, description);
+									ps.setString(3, address);
+									ps.setDate(4, df.dateConvert(new java.util.Date()));
+									ps.setString(5,trans_type );
+									ps.setString(6, userid);
+									ps.setString(7, status);
+									done=(ps.executeUpdate()!=-1);
+									System.out.println("output "+done);
+
+						}catch(Exception ex){ex.printStackTrace();}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+						return done;
+	}
+
+
+*/
+
+/*
+public String UpdateMailStatement(String mailcode,String maildescription, String mailaddress, String createdate, String transactiontype, String userid, String status)
+		{
+					System.out.print(mailcode);
+					System.out.print(maildescription);
+					System.out.print(mailaddress);
+					System.out.print(createdate);
+
+
+
+					String mess ="";
+					Connection con = null;
+					Statement s = null;
+					PreparedStatement ps = null;
+					ResultSet rs = null;
+
+
+						try
+						{
+								con = getConnection();
+
+								    String updatequery = "UPDATE am_mail_statement_view SET Mail_description=?, Mail_address = ?,Create_date= ? , Transaction_type=?, User_id =?, Status = ? WHERE Mail_code=?";
+									ps = con.prepareStatement(updatequery);
+									ps.setString(1,maildescription);
+									System.out.print("wetin dey happen self"+maildescription);
+									ps.setString(2,mailaddress);
+									System.out.print("wetin dey happen self"+mailaddress);
+									ps.setString(3,createdate);
+									System.out.print("wetin dey happen self"+createdate);
+									ps.setString(4,transactiontype);
+									ps.setString(5,userid);
+									ps.setString(6,status);
+									ps.setString(7,mailcode);
+
+									System.out.print("wetin dey happen self"+mailcode);
+									System.out.print("wetin dey happen self checkpoint 1");
+									int cnt=ps.executeUpdate();
+									mess = "Success_update";
+									System.out.print("wetin dey happen self checkpoint 2"+mess);
+									if(cnt>0)
+									{
+										mess = "Success_update";
+										System.out.println("*********************"+mess);
+									}
+
+
+						}catch(Exception ex)
+						{
+								ex.printStackTrace();
+						}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+
+						return mess;
+
+		}
+
+*/
+
+public boolean iscreatesave2(String codee) {
+	 	boolean done=false;
+	    Connection con = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
+
+
+	    String FINDER_QUERY = "SELECT Sbu_code,Sbu_name,Sbu_contact,Status from Sbu_SetUp where Sbu_code = ?";
+
+	    try {
+	        con = getConnection();
+	        ps = con.prepareStatement(FINDER_QUERY);
+	        ps.setString(1, codee);
+	       // ps.setString(2,Transaction_Type);
+	       // ps.setString(3,Transaction_Type);
+	        rs = ps.executeQuery();
+	        System.out.println("Yes o...............!");
+
+	        while (rs.next())
+	        {
+	           done=true;
+	           System.out.println("records already exist "+done);
+
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("WARNING: cannot fetch [am_raisentry_post_josh]->" +
+	                ex.getMessage());
+	    } finally {
+	        closeConnection(con, ps, rs);
+	    }
+
+	    return done;
+
+	}
+
+public boolean isCheckMailSetup(String codee) {
+	 	boolean done=false;
+	    Connection con = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
+
+
+	    String FINDER_QUERY = "SELECT Mail_code,Mail_description,Mail_address, Creation_date,Transaction_type,User_id,Status from am_mail_statement where Mail_code = ?";
+
+	    try {
+	        con = getConnection();
+	        ps = con.prepareStatement(FINDER_QUERY);
+	        ps.setString(1, codee);
+	       // ps.setString(2,Transaction_Type);
+	       // ps.setString(3,Transaction_Type);
+	        rs = ps.executeQuery();
+	        System.out.println("Yes o...............!");
+
+	        while (rs.next())
+	        {
+	           done=true;
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("WARNING: cannot fetch [am_raisentry_post_josh]->" +
+	                ex.getMessage());
+	    } finally {
+	        closeConnection(con, ps, rs);
+	    }
+
+	    return done;
+
+	}
+
+/*
+public boolean SaveApproval(String code, double min_amount, double max_amount, String des)
+		{
+						boolean done = false;
+						 Connection con = null;
+						 Statement s = null;
+						 ResultSet  r = null;
+						 PreparedStatement ps = null;
+						 String query = "INSERT INTO Approval_Limit"
+								+ "(Level_code, Min_Amount"
+								+ ",Max_Amount,Description)"
+								+ " VALUES (?,?,?,?)";
+
+						//int rowcount;
+						//String message = "";
+							try
+							{
+										con = getConnection();
+										System.out.println("established connection...");
+										ps = con.prepareStatement(query);
+										ps.setString(1, code);
+										ps.setDouble(2, min_amount);
+										ps.setDouble(3, max_amount);
+										ps.setString(4, des);
+
+										done=(ps.executeUpdate()!=-1);
+										System.out.println("output "+done);
+
+							}catch(Exception ex){ex.printStackTrace();}
+							finally
+							{
+								closeConnection(con, ps);
+							}
+							return done;
+		}
+
+*/
+
+public String UpdateApproval_Level(String code,String trans_type, String level_id)
+		{
+					System.out.print(code);
+					System.out.print(trans_type);
+					System.out.print(level_id);
+					//System.out.print(createdate);
+
+
+
+					String mess ="";
+					Connection con = null;
+					Statement s = null;
+					PreparedStatement ps = null;
+					ResultSet rs = null;
+
+
+						try
+						{
+								con = getConnection();
+
+								    String updatequery = "UPDATE Approval_Level_setup SET Transaction_type=?,Level=? WHERE Code=?";
+									ps = con.prepareStatement(updatequery);
+									ps.setString(1,trans_type);
+									System.out.print("wetin dey happen self"+trans_type);
+									ps.setString(2, level_id);
+									System.out.print("wetin dey happen self today "+level_id);
+									//ps.setDate(4, df.dateConvert(new java.util.Date()));
+									//System.out.print("wetin dey happen self"+createdate);
+									ps.setString(3,code);
+									//ps.setString(5,code);
+
+									System.out.print("wetin dey happen self"+code);
+									System.out.print("wetin dey happen self checkpoint 1");
+									int cnt=ps.executeUpdate();
+									mess = "Success_update";
+									System.out.print("wetin dey happen self checkpoint 2"+mess);
+									if(cnt>0)
+									{
+										mess = "Success_update";
+										System.out.println("*********************"+mess);
+									}
+
+
+						}catch(Exception ex)
+						{
+								ex.printStackTrace();
+						}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+
+						return mess;
+
+		}
+
+/*
+public String UpdateMailStatement(String mailcode,String maildescription, String mailaddress, String transactiontype, String status)
+		{
+					System.out.print(mailcode);
+					System.out.print(maildescription);
+					System.out.print(mailaddress);
+					//System.out.print(createdate);
+                    handler = new AdminHandler();
+
+
+					String mess ="";
+					Connection con = null;
+					Statement s = null;
+					PreparedStatement ps = null;
+					ResultSet rs = null;
+
+
+						try{
+								con = getConnection();
+
+								    String updatequery = "UPDATE am_mail_statement SET Mail_description=?, Mail_address = ?, Transaction_type=?, Status = ? WHERE Mail_code=?";
+									ps = con.prepareStatement(updatequery);
+									ps.setString(1,maildescription);
+									System.out.print("wetin dey happen self"+maildescription);
+									ps.setString(2,mailaddress);
+									System.out.print("wetin dey happen self"+mailaddress);
+                                    ps.setString(3,handler.getTransactCode(transactiontype));
+									System.out.print("wetin dey happen self"+transactiontype);
+									ps.setString(4,status);
+									ps.setString(5,mailcode);
+
+									System.out.print("wetin dey happen self"+mailcode);
+									System.out.print("wetin dey happen self checkpoint 1");
+									int cnt=ps.executeUpdate();
+									mess = "Success_update";
+									System.out.print("wetin dey happen self checkpoint 2"+mess);
+									if(cnt>0)
+									{
+										mess = "Success_update";
+										System.out.println("*********************"+mess);
+									}
+
+
+						}catch(Exception ex)
+						{
+								ex.printStackTrace();
+						}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+
+						return mess;
+
+		}
+
+
+*/
+public String getTransactCode(String Trasn_Id){
+    String query =
+           "SELECT DESCRIPTION  FROM Am_Transaction_Type  " +
+           "WHERE TRANS_CODE = '" + Trasn_Id + "' ";
+
+      Connection con = null;
+      ResultSet rs = null;
+      Statement stmt = null;
+   String branchcode = "0";
+   try {
+       con= getConnection();
+       stmt = con.createStatement();
+       rs = stmt.executeQuery(query);
+       while (rs.next()) {
+
+           branchcode = rs.getString(1);
+
+       }
+
+   } catch (Exception ex) {
+       ex.printStackTrace();
+   } finally {
+    closeConnection(con, stmt,rs);
+   }
+   return branchcode;
+}
+
+
+public boolean SaveMailSetup(String mailcode, String description, String address, String date, String trans_type, String userid, String status)
+	{
+
+					boolean done = false;
+					 Connection con = null;
+					 Statement s = null;
+					 ResultSet  r = null;
+					 PreparedStatement ps = null;
+
+					 handler = new AdminHandler();
+
+
+					 String query = "INSERT INTO am_mail_statement"
+							+ "(Mail_code, Mail_description"
+							+ ",Mail_address,creation_date,Transaction_type,User_id,Status)"
+							+ " VALUES (?,?,?,?,?,?,?)";
+
+					//int rowcount;
+					//String message = "";
+						try
+						{
+							 String id = String.valueOf(help.getGeneratedId("am_mail_statement"));
+									con = getConnection();
+									System.out.println("established connection...");
+									ps = con.prepareStatement(query);
+									ps.setString(1, id);
+									ps.setString(2, description.toUpperCase());
+									ps.setString(3, address);
+									ps.setDate(4, df.dateConvert(new java.util.Date()));
+									ps.setString(5,handler.getTransactCode(trans_type));
+									ps.setString(6, userid);
+									ps.setString(7, status);
+									done=(ps.executeUpdate()!=-1);
+									System.out.println("output "+done);
+
+						}catch(Exception ex){ex.printStackTrace();}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+						return done;
+	}
+
+
+public boolean SaveApproval(String code, double min_amount, double max_amount, String des)
+		{
+						boolean done = false;
+						 Connection con = null;
+						 Statement s = null;
+						 ResultSet  r = null;
+						 PreparedStatement ps = null;
+						 String query = "INSERT INTO Approval_Limit"
+								+ "(Level_code, Min_Amount"
+								+ ",Max_Amount,Description)"
+								+ " VALUES (?,?,?,?)";
+
+						//int rowcount;
+						//String message = "";
+							try
+							{
+										String id = String.valueOf(help.getGeneratedId("Approval_Limit"));
+										con = getConnection();
+										System.out.println("established connection...");
+										ps = con.prepareStatement(query);
+										ps.setString(1, id);
+										ps.setDouble(2, min_amount);
+										ps.setDouble(3, max_amount);
+										ps.setString(4, des.toUpperCase());
+
+										done=(ps.executeUpdate()!=-1);
+										System.out.println("output "+done);
+
+							}catch(Exception ex){ex.printStackTrace();}
+							finally
+							{
+								closeConnection(con, ps);
+							}
+							return done;
+		}
+
+
+public boolean SaveApproval_level(String code, String trans_type, String  level, String date,String userid)
+{
+				boolean done = false;
+				 Connection con = null;
+				 Statement s = null;
+				 ResultSet  r = null;
+				 PreparedStatement ps = null;
+				 String query = "INSERT INTO Approval_Level_setup"
+						+ "(code, Transaction_type"
+						+ ",Level,Date,User_id)"
+						+ " VALUES (?,?,?,?,?)";
+
+				//int rowcount;
+				//String message = "";
+					try
+					{
+						 		String id = String.valueOf(help.getGeneratedId("Approval_Level_setup"));
+								con = getConnection();
+								System.out.println("established connection...");
+								ps = con.prepareStatement(query);
+								ps.setString(1, id);
+								ps.setString(2, trans_type);
+								ps.setString(3, level);
+								ps.setDate(4, df.dateConvert(new java.util.Date()));
+								ps.setString(5,userid);
+
+								done=(ps.executeUpdate()!=-1);
+								System.out.println("output "+done);
+
+					}catch(Exception ex){ex.printStackTrace();}
+					finally
+					{
+						closeConnection(con, ps);
+					}
+					return done;
+}
+
+public String checkBoxCheck(String sbu_code, String attach_id,String sbu_name)
+	{
+	 	String result ="N";
+	    Connection con = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
+	    String FINDER_QUERY = " select distinct sbu_code from am_sbu_attachement where sbu_code in (select sbu_code from sbu_setup where sbu_code=?  and attach_id=?) and sbu_name in (select sbu_name from sbu_setup where sbu_name=?) ";
+	    try {
+	        con = getConnection();
+	        ps = con.prepareStatement(FINDER_QUERY);
+	        ps.setString(1, sbu_code);
+	        ps.setString(2, attach_id);
+	        ps.setString(3, sbu_name);
+
+	        rs = ps.executeQuery();
+	        while (rs.next())
+	        {
+	        	result ="Y";
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("error generated" +
+	                ex.getMessage());
+	    } finally {
+	        closeConnection(con, ps, rs);
+	    }
+
+	    return result;
+
+	}
+
+
+
+
+
+
+
+public String UpdateMailStatement(String mailcode,String maildescription, String mailaddress, String transactiontype, String status)
+		{
+					System.out.print(mailcode);
+					System.out.print(maildescription);
+					System.out.print(mailaddress);
+					//System.out.print(createdate);
+
+					handler = new AdminHandler();
+
+
+					String mess ="";
+					Connection con = null;
+					Statement s = null;
+					PreparedStatement ps = null;
+					ResultSet rs = null;
+
+
+						try
+						{
+								con = getConnection();
+
+								    String updatequery = "UPDATE am_mail_statement SET Mail_description=?, Mail_address = ?, Transaction_type=?, Status = ? WHERE Mail_code=?";
+									ps = con.prepareStatement(updatequery);
+									ps.setString(1,maildescription);
+									System.out.print("wetin dey happen self"+maildescription);
+									ps.setString(2,mailaddress);
+									System.out.print("wetin dey happen self"+mailaddress);
+									ps.setString(3,handler.getTransactCode(transactiontype));
+									System.out.print("wetin dey happen self"+transactiontype);
+									ps.setString(4,status);
+									ps.setString(5,mailcode);
+
+									System.out.print("wetin dey happen self"+mailcode);
+									System.out.print("wetin dey happen self checkpoint 1");
+									int cnt=ps.executeUpdate();
+									mess = "Success_update";
+									System.out.print("wetin dey happen self checkpoint 2"+mess);
+									if(cnt>0)
+									{
+										mess = "Success_update";
+										System.out.println("*********************"+mess);
+									}
+
+
+						}catch(Exception ex)
+						{
+								ex.printStackTrace();
+						}
+						finally
+						{
+							closeConnection(con, ps);
+						}
+
+						return mess;
+
+		}
+
+
+
+public com.magbel.ia.legend.admin.objects.AssignSbu getClassPrivilegeSbu(String attched_id) {
+	com.magbel.ia.legend.admin.objects.AssignSbu classprivilege = null;
+
+	String query = "Select MTID,Attach_id,SBU_NAME,GL_PREFIX,GL_SUFIX,CREATE_DATE,CREATE_USER,SBU_CODE from AM_SBU_ATTACHEMENT WHERE Attach_id =?";
+
+	//String query1 = "SELECT Sbu_code,Sbu_name,Sbu_contact,Status,Contact_email  FROM Sbu_SetUp WHERE Sbu_name= ?";
+
+	//String query = "Select a.sbu_code from am_sbu_attachement a,sbu_setup b where a.code=b.sbu_code and a.sbuname=b.sbu_name";
+	/*String query = "SELECT MTID,ATTACH_ID,SBU_NAME"
+		+ ",GL_PREFIX,GL_SUFIX,CREATE_DATE,CREATE_USER,SBU_CODE"
+		+ " FROM AM_SBU_ATTACHEMENT WHERE ATTACH_ID='" + attched_id
+		+ "' AND SBU_CODE='" + sbucode + "'";
+		*/
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+
+	//ApplicationHelper help = new ApplicationHelper();
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+
+		ps.setString(1, attched_id);
+		//ps.setString(2,mtid);
+		//ps.setString(2, sbuname);
+		//ps.setString(2, roleuuid);
+		rs = ps.executeQuery();
+		while (rs.next()) {
+		//	 String id = help.getGeneratedId("AM_SBU_ATTACHEMENT");
+
+
+
+
+			String branchAcronym = rs.getString("SBU_NAME");
+
+			String glPrefix = rs.getString("GL_PREFIX");
+
+			String userid = rs.getString("GL_SUFIX");
+
+			String date = rs.getString("CREATE_DATE");
+
+			String createuser = rs.getString("CREATE_USER");
+
+			String  sbbb  = rs.getString("SBU_CODE");
+
+			String branchName = rs.getString("ATTACH_ID");
+
+			String id = rs.getString("MTID");
+
+
+
+
+			//System.out.println(branchCode);
+
+
+			 classprivilege = new com.magbel.ia.legend.admin.objects.AssignSbu();
+			System.out.println("11");
+
+			classprivilege.setMitd(id);
+			classprivilege.setAttachid(branchName);
+			classprivilege.setSbuname(branchAcronym);
+			classprivilege.setGlprifix(glPrefix);
+			classprivilege.setGlsurfix(userid);
+			classprivilege.setCreatedate(date);
+			classprivilege.setCreateuser(createuser);
+			classprivilege.setSbucode(sbbb);
+
+
+		}
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching Class Privileges ->" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+	return classprivilege;
+}
+
+public com.magbel.ia.legend.admin.objects.AssignSbu getClassPrivilegeSbu(String attched_id,String sbucode) {
+	com.magbel.ia.legend.admin.objects.AssignSbu classprivilege = null;
+
+	String query = "Select MTID,Attach_id,SBU_NAME,GL_PREFIX,GL_SUFIX,CREATE_DATE,CREATE_USER,SBU_CODE from AM_SBU_ATTACHEMENT WHERE Attach_id =? AND SBU_CODE =?";
+
+	//String query1 = "SELECT Sbu_code,Sbu_name,Sbu_contact,Status,Contact_email  FROM Sbu_SetUp WHERE Sbu_name= ?";
+
+	//String query = "Select a.sbu_code from am_sbu_attachement a,sbu_setup b where a.code=b.sbu_code and a.sbuname=b.sbu_name";
+	/*String query = "SELECT MTID,ATTACH_ID,SBU_NAME"
+		+ ",GL_PREFIX,GL_SUFIX,CREATE_DATE,CREATE_USER,SBU_CODE"
+		+ " FROM AM_SBU_ATTACHEMENT WHERE ATTACH_ID='" + attched_id
+		+ "' AND SBU_CODE='" + sbucode + "'";
+		*/
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+
+	//ApplicationHelper help = new ApplicationHelper();
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+
+		ps.setString(1, attched_id);
+		ps.setString(2, sbucode);
+		//System.out.println("==========coming in from d method===attched_id======================"+attched_id);
+		//ps.setString(2,mtid);
+		//ps.setString(2, sbuname);
+		//ps.setString(2, roleuuid);
+		rs = ps.executeQuery();
+		while (rs.next()) {
+		//	 String id = help.getGeneratedId("AM_SBU_ATTACHEMENT");
+			String id = rs.getString("MTID");
+			System.out.println("=================MTID===================="+id);
+			String sbuname = rs.getString("SBU_NAME");
+			System.out.println("=================SBU_NAME===================="+sbuname);
+
+
+			String glPrefix = rs.getString("GL_PREFIX");
+			System.out.println("=================GL_PREFIX===================="+glPrefix);
+			String glsufix = rs.getString("GL_SUFIX");
+			System.out.println("=================GL_SUFIX===================="+glsufix);
+			String date = rs.getString("CREATE_DATE");
+			System.out.println("=================CREATE_DATE===================="+date);
+			String createuser = rs.getString("CREATE_USER");
+			System.out.println("=================CREATE_USER===================="+createuser);
+			String  sbbbcode  = rs.getString("SBU_CODE");
+			System.out.println("=================SBU_CODE===================="+sbbbcode);
+			String attachid = rs.getString("ATTACH_ID");
+			System.out.println("=================ATTACH_ID===================="+attachid);
+
+			classprivilege = new com.magbel.ia.legend.admin.objects.AssignSbu();
+
+
+
+
+
+
+
+
+
+			classprivilege.setMitd(id);
+			classprivilege.setSbuname(sbuname);
+
+			classprivilege.setGlprifix(glPrefix);
+			classprivilege.setGlsurfix(glsufix);
+			classprivilege.setCreatedate(date);
+			classprivilege.setCreateuser(createuser);
+			classprivilege.setAttachid(attachid);
+			classprivilege.setSbucode(sbbbcode);
+			classprivilege.setCreateuser(createuser);
+
+
+
+		}
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching Class Privileges ->" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+	return classprivilege;
+}
+//victorial
+
+public boolean createBranch(Branch branch)
+      {
+          boolean done;
+          Connection con = null;
+          PreparedStatement ps = null;
+          done = false;
+          String query = "INSERT INTO am_ad_branch(BRANCH_ID,BRANCH_CODE,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX,BRANCH" +
+  "_ADDRESS ,STATE,PHONE_NO,FAX_NO,REGION,PROVINCE ,BRANCH_STATUS,USER_ID,CREATE_DA" +
+  "TE,GL_SUFFIX,EMAIL,Uncapitalized_account)  VALUES(?,?,? ,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+  ;
+
+          try
+          {
+             apph = new ApplicationHelper();
+             String stringid = String.valueOf(apph.getGeneratedId("am_ad_branch"));
+              con = getConnection();
+              ps = con.prepareStatement(query);
+              ps.setString(1, stringid);
+              ps.setString(2, branch.getBranchCode());
+              ps.setString(3, branch.getBranchName());
+              ps.setString(4, branch.getBranchAcronym());
+              ps.setString(5, branch.getGlPrefix());
+              ps.setString(6, branch.getBranchAddress());
+              ps.setString(7, branch.getState());
+              ps.setString(8, branch.getPhoneNo());
+              ps.setString(9, branch.getFaxNo());
+              ps.setString(10, branch.getRegion());
+              ps.setString(11, branch.getProvince());
+              ps.setString(12, branch.getBranchStatus());
+              ps.setString(13, branch.getUsername());
+              ps.setDate(14, df.dateConvert(new Date()));
+              ps.setString(15, branch.getGlSuffix());
+              ps.setString(16, branch.getEmailAddress());
+              ps.setString(17, branch.getUnClassified());
+              //ps.setLong(16,System.currentTimeMillis());
+              done = ps.executeUpdate() != -1;
+          }
+          catch(Exception e)
+          {
+              System.out.println(getClass().getName() + " ERROR:Error Creating Branch ->" + e.getMessage());
+              e.printStackTrace();
+          }
+          finally
+          {
+              closeConnection(con, ps);
+          }
+          return done;
+    }
+
+
+    private Branch getABranch(String filter)
+        {
+            Branch branch;
+            branch = null;
+            /*
+            String query = "SELECT BRANCH_ID,BRANCH_CODE ,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX,BRANCH_ADDRES" +
+    "S,STATE,PHONE_NO,FAX_NO,REGION,PROVINCE,BRANCH_STATUS,USER_ID,GL_SUFFIX,CREATE_D" +
+    "ATE,EMAIL,LOCATION  FROM am_ad_branch "
+    ;
+            */
+
+            String query = "SELECT BRANCH_ID,BRANCH_CODE ,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX,BRANCH_ADDRES" +
+    "S,STATE,PHONE_NO,FAX_NO,REGION,PROVINCE,BRANCH_STATUS,USER_ID,GL_SUFFIX,CREATE_D" +
+    "ATE,EMAIL FROM am_ad_branch " ;
+            query = query + filter;
+            Connection c = null;
+            ResultSet rs = null;
+            Statement s = null;
+            try
+            {
+                c = getConnection();
+                s = c.createStatement();
+                for(rs = s.executeQuery(query); rs.next();)
+                {
+                    String branchId = rs.getString("BRANCH_ID");
+                    String branchCode = rs.getString("BRANCH_CODE");
+                    String branchName = rs.getString("BRANCH_NAME");
+                    String branchAcronym = rs.getString("BRANCH_ACRONYM");
+                    String glPrefix = rs.getString("GL_PREFIX");
+                    String branchAddress = rs.getString("BRANCH_ADDRESS");
+                    String state = rs.getString("STATE");
+                    String phoneNo = rs.getString("PHONE_NO");
+                    String faxNo = rs.getString("FAX_NO");
+                    String province = rs.getString("PROVINCE");
+                    String region = rs.getString("REGION");
+                    String branchStatus = rs.getString("BRANCH_STATUS");
+                    String username = rs.getString("USER_ID");
+                    String glSuffix = rs.getString("GL_SUFFIX");
+                    String createDate = rs.getString("CREATE_DATE");
+                    String emailAddress = rs.getString("EMAIL");
+                    //int location = rs.getInt("LOCATION");
+                    branch = new Branch(branchId, branchCode, branchName, branchAcronym, glPrefix, glSuffix, branchAddress, state, phoneNo, faxNo, region, province, branchStatus, username, createDate, emailAddress);
+                }
+
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                closeConnection(c, s, rs);
+            }
+            return branch;
+    }
+
+
+public boolean updateBranch(Branch branch)
+        {
+            boolean done;
+            Connection con = null;
+            PreparedStatement ps = null;
+            done = false;
+            String query = "UPDATE am_ad_branch SET BRANCH_CODE =?,BRANCH_NAME = ?,BRANCH_ACRONYM = ? ,GL_PR" +
+    "EFIX = ?,BRANCH_ADDRESS = ?,STATE = ? ,PHONE_NO = ?,FAX_NO = ?,REGION = ?,PROVIN" +
+    "CE = ? ,BRANCH_STATUS = ?,GL_SUFFIX = ?, EMAIL = ?,Uncapitalized_account=? WHERE BRANCH_ID =?"
+    ;
+            try
+            {
+                con = getConnection();
+                ps = con.prepareStatement(query);
+                ps.setString(1, branch.getBranchCode());
+                ps.setString(2, branch.getBranchName());
+                ps.setString(3, branch.getBranchAcronym());
+                ps.setString(4, branch.getGlPrefix());
+                ps.setString(5, branch.getBranchAddress());
+                ps.setString(6, branch.getState());
+                ps.setString(7, branch.getPhoneNo());
+                ps.setString(8, branch.getFaxNo());
+                ps.setString(9, branch.getRegion());
+                ps.setString(10, branch.getProvince());
+                ps.setString(11, branch.getBranchStatus());
+                ps.setString(12, branch.getGlSuffix());
+                ps.setString(13, branch.getEmailAddress());
+                ps.setString(14, branch.getUnClassified());
+                ps.setString(15, branch.getBranchId());
+                done = ps.executeUpdate() != -1;
+            }
+            catch(Exception e)
+            {
+                System.out.println("WARNING:Error executing Query ->" + e.getMessage());
+                e.printStackTrace();
+            }
+            finally
+            {
+                closeConnection(con, ps);
+            }
+            return done;
+
+    }
+
+
+    public boolean insertDeptForBranch(java.util.ArrayList list) {
+
+		String query = "INSERT INTO sbu_branch_dept(branchCode"
+				+ ",deptCode,branchId" + ",deptId,gl_prefix"
+				+ ",gl_suffix)" + " VALUES(?,?,?,?,?,?)";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		com.magbel.ia.legend.admin.objects.BranchDept bd = null;
+		int[] d = null;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+
+			for (int i = 0; i < list.size(); i++) {
+				bd = (com.magbel.ia.legend.admin.objects.BranchDept) list.get(i);
+				ps.setString(1, bd.getBranchCode());
+				ps.setString(2, bd.getDeptCode());
+				ps.setString(3, bd.getBranchId());
+				ps.setString(4, bd.getDeptId());
+				ps.setString(5, bd.getGl_prefix());
+				ps.setString(6, bd.getGl_suffix());
+				ps.addBatch();
+			}
+			d = ps.executeBatch();
+		} catch (Exception ex) {
+			System.out.println("AdminHandler: insertDeptForBranch(): WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+		return (d.length > 0);
+	}
+
+    public boolean removeAvaliableSbu(java.util.ArrayList list) {
+	String query = "DELETE FROM AM_SBU_ATTACHEMENT" + " WHERE Sbu_Code=?"
+			+ " AND Sbu_name=? AND ATTACH_ID=?";
+	String query2 = "DELETE FROM Sbu_SetUp"
+			+ " WHERE Sbu_Code=?" + " AND Sbu_name=? ";
+
+	Connection con = null;
+	PreparedStatement ps = null;
+	PreparedStatement ps2 = null;
+	ResultSet rs = null;
+	com.magbel.ia.legend.admin.objects.AssignSbu bd = null;
+	int[] d = null;
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+		ps2 = con.prepareStatement(query2);
+		for (int i = 0; i < list.size(); i++) {
+			bd = (com.magbel.ia.legend.admin.objects.AssignSbu) list.get(i);
+
+			ps.setString(1, bd.getSbucode());
+			ps.setString(2, bd.getSbuname());
+			ps.setString(3, bd.getAttachid());
+
+			ps.addBatch();
+			ps2.setString(1, bd.getSbucode());
+			ps2.setString(2, bd.getSbuname());
+			ps2.addBatch();
+
+		}
+
+		d = ps.executeBatch();
+		ps2.addBatch();
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching all asset - from am_sbu_attachement>" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+
+	return (d.length > 0);
+}
+
+/*
+    public int getBranchIDforSBU(String branchCode){
+int  branch=0;
+
+            String query = "SELECT BRANCH_ID FROM am_ad_branch where branch_code = '"+branchCode+"'";
+
+
+            Connection c = null;
+            ResultSet rs = null;
+            Statement s = null;
+            try
+            {
+                c = getConnection();
+                s = c.createStatement();
+                for(rs = s.executeQuery(query); rs.next();)
+                {
+                   branch = rs.getInt("BRANCH_ID");
+
+
+                }
+
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                closeConnection(c, s, rs);
+            }
+            return branch;
+}//getBranchIDforSBU(String brachCode)
+
+*/
+
+    public String createResignation(Resignation resign) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		String result = null;
+		String query = "INSERT INTO am_ad_Resignation(Staff_Name,Department"
+				+ "  ,Date_of_Resumption,Section_Unit,Exit_Type,Exit_Reason,User_id,Create_date)"
+				+ "   VALUES (?,?,?,?,?,?,?,?)";
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, resign.getStaffname());
+			ps.setString(2, resign.getDepartment());
+			ps.setString(3, resign.getDate_of_resumption());
+			ps.setString(4, resign.getSection_unit());
+			ps.setString(5, resign.getExit_type());
+			ps.setString(6, resign.getExit_reason());
+			ps.setInt(7,resign.getUserId());
+			ps.setDate(8, df.dateConvert(new java.util.Date()));
+
+			int res = ps.executeUpdate();
+			if (res > 0) {
+				result = "SUCCESS";
+			} else {
+				result = "FAILED";
+			}
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error creating State ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return result;
+
+	}
+    public java.util.ArrayList<Resignation> getResignationList()
+	{
+		java.util.ArrayList<Resignation> _list = new java.util.ArrayList<Resignation>();
+		com.magbel.ia.legend.admin.objects.Resignation resign = null;
+		String query = "Select * from am_ad_Resignation";
+		System.out.println(""+query);
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				int staffid = rs.getInt("Staff_ID");
+				String staffname = rs.getString("Staff_Name");
+				String department = rs.getString("Department");
+				String date_of_Resumption =rs.getString("Date_of_Resumption");
+				String section_Unit = rs.getString("Section_Unit");
+				String exit_Type = rs.getString("Exit_Type");
+				String exit_Reason = rs.getString("Exit_Reason");
+
+				resign = new Resignation();
+				resign.setStaffId(staffid);
+				resign.setStaffname(staffname);
+				resign.setDepartment(department);
+				resign.setDate_of_resumption(date_of_Resumption);
+				resign.setSection_unit(section_Unit);
+				resign.setExit_type(exit_Type);
+				resign.setExit_reason(exit_Reason);
+				_list.add(resign);
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting Resignation ->" + e.getMessage());
+			System.out.print("Error viewing Resigination!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+    public java.util.ArrayList<Resignation> getResignationList(String filter)
+	{
+		java.util.ArrayList<Resignation> _list = new java.util.ArrayList<Resignation>();
+		com.magbel.ia.legend.admin.objects.Resignation resign = null;
+		String query = "Select * from am_ad_Resignation"+filter;
+		System.out.println(""+query);
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				int staffid = rs.getInt("Staff_ID");
+				String staffname = rs.getString("Staff_Name");
+				String department = rs.getString("Department");
+				String date_of_Resumption =rs.getString("Date_of_Resumption");
+				String section_Unit = rs.getString("Section_Unit");
+				String exit_Type = rs.getString("Exit_Type");
+				String exit_Reason = rs.getString("Exit_Reason");
+
+				resign = new Resignation();
+				resign.setStaffId(staffid);
+				resign.setStaffname(staffname);
+				resign.setDepartment(department);
+				resign.setDate_of_resumption(date_of_Resumption);
+				resign.setSection_unit(section_Unit);
+				resign.setExit_type(exit_Type);
+				resign.setExit_reason(exit_Reason);
+				_list.add(resign);
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting Resignation ->" + e.getMessage());
+			System.out.print("Error viewing Resigination!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+    public String updateResignation(Resignation resign) {
+    	System.out.println("Resignation  enter 1");
+		Connection con = null;
+		PreparedStatement ps = null;
+		String result = null;
+
+		//String query = "UPDATE am_ad_Resignation SET Staff_Name=?,Department=?,Date_of_Resumption=?,Section_Unit=?,Exit_Type=?,Exit_Reason=?,User_id=? WHERE Staff_ID =?";
+
+		String query = "UPDATE am_ad_Resignation SET Staff_Name = ?"
+			+ ",Department = ?,Date_of_Resumption=?,Section_Unit = ?"
+			+ ",Exit_Type = ?,Exit_Reason=?,User_id=?" + " WHERE Staff_ID=?";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			System.out.println("Resignation  enter 2");
+			ps.setString(1, resign.getStaffname());
+			System.out.println("Resignation  enter 3"+resign.getStaffname());
+			ps.setString(2, resign.getDepartment());
+			System.out.println("Resignation  enter 4"+resign.getDepartment());
+			ps.setString(3, resign.getDate_of_resumption());
+			System.out.println("Resignation  enter 5"+resign.getDate_of_resumption());
+			ps.setString(4, resign.getSection_unit());
+			System.out.println("Resignation  enter 6"+resign.getSection_unit());
+			ps.setString(5, resign.getExit_type());
+			System.out.println("Resignation  enter 7"+resign.getExit_type());
+			ps.setString(6, resign.getExit_reason());
+			System.out.println("Resignation  enter 8"+resign.getExit_reason());
+			ps.setInt(7,resign.getUserId());
+			System.out.println("Resignation  enter 9"+resign.getUserId());
+			ps.setInt(8, resign.getStaffId());
+			System.out.println("Resignation  enter 10"+resign.getStaffId());
+
+			int res = ps.executeUpdate();
+
+			System.out.println("SUCCESSFUL UPDATED 55"+res);
+			if(res> 0) {
+				result = "SUCCESS";
+				System.out.println("SUCCESSFUL UPDATED 2");
+			}else {
+				result = "FAILED";
+				System.out.println("SUCCESSFUL UPDATED 3");
+			}
+
+			System.out.println(query);
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error Updating State ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return result;
+
+	}
+    public String createLeave(Leave leave) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		String result = null;
+		String query = "INSERT INTO am_ad_leave(Staff_Name,Department"
+				+ "  ,Section_Unit,Last_Leave_Date,Effective_Date,Leave_Days,User_id,Create_date)"
+				+ "   VALUES (?,?,?,?,?,?,?,?)";
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, leave.getStaffname());
+			ps.setString(2, leave.getDepartment());
+			ps.setString(3, leave.getSection_unit());
+			ps.setString(4, leave.getLast_Leave_Date());
+			ps.setString(5, leave.getEffective_Date());
+			ps.setString(6, leave.getLeave_Days());
+			ps.setInt(7,leave.getUserId());
+			ps.setDate(8, df.dateConvert(new java.util.Date()));
+
+			int res = ps.executeUpdate();
+			if (res > 0) {
+				result = "SUCCESS";
+			} else {
+				result = "FAILED";
+			}
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error creating State ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return result;
+
+	}
+    public java.util.ArrayList<Leave> getLeaveList()
+	{
+		java.util.ArrayList<Leave> _list = new java.util.ArrayList<Leave>();
+		com.magbel.ia.legend.admin.objects.Leave resign = null;
+		String query = "Select * from am_ad_leave";
+		System.out.println(""+query);
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				int staffid = rs.getInt("Staff_ID");
+				String staffname = rs.getString("Staff_Name");
+				String department = rs.getString("Department");
+				String Section_Unit =rs.getString("Section_Unit");
+				String Last_Leave_Date = rs.getString("Last_Leave_Date");
+				String Effective_Date = rs.getString("Effective_Date");
+				String Leave_Days = rs.getString("Leave_Days");
+				int User_id = rs.getInt("User_id");
+
+
+				resign = new Leave();
+				resign.setStaffId(staffid);
+				resign.setStaffname(staffname);
+				resign.setDepartment(department);
+				resign.setSection_unit(Section_Unit);
+				resign.setLast_Leave_Date(Last_Leave_Date);
+				resign.setEffective_Date(Effective_Date);
+				resign.setLeave_Days(Leave_Days);
+				resign.setUserId(User_id);
+				_list.add(resign);
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting Resignation ->" + e.getMessage());
+			System.out.print("Error viewing Resigination!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+    public java.util.ArrayList<Leave> getLeaveList(String filter)
+	{
+		java.util.ArrayList<Leave> _list = new java.util.ArrayList<Leave>();
+		com.magbel.ia.legend.admin.objects.Leave resign = null;
+		String query = "Select * from am_ad_leave"+filter;
+		System.out.println(""+query);
+
+
+		Connection c = null;
+		ResultSet rs = null;
+		Statement s = null;
+
+		try {
+			c = getConnection();
+			s = c.createStatement();
+			rs = s.executeQuery(query);
+			while(rs.next())
+			{
+				int staffid = rs.getInt("Staff_ID");
+				String staffname = rs.getString("Staff_Name");
+				String department = rs.getString("Department");
+				String Section_Unit =rs.getString("Section_Unit");
+				String Last_Leave_Date = rs.getString("Last_Leave_Date");
+				String Effective_Date = rs.getString("Effective_Date");
+				String Leave_Days = rs.getString("Leave_Days");
+				int User_id = rs.getInt("User_id");
+
+
+				resign = new Leave();
+				resign.setStaffId(staffid);
+				resign.setStaffname(staffname);
+				resign.setDepartment(department);
+				resign.setSection_unit(Section_Unit);
+				resign.setLast_Leave_Date(Last_Leave_Date);
+				resign.setEffective_Date(Effective_Date);
+				resign.setLeave_Days(Leave_Days);
+				resign.setUserId(User_id);
+				_list.add(resign);
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " Error Selecting Resignation ->" + e.getMessage());
+			System.out.print("Error viewing Resigination!");
+		}
+
+		finally {
+			closeConnection(c, s, rs);
+		}
+		return _list;
+
+	}
+    public String updateLeave(Leave resign) {
+    	System.out.println("Resignation  enter 1");
+		Connection con = null;
+		PreparedStatement ps = null;
+		String result = null;
+
+		//String query = "UPDATE am_ad_Resignation SET Staff_Name=?,Department=?,Date_of_Resumption=?,Section_Unit=?,Exit_Type=?,Exit_Reason=?,User_id=? WHERE Staff_ID =?";
+
+		String query = "UPDATE am_ad_leave SET Staff_Name = ?"
+			+ ",Department = ?,Section_Unit=?,Last_Leave_Date = ?"
+			+ ",Effective_Date = ?,Leave_Days=?,User_id=?" + " WHERE Staff_ID=?";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			System.out.println("Resignation  enter 2");
+			ps.setString(1, resign.getStaffname());
+			System.out.println("Resignation  enter 3"+resign.getStaffname());
+			ps.setString(2, resign.getDepartment());
+			System.out.println("Resignation  enter 4"+resign.getDepartment());
+			ps.setString(3, resign.getSection_unit());
+			System.out.println("Resignation  enter 5"+resign.getSection_unit());
+			ps.setString(4, resign.getSection_unit());
+			System.out.println("Resignation  enter 6"+resign.getSection_unit());
+			ps.setString(5, resign.getLast_Leave_Date());
+			System.out.println("Resignation  enter 7"+resign.getLast_Leave_Date());
+			ps.setString(6, resign.getEffective_Date());
+			System.out.println("Resignation  enter 8"+resign.getEffective_Date());
+			ps.setInt(7,resign.getUserId());
+			System.out.println("Resignation  enter 9"+resign.getUserId());
+			ps.setInt(8, resign.getStaffId());
+			System.out.println("Resignation  enter 10"+resign.getStaffId());
+
+
+
+			int res = ps.executeUpdate();
+
+			System.out.println("SUCCESSFUL UPDATED 55"+res);
+			if(res> 0) {
+				result = "SUCCESS";
+				System.out.println("SUCCESSFUL UPDATED 2");
+			}else {
+				result = "FAILED";
+				System.out.println("SUCCESSFUL UPDATED 3");
+			}
+
+			System.out.println(query);
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error Updating State ->" + e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return result;
+
+	}
+	public boolean updateClassPrivilege1(java.util.ArrayList<ClassPrivilege> list,int userid, String branchCode,int loginId,String eff_date) {
+		/**
+		 * edited by Joshua
+		 */
+
+			for (int i = 0; i < list.size(); i++) {
+				System.out.println();
+				ClassPrivilege cp = list.get(i);
+				//System.out
+				updateClassPrivilege1(cp,userid,branchCode,loginId,eff_date);
+
+			}
+			System.out.println("Nos of rtecords updated = "+list.size());
+		return true;
+	}
+
+	public void updateClassPrivilege1(com.magbel.ia.legend.admin.objects.ClassPrivilege cp,int userid,String branchCode,int loginId,String eff_date) {
+		AuditTrailGen atg1 = new AuditTrailGen();
+		//String query = "UPDATE am_ad_class_privileges "+
+				//"SET role_view = ?,role_addn = ?,role_edit = ?"
+			//+ " WHERE clss_uuid=? AND Role_uuid=? ";
+		//AND user_id=?
+
+		String query = "UPDATE am_ad_class_privileges "+
+		"SET role_view = ?,role_addn = ?,role_edit = ?"
+	+ " WHERE clss_uuid=? AND Role_uuid=? ";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int[] d = null;
+		try {
+
+			con = getConnection();
+			ps = con.prepareStatement(query);
+
+				ps.setString(1, cp.getRole_view());
+				ps.setString(2, cp.getRole_addn());
+				ps.setString(3, cp.getRole_edit());
+				ps.setString(4, cp.getClss_uuid());
+				ps.setString(5, cp.getRole_uuid());
+				//ps.setInt(6, userid);
+
+				//this is to congfirm changed fields
+				//compareAuditValues(cp.getRole_view(),cp.getRole_addn(),cp.getRole_edit(),cp.getClss_uuid(),cp.getRole_uuid(),String.valueOf(userid),branchCode,loginId,eff_date);
+
+				//System.out.println("\n\n >>>>>>>>>>>>>>>>>> query "+ query);
+				//System.out.println("\n\n >>>>>>>>>>>>>>>>>> cp.getRole_view()"+ cp.getRole_view());
+				//System.out.println("\n\n >>>>>>>>>>>>>>>>>> cp.getRole_addn() "+ cp.getRole_addn());
+				//System.out.println("\n\n >>>>>>>>>>>>>>>>>> cp.getRole_edit() "+ cp.getRole_edit());
+				//System.out.println("\n\n >>>>>>>>>>>>>>>>>> cp.getClss_uuid() "+ cp.getClss_uuid());
+				//System.out.println("\n\n >>>>>>>>>>>>>>>>>> cp.getRole_uuid() "+ cp.getRole_uuid());
+
+				System.out.println("\n\n >>>>>>>>>>>>>>>>>> ps.execute() "+ ps.executeUpdate());
+
+		}catch (Exception ex) {
+			System.out.println("WARN: Error doing updateClassPrivilege ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+	}
+	public void compareAuditValues(String  gl_prefix, String gl_suffix, String branch_id, String dept_code, String user_id, String branchCode,int loginId,String eff_date)
+	{
+		AuditTrailGen atg = new AuditTrailGen();
+		String gl_prefix1 = "";
+		String gl_suffix1 = "";
+		//String role_edit1 = "";
+		//String query = "SELECT role_view, role_addn, role_edit FROM am_ad_class_privileges WHERE  clss_uuid = ? AND Role_uuid=?";
+		String query = "SELECT gl_prefix,gl_suffix FROM sbu_branch_dept WHERE  branchId=? AND deptCode=?";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean done = false;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			//ps.setInt(1, Integer.parseInt(user_id));
+			ps.setInt(1, Integer.parseInt(branch_id));
+			ps.setInt(2, Integer.parseInt(dept_code));
+			//System.out.println("==============**=====branch_id==============="+branch_id);
+			//System.out.println("==============**=====dept_Code==============="+dept_code);
+			rs = ps.executeQuery();
+			//System.out.println("===================ResultSET==============="+rs);
+			while (rs.next())
+			{
+				//System.out.println("===================WHILE INSIDE A ResultSET==============="+rs);
+				gl_prefix1 = rs.getString("gl_prefix");
+				//System.out.println("===================gl_prefix1==============="+gl_prefix1);
+				gl_suffix1 = rs.getString("gl_suffix");
+				//System.out.println("===================gl_suffix1==============="+gl_suffix1);
+				//role_edit1 = rs.getString("role_edit");
+				//System.out.println("===================role_edit1==============="+role_edit1);
+			}
+			System.out.println("\n\n old values >> "+ gl_prefix1 + "\n\n new values >>" + gl_prefix);
+			System.out.println("\n\n old values >> "+ gl_suffix1 + "\n\n new values >>" + gl_suffix);
+			//System.out.println("\n\n old values >> "+ role_edit1 + "\n\n new values >>" + role_edit);
+			//System.out.println("\n\n role_id>> "+ role_id);
+
+
+
+
+			if(!gl_prefix1.equalsIgnoreCase(gl_prefix)){atg.logAuditTrailSecurityComp_Dept("sbu_branch_dept",  branchCode,loginId, eff_date, dept_code,gl_prefix1,gl_prefix,"gl_prefix");}
+			if(!gl_suffix1.equalsIgnoreCase(gl_suffix)){atg.logAuditTrailSecurityComp_Dept("sbu_branch_dept",  branchCode,loginId, eff_date, dept_code,gl_suffix1,gl_suffix,"gl_suffix");}
+			//if(!role_edit1.equalsIgnoreCase(role_edit)){atg.logAuditTrailSecurityComp("am_ad_class_privileges",  branchCode,loginId, eff_date, role_id,role_edit1,role_edit,"role_edit");}
+
+			System.out.println("===================logAuditTrailSecurityComp= within  compareAuditValues==============");
+
+		}catch (Exception e) {
+			System.out.println("WARNING:Error executing Query User Full NamecompareAuditValues: ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps, rs);
+		}
+		//return UserFullName;
+	}
+	public void compareAuditValuesSbu(String  gl_prefix, String gl_suffix, String attach_id, String sbu_code, String user_id, String branchCode,int loginId,String eff_date)
+	{
+
+		System.out.println("==============**=====IN SIDE compareAuditValuesSbu With Attached Id =======**========"+attach_id+"and ******sbu_code********"+sbu_code);
+		AuditTrailGen atg = new AuditTrailGen(); 
+		String gl_prefix1 = "";
+		String gl_suffix1 = "";
+		//String role_edit1 = "";
+		//String query = "SELECT role_view, role_addn, role_edit FROM am_ad_class_privileges WHERE  clss_uuid = ? AND Role_uuid=?";
+		String query = "SELECT GL_PREFIX,GL_SUFIX FROM AM_SBU_ATTACHEMENT WHERE  ATTACH_ID=? AND SBU_CODE=?";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean done = false;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			//System.out.println("==============**==ps connection============="+ps);
+			//ps.setInt(1, Integer.parseInt(user_id));
+			ps.setInt(1, Integer.parseInt(attach_id));
+			ps.setString(2, sbu_code);
+			//System.out.println("==============**=====attach_id==============="+attach_id);
+			//System.out.println("==============**=====sbu_code==============="+sbu_code);
+			rs = ps.executeQuery();
+			//System.out.println("===================ResultSET==============="+rs);
+			while (rs.next())
+			{
+				//System.out.println("===================WHILE INSIDE A ResultSET==============="+rs);
+				gl_prefix1 = rs.getString("GL_PREFIX");
+				//System.out.println("===================gl_prefix1==============="+gl_prefix1);
+				gl_suffix1 = rs.getString("GL_SUFIX");
+				//System.out.println("===================gl_suffix1==============="+gl_suffix1);
+				//role_edit1 = rs.getString("role_edit");
+				//System.out.println("===================role_edit1==============="+role_edit1);
+			}
+			System.out.println("\n\n old values >> "+ gl_prefix1 + "\n\n new values >>" + gl_prefix);
+			System.out.println("\n\n old values >> "+ gl_suffix1 + "\n\n new values >>" + gl_suffix);
+			//System.out.println("\n\n old values >> "+ role_edit1 + "\n\n new values >>" + role_edit);
+			//System.out.println("\n\n role_id>> "+ role_id);
+
+
+
+
+			if(gl_prefix1.equalsIgnoreCase(gl_prefix)){atg.logAuditTrailSecurityComp_Sbu("AM_SBU_ATTACHEMENT",  branchCode,loginId, eff_date, sbu_code,gl_prefix1,gl_prefix,"GL_PREFIX");}
+			if(gl_suffix1.equalsIgnoreCase(gl_suffix)){atg.logAuditTrailSecurityComp_Sbu("AM_SBU_ATTACHEMENT",  branchCode,loginId, eff_date, sbu_code,gl_suffix1,gl_suffix,"GL_SUFFIX");}
+			//if(!role_edit1.equalsIgnoreCase(role_edit)){atg.logAuditTrailSecurityComp("am_ad_class_privileges",  branchCode,loginId, eff_date, role_id,role_edit1,role_edit,"role_edit");}
+
+			//System.out.println("===================compareAuditValuesSbu==============");
+
+		}catch (Exception e) {
+			System.out.println("WARNING:Error executing Query User Full NamecompareAuditValues: ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps, rs);
+		}
+		//return UserFullName;
+	}
+	public boolean updateDeptForBranch(java.util.ArrayList list,int userid, String branchCode,int loginId,String eff_date) {
+		String query = "UPDATE sbu_branch_dept SET branchCode = ?"
+				+ ",deptCode = ?,gl_prefix = ?,gl_suffix = ?"
+				+ " WHERE branchId=?" + " AND deptId=?";
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		com.magbel.ia.legend.admin.objects.BranchDept bd = null;
+		int[] d = null;
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+
+			for (int i = 0; i < list.size(); i++) {
+				bd = (com.magbel.ia.legend.admin.objects.BranchDept) list.get(i);
+				ps.setString(1, bd.getBranchCode());
+				ps.setString(2, bd.getDeptCode());
+				ps.setString(3, bd.getGl_prefix());
+				ps.setString(4, bd.getGl_suffix());
+				ps.setString(5, bd.getBranchId());
+				ps.setString(6, bd.getDeptId());
+
+				ps.addBatch();
+
+				//compareAuditValues(cp.getRole_view(),cp.getRole_addn(),cp.getRole_edit(),cp.getClss_uuid(),cp.getRole_uuid(),String.valueOf(userid),branchCode,loginId,eff_date);
+				compareAuditValues(bd.getGl_prefix(),bd.getGl_suffix(),bd.getBranchId(),bd.getDeptCode(),String.valueOf(userid),branchCode,loginId,eff_date);
+			}
+			d = ps.executeBatch();
+
+		} catch (Exception ex) {
+			System.out.println("WARN: Error fetching all asset ->" + ex);
+		} finally {
+			closeConnection(con, ps);
+		}
+
+		return (d.length > 0);
+	}
+
+ public void SaveLoginAudit(String userid, String branchcode, String workstname, String ip, String sessionid)
+	{
+
+					 boolean done = false;
+					 Connection con = null;
+					 Statement s = null;
+					 ResultSet  r = null;
+					 PreparedStatement ps = null;
+					 DatetimeFormat format = new DatetimeFormat();
+
+					 String query = "INSERT INTO gb_user_login"
+							+ "(create_date, user_id"
+							+ ",branch_code,mtid,time_in,workstation_name,System_ip,session_id)"
+							+ " VALUES (?,?,?,?,?,?,?,?)";
+						try
+						{
+							 	apph = new ApplicationHelper();
+							 	String stringid = String.valueOf(apph.getGeneratedId("gb_user_login"));
+
+							 	    con = getConnection();
+									ps = con.prepareStatement(query);
+									ps.setDate(1,  df.dateConvert(new java.util.Date()));
+									ps.setString(2, userid);
+									ps.setString(3, branchcode);
+									ps.setString(4, stringid);
+									//ps.setString(5,String.valueOf(df.dateConvert(new java.util.Date()).getHours())+df.dateConvert(new java.util.Date()).getMinutes()+df.dateConvert(new java.util.Date()).getSeconds());
+									ps.setString(5,df.getDateTimeStamp().substring(10));
+									ps.setString(6, workstname);
+									ps.setString(7, ip);
+									ps.setString(8,sessionid);
+									done=(ps.executeUpdate()!=-1);
+
+						}catch(Exception ex){ex.printStackTrace();}
+						finally
+						{
+							closeConnection(con, ps);
+						}					//return done
+
+	}
+
+
+
+public void updateLoginAudit(String userid) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "UPDATE gb_user_login SET time_out = ? WHERE user_id =?";
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1,df.getDateTimeStamp().substring(10));
+			ps.setString(2, userid);
+			done=( ps.executeUpdate()!=-1);
+		} catch (Exception e) {
+			System.out.println(this.getClass().getName()
+					+ " ERROR:Error Updating ab_user_login timeout ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+}
+
+
+public boolean createState(com.magbel.ia.legend.admin.objects.State state) {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+		String query = "INSERT INTO am_gb_states(state_code,state_name"
+				+ "  ,state_status,user_id,create_date,state_id)"
+				+ "   VALUES (?,?,?,?,?,?)";
+
+		try {
+			con = getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, state.getStateCode());
+			ps.setString(2, state.getStateName());
+			ps.setString(3, state.getStateStatus());
+			ps.setString(4, state.getUserId());
+			ps.setDate(5, df.dateConvert(new java.util.Date()));
+			ps.setString(6, new ApplicationHelper().getGeneratedId("am_gb_states"));
+			done=( ps.executeUpdate()!=-1);
+
+		} catch (Exception e) {
+			System.out.println("WARNING:Error creating State ->"
+					+ e.getMessage());
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+
+	}
+
+
+public String getPrivilegesRole(String role_name) {
+
+
+	String query = "Select role_uuid from  am_ad_privileges where role_name=?";
+	Connection con = null;
+	PreparedStatement ps = null;
+	ResultSet rs = null;
+	String role_uuid = null;
+
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+		ps.setString(1,role_name);
+		rs = ps.executeQuery();
+
+		while (rs.next()) {
+		role_uuid = rs.getString("role_uuid");
+		}
+	} catch (Exception ex) {
+		System.out.println("WARN: Error fetching role_uuid  getPrivilegesRole ->" + ex);
+	} finally {
+		closeConnection(con, ps);
+	}
+	return role_uuid;
+
+}
+
+private Branch getABranch2(String filter)
+{
+    Branch branch;
+    branch = null;
+    /*
+    String query = "SELECT BRANCH_ID,BRANCH_CODE ,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX,BRANCH_ADDRES" +
+"S,STATE,PHONE_NO,FAX_NO,REGION,PROVINCE,BRANCH_STATUS,USER_ID,GL_SUFFIX,CREATE_D" +
+"ATE,EMAIL,LOCATION  FROM am_ad_branch "
+;
+    */
+
+    String query = "SELECT BRANCH_ID,BRANCH_CODE ,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX,BRANCH_ADDRES" +
+"S,STATE,PHONE_NO,FAX_NO,REGION,PROVINCE,BRANCH_STATUS,USER_ID,GL_SUFFIX,CREATE_D" +
+"ATE,EMAIL,Uncapitalized_account FROM am_ad_branch " ;
+    query = query + filter;
+    Connection c = null;
+    ResultSet rs = null;
+    Statement s = null;
+    try
+    {
+        c = getConnection();
+        s = c.createStatement();
+        for(rs = s.executeQuery(query); rs.next();)
+        {
+            String branchId = rs.getString("BRANCH_ID");
+            String branchCode = rs.getString("BRANCH_CODE");
+            String branchName = rs.getString("BRANCH_NAME");
+            String branchAcronym = rs.getString("BRANCH_ACRONYM");
+            String glPrefix = rs.getString("GL_PREFIX");
+            String branchAddress = rs.getString("BRANCH_ADDRESS");
+            String state = rs.getString("STATE");
+            String phoneNo = rs.getString("PHONE_NO");
+            String faxNo = rs.getString("FAX_NO");
+            String province = rs.getString("PROVINCE");
+            String region = rs.getString("REGION");
+            String branchStatus = rs.getString("BRANCH_STATUS");
+            String username = rs.getString("USER_ID");
+            String glSuffix = rs.getString("GL_SUFFIX");
+            String createDate = rs.getString("CREATE_DATE");
+            String emailAddress = rs.getString("EMAIL");
+            String unclassified = rs.getString("Uncapitalized_account");
+
+            //int location = rs.getInt("LOCATION");
+            branch = new Branch(branchId, branchCode, branchName, branchAcronym, glPrefix, glSuffix, branchAddress, state, phoneNo, faxNo, region, province, branchStatus, username, createDate, emailAddress,unclassified);
+        }
+
+    }
+    catch(Exception e)
+    {
+        e.printStackTrace();
+    }
+    finally
+    {
+        closeConnection(c, s, rs);
+    }
+    return branch;
+}
+
+public com.magbel.ia.legend.admin.objects.Branch getBranchByBranchID2(String branchid) {
+	String filter = " WHERE BRANCH_ID = " + branchid;
+	com.magbel.ia.legend.admin.objects.Branch branch = getABranch2(filter);
+	return branch;
+
+}
+private com.magbel.ia.legend.admin.objects.Category getACategory2(String filter) {
+	com.magbel.ia.legend.admin.objects.Category category = null;
+	String query = "SELECT category_ID,category_code,category_name"
+			+ ",category_acronym,Required_for_fleet"
+			+ ",Category_Class ,PM_Cycle_Period,mileage"
+			+ ",Notify_Maint_Days ,notify_every_days,residual_value"
+			+ ",Dep_rate ,Asset_Ledger,Dep_ledger"
+			+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
+			+ ",license_ledger ,fuel_ledger,accident_ledger"
+			+ ",Category_Status ,user_id,create_date"
+			+ ",acct_type ,currency_Id,enforceBarcode,category_type" + " FROM am_ad_category ";
+
+	query = query + filter;
+	Connection c = null;
+	ResultSet rs = null;
+	Statement s = null;
+
+	try {
+		c = getConnection();
+		s = c.createStatement();
+		rs = s.executeQuery(query);
+		while (rs.next()) {
+			String categoryId = rs.getString("category_ID");
+			String categoryCode = rs.getString("category_code");
+			String categoryName = rs.getString("category_name");
+			String categoryAcronym = rs.getString("category_acronym");
+			String requiredforFleet = rs.getString("Required_for_fleet");
+			String categoryClass = rs.getString("Category_Class");
+			String pmCyclePeriod = rs.getString("PM_Cycle_Period");
+			String mileage = rs.getString("mileage");
+			String notifyMaintdays = rs.getString("Notify_Maint_Days");
+			String notifyEveryDays = rs.getString("notify_every_days");
+			String residualValue = rs.getString("residual_value");
+			String depRate = rs.getString("Dep_rate");
+			String assetLedger = rs.getString("Asset_Ledger");
+			String depLedger = rs.getString("Dep_ledger");
+			String accumDepLedger = rs.getString("Accum_Dep_ledger");
+			String glAccount = rs.getString("gl_account");
+			String insuranceAcct = rs.getString("insurance_acct");
+			String licenseLedger = rs.getString("license_ledger");
+			String fuelLedger = rs.getString("fuel_ledger");
+			String accidentLedger = rs.getString("accident_ledger");
+			String categoryStatus = rs.getString("Category_Status");
+			String userId = rs.getString("user_id");
+			String createDate = sdf.format(rs.getDate("create_date"));
+			String acctType = rs.getString("acct_type");
+			String currencyId = rs.getString("currency_Id");
+                            String enforeBarcode = rs.getString("enforceBarcode");
+                            String categorytype = rs.getString("category_type");
+			category = new com.magbel.ia.legend.admin.objects.Category(categoryId,
+					categoryCode, categoryName, categoryAcronym,
+					requiredforFleet, categoryClass, pmCyclePeriod,
+					mileage, notifyMaintdays, notifyEveryDays,
+					residualValue, depRate, assetLedger, depLedger,
+					accumDepLedger, glAccount, insuranceAcct,
+					licenseLedger, fuelLedger, accidentLedger,
+					categoryStatus, userId, createDate, acctType,
+					currencyId,enforeBarcode,categorytype);
+
+		}
+
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
+	finally {
+		closeConnection(c, s, rs);
+	}
+	return category;
+
+}
+public com.magbel.ia.legend.admin.objects.Category getCategoryByID2(String categoryid) {
+	String filter = " WHERE category_ID=" + categoryid;
+	com.magbel.ia.legend.admin.objects.Category category = getACategory2(filter);
+	return category;
+
+}
+
+///----------------
+
+
+public com.magbel.ia.legend.admin.objects.Bank getBankByCode(String bankCode) {
+	String filter = " WHERE bankCode='" + bankCode + "'";
+	com.magbel.ia.legend.admin.objects.Bank bank = getABank(filter);
+	return bank;
+
+}
+
+private com.magbel.ia.legend.admin.objects.Bank getABank(String filter) {
+	com.magbel.ia.legend.admin.objects.Bank bank = null;
+	String query = "SELECT bankCode,bankName,address,phone,email,user_id,CREATE_DATE FROM am_ad_bank ";
+
+	query = query + filter;
+	Connection c = null;
+	ResultSet rs = null;
+	Statement s = null;
+
+	try {
+		c = getConnection();
+		s = c.createStatement();
+		rs = s.executeQuery(query);
+		while (rs.next()) {
+			String bankCode = rs.getString("bankCode");
+			String bankName = rs.getString("bankName");
+			String address = rs.getString("address");
+			String phone = rs.getString("phone");
+			String email = rs.getString("email");
+			String user_id = rs.getString("user_id");
+			Date createDate = rs.getDate("CREATE_DATE"); 
+			bank = new com.magbel.ia.legend.admin.objects.Bank(bankCode, bankName,
+					address, phone, email, user_id,createDate);
+		}
+
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
+	finally {
+		closeConnection(c, s, rs);
+	}
+	return bank;
+
+}
+public java.util.List<Bank> getBanksByQuery(String filter) {
+	java.util.List<Bank> _list = new java.util.ArrayList<Bank>();
+	com.magbel.ia.legend.admin.objects.Bank bank = null;
+	String query = "SELECT bankCode,bankName,address,phone,email,user_id,CREATE_DATE FROM am_ad_bank ";
+
+	query = query + filter;
+	Connection c = null;
+	ResultSet rs = null;
+	Statement s = null;
+
+	try {
+		c = getConnection();
+		s = c.createStatement();
+		rs = s.executeQuery(query);
+		while (rs.next()) {
+			String bankCode = rs.getString("bankCode");
+			String bankName = rs.getString("bankName");
+			String address = rs.getString("address");
+			String phone = rs.getString("phone");
+			String email = rs.getString("email");
+			String user_id = rs.getString("user_id");
+			Date createDate = rs.getDate("CREATE_DATE"); 
+			bank = new com.magbel.ia.legend.admin.objects.Bank(bankCode, bankName,
+					address, phone, email, user_id,createDate);
+			_list.add(bank);
+		}
+
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
+	finally {
+		closeConnection(c, s, rs);
+	}
+	return _list;
+
+}
+public boolean createBank(com.magbel.ia.legend.admin.objects.Bank bank) {
+
+	Connection con = null;
+	PreparedStatement ps = null;
+	boolean done = false;
+	String query = "INSERT INTO am_ad_Bank(bankCode,bankName,address,phone,email,user_id,CREATE_DATE,mtid)"
+			+ " VALUES (?,?,?,?,?,?,?,?)";
+
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+		 
+		ps.setString(1,bank.getBankCode());
+		ps.setString(2,bank.getBankName());
+		ps.setString(3,bank.getAddress());
+		ps.setString(4, bank.getPhone());
+		ps.setString(5, bank.getEmail());
+		ps.setString(6, bank.getUser_id());
+		ps.setDate(7, df.dateConvert(new java.util.Date()));
+		ps.setString(8,  new ApplicationHelper().getGeneratedId("am_ad_bank"));
+	done=( ps.executeUpdate()!=-1);
+
+	} catch (Exception e) {
+		System.out.println(this.getClass().getName()
+				+ " ERROR:Error creating am_ad_bank ->" + e.getMessage());
+		e.printStackTrace();
+	} finally {
+		closeConnection(con, ps);
+	}
+	return done;
+
+}
+
+public boolean updateBank(com.magbel.ia.legend.admin.objects.Bank bank) {
+
+	Connection con = null;
+	PreparedStatement ps = null;
+	boolean done = false;
+	String query = "UPDATE am_ad_bank SET bankName=?,address=?,phone=?,email=?  WHERE bankCode=?";
+
+	try {
+		con = getConnection();
+		ps = con.prepareStatement(query);
+		ps.setString(1, bank.getBankName());
+		ps.setString(2, bank.getAddress());
+		ps.setString(3, bank.getPhone());
+		ps.setString(4, bank.getEmail());
+		ps.setString(5, bank.getBankCode());
+
+		done=( ps.executeUpdate()!=-1);
+
+	} catch (Exception e) {
+		System.out.println(this.getClass().getName()
+				+ " ERROR:Error Updating Query ->" + e.getMessage());
+		e.printStackTrace();
+	} finally {
+		closeConnection(con, ps);
+	}
+	return done;
+
+}
+}

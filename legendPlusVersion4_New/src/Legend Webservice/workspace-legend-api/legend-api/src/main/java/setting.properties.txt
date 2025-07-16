@@ -1,0 +1,3 @@
+database=MSSQL-SEVER
+dbuser=MAGBEL
+dbpassword=MAGBEL_LEGEND

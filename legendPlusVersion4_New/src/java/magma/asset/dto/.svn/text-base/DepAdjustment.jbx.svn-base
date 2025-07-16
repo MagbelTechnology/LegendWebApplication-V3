@@ -1,0 +1,14 @@
+[PropertyInfo]
+accumDep,double,false,false, , ,true,<default>
+adjustDate,String,false,false, , ,true,<default>
+assetId,String,false,false, , ,true,<default>
+effDate,String,false,false, , ,true,<default>
+nbv,double,false,false, , ,true,<default>
+newAccumDep,double,false,false, , ,true,<default>
+newNbv,double,false,false, , ,true,<default>
+reason,String,false,false, , ,true,<default>
+[IconNames]
+
+
+
+

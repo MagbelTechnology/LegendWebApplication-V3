@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DepreciationCharges" language="groovy" pageWidth="2035" pageHeight="842" columnWidth="2015" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="992"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterYear" class="java.lang.String"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT m.asset_id, a.BRANCH_CODE,a.CATEGORY_CODE,a.SBU_CODE, a.Description, m.monthly_dep, m.dep_date, d.Class_Name,a.total_life,(a.Cost_Price+a.IMPROV_COST) AS cost_price,e.YearDeprCharges,
+(a.Accum_Dep+a.IMPROV_ACCUMDEP) AS Accum_Depr, a.TOTAL_NBV,a.Date_purchased,a.Effective_Date  FROM monthly_depreciation_processing m, AM_ASSET a, am_ad_category c,am_ad_category_class d, DepreciationChargeSumByYear e
+WHERE m.asset_id = a.Asset_id
+AND a.CATEGORY_CODE = c.CATEGORY_CODE
+AND c.Category_Class =  d.Class_Code
+AND m.asset_id = e.asset_id
+AND e.year = $P!{filterYear}
+$P!{filterClause}
+group by a.BRANCH_CODE,a.CATEGORY_CODE,a.SBU_CODE,m.asset_id,a.Description, m.monthly_dep, m.dep_date,d.Class_Name,a.Total_Life,a.TOTAL_NBV,
+a.Cost_Price,a.IMPROV_COST,a.Accum_Dep,a.IMPROV_ACCUMDEP,a.Date_purchased,a.Effective_Date,e.YearDeprCharges]]>
+	</queryString>
+	<field name="asset_id" class="java.lang.String"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="CATEGORY_CODE" class="java.lang.String"/>
+	<field name="SBU_CODE" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="monthly_dep" class="java.math.BigDecimal"/>
+	<field name="dep_date" class="java.sql.Timestamp"/>
+	<field name="Class_Name" class="java.lang.String"/>
+	<field name="total_life" class="java.lang.Integer"/>
+	<field name="cost_price" class="java.math.BigDecimal"/>
+	<field name="YearDeprCharges" class="java.math.BigDecimal"/>
+	<field name="Accum_Depr" class="java.math.BigDecimal"/>
+	<field name="TOTAL_NBV" class="java.math.BigDecimal"/>
+	<field name="Date_purchased" class="java.sql.Timestamp"/>
+	<field name="Effective_Date" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="0" width="131" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ASSET ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="132" y="0" width="105" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BRANCH CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="237" y="0" width="134" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CATEGORY CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="371" y="0" width="116" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SBU CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="487" y="0" width="377" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1791" y="0" width="128" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DEPRECIATION DATE ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="864" y="0" width="116" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[LIFE SPAN(MONTH)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="980" y="0" width="155" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[DEPR. CHARGE MONTHLY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="1135" y="0" width="183" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[DEPR. CHARGE YEAR TODATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" x="1318" y="0" width="135" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[ACCUMULATED DEPR.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" mode="Transparent" x="1453" y="0" width="111" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[NET BOOK VALUE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="1564" y="0" width="104" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[PURCHASE DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-3" x="1668" y="0" width="123" height="20"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[DEPR. START DATE]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="26" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="131" height="26"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{asset_id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="132" y="0" width="105" height="26"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BRANCH_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="237" y="0" width="134" height="26"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CATEGORY_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="371" y="0" width="116" height="26"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SBU_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="487" y="0" width="377" height="26"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="1453" y="0" width="111" height="26"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL_NBV}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="1791" y="0" width="128" height="26"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{dep_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement key="textField" x="864" y="0" width="116" height="26" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{total_life}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement key="textField" x="980" y="0" width="155" height="26" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{monthly_dep}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement key="textField" x="1135" y="0" width="183" height="26" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{monthly_dep}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement key="textField" x="1318" y="0" width="135" height="26" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Accum_Depr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-31" x="1564" y="0" width="104" height="26"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Date_purchased}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement key="textField-31" x="1668" y="0" width="123" height="26"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Effective_Date}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

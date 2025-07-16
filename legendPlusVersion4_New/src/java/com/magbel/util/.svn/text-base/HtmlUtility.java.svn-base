@@ -1,0 +1,239 @@
+// Decompiled by Jad v1.5.8f. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3)
+// Source File Name:   HtmlUtilily.java
+
+package com.magbel.util;
+
+
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import legend.UniqueBean;
+
+
+
+public class HtmlUtility{
+
+    public HtmlUtility(){
+    }
+
+    public String getYesNoForCombo(String selected) {
+
+        String html;
+        html = "";
+        String id = "";
+        if (selected == null) {
+            selected = "";
+        }
+
+        html = html + "<option " +
+               ((selected != null) && (selected.equals("N")) ?
+                " selected='true' " : "") +
+               " value='N' >No</option> " +
+               "<option  " +
+               ((selected != null) && (selected.equals("Y")) ?
+                " selected='true' " : "") +
+               " value='Y'>Yes</option> ";
+
+        return html;
+    }
+
+    public String getResources(String selected, String query) {
+        Connection mcon;
+        PreparedStatement mps;
+        ResultSet mrs;
+        String html;
+        mcon = null;
+        mps = null;
+        mrs = null;
+        html = "";
+        String id = "";
+        
+        if (selected == null || selected.equals("null")) {
+            selected = "0";
+        }
+        try {
+            mcon = (new DataConnect("fixedasset")).getConnection();
+            mps = mcon.prepareStatement(query);
+
+            for (mrs = mps.executeQuery(); mrs.next(); ) {
+               
+                id = mrs.getString(1);
+                html = html + "<option  " +
+                       ((id != null) && id.equals(selected) ?
+                        " selected='true' " : "") +
+                       " value='" + id + "'>" +
+                       mrs.getString(2) + "</option> ";
+            }
+
+        } catch (Exception ee) {
+            System.out.println("WARN This is the error:HtmlUtil:->" + ee);
+        } finally {
+            closeConnection(mcon, mps, mrs);
+        }
+
+        return html;
+    }
+
+
+    public String getUnique(String epostId) {
+        return epostId +
+                (new SimpleDateFormat("yyyyMMddhhmmSSSS")).format(new Date()) +
+                removeNdot("" + Math.random() * 10000000D);
+    }
+
+    private String removeNdot(String tValue) {
+        String decimalPart = "";
+        String strValue = tValue;
+        if (strValue.lastIndexOf(".") != -1) {
+            decimalPart = strValue.substring(strValue.lastIndexOf(".") + 1);
+            if (decimalPart.length() == 1) {
+                decimalPart = decimalPart + "0";
+            }
+            strValue = strValue.substring(0, strValue.lastIndexOf(".")) +
+                       decimalPart;
+        } else {
+            strValue = strValue + "00";
+        }
+        return strValue;
+    }
+
+    public String findObject(String query) {
+
+        Connection Con2 = null;
+        PreparedStatement Stat = null;
+        ResultSet result = null;
+        String found = null;
+
+        String finder = "UNKNOWN";
+
+        double sequence = 0.00d;
+        try {
+
+            Con2 = new DataConnect("fixedasset").getConnection();
+            Stat = Con2.prepareStatement(query);
+            result = Stat.executeQuery();
+
+            while (result.next()) {
+                finder = result.getString(1);
+            }
+
+        } catch (Exception ee2) {
+            System.out.println("WARN:ERROR OBTAINING OBJ --> " + ee2);
+            ee2.printStackTrace();
+        } finally {
+            closeConnection(Con2, Stat, result);
+        }
+
+        return finder;
+    }
+
+    private void closeConnection(Connection con, PreparedStatement ps,
+                                 ResultSet rs) {
+        try {
+
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (con != null) {
+                con.close();
+            }
+
+        } catch (Exception e) {
+            System.out.println("WANR: Error closing connection >>" + e);
+        }
+    }
+
+
+
+
+/*
+    public int confirmUnique(String query) {
+        int count =0;
+
+        String html ="";
+        Connection mcon =null;
+        PreparedStatement mps =null;
+        ResultSet mrs =null;
+        
+        System.out.println("================" + "i am in confirmUnique method" + "================");
+        //System.out.println("================" + "the value of component is "+component + "================");
+        try {
+            mcon = (new DataConnect("fixedasset")).getConnection();
+            mps = mcon.prepareStatement(query);
+
+            mrs = mps.executeQuery();
+            while(mrs.next()){
+            count = mrs.getInt(1);
+            }
+
+        } catch (Exception ee) {
+            System.out.println("WARN This is the error from confirmUnique():HtmlUtil:->" + ee);
+        } finally {
+            closeConnection(mcon, mps, mrs);
+        }
+
+        System.out.println("================"+"the value of count is " + count +"================");
+        //if(count >= 1){
+        //html ="window.alert('Asset with same No/Code already exist')" + component + ".value =''";
+       // html ="<script type='text/javascript'>window.alert('Asset with same No/Code already exist');</script>" ;
+
+       // }
+
+
+        return count;
+
+    }
+*/
+
+    public String[] getArrayList(){
+//ArrayList al = new ArrayList();
+        String[] al=null;
+Connection mcon =null;
+        PreparedStatement mps =null;
+        ResultSet rs =null;
+try{
+String query = "SELECT bar_code,lpo FROM am_asset" ;
+mcon = (new DataConnect("fixedasset")).getConnection();
+            mps = mcon.prepareStatement(query);
+
+            rs = mps.executeQuery();
+
+int i = 0;
+while(rs.next()){
+//UniqueBean ub = new UniqueBean();
+ //ub.setBar_code(rs.getString("bar_code"));
+//ub.setLpo(rs.getString("lpo"));
+
+
+//al.add(ub);
+    System.out.println("the count for i is <<<<<<<<<" + ++i);
+} //while(rs.next())
+
+
+}//try
+
+catch(Exception e){
+e.printStackTrace();
+}//catch
+finally{
+  closeConnection(mcon, mps, rs);
+}
+// System.out.println("the size of arraylist is ======="+ al.size() );
+return al;
+}//
+
+
+
+
+
+
+
+
+
+}

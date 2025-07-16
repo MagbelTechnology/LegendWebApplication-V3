@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StockTransferSummary" language="groovy" pageWidth="883" pageHeight="842" columnWidth="863" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT b.BRANCH_NAME AS FROM_BRANCH_NAME, *FROM StockTransferSummaryView a, am_ad_branch b
+WHERE a.FROM_BRANCH_ID = b.BRANCH_ID
+$P!{filterClause}]]>
+	</queryString>
+	<field name="FROM_BRANCH_NAME" class="java.lang.String"/>
+	<field name="company_name" class="java.lang.String"/>
+	<field name="TO_BRANCH_NAME" class="java.lang.String"/>
+	<field name="FROM_BRANCH_ID" class="java.lang.Integer"/>
+	<field name="category_name" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="QTY" class="java.lang.Integer"/>
+	<field name="AVERAGE_COST" class="java.math.BigDecimal"/>
+	<field name="BRANCH_ID" class="java.lang.Integer"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="BRANCH_ACRONYM" class="java.lang.String"/>
+	<field name="GL_PREFIX" class="java.lang.String"/>
+	<field name="BRANCH_ADDRESS" class="java.lang.String"/>
+	<field name="STATE" class="java.lang.String"/>
+	<field name="PHONE_NO" class="java.lang.String"/>
+	<field name="FAX_NO" class="java.lang.String"/>
+	<field name="REGION" class="java.lang.String"/>
+	<field name="PROVINCE" class="java.lang.String"/>
+	<field name="BRANCH_STATUS" class="java.lang.String"/>
+	<field name="USER_ID" class="java.lang.String"/>
+	<field name="CREATE_DATE" class="java.sql.Timestamp"/>
+	<field name="GL_SUFFIX" class="java.lang.String"/>
+	<field name="EMAIL" class="java.lang.String"/>
+	<field name="uncapitalized_account" class="java.lang.String"/>
+	<variable name="branch_totalQty" class="java.lang.Integer" resetType="Group" resetGroup="branchGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTY}]]></variableExpression>
+	</variable>
+	<variable name="branch_totalcost" class="java.math.BigDecimal" resetType="Group" resetGroup="branchGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{AVERAGE_COST}]]></variableExpression>
+	</variable>
+	<variable name="categoryTotalQty" class="java.lang.Integer" resetType="Group" resetGroup="categoryByGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{QTY}]]></variableExpression>
+	</variable>
+	<variable name="categoryTotalCost" class="java.math.BigDecimal" resetType="Group" resetGroup="categoryByGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{AVERAGE_COST}]]></variableExpression>
+	</variable>
+	<group name="branchGroup">
+		<groupExpression><![CDATA[$F{BRANCH_NAME}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement x="82" y="0" width="277" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{FROM_BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="443" y="0" width="221" height="20"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{TO_BRANCH_NAME}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="359" y="0" width="74" height="20"/>
+					<textElement/>
+					<text><![CDATA[TO]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="1" width="82" height="19"/>
+					<textElement/>
+					<text><![CDATA[FROM]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="categoryByGroup">
+		<groupExpression><![CDATA[$F{category_name}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="82" y="0" width="277" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="359" y="0" width="84" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Qty]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="443" y="0" width="90" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Average Cost]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="82" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[S/No]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="82" y="0" width="277" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="359" y="0" width="84" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{QTY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="443" y="0" width="90" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{AVERAGE_COST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="1" width="82" height="19"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

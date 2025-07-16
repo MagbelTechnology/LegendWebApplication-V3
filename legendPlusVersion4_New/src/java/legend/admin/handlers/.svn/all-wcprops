@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/legend-repos/!svn/ver/3/Legend/src/java/legend/admin/handlers
+END
+CategoryClassHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/CategoryClassHandler.java
+END
+LicenseTypeHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/LicenseTypeHandler.java
+END
+CompanyHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/admin/handlers/CompanyHandler.java
+END
+InsuranceHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/InsuranceHandler.java
+END
+SecurityHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/SecurityHandler.java
+END
+SecurityHandler.java_27_01_09
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/SecurityHandler.java_27_01_09
+END
+AdminHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/legend-repos/!svn/ver/4/Legend/src/java/legend/admin/handlers/AdminHandler.java
+END
+LocationHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/LocationHandler.java
+END
+CurrencyHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/CurrencyHandler.java
+END
+DriverHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/DriverHandler.java
+END
+FuelTypeHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/FuelTypeHandler.java
+END
+VendorHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/legend-repos/!svn/ver/2/Legend/src/java/legend/admin/handlers/VendorHandler.java
+END

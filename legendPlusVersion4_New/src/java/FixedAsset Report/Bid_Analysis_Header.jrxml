@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Bid_Analysis_Header"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="1020"
+		 pageHeight="842"
+		 columnWidth="960"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="2" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="SUBREPORT_DIR" isForPrompting="true" class="java.lang.String">
+		<defaultValueExpression ><![CDATA["C:\\jboss-4.0.5.GA\\server\\default\\deploy\\legend2.net.war\\reports\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString><![CDATA[SELECT
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     am_gb_company."company_code" AS am_gb_company_company_code,
+     am_gb_company."company_address" AS am_gb_company_company_address,
+     PR_RFQ_RESPONSE."ReqnID" AS PR_RFQ_RESPONSE_ReqnID,
+     PR_RFQ_RESPONSE."UserID" AS PR_RFQ_RESPONSE_UserID,
+     PR_RFQ_RESPONSE."Status" AS PR_RFQ_RESPONSE_Status,
+     PR_RFQ_RESPONSE."Company_Code" AS PR_RFQ_RESPONSE_Company_Code,
+     PR_RFQ_RESPONSE."Vendor_Code" AS PR_RFQ_RESPONSE_Vendor_Code,
+     PR_RFQ_RESPONSE."Quoted_Vendor_code" AS PR_RFQ_RESPONSE_Quoted_Vendor_code,
+     PR_RFQ_RESPONSE."QuotedBy" AS PR_RFQ_RESPONSE_QuotedBy,
+     PR_RFQ_RESPONSE."Job_Title" AS PR_RFQ_RESPONSE_Job_Title,
+     PR_RFQ_RESPONSE."Email" AS PR_RFQ_RESPONSE_Email,
+     PR_RFQ_RESPONSE."DaysQuote_Valid" AS PR_RFQ_RESPONSE_DaysQuote_Valid,
+     PR_RFQ_RESPONSE."Remark" AS PR_RFQ_RESPONSE_Remark,
+     PR_RFQ_RESPONSE_DETAIL."Description" AS PR_RFQ_RESPONSE_DETAIL_Description,
+     PR_RFQ_RESPONSE_DETAIL."Delivery_Date" AS PR_RFQ_RESPONSE_DETAIL_Delivery_Date,
+     PR_RFQ_RESPONSE_DETAIL."Quantity" AS PR_RFQ_RESPONSE_DETAIL_Quantity,
+     PR_RFQ_RESPONSE_DETAIL."Unit_Price" AS PR_RFQ_RESPONSE_DETAIL_Unit_Price,
+     PR_RFQ_RESPONSE_DETAIL."Cost_Price" AS PR_RFQ_RESPONSE_DETAIL_Cost_Price,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     am_ad_vendor."Vendor_Status" AS am_ad_vendor_Vendor_Status,
+     PR_RFQ_RESPONSE_DETAIL."Item_No" AS PR_RFQ_RESPONSE_DETAIL_Item_No
+FROM
+     "dbo"."PR_RFQ_RESPONSE_DETAIL" PR_RFQ_RESPONSE_DETAIL RIGHT OUTER JOIN "dbo"."PR_RFQ_RESPONSE" PR_RFQ_RESPONSE ON PR_RFQ_RESPONSE_DETAIL."Vendor_Code" = PR_RFQ_RESPONSE."Vendor_Code"
+     AND PR_RFQ_RESPONSE_DETAIL."ReqnID" = PR_RFQ_RESPONSE."ReqnID"
+     INNER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON PR_RFQ_RESPONSE."Vendor_Code" = am_ad_vendor."Vendor_Code",
+     "dbo"."am_gb_company" am_gb_company]]></queryString>
+
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_gb_company_company_code" class="java.lang.String"/>
+	<field name="am_gb_company_company_address" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_ReqnID" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_UserID" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Status" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Company_Code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Vendor_Code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Quoted_Vendor_code" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_QuotedBy" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Job_Title" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_Email" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DaysQuote_Valid" class="java.lang.Integer"/>
+	<field name="PR_RFQ_RESPONSE_Remark" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Description" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Delivery_Date" class="java.sql.Timestamp"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Quantity" class="java.lang.Integer"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Unit_Price" class="java.math.BigDecimal"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Cost_Price" class="java.math.BigDecimal"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Status" class="java.lang.String"/>
+	<field name="PR_RFQ_RESPONSE_DETAIL_Item_No" class="java.lang.Integer"/>
+
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="30"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="26"
+						y="0"
+						width="215"
+						height="30"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="241"
+						y="0"
+						width="118"
+						height="30"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_Status}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="362"
+						y="0"
+						width="118"
+						height="30"
+						key="textField-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_RFQ_RESPONSE_Remark}]]></textFieldExpression>
+				</textField>
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="31"  isSplitAllowed="true" >
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<lastPageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</lastPageFooter>
+		<summary>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

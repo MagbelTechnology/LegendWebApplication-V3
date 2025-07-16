@@ -1,0 +1,71 @@
+package com.magbel.ia.vao;
+
+
+public class AmountType
+{
+
+    private String id;
+    private String amountCode;
+    private int userId;
+    private String description;
+    private String type;
+
+    public AmountType(String id, String amountCode, int userId, String description, String type)
+    {
+        setId(id);
+        setAmountCode(amountCode);
+        setUserId(userId);
+        setDescription(description);
+        setType(type);
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public void setAmountCode(String amountCode)
+    {
+        this.amountCode = amountCode;
+    }
+
+    public void setUserId(int userId)
+    {
+        this.userId = userId;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public String getAmountCode()
+    {
+        return amountCode;
+    }
+
+    public int getUserId()
+    {
+        return userId;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+}

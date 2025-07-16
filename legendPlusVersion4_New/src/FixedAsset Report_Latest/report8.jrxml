@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report8" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT
+     PR_REQUEST_FOR_QUOTATION."RFQ_NO" AS PR_REQUEST_FOR_QUOTATION_RFQ_NO,
+     PR_REQUEST_FOR_QUOTATION."Vendor_Code" AS PR_REQUEST_FOR_QUOTATION_Vendor_Code,
+     PR_REQUEST_FOR_QUOTATION."ReqnID" AS PR_REQUEST_FOR_QUOTATION_ReqnID,
+     PR_REQUEST_FOR_QUOTATION."Reference_No" AS PR_REQUEST_FOR_QUOTATION_Reference_No,
+     PR_REQUEST_FOR_QUOTATION."Issue_Date" AS PR_REQUEST_FOR_QUOTATION_Issue_Date,
+     PR_REQUEST_FOR_QUOTATION."Instruction" AS PR_REQUEST_FOR_QUOTATION_Instruction,
+     PR_REQUEST_FOR_QUOTATION."Instruction1" AS PR_REQUEST_FOR_QUOTATION_Instruction1,
+     PR_REQUEST_FOR_QUOTATION."Instruction2" AS PR_REQUEST_FOR_QUOTATION_Instruction2,
+     PR_REQUEST_FOR_QUOTATION."Return_QuoteTo" AS PR_REQUEST_FOR_QUOTATION_Return_QuoteTo,
+     PR_REQUEST_FOR_QUOTATION."Return_QuoteTo1" AS PR_REQUEST_FOR_QUOTATION_Return_QuoteTo1,
+     PR_REQUEST_FOR_QUOTATION."Return_QuoteTo2" AS PR_REQUEST_FOR_QUOTATION_Return_QuoteTo2,
+     PR_REQUEST_FOR_QUOTATION."Award_Status" AS PR_REQUEST_FOR_QUOTATION_Award_Status,
+     PR_REQUISITION."UserID" AS PR_REQUISITION_UserID,
+     PR_REQUISITION."ReqnBranch" AS PR_REQUISITION_ReqnBranch,
+     PR_REQUISITION."ReqnSection" AS PR_REQUISITION_ReqnSection,
+     PR_REQUISITION."ReqnDepartment" AS PR_REQUISITION_ReqnDepartment,
+     PR_REQUISITION."ReqnDate" AS PR_REQUISITION_ReqnDate,
+     PR_REQUISITION."ReqnUserID" AS PR_REQUISITION_ReqnUserID,
+     PR_REQUISITION."ItemRequested" AS PR_REQUISITION_ItemRequested,
+     PR_REQUISITION."Status" AS PR_REQUISITION_Status,
+     PR_REQUISITION."Quantity" AS PR_REQUISITION_Quantity,
+     PR_REQUISITION."projectCode" AS PR_REQUISITION_projectCode,
+     PR_REQUISITION."Remark" AS PR_REQUISITION_Remark,
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     am_gb_company."company_code" AS am_gb_company_company_code,
+     PR_REQUEST_FOR_QUOTATION."Company_Code" AS PR_REQUEST_FOR_QUOTATION_Company_Code,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     am_ad_vendor."Contact_Person" AS am_ad_vendor_Contact_Person,
+     am_ad_vendor."Contact_Address" AS am_ad_vendor_Contact_Address,
+     am_ad_vendor."Vendor_Phone" AS am_ad_vendor_Vendor_Phone,
+     am_ad_vendor."Vendor_fax" AS am_ad_vendor_Vendor_fax,
+     am_ad_vendor."Vendor_email" AS am_ad_vendor_Vendor_email,
+     am_ad_vendor."Vendor_State" AS am_ad_vendor_Vendor_State,
+     am_ad_vendor."Vendor_Status" AS am_ad_vendor_Vendor_Status,
+     am_ad_vendor."Vendor_Code" AS am_ad_vendor_Vendor_Code,
+     am_gb_company."company_address" AS am_gb_company_company_address,
+     PR_REQUISITION."ReqnID" AS PR_REQUISITION_ReqnID,
+     am_ad_sub_category."sub_category_name" AS am_ad_sub_category_sub_category_name
+FROM
+     "dbo"."PR_REQUEST_FOR_QUOTATION" PR_REQUEST_FOR_QUOTATION RIGHT OUTER JOIN "dbo"."PR_REQUISITION" PR_REQUISITION ON PR_REQUEST_FOR_QUOTATION."ReqnID" = PR_REQUISITION."ReqnID"
+     INNER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON PR_REQUEST_FOR_QUOTATION."Vendor_Code" = am_ad_vendor."Vendor_Code"
+     INNER JOIN "dbo"."am_ad_sub_category" am_ad_sub_category ON PR_REQUISITION."ItemRequested" = am_ad_sub_category."sub_category_code",
+     "dbo"."am_gb_company" am_gb_company
+WHERE
+     PR_REQUISITION."Status" = 'Active'
+     and PR_REQUEST_FOR_QUOTATION."ReqnID" = !$P{filterClause}
+ORDER BY
+     PR_REQUEST_FOR_QUOTATION."Vendor_Code" ASC,
+     PR_REQUEST_FOR_QUOTATION."ReqnID" ASC]]>
+	</queryString>
+	<field name="PR_REQUEST_FOR_QUOTATION_RFQ_NO" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Vendor_Code" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_ReqnID" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Reference_No" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Issue_Date" class="java.sql.Timestamp"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Instruction" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Instruction1" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Instruction2" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Return_QuoteTo" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Return_QuoteTo1" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Return_QuoteTo2" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Award_Status" class="java.lang.String"/>
+	<field name="PR_REQUISITION_UserID" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnBranch" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnSection" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnDepartment" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnDate" class="java.sql.Timestamp"/>
+	<field name="PR_REQUISITION_ReqnUserID" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ItemRequested" class="java.lang.String"/>
+	<field name="PR_REQUISITION_Status" class="java.lang.String"/>
+	<field name="PR_REQUISITION_Quantity" class="java.lang.String"/>
+	<field name="PR_REQUISITION_projectCode" class="java.lang.String"/>
+	<field name="PR_REQUISITION_Remark" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_gb_company_company_code" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Company_Code" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="am_ad_vendor_Contact_Person" class="java.lang.String"/>
+	<field name="am_ad_vendor_Contact_Address" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Phone" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_fax" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_email" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_State" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Status" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Code" class="java.lang.String"/>
+	<field name="am_gb_company_company_address" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnID" class="java.lang.String"/>
+	<field name="am_ad_sub_category_sub_category_name" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="49" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

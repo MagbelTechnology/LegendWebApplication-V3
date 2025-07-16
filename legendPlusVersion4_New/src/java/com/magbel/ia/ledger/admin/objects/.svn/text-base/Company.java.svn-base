@@ -1,0 +1,495 @@
+
+package legend.admin.objects;
+
+public class Company {
+
+	private String companyCode = "";
+
+	private String companyName = "";
+
+	private String acronym = "";
+
+	private String companyAddress = "";
+
+	private double vatRate = 0;
+
+	private double whtRate = 0;
+	
+	private double fedwhtRate = 0; 						//ganiyu's code
+
+	private String financialStartDate = ""; // smalldatetime
+
+	private int financialNoOfMonths = 0;
+
+	private String financialEndDate = ""; // smalldatetime
+
+	private int minimumPassword = 4;
+
+	private int passwordExpiry = 1;
+
+	private int sessionTimeout = 1;
+
+	private String enforceAcqBudget = "N";
+
+	private String enforcePmBudget = "N";
+
+	private String enforceFuelAllocation = "N";
+
+	private String requireQuarterlyPM = "N";
+
+	private String quarterlySurplusCf = "N";
+
+	private String userId;
+
+	private String processingStatus;
+
+	private double transWaitTime = 0;
+	
+	private String logUserAudit;
+
+    private int log_on;
+    private String comp_delimiter = "";
+
+	public Company() {
+	}
+
+	public Company(String companyCode, String companyName, String acronym,
+			String companyAddress, double vatRate, double whtRate,
+			String financialStartDate, int financialNoOfMonths,
+			String financialEndDate, int minimumPassword, int passwordExpiry,
+			int sessionTimeout, String enforceAcqBudget,
+			String enforcePmBudget, String enforceFuelAllocation,
+			String requireQuarterlyPM, String quarterlySurplusCf,
+			String userId, String processingStatus, double transWaitTime) {
+
+		this.companyCode = companyCode;
+		this.companyName = companyName;
+		this.acronym = acronym;
+		this.companyAddress = companyAddress;
+		this.vatRate = vatRate;
+		this.whtRate = whtRate;
+		this.financialStartDate = financialStartDate;
+		this.financialNoOfMonths = financialNoOfMonths;
+		this.financialEndDate = financialEndDate;
+		this.minimumPassword = minimumPassword;
+		this.passwordExpiry = passwordExpiry;
+		this.sessionTimeout = sessionTimeout;
+		this.enforceAcqBudget = enforceAcqBudget;
+		this.enforcePmBudget = enforcePmBudget;
+		this.enforceFuelAllocation = enforceFuelAllocation;
+		this.requireQuarterlyPM = requireQuarterlyPM;
+		this.quarterlySurplusCf = quarterlySurplusCf;
+		this.userId = userId;
+		// this.processingStatus = processingStatus;
+		this.transWaitTime = transWaitTime;
+	}
+
+
+
+//ganiyu's code,constructor with fedwhtRate field.
+
+public Company(String companyCode, String companyName, String acronym,
+			String companyAddress, double vatRate, double whtRate, double fedwhtRate,
+			String financialStartDate, int financialNoOfMonths,
+			String financialEndDate, int minimumPassword, int passwordExpiry,
+			int sessionTimeout, String enforceAcqBudget,
+			String enforcePmBudget, String enforceFuelAllocation,
+			String requireQuarterlyPM, String quarterlySurplusCf,
+			String userId, String processingStatus, double transWaitTime,int log_on) {
+
+		this.companyCode = companyCode;
+		this.companyName = companyName;
+		this.acronym = acronym;
+		this.companyAddress = companyAddress;
+		this.vatRate = vatRate;
+		this.whtRate = whtRate;
+		this.financialStartDate = financialStartDate;
+		this.financialNoOfMonths = financialNoOfMonths;
+		this.financialEndDate = financialEndDate;
+		this.minimumPassword = minimumPassword;
+		this.passwordExpiry = passwordExpiry;
+		this.sessionTimeout = sessionTimeout;
+		this.enforceAcqBudget = enforceAcqBudget;
+		this.enforcePmBudget = enforcePmBudget;
+		this.enforceFuelAllocation = enforceFuelAllocation;
+		this.requireQuarterlyPM = requireQuarterlyPM;
+		this.quarterlySurplusCf = quarterlySurplusCf;
+		this.userId = userId;
+		// this.processingStatus = processingStatus;
+		this.transWaitTime = transWaitTime;
+		this.fedwhtRate = fedwhtRate;	//ganiyu's code
+        this.log_on =log_on;
+}
+
+
+
+	/**
+	 * @param companyCode
+	 *            the companyCode to set
+	 */
+	public void setCompanyCode(String companyCode) {
+		this.companyCode = companyCode;
+	}
+
+	/**
+	 * @return the companyCode
+	 */
+	public String getCompanyCode() {
+		return companyCode;
+	}
+
+	/**
+	 * @param companyName
+	 *            the companyName to set
+	 */
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	/**
+	 * @return the companyName
+	 */
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	/**
+	 * @param acronym
+	 *            the acronym to set
+	 */
+	public void setAcronym(String acronym) {
+		this.acronym = acronym;
+	}
+
+	/**
+	 * @return the acronym
+	 */
+	public String getAcronym() {
+		return acronym;
+	}
+
+	/**
+	 * @param companyAddress
+	 *            the companyAddress to set
+	 */
+	public void setCompanyAddress(String companyAddress) {
+		this.companyAddress = companyAddress;
+	}
+
+	/**
+	 * @return the companyAddress
+	 */
+	public String getCompanyAddress() {
+		return companyAddress;
+	}
+
+	/**
+	 * @param vatRate
+	 *            the vatRate to set
+	 */
+	public void setVatRate(double vatRate) {
+		this.vatRate = vatRate;
+	}
+
+	/**
+	 * @return the vatRate
+	 */
+	public double getVatRate() {
+		return vatRate;
+	}
+
+	/**
+	 * @param whtRate
+	 *            the whtRate to set
+	 */
+	public void setWhtRate(double whtRate) {
+		this.whtRate = whtRate;
+	}
+
+	/**
+	 * @return the whtRate
+	 */
+	public double getWhtRate() {
+		return whtRate;
+	}
+
+	//ganiyu's code
+	
+	public double getFedwhtRate() {
+		return fedwhtRate;
+	}
+	
+	public void setFedwhtRate(double fedwhtRate) {
+		this.fedwhtRate = fedwhtRate;
+	}
+	
+	
+	/**
+	 * @param financialStartDate
+	 *            the financialStartDate to set
+	 */
+	public void setFinancialStartDate(String financialStartDate) {
+		this.financialStartDate = financialStartDate;
+	}
+
+	/**
+	 * @return the financialStartDate
+	 */
+	public String getFinancialStartDate() {
+		return financialStartDate;
+	}
+
+	/**
+	 * @param financialNoOfMonths
+	 *            the financialNoOfMonths to set
+	 */
+	public void setFinancialNoOfMonths(int financialNoOfMonths) {
+		this.financialNoOfMonths = financialNoOfMonths;
+	}
+
+	/**
+	 * @return the financialNoOfMonths
+	 */
+	public int getFinancialNoOfMonths() {
+		return financialNoOfMonths;
+	}
+
+	/**
+	 * @param financialEndDate
+	 *            the financialEndDate to set
+	 */
+	public void setFinancialEndDate(String financialEndDate) {
+		this.financialEndDate = financialEndDate;
+	}
+
+	/**
+	 * @return the financialEndDate
+	 */
+	public String getFinancialEndDate() {
+		return financialEndDate;
+	}
+
+	/**
+	 * @param minimumPassword
+	 *            the minimumPassword to set
+	 */
+	public void setMinimumPassword(int minimumPassword) {
+		this.minimumPassword = minimumPassword;
+	}
+
+	/**
+	 * @return the minimumPassword
+	 */
+	public int getMinimumPassword() {
+		return minimumPassword;
+	}
+
+	/**
+	 * @param passwordExpiry
+	 *            the passwordExpiry to set
+	 */
+	public void setPasswordExpiry(int passwordExpiry) {
+		this.passwordExpiry = passwordExpiry;
+	}
+
+	/**
+	 * @return the passwordExpiry
+	 */
+	public int getPasswordExpiry() {
+		return passwordExpiry;
+	}
+
+	/**
+	 * @param sessionTimeout
+	 *            the sessionTimeout to set
+	 */
+	public void setSessionTimeout(int sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
+	}
+
+	/**
+	 * @return the sessionTimeout
+	 */
+	public int getSessionTimeout() {
+		return sessionTimeout;
+	}
+
+	/**
+	 * @param enforceAcqBudget
+	 *            the enforceAcqBudget to set
+	 */
+	public void setEnforceAcqBudget(String enforceAcqBudget) {
+		if (enforceAcqBudget != null || enforceAcqBudget != "")
+			this.enforceAcqBudget = enforceAcqBudget;
+		else
+			this.enforceAcqBudget = "N";
+	}
+
+	/**
+	 * @return the enforceAcqBudget
+	 */
+	public String getEnforceAcqBudget() {
+		return enforceAcqBudget;
+	}
+
+	/**
+	 * @param enforcePmBudget
+	 *            the enforcePmBudget to set
+	 */
+	public void setEnforcePmBudget(String enforcePmBudget) {
+		if (enforcePmBudget != null || enforcePmBudget != "")
+			this.enforcePmBudget = enforcePmBudget;
+		else
+			this.enforcePmBudget = "N";
+	}
+
+	/**
+	 * @return the enforcePmBudget
+	 */
+	public String getEnforcePmBudget() {
+		return enforcePmBudget;
+	}
+
+	/**
+	 * @param enforceFuelAllocation
+	 *            the enforceFuelAllocation to set
+	 */
+	public void setEnforceFuelAllocation(String enforceFuelAllocation) {
+		if (enforceFuelAllocation != null || enforceFuelAllocation != "")
+			this.enforceFuelAllocation = enforceFuelAllocation;
+		else
+			this.enforceFuelAllocation = "N";
+	}
+
+	/**
+	 * @return the enforceFuelAllocation
+	 */
+	public String getEnforceFuelAllocation() {
+		return enforceFuelAllocation;
+	}
+
+	/**
+	 * @param requireQuarterlyPM
+	 *            the requireQuarterlyPM to set
+	 */
+	public void setRequireQuarterlyPM(String requireQuarterlyPM) {
+		if (requireQuarterlyPM != null || requireQuarterlyPM != "")
+			this.requireQuarterlyPM = requireQuarterlyPM;
+		else
+			this.requireQuarterlyPM = "N";
+	}
+
+	/**
+	 * @return the requireQuarterlyPM
+	 */
+	public String getRequireQuarterlyPM() {
+		return requireQuarterlyPM;
+	}
+
+	/**
+	 * @param quarterlySurplusCf
+	 *            the quarterlySurplusCf to set
+	 */
+	public void setQuarterlySurplusCf(String quarterlySurplusCf) {
+		if (quarterlySurplusCf != null || quarterlySurplusCf != "")
+			this.quarterlySurplusCf = quarterlySurplusCf;
+		else
+			this.quarterlySurplusCf = "N";
+	}
+
+	/**
+	 * @return the quarterlySurplusCf
+	 */
+	public String getQuarterlySurplusCf() {
+		return quarterlySurplusCf;
+	}
+
+	/**
+	 * @param userId
+	 *            the userId to set
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	/**
+	 * @return the userId
+	 */
+	public String getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param processingStatus
+	 *            the processingStatus to set
+	 */
+	public void setProcessingStatus(String processingStatus) {
+		this.processingStatus = processingStatus;
+	}
+
+	/**
+	 * @return the processingStatus
+	 */
+	public String getProcessingStatus() {
+		return processingStatus;
+	}
+
+	/**
+	 * @param transWaitTime
+	 *            the transWaitTime to set
+	 */
+	public void setTransWaitTime(double transWaitTime) {
+		this.transWaitTime = transWaitTime;
+	}
+
+	/**
+	 * @return the transWaitTime
+	 */
+	public double getTransWaitTime() {
+		return transWaitTime;
+	}
+
+	/**
+	 * @return the logUserAudit
+	 */
+	public String getLogUserAudit() {
+		return logUserAudit;
+	}
+
+	/**
+	 * @param logUserAudit the logUserAudit to set
+	 */
+	public void setLogUserAudit(String logUserAudit) {
+		this.logUserAudit = logUserAudit;
+	}
+
+    /**
+     * @return the attempt_logon
+     */
+    public int getLog_on() {
+       
+        return log_on;
+    }
+
+    /**
+     * @param attempt_logon the attempt_logon to set
+     */
+    public void setLog_on(int log_on) {
+        this.log_on = log_on;
+    }
+
+    /**
+     * @return the comp_delimiter
+     */
+    public String getComp_delimiter() {
+        return comp_delimiter;
+    }
+
+    /**
+     * @param comp_delimiter the comp_delimiter to set
+     */
+    public void setComp_delimiter(String comp_delimiter) {
+        this.comp_delimiter = comp_delimiter;
+    }
+
+}

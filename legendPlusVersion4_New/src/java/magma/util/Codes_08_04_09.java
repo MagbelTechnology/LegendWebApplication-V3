@@ -1,0 +1,142 @@
+package magma.util;
+import magma.net.dao.MagmaDBConnection;
+import java.sql.*;
+
+/**
+ * <p>Title: fileName.java</p>
+ *
+ * <p>Description: File Description</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @version 1.0
+ */
+public class Codes_08_04_09 {
+    private MagmaDBConnection dbConnection;
+
+
+
+    public Codes_08_04_09() {
+    	        dbConnection = new MagmaDBConnection();
+    }
+
+    public String getBranchCode(String BranchId)
+    {
+        String query =
+               "SELECT BRANCH_CODE  FROM am_ad_branch  " +
+               "WHERE BRANCH_ID = '" + BranchId + "' ";
+
+          Connection con = null;
+          ResultSet rs = null;
+          Statement stmt = null;
+       String branchcode = "0";
+       try {
+           con=dbConnection.getConnection("fixedasset");
+           stmt = con.createStatement();
+           rs = stmt.executeQuery(query);
+           while (rs.next()) {
+
+               branchcode = rs.getString(1);
+
+           }
+
+       } catch (Exception ex) {
+           ex.printStackTrace();
+       } finally {
+           dbConnection.closeConnection(con,stmt,rs);
+       }
+
+       return branchcode;
+
+    }
+    public String getDeptCode(String DeptId)
+   {
+       String query =
+              "SELECT DEPT_CODE  FROM am_ad_department  " +
+              "WHERE DEPT_ID = '" + DeptId + "' ";
+
+         Connection con = null;
+         ResultSet rs = null;
+         Statement stmt = null;
+      String deptcode = "0";
+      try {
+          con=dbConnection.getConnection("fixedasset");
+          stmt = con.createStatement();
+          rs = stmt.executeQuery(query);
+          while (rs.next()) {
+
+              deptcode = rs.getString(1);
+
+          }
+
+      } catch (Exception ex) {
+          ex.printStackTrace();
+      } finally {
+          dbConnection.closeConnection(con,stmt,rs);
+      }
+
+      return deptcode;
+
+   }
+   public String getSectionCode(String SectionId)
+     {
+         String query =
+                "SELECT SECTION_CODE  FROM am_ad_section  " +
+                "WHERE SECTION_ID = '" + SectionId + "' ";
+
+           Connection con = null;
+           ResultSet rs = null;
+           Statement stmt = null;
+        String sectioncode = "0";
+        try {
+            con=dbConnection.getConnection("fixedasset");
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(query);
+            while (rs.next()) {
+
+                sectioncode = rs.getString(1);
+
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            dbConnection.closeConnection(con,stmt,rs);
+        }
+
+        return sectioncode;
+
+     }
+     public String getCategoryCode(String categoryId)
+         {
+             String query =
+                 "SELECT CATEGORY_CODE  FROM am_ad_category  " +
+                "WHERE category_id = '" + categoryId + "' ";
+
+               Connection con = null;
+               ResultSet rs = null;
+               Statement stmt = null;
+            String categorycode = "0";
+            try {
+                con=dbConnection.getConnection("fixedasset");
+                stmt = con.createStatement();
+                rs = stmt.executeQuery(query);
+                while (rs.next()) {
+
+                    categorycode = rs.getString(1);
+
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                dbConnection.closeConnection(con,stmt,rs);
+            }
+
+            return categorycode;
+
+     }
+}

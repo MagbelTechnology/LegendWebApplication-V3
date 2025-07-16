@@ -1,0 +1,952 @@
+package magma;
+
+import java.sql.*;
+import java.util.*;
+import magma.net.dao.MagmaDBConnection;
+import magma.net.manager.FleetHistoryManager;
+
+public class GroupAssetToAssetBean extends legend.ConnectionClass {
+    private String branch_id = "0";
+    private String department_id = "0";
+    private String section_id = "0";
+    private String category_id = "0";
+    private String make = "0";
+    private String location = "0";
+    private String maintained_by = "0";
+    private String driver = "0";
+    private String state = "0";
+    private String supplied_by = "0";
+    private String registration_no = "";
+    private String date_of_purchase = null;
+    private String depreciation_start_date = null;
+    private String depreciation_end_date = null;
+    private String authorized_by = "";
+    private String reason = "";
+    private String description = "";
+    private String cost_price = "0";
+    private String vatable_cost = "0";
+    private String subject_to_vat = "N";
+    private String vat_amount = "0";
+    private String wh_tax_cb = "N";
+    private String wh_tax_amount = "0";
+    private String serial_number = "";
+    private String engine_number = "";
+    private String model = "";
+    private String user = "";
+    private String depreciation_rate = "100";
+    private String residual_value = getResidual_value();
+    private String require_depreciation = "N";
+    private String vendor_account = "";
+    private String spare_1 = "";
+    private String spare_2 = "";
+    private String email_1 = "";
+    private String email2 = "";
+    private String user_id = "0";
+    private String asset_id = "";
+    private String posting_date = null;
+    private String accum_dep = "0";
+    private String who_to_remind = "";
+    private String status = "A";
+    private String raise_entry = "N";
+    private String require_redistribution = "N";
+    private String who_to_remind_2 = "";
+    private String group_id = "0";
+    private String province = "";
+    private String multiple = "N";
+    private String section = "";
+    private String warrantyStartDate = "";
+    private String noOfMonths = "";
+    private String expiryDate = "";
+
+    private MagmaDBConnection dbConnection;
+    private String assetId;
+
+    public GroupAssetToAssetBean() throws Exception {
+        super();
+        dbConnection = new MagmaDBConnection();
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
+    }
+
+    public void setBranch_id(String branch_id) {
+        if (branch_id != null) {
+            this.branch_id = branch_id;
+        }
+    }
+
+    public void setDepartment_id(String department_id) {
+        if (department_id != null) {
+            this.department_id = department_id;
+        }
+    }
+
+    public void setSection_id(String section_id) {
+        if (section_id != null) {
+            this.section_id = section_id;
+        }
+    }
+
+    public void setSection(String section) {
+        if (section != null) {
+            this.section = section;
+        }
+    }
+
+    public void setCategory_id(String category_id) {
+        if (category_id != null) {
+            this.category_id = category_id;
+        }
+    }
+
+    public void setMake(String make) {
+        if (make != null) {
+            this.make = make;
+        }
+    }
+
+    public void setLocation(String location) {
+        if (location != null) {
+            this.location = location;
+        }
+    }
+
+    public void setMaintained_by(String maintained_by) {
+        if (maintained_by != null) {
+            this.maintained_by = maintained_by;
+        }
+    }
+
+    public void setDriver(String driver) {
+        if (driver != null) {
+            this.driver = driver;
+        }
+    }
+
+    public void setState(String state) {
+        if (state != null) {
+            this.state = state;
+        }
+    }
+
+    public void setSupplied_by(String supplied_by) {
+        if (supplied_by != null) {
+            this.supplied_by = supplied_by;
+        }
+    }
+
+    public void setRegistration_no(String registration_no) {
+        if (registration_no != null) {
+            this.registration_no = registration_no;
+        }
+    }
+
+    public void setDate_of_purchase(String date_of_purchase) {
+        if (date_of_purchase != null) {
+            this.date_of_purchase = date_of_purchase;
+        }
+    }
+
+    public void setDepreciation_start_date(String depreciation_start_date) {
+        if (depreciation_start_date != null) {
+            this.depreciation_start_date = depreciation_start_date;
+        }
+    }
+
+    public void setDepreciation_end_date(String depreciation_end_date) {
+        if (depreciation_end_date != null) {
+            this.depreciation_end_date = depreciation_end_date;
+        }
+    }
+
+    public void setAuthorized_by(String authorized_by) {
+        if (authorized_by != null) {
+            this.authorized_by = authorized_by;
+        }
+    }
+
+    public void setReason(String reason) {
+        if (reason != null) {
+            this.reason = reason;
+        }
+    }
+
+    public void setDescription(String description) {
+        if (description != null) {
+            this.description = description;
+        }
+    }
+
+    public void setCost_price(String cost_price) {
+        if (cost_price != null) {
+            this.cost_price = cost_price.replaceAll(",", "");
+        }
+    }
+
+    public void setVatable_cost(String vatable_cost) {
+        if (vatable_cost != null) {
+            this.vatable_cost = vatable_cost.replaceAll(",", "");
+        }
+    }
+
+    public void setSubject_to_vat(String subject_to_vat) {
+        if (subject_to_vat != null) {
+            this.subject_to_vat = subject_to_vat.replaceAll(",", "");
+        }
+    }
+
+    public void setVat_amount(String vat_amount) {
+        if (vat_amount != null) {
+            this.vat_amount = vat_amount.replaceAll(",", "");
+        }
+    }
+
+    public void setWh_tax_cb(String wh_tax_cb) {
+        if (wh_tax_cb != null) {
+            this.wh_tax_cb = wh_tax_cb;
+        }
+    }
+
+    public void setWh_tax_amount(String wh_tax_amount) {
+        if (wh_tax_amount != null) {
+            this.wh_tax_amount = wh_tax_amount.replaceAll(",", "");
+        }
+    }
+
+    public void setSerial_number(String serial_number) {
+        if (serial_number != null) {
+            this.serial_number = serial_number;
+        }
+    }
+
+    public void setEngine_number(String engine_number) {
+        if (engine_number != null) {
+            this.engine_number = engine_number;
+        }
+    }
+
+    public void setModel(String model) {
+        if (model != null) {
+            this.model = model;
+        }
+    }
+
+    public void setUser(String user) {
+        if (user != null) {
+            this.user = user;
+        }
+    }
+
+    public void setDepreciation_rate(String depreciation_rate) {
+        if (depreciation_rate != null) {
+            this.depreciation_rate = depreciation_rate.replaceAll(",", "");
+        }
+    }
+
+    public void setResidual_value(String residual_value) {
+        if (residual_value != null) {
+            this.residual_value = residual_value.replaceAll(",", "");
+        }
+    }
+
+    public void setRequire_depreciation(String require_depreciation) {
+        if (require_depreciation != null) {
+            this.require_depreciation = require_depreciation;
+        }
+    }
+
+    public void setVendor_account(String vendor_account) {
+        if (vendor_account != null) {
+            this.vendor_account = vendor_account;
+        }
+    }
+
+    public void setSpare_1(String spare_1) {
+        if (spare_1 != null) {
+            this.spare_1 = spare_1;
+        }
+    }
+
+    public void setSpare_2(String spare_2) {
+        if (spare_2 != null) {
+            this.spare_2 = spare_2;
+        }
+    }
+
+    public void setEmail_1(String email_1) {
+        if (email_1 != null) {
+            this.email_1 = email_1;
+        }
+    }
+
+    public void setEmail2(String email2) {
+        if (email2 != null) {
+            this.email2 = email2;
+        }
+    }
+
+    public void setUser_id(String user_id) {
+        if (user_id != null) {
+            this.user_id = user_id;
+        }
+    }
+
+    public void setAsset_id(String asset_id) {
+        if (asset_id != null) {
+            this.asset_id = asset_id;
+        }
+    }
+
+    public void setPosting_date(String posting_date) {
+        this.posting_date = posting_date;
+    }
+
+    public void setAccum_dep(String accum_dep) {
+        this.accum_dep = accum_dep;
+    }
+
+    public void setWho_to_remind(String who_to_remind) {
+        this.who_to_remind = who_to_remind;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setRaise_entry(String raise_entry) {
+        this.raise_entry = raise_entry;
+    }
+
+    public void setRequire_redistribution(String require_redistribution) {
+        this.require_redistribution = require_redistribution;
+    }
+
+    public void setWho_to_remind_2(String who_to_remind_2) {
+        this.who_to_remind_2 = who_to_remind_2;
+    }
+
+    public void setGroup_id(String group_id) {
+        if (group_id != null) {
+            this.group_id = group_id;
+        }
+    }
+
+    public void setMultiple(String multiple) {
+        if (multiple != null) {
+            this.multiple = multiple;
+        }
+    }
+
+    public void setProvince(String province) {
+        if (province != null) {
+            this.province = province;
+        }
+    }
+
+    public void setWarrantyStartDate(String warDate) {
+        if (warrantyStartDate != null) {
+            this.warrantyStartDate = warDate;
+        }
+    }
+
+    public void setNoOfMonths(String months) {
+        if (noOfMonths != null) {
+            this.noOfMonths = months;
+        }
+    }
+
+    public void setExpiryDate(String expiryDate) {
+        if (expiryDate != null) {
+            this.expiryDate = expiryDate;
+        }
+    }
+
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public String getBranch_id() {
+        return branch_id;
+    }
+
+    public String getDepartment_id() {
+        return department_id;
+    }
+
+    public String getSection_id() {
+        return section_id;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public String getCategory_id() {
+        return category_id;
+    }
+
+    public String getMake() {
+        return make;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getMaintained_by() {
+        return maintained_by;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getSupplied_by() {
+        return supplied_by;
+    }
+
+    public String getRegistration_no() {
+        return registration_no;
+    }
+
+    public String getDate_of_purchase() {
+        return date_of_purchase;
+    }
+
+    public String getDepreciation_start_date() {
+        return depreciation_start_date;
+    }
+
+    public String getDepreciation_end_date() {
+        return depreciation_end_date;
+    }
+
+    public String getAuthorized_by() {
+        return authorized_by;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getCost_price() {
+        return cost_price;
+    }
+
+    public String getVatable_cost() {
+        return vatable_cost;
+    }
+
+    public String getSubject_to_vat() {
+        return subject_to_vat;
+    }
+
+    public String getVat_amount() {
+        return vat_amount;
+    }
+
+    public String getWh_tax_cb() {
+        return wh_tax_cb;
+    }
+
+    public String getWh_tax_amount() {
+        return wh_tax_amount;
+    }
+
+    public String getSerial_number() {
+        return serial_number;
+    }
+
+    public String getEngine_number() {
+        return engine_number;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getDepreciation_rate() {
+        return depreciation_rate;
+    }
+
+    public String getResidual_value() {
+        return residual_value;
+    }
+
+    public String getRequire_depreciation() {
+        return require_depreciation;
+    }
+
+    public String getVendor_account() {
+        return vendor_account;
+    }
+
+    public String getSpare_1() {
+        return spare_1;
+    }
+
+    public String getSpare_2() {
+        return spare_2;
+    }
+
+    public String getEmail_1() {
+        return email_1;
+    }
+
+    public String getEmail2() {
+        return email2;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public String getAsset_id() {
+        return asset_id;
+    }
+
+    public String getPosting_date() {
+        return posting_date;
+    }
+
+    public String getAccum_dep() {
+        return accum_dep;
+    }
+
+    public String getWho_to_remind() {
+        return who_to_remind;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getRaise_entry() {
+        return raise_entry;
+    }
+
+    public String getRequire_redistribution() {
+        return require_redistribution;
+    }
+
+    public String getWho_to_remind_2() {
+        return who_to_remind_2;
+    }
+
+    public String getGroup_id() {
+        return group_id;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public String getMultiple() {
+        return multiple;
+    }
+
+    public String getWarrantyStartDate() {
+        return warrantyStartDate;
+    }
+
+    public String getNoOfMonths() {
+        return noOfMonths;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    /**
+     * fetch
+     *
+     * @param s String
+     */
+    public void fetch(String s) throws Exception {
+
+        String fetchQuery = "SELECT ASSET_ID,REGISTRATION_NO," +
+                            "BRANCH_ID, DEPT_ID, CATEGORY_ID," +
+                            "SECTION_ID, DESCRIPTION, VENDOR_AC, DATE_PURCHASED," +
+                            "DEP_RATE, ASSET_MAKE, ASSET_MODEL, ASSET_SERIAL_NO," +
+                            "ASSET_ENGINE_NO, SUPPLIER_NAME, ASSET_USER, " +
+                            "ASSET_MAINTENANCE, COST_PRICE, DEP_END_DATE," +
+                            "RESIDUAL_VALUE, AUTHORIZED_BY," +
+                            "WH_TAX, WH_TAX_AMOUNT, POSTING_DATE, EFFECTIVE_DATE," +
+                            "PURCHASE_REASON, LOCATION, VATABLE_COST, VAT," +
+                            "REQ_DEPRECIATION, SUBJECT_TO_VAT, WHO_TO_REM," +
+                            "EMAIL1, WHO_TO_REM_2, EMAIL2, STATE," +
+                            "DRIVER, SPARE_1, SPARE_2, [USER_ID],PROVINCE, WAR_START_DATE, WAR_MONTH, WAR_EXPIRY_DATE " +
+                            "FROM AM_GROUP_ASSET  " +
+                            "WHERE ASSET_ID = '" + s + "'";
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+
+            con = dbConnection.getConnection("fixedasset");
+            ps = con.prepareStatement(fetchQuery);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                group_id = s;
+
+                setBranch_id(rs.getString(3));
+                setDepartment_id(rs.getString(4));
+                setSection_id(rs.getString(6));
+                setCategory_id(rs.getString(5));
+                setMake(rs.getString(11));
+                setLocation(rs.getString(27));
+                setMaintained_by(rs.getString(17));
+                setDriver(rs.getString(37));
+                setState(rs.getString(36));
+                setSupplied_by(rs.getString(15));
+                setRegistration_no(rs.getString(2));
+                date_of_purchase = dbConnection.formatDate(rs.getDate(9));
+                depreciation_start_date = dbConnection.formatDate(rs.getDate(25));
+                depreciation_end_date = dbConnection.formatDate(rs.getDate(19));
+                posting_date = dbConnection.formatDate(rs.getDate(24));
+                setAuthorized_by(rs.getString(21));
+                setReason(rs.getString(26));
+                setDescription(rs.getString(7));
+                setCost_price(rs.getString(18));
+                setVatable_cost(rs.getString(28));
+                setSubject_to_vat(rs.getString(31));
+                setVat_amount(rs.getString(29));
+                setWh_tax_cb(rs.getString(22));
+                setWh_tax_amount(rs.getString(23));
+                setSerial_number(rs.getString(13));
+                setEngine_number(rs.getString(14));
+                setModel(rs.getString(12));
+                setUser(rs.getString(16));
+                setDepreciation_rate(rs.getString(10));
+                setResidual_value(rs.getString(20));
+                setRequire_depreciation(rs.getString(30));
+                setVendor_account(rs.getString(8));
+                setWho_to_remind(rs.getString(32));
+                setSpare_1(rs.getString(38));
+                setSpare_2(rs.getString(39));
+                setEmail_1(rs.getString(33));
+                setWho_to_remind_2(rs.getString(34));
+                setEmail2(rs.getString(35));
+                setProvince(rs.getString(41));
+                setWarrantyStartDate(dbConnection.formatDate(rs.getDate(
+                        "WAR_START_DATE")));
+                setExpiryDate(dbConnection.formatDate(rs.getDate(
+                        "WAR_EXPIRY_DATE")));
+                setNoOfMonths(rs.getString("WAR_MONTH"));
+            }
+
+        } catch (Exception e) {
+            System.out.println("INFO:Error Fetching GroupAsset Records ->" +
+                               e.getMessage());
+        } finally {
+            dbConnection.closeConnection(con, ps, rs);
+        }
+    }
+
+    /**
+     * save
+     *
+     * @return boolean
+     */
+    public boolean save() throws Exception, Throwable {
+
+        asset_id = new legend.AutoIDSetup().getIdentity(branch_id,
+                department_id, section_id, category_id);
+        Connection con = null;
+        PreparedStatement ps = null;
+        boolean done = true;
+        if (require_redistribution.equalsIgnoreCase("Y")) {
+            status = "Z";
+        }
+        if (make == null || make.equals("")) {
+            make = "0";
+        }
+        if (maintained_by == null || maintained_by.equals("")) {
+            maintained_by = "0";
+        }
+        if (supplied_by == null || supplied_by.equals("")) {
+            supplied_by = "0";
+        }
+        if (user == null || user.equals("")) {
+            user = "0";
+        }
+        if (location == null || location.equals("")) {
+            location = "0";
+        }
+        if (driver == null || driver.equals("")) {
+            driver = "0";
+        }
+        if (state == null || state.equals("")) {
+            state = "0";
+        }
+        if (department_id == null || department_id.equals("")) {
+            department_id = "0";
+        }
+        if (vat_amount == null || vat_amount.equals("")) {
+            vat_amount = "0.0";
+        }
+        if (vatable_cost == null || vatable_cost.equals("")) {
+            vatable_cost = "0.0";
+        }
+        if (wh_tax_amount == null || wh_tax_amount.equals("")) {
+            wh_tax_amount = "0";
+        }
+        if (branch_id == null || branch_id.equals("")) {
+            branch_id = "0";
+        }
+        if (province == null || province.equals("")) {
+            province = "0";
+        }
+        if (category_id == null || category_id.equals("")) {
+            category_id = "0";
+        }
+        if (category_id == null || category_id.equals("")) {
+            category_id = "0";
+        }
+        if (residual_value == null || residual_value.equals("")) {
+            residual_value = "0";
+        }
+        if (noOfMonths == null || noOfMonths.equals("")) {
+            noOfMonths = "0";
+        }
+        if (warrantyStartDate == null || warrantyStartDate.equals("")) {
+            warrantyStartDate = null;
+        }
+        if (expiryDate == null || expiryDate.equals("")) {
+            expiryDate = null;
+        }
+        vat_amount = vat_amount.replaceAll(",", "");
+        vatable_cost = vatable_cost.replaceAll(",", "");
+        wh_tax_amount = wh_tax_amount.replaceAll(",", "");
+        residual_value = residual_value.replaceAll(",", "");
+
+        String createQuery = "INSERT INTO AM_ASSET         " +
+                             "(" +
+                             "ASSET_ID, REGISTRATION_NO, BRANCH_ID, DEPT_ID," +
+                             "SECTION_ID, CATEGORY_ID, [DESCRIPTION], VENDOR_AC," +
+                             "DATE_PURCHASED, DEP_RATE, ASSET_MAKE, ASSET_MODEL," +
+                             "ASSET_SERIAL_NO, ASSET_ENGINE_NO, SUPPLIER_NAME," +
+
+                             "ASSET_USER, ASSET_MAINTENANCE, ACCUM_DEP, MONTHLY_DEP," +
+                             "COST_PRICE, NBV, DEP_END_DATE, RESIDUAL_VALUE," +
+                             "AUTHORIZED_BY, POSTING_DATE, EFFECTIVE_DATE, PURCHASE_REASON," +
+                             "USEFUL_LIFE, TOTAL_LIFE, LOCATION, REMAINING_LIFE," +
+
+                             "VATABLE_COST,VAT, WH_TAX, WH_TAX_AMOUNT, REQ_DEPRECIATION," +
+                             "REQ_REDISTRIBUTION, SUBJECT_TO_VAT, WHO_TO_REM, EMAIL1," +
+                             "WHO_TO_REM_2, EMAIL2, RAISE_ENTRY, DEP_YTD, [SECTION]," +
+                             "STATE, DRIVER, SPARE_1, SPARE_2, ASSET_STATUS, [USER_ID]," +
+                             "MULTIPLE,PROVINCE, WAR_START_DATE, WAR_MONTH, WAR_EXPIRY_DATE ) " +
+
+                             "VALUES" +
+                             "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
+                             "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        /*
+         *First Create Asset Records
+         * and then determine if it
+         * should be made available for fleet.
+         */
+
+        try {
+
+            double costPrice = Double.parseDouble(vat_amount) +
+                               Double.parseDouble(vatable_cost);
+            con = dbConnection.getConnection("fixedasset");
+            ps = con.prepareStatement(createQuery);
+            ps.setString(1, asset_id);
+            ps.setString(2, registration_no);
+            ps.setInt(3, Integer.parseInt(branch_id));
+            ps.setInt(4, Integer.parseInt(department_id));
+            ps.setString(5, section);
+            ps.setInt(6, Integer.parseInt(category_id));
+            ps.setString(7, description);
+            ps.setString(8, vendor_account);
+            ps.setDate(9, dbConnection.dateConvert(date_of_purchase));
+            ps.setString(10, getDepreciationRate(category_id));
+            ps.setString(11, make);
+            ps.setString(12, model);
+            ps.setString(13, serial_number);
+            ps.setString(14, engine_number);
+            ps.setInt(15, Integer.parseInt(supplied_by));
+            ps.setString(16, user);
+            ps.setInt(17, Integer.parseInt(maintained_by));
+            ps.setInt(18, 0);
+            ps.setInt(19, 0);
+            ps.setDouble(20, costPrice);
+            ps.setDouble(21, costPrice);
+            ps.setDate(22, dbConnection.dateConvert(depreciation_end_date));
+            ps.setDouble(23, Double.parseDouble(residual_value));
+            ps.setString(24, authorized_by);
+            ps.setDate(25, dbConnection.dateConvert(new java.util.Date()));
+            ps.setDate(26,
+                       dbConnection.dateConvert(depreciation_start_date));
+            ps.setString(27, reason);
+            ps.setString(28, "0");
+            ps.setString(29, computeTotalLife(getDepreciationRate(category_id)));
+            ps.setInt(30, Integer.parseInt(location));
+            ps.setString(31, computeTotalLife(getDepreciationRate(category_id)));
+            ps.setDouble(32, Double.parseDouble(vatable_cost));
+            ps.setDouble(33, Double.parseDouble(vat_amount));
+            ps.setString(34, wh_tax_cb);
+            ps.setDouble(35, Double.parseDouble(wh_tax_amount));
+            ps.setString(36, require_depreciation);
+            ps.setString(37, require_redistribution);
+            ps.setString(38, subject_to_vat);
+            ps.setString(39, who_to_remind);
+            ps.setString(40, email_1);
+            ps.setString(41, who_to_remind_2);
+            ps.setString(42, email2);
+            ps.setString(43, raise_entry);
+            ps.setString(44, "0");
+            ps.setString(45, section);
+            ps.setInt(46, Integer.parseInt(state));
+            ps.setInt(47, Integer.parseInt(driver));
+            ps.setString(48, spare_1);
+            ps.setString(49, spare_2);
+            ps.setString(50, status);
+            ps.setString(51, user_id);
+            ps.setString(52, multiple);
+            ps.setString(53, province);
+            ps.setDate(54, dbConnection.dateConvert(warrantyStartDate));
+            ps.setInt(55, Integer.parseInt(noOfMonths));
+            ps.setDate(56, dbConnection.dateConvert(expiryDate));
+            ps.execute();
+
+            FleetHistoryManager fm = new FleetHistoryManager();
+            if (fm.isRequiredForFleet(asset_id)) {
+                /*
+                 *Copy asset data to Fleet Master
+                 */
+                fm.copyAssetDataToFleet(asset_id);
+            }
+            setAssetId(asset_id);
+            removeCreatedAsset(group_id);
+
+        } catch (Exception ex) {
+            done = false;
+            System.out.println("WARN:Error creating asset->" + ex);
+        } finally {
+            dbConnection.closeConnection(con, ps);
+        }
+
+        return done;
+
+    }
+
+    public String computeTotalLife(String depRate) {
+
+        String totalLife = "0";
+        if (depRate == null || depRate.equals("")) {
+            depRate = "0.0";
+        }
+
+        double division = 100 / (Double.parseDouble(depRate));
+        int intTotal = (int) (division * 12);
+
+        totalLife = Integer.toString(intTotal);
+
+        return totalLife;
+
+    }
+
+    private void removeCreatedAsset(String groupid) throws Exception {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        String query = "DELETE FROM AM_GROUP_ASSET WHERE ASSET_ID = '" +
+                       groupid + "'";
+        try {
+            con = dbConnection.getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            ps.execute();
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error removeCreatedAsset ->" + ex);
+        } finally {
+            dbConnection.closeConnection(con, ps);
+        }
+    }
+
+    /**
+     * getDepreciationRate
+     *
+     * @param category_id String
+     * @return String
+     */
+    private String getDepreciationRate(String category_id) throws Exception {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String rate = "0.0";
+        String query = "SELECT DEP_RATE FROM AM_AD_CATEGORY " +
+                       "WHERE CATEGORY_ID = " + category_id;
+        try {
+            con = dbConnection.getConnection("fixedasset");
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                rate = rs.getString(1);
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error fetching DepreciationRate ->" + ex);
+        } finally {
+            dbConnection.closeConnection(con, ps);
+        }
+
+        return rate;
+    }
+
+    /**
+     * residualValue
+     *
+     * @return String
+     */
+    public String findResidualValue() {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String residual = "0.0";
+
+        try {
+            con = dbConnection.getConnection("fixedasset");
+            ps = con.prepareStatement(
+                    "select residual_value from am_gb_company");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                residual = rs.getString(1);
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error fetching all asset ->" + ex);
+        } finally {
+            dbConnection.closeConnection(con, ps);
+        }
+        return residual;
+    }
+
+
+}

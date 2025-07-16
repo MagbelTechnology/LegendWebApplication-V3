@@ -1,0 +1,429 @@
+package audit;
+
+import java.util.*;
+import java.io.Serializable;
+
+
+/**
+ * <p>Title: Apex</p>
+ * <p>Description: LEGEND Fixed Asset Management System </p>
+ * <p>Copyright: Copyright (c) 2006. All rights reserved.</p>
+ * <p>Company: Magbel Technologies Limited.</p>
+*  @author  Bolaji L. Ogeyingbo.
+ * @version 1.0
+ */
+public   class Bag<E>  implements java.io.Serializable
+{
+  int rowid = 0;
+  private String name;
+  StringBuffer mandatoryfieldnulls = new StringBuffer();
+  private Map<String, Field>  container = Collections.synchronizedMap(new HashMap<String, Field>());
+  
+  public InterSystemMessages intersystemmessages = new InterSystemMessages();
+  public final int BEFORE_UPDATE = 1; //constant to specify selection before  update on reference table
+  public final int AFTER_UPDATE = 2; //constant to specify selection after  update on reference table
+  public final boolean checkupdate = false;
+  int rowsupdated = 0;
+  private boolean checkedchanges = false;
+  private String tablename = "";
+  
+ 
+  public Bag()
+  {  }
+
+
+ /**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+  public final Bag getMandatoryFields()
+   {
+     Bag mandatoryFields = new Bag();
+         mandatoryFields.setName(this.name);
+	Iterator it = getContainer().values().iterator(); 
+	 while(it.hasNext())
+	  { 
+	    Field tmf = new Field("");
+		      tmf = (Field)it.next();
+		if (tmf.isMandatory() )
+		 {
+		  mandatoryFields.putField(tmf.getName(),tmf);
+		  if(tmf.getNewValue() == null)
+		    {
+			 mandatoryfieldnulls.append("'" );
+			 mandatoryfieldnulls.append(tmf.getName());
+			 mandatoryfieldnulls.append("', " );
+			 }
+		 }
+	  }
+	 return mandatoryFields;
+	}
+  
+  
+ 
+ /**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+  public final Bag getChangedFields()
+   {
+     
+	Bag changedFields = new Bag();
+        changedFields.setName(this.name);
+	Iterator it = getContainer().values().iterator(); 
+	 while(it.hasNext())
+     	  {
+	   Field tmf = new Field("");
+	         tmf = (Field)it.next();
+	    if(tmf.isChanged())
+		   {
+		    changedFields.putField(tmf.getName(),tmf);
+		   }
+	   }
+	     changedFields.setCheckedChanges(true);
+	  return changedFields;
+	}
+		
+
+		
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+ public final boolean checkedChanges()
+	{
+		    return this.checkedchanges;
+	}
+		  
+		  
+		  
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+public final void setCheckedChanges(boolean CheckValue)
+	{
+		this.checkedchanges = CheckValue;
+	}
+		  
+		  
+		
+   
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+ public final int getId()
+	{
+	    return this.rowid;
+	}
+		
+		
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+public final void setId(int ID)
+	{
+	  this.rowid = ID;
+    }
+  
+  
+
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */  
+ public final String getMandatoryFieldNulls()
+	{
+	    if( mandatoryfieldnulls != null)
+		   return mandatoryfieldnulls.toString();
+		else
+		   return null;
+	}
+	
+	
+	
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+   public final Bag getDirtyFields()
+   {
+    Bag dirtyFields = new Bag();
+         dirtyFields.setName(this.name);
+         Iterator it = getContainer().values().iterator(); 
+	 while(it.hasNext())
+	  {
+	   Field tmf ;//= new Field("");
+	         tmf = (Field)it.next();
+	    if(tmf.isDirty())
+		   {
+		    dirtyFields.putField(tmf.getName(),tmf);
+		   }
+	   }
+	  return dirtyFields;
+	}
+
+	 
+	
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+ public final void setName(String Name)
+	{  this.name = Name;  }
+	 
+
+
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */	 
+public final void setField(String fieldname, String fieldvalue,int columnType, int columnId)
+	  {
+	    try{
+	    Field fid = new Field(fieldname);
+		fid.setOldValue(fieldvalue);
+		fid.setColumnType(columnType);
+		fid.setColumnId(columnId);
+		container.put(fieldname, fid);
+		} catch(Exception e){e.printStackTrace();}
+	  }
+	  
+	  
+	
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+public final void setValue(String fieldname, String fieldvalue)
+	{
+		try{
+	        Field fid;// = new Field(fieldname);
+			fid = container.get(fieldname); container.remove(fieldname);
+			//System.out.println("setValue() "+fid.getName());
+			fid.setNewValue(fieldvalue); container.put(fieldname, fid);
+	    } catch(Exception e){e.printStackTrace();}
+	}
+			
+		 
+		
+
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */		
+ public final String getValue(String fieldname)
+   {
+	Field fd = this.getField(fieldname);
+	 return fd.getNewValue();
+   }
+	
+
+
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */	
+public final int getColumnType(String fieldname)
+{
+	Field fd = this.getField(fieldname);
+	return fd.getColumnType();
+}
+			
+		
+
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */		
+public final String getOldValue(String fieldname)
+	{
+	 Field fd = this.getField(fieldname);
+	return fd.getOldValue();
+	}
+	 
+	 
+	 
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+public final String  getName()
+	{   return this.name;   }
+
+
+	 
+	 
+	 
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+public final void putField(String fieldname, Field Fld)
+	{
+	    try{
+	    container.put(fieldname,Fld);
+		} catch(Exception e){e.printStackTrace();}
+	}
+		
+	
+   
+		
+		
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+public final Field getField(String fieldname)
+	{
+		Field field ;
+		field = container.get(fieldname);
+		return field;
+	}
+	
+
+
+	
+	
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+public final Map getContainer()
+	{   return this.container;  }
+		
+		
+   
+	
+	    
+
+
+/**
+ *   Get the status of the Pension Plan
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */		
+public final static Bag createBag(String Name) throws Exception
+	{
+	   Bag mybag = new Bag();
+	   mybag.setName(Name);
+	    return mybag;
+	}
+       
+
+
+/**
+ *   Creates a field with a name and value
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */	   
+public final void createField(String Name, String value) throws Exception
+	{
+	   Field fd = new Field(Name);
+	   fd.setNewValue(value);
+	    this.putField(Name,fd);
+	}	
+	
+	
+	
+/**
+ *   Get's the tableName
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */ 
+public final String getTableName()
+	{
+	    return this.tablename;
+	}
+	  
+	  
+
+/**
+ *   Set's tableName
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+public final void setTableName(String tableName)
+	{  this.tablename = tableName; }
+	  
+
+	  
+/**
+ * To perform unit testing
+ * @return     status    as   String
+ * @author  Bolaji L. Ogeyingbo.
+  * @version 1.0
+ */
+	public static void main (String[] args)
+	{
+	 try {
+	     Bag me = createBag("TestBag");
+	     System.out.println("Bag's name: "+me.getName()+"\n");
+	    for(int j = 0; j < 20; j++)
+	      {
+             me.setField("testfd"+j, ""+j, j - 5, j);
+		      me.setValue("testfd"+j, ""+(j - 5));
+	      }
+	    Iterator it = me.getContainer().values().iterator();
+	    while(it.hasNext())
+	      {  
+		     int i = 0; Field fd = (Field)it.next(); 
+			 if(fd.isChanged())
+			   {
+			    System.out.println("This values have chanegd Field "+fd.getName()+"'s old value is: "+me.getOldValue(fd.getName()));  
+			    System.out.println("Field "+fd.getName()+"'s new value is: "+me.getValue(fd.getName())); 
+                }			 
+		  }
+		}catch(Exception e){ e.printStackTrace(); } 
+	}
+  	
+}
+   		
+			 
+	 
+  
+  
+
+  

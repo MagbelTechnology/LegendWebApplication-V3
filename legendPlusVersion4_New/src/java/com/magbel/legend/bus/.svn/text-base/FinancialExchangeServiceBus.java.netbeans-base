@@ -1,0 +1,62 @@
+package com.magbel.legend.bus;
+
+
+import com.mindcom.webbfront.*;
+import com.mindcom.webbfront.util.*;
+
+
+public class FinancialExchangeServiceBus
+{
+	public FinancialExchangeServiceBus()
+	{}
+public String transferFund(String AccName,String Acct2,String Acct1,double Amt) throws Exception
+{
+	String responseCode="";
+    HostParameters hp = new HostParameters();
+    hp.setHostIpAddress("172.27.12.26");
+//  hp.setPort(27601);
+    hp.setPort(4441);//FIX port
+ // hp.setPort(14441);
+    hp.setTimeout(60);
+    hp.setAquirerId("000000");
+    hp.setForwardId("000000");
+    hp.setCardAccId("00000000");
+    hp.setCardAccName(AccName);
+    hp.setTerminalId("12345678");
+    hp.setCurrency("566");
+//  hp.setControllerId("STT");
+//  hp.setControllerId("ETZ");
+    hp.setControllerId("FIX");
+    WebbManager wm = new WebbManager(hp);
+    wm.setDebug(true);
+    String custAccountNumber = Acct1;
+    String accountNumber2 = Acct2;
+//  String defaultPan = "6280090000000000000";
+    String defaultPan = "6272140000000000000";//FIX defaultpan
+    double amount = Amt;
+    try
+    {
+        java.util.Date mydate  = new java.util.Date();
+        responseCode = wm.doFundsTranfer(Sequencer.next(), defaultPan, custAccountNumber, accountNumber2, amount,mydate);
+        if(responseCode.equals("000"))
+        {
+            System.out.println("Funds Transfer Successfull !");
+        }
+        else
+        {
+        System.out.println("Funds Transfer Failed !");
+        }
+    }
+    catch(Exception e)
+    {
+	   System.out.println("Sequencer.next()*******->"+Sequencer.next());
+	   System.out.println("defaultPan*******->"+defaultPan);
+	   System.out.println("custAccountNumber*******->"+custAccountNumber);
+	   System.out.println("accountNumber2*******->"+accountNumber2);
+	   System.out.println("amount*******->"+amount);
+	   System.out.println((new StringBuilder("Error message********->")).append(e.getMessage()).toString());
+	   e.printStackTrace();   
+    }
+    return responseCode;
+ }
+}

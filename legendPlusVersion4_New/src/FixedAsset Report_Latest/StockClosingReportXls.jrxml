@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StockClosingReport" language="groovy" pageWidth="883" pageHeight="842" columnWidth="863" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT *FROM ST_STOCK a, ST_INVENTORY_ITEMS b, ST_STOCK_CATEGORY c
+WHERE a.ITEM_CODE = b.ITEM_CODE
+AND b.Category_Code = c.CATEGORY_CODE
+$P!{filterClause}
+ORDER BY a.Category_Id]]>
+	</queryString>
+	<field name="Asset_id" class="java.lang.String"/>
+	<field name="Registration_No" class="java.lang.String"/>
+	<field name="Branch_ID" class="java.lang.Integer"/>
+	<field name="Dept_ID" class="java.lang.Integer"/>
+	<field name="Category_ID" class="java.lang.Integer"/>
+	<field name="Section_id" class="java.lang.Integer"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="Vendor_AC" class="java.lang.String"/>
+	<field name="Date_purchased" class="java.sql.Timestamp"/>
+	<field name="Dep_Rate" class="java.math.BigDecimal"/>
+	<field name="Asset_Make" class="java.lang.String"/>
+	<field name="Asset_Model" class="java.lang.String"/>
+	<field name="Asset_Serial_No" class="java.lang.String"/>
+	<field name="Asset_Engine_No" class="java.lang.String"/>
+	<field name="Supplier_Name" class="java.lang.Integer"/>
+	<field name="Asset_User" class="java.lang.String"/>
+	<field name="Asset_Maintenance" class="java.lang.Integer"/>
+	<field name="Accum_Dep" class="java.math.BigDecimal"/>
+	<field name="Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="Cost_Price" class="java.math.BigDecimal"/>
+	<field name="NBV" class="java.math.BigDecimal"/>
+	<field name="Dep_End_Date" class="java.sql.Timestamp"/>
+	<field name="Residual_Value" class="java.math.BigDecimal"/>
+	<field name="Authorized_By" class="java.lang.String"/>
+	<field name="Wh_Tax" class="java.lang.String"/>
+	<field name="Wh_Tax_Amount" class="java.math.BigDecimal"/>
+	<field name="Req_Redistribution" class="java.lang.String"/>
+	<field name="Posting_Date" class="java.sql.Timestamp"/>
+	<field name="Effective_Date" class="java.sql.Timestamp"/>
+	<field name="Purchase_Reason" class="java.lang.String"/>
+	<field name="Useful_Life" class="java.lang.Integer"/>
+	<field name="Total_Life" class="java.lang.Integer"/>
+	<field name="Location" class="java.lang.Integer"/>
+	<field name="Remaining_Life" class="java.lang.Integer"/>
+	<field name="Vatable_Cost" class="java.math.BigDecimal"/>
+	<field name="Vat" class="java.math.BigDecimal"/>
+	<field name="Req_Depreciation" class="java.lang.String"/>
+	<field name="Subject_TO_Vat" class="java.lang.String"/>
+	<field name="Who_TO_Rem" class="java.lang.String"/>
+	<field name="Email1" class="java.lang.String"/>
+	<field name="Who_To_Rem_2" class="java.lang.String"/>
+	<field name="Email2" class="java.lang.String"/>
+	<field name="Raise_Entry" class="java.lang.String"/>
+	<field name="Dep_Ytd" class="java.math.BigDecimal"/>
+	<field name="Section" class="java.lang.String"/>
+	<field name="Asset_Status" class="java.lang.String"/>
+	<field name="State" class="java.lang.Integer"/>
+	<field name="Driver" class="java.lang.Integer"/>
+	<field name="Spare_1" class="java.lang.String"/>
+	<field name="Spare_2" class="java.lang.String"/>
+	<field name="User_ID" class="java.lang.Integer"/>
+	<field name="Date_Disposed" class="java.sql.Timestamp"/>
+	<field name="PROVINCE" class="java.lang.Integer"/>
+	<field name="Multiple" class="java.lang.String"/>
+	<field name="WAR_START_DATE" class="java.sql.Timestamp"/>
+	<field name="WAR_MONTH" class="java.lang.Integer"/>
+	<field name="WAR_EXPIRY_DATE" class="java.sql.Timestamp"/>
+	<field name="Last_Dep_Date" class="java.sql.Timestamp"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="SECTION_CODE" class="java.lang.String"/>
+	<field name="DEPT_CODE" class="java.lang.String"/>
+	<field name="CATEGORY_CODE" class="java.lang.String"/>
+	<field name="AMOUNT_PTD" class="java.math.BigDecimal"/>
+	<field name="AMOUNT_REM" class="java.math.BigDecimal"/>
+	<field name="PART_PAY" class="java.lang.String"/>
+	<field name="FULLY_PAID" class="java.lang.String"/>
+	<field name="GROUP_ID" class="java.lang.Long"/>
+	<field name="BAR_CODE" class="java.lang.String"/>
+	<field name="SBU_CODE" class="java.lang.String"/>
+	<field name="LPO" class="java.lang.String"/>
+	<field name="supervisor" class="java.lang.String"/>
+	<field name="defer_pay" class="java.lang.String"/>
+	<field name="OLD_ASSET_ID" class="java.lang.String"/>
+	<field name="WHT_PERCENT" class="java.lang.Integer"/>
+	<field name="Post_reject_reason" class="java.lang.String"/>
+	<field name="Finacle_Posted_Date" class="java.sql.Timestamp"/>
+	<field name="system_ip" class="java.lang.String"/>
+	<field name="mac_address" class="java.lang.String"/>
+	<field name="REVALUE_COST" class="java.math.BigDecimal"/>
+	<field name="ItemType" class="java.lang.String"/>
+	<field name="WAREHOUSE_CODE" class="java.lang.String"/>
+	<field name="ITEM_CODE" class="java.lang.String"/>
+	<field name="SUB_CATEGORY_ID" class="java.lang.Integer"/>
+	<field name="SUB_CATEGORY_CODE" class="java.lang.String"/>
+	<field name="SPARE_3" class="java.lang.String"/>
+	<field name="SPARE_4" class="java.lang.String"/>
+	<field name="SPARE_5" class="java.lang.String"/>
+	<field name="SPARE_6" class="java.lang.String"/>
+	<field name="MEMO" class="java.lang.String"/>
+	<field name="memovalue" class="java.lang.String"/>
+	<field name="INTEGRIFY" class="java.lang.String"/>
+	<field name="IMPROV_COST" class="java.math.BigDecimal"/>
+	<field name="IMPROV_ACCUMDEP" class="java.math.BigDecimal"/>
+	<field name="IMPROV_NBV" class="java.math.BigDecimal"/>
+	<field name="IMPROV_VATABLECOST" class="java.math.BigDecimal"/>
+	<field name="TOTAL_NBV" class="java.math.BigDecimal"/>
+	<field name="IMPROV_USEFULLIFE" class="java.lang.Integer"/>
+	<field name="IMPROV_TOTALLIFE" class="java.lang.Integer"/>
+	<field name="IMPROV_REMAINLIFE" class="java.lang.Integer"/>
+	<field name="IMPROV_MONTHLYDEP" class="java.math.BigDecimal"/>
+	<field name="QUANTITY" class="java.lang.Integer"/>
+	<field name="UNIT_CODE" class="java.lang.String"/>
+	<field name="PARENT_TAG" class="java.lang.String"/>
+	<field name="ASSET_CODE" class="java.lang.Integer"/>
+	<field name="REGION_CODE" class="java.lang.String"/>
+	<field name="ZONE_CODE" class="java.lang.String"/>
+	<field name="PROJECT_CODE" class="java.lang.String"/>
+	<field name="UNIT_PRICE" class="java.math.BigDecimal"/>
+	<field name="MTID" class="java.lang.String"/>
+	<field name="COMP_CODE" class="java.lang.String"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="ITEMTYPE_CODE" class="java.lang.String"/>
+	<field name="TAX_CODE" class="java.lang.String"/>
+	<field name="MIN_QUANTITY" class="java.lang.Integer"/>
+	<field name="WEIGHT_AVG_COST" class="java.math.BigDecimal"/>
+	<field name="STANDARD_COST" class="java.math.BigDecimal"/>
+	<field name="WEIGHT" class="java.math.BigDecimal"/>
+	<field name="BACKORDERABLE" class="java.lang.String"/>
+	<field name="INITIAL_BALANCE" class="java.lang.Integer"/>
+	<field name="USERID" class="java.lang.Integer"/>
+	<field name="SALES_ACCT" class="java.lang.String"/>
+	<field name="COG_SOLD" class="java.lang.String"/>
+	<field name="INVENTORY_ACCT" class="java.lang.String"/>
+	<field name="BALANCE" class="java.lang.Integer"/>
+	<field name="REORDER_LEVEL" class="java.lang.Integer"/>
+	<field name="REQ_APPROVAL" class="java.lang.String"/>
+	<field name="MAX_APPROVE_LEVEL" class="java.lang.Integer"/>
+	<field name="MIN_AMT_LIMIT" class="java.math.BigDecimal"/>
+	<field name="MAX_AMT_LIMIT" class="java.math.BigDecimal"/>
+	<field name="ADJ_MAX_APPROVE_LEVEL" class="java.lang.Integer"/>
+	<field name="ADJ_MIN_AMT_LIMIT" class="java.math.BigDecimal"/>
+	<field name="ADJ_MAX_AMT_LIMIT" class="java.math.BigDecimal"/>
+	<field name="ADJUST_ACCT" class="java.lang.String"/>
+	<field name="FIFO" class="java.math.BigDecimal"/>
+	<field name="RECEIVABLE" class="java.lang.String"/>
+	<field name="MEASURING_CODE" class="java.lang.String"/>
+	<field name="category_name" class="java.lang.String"/>
+	<field name="category_acronym" class="java.lang.String"/>
+	<field name="Required_for_fleet" class="java.lang.String"/>
+	<field name="Category_Class" class="java.lang.String"/>
+	<field name="PM_Cycle_Period" class="java.lang.Integer"/>
+	<field name="mileage" class="java.math.BigDecimal"/>
+	<field name="Notify_Maint_Days" class="java.lang.Integer"/>
+	<field name="notify_every_days" class="java.lang.Integer"/>
+	<field name="Asset_Ledger" class="java.lang.String"/>
+	<field name="Dep_ledger" class="java.lang.String"/>
+	<field name="Accum_Dep_ledger" class="java.lang.String"/>
+	<field name="gl_account" class="java.lang.String"/>
+	<field name="insurance_acct" class="java.lang.String"/>
+	<field name="license_ledger" class="java.lang.String"/>
+	<field name="fuel_ledger" class="java.lang.String"/>
+	<field name="accident_ledger" class="java.lang.String"/>
+	<field name="Category_Status" class="java.lang.String"/>
+	<field name="create_date" class="java.sql.Timestamp"/>
+	<field name="acct_type" class="java.lang.String"/>
+	<field name="currency_Id" class="java.lang.Integer"/>
+	<field name="enforceBarcode" class="java.lang.String"/>
+	<field name="category_type" class="java.lang.String"/>
+	<sortField name="Category_ID"/>
+	<variable name="totalcategory" class="java.math.BigDecimal" resetType="Group" resetGroup="CATEGORY" calculation="Sum">
+		<variableExpression><![CDATA[$F{Cost_Price}]]></variableExpression>
+	</variable>
+	<group name="CATEGORY" isStartNewPage="true" isResetPageNumber="true" isReprintHeaderOnEachPage="true">
+		<groupExpression><![CDATA[$F{Category_ID}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="330" height="20"/>
+				<textElement/>
+				<text><![CDATA[DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="330" y="0" width="93" height="20"/>
+				<textElement/>
+				<text><![CDATA[CLOSING STOCK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="547" y="0" width="124" height="20"/>
+				<textElement/>
+				<text><![CDATA[TOTAL  PRICE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="423" y="0" width="124" height="20"/>
+				<textElement/>
+				<text><![CDATA[UNIT PRICE]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="1" width="330" height="20" printWhenGroupChanges="CATEGORY"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{category_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="1" width="330" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="330" y="1" width="93" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{QUANTITY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="423" y="1" width="124" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{UNIT_PRICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="547" y="1" width="124" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{UNIT_PRICE}*$F{QUANTITY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement isPrintRepeatedValues="false" x="547" y="0" width="124" height="20" printWhenGroupChanges="CATEGORY"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalcategory}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="130" height="20" printWhenGroupChanges="CATEGORY"/>
+				<textElement/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

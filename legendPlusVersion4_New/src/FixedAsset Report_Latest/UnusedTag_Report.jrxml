@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="UnusedTag_Report" language="groovy" pageWidth="667" pageHeight="842" columnWidth="647" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+     ST_INVENTORY_RFID_UNUSED."RFID_TAG" AS ST_INVENTORY_RFID_UNUSED_RFID_TAG,
+     ST_INVENTORY_RFID_UNUSED."LOCATION" AS ST_INVENTORY_RFID_UNUSED_LOCATION,
+     ST_INVENTORY_RFID_UNUSED."CREATEDATESTAMP" AS ST_INVENTORY_RFID_UNUSED_CREATEDATESTAMP,
+     ST_INVENTORY_RFID_UNUSED."CREATE_DATE" AS ST_INVENTORY_RFID_UNUSED_CREATE_DATE
+FROM
+     "dbo"."ST_INVENTORY_RFID_UNUSED" ST_INVENTORY_RFID_UNUSED
+$P!{filterClause}]]>
+	</queryString>
+	<field name="ST_INVENTORY_RFID_UNUSED_RFID_TAG" class="java.lang.String"/>
+	<field name="ST_INVENTORY_RFID_UNUSED_LOCATION" class="java.lang.String"/>
+	<field name="ST_INVENTORY_RFID_UNUSED_CREATEDATESTAMP" class="java.sql.Timestamp"/>
+	<field name="ST_INVENTORY_RFID_UNUSED_CREATE_DATE" class="java.lang.String"/>
+	<sortField name="ST_INVENTORY_RFID_UNUSED_CREATEDATESTAMP"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement x="92" y="1" width="258" height="20"/>
+				<textElement/>
+				<text><![CDATA[IE LEGEND IMTS UNUSED TAG REPORT]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="92" y="0" width="256" height="20"/>
+				<textElement/>
+				<text><![CDATA[UNUSED RFID TAG CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="348" y="0" width="148" height="20"/>
+				<textElement/>
+				<text><![CDATA[DATE SCANNED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="496" y="0" width="151" height="20"/>
+				<textElement/>
+				<text><![CDATA[TIME SCANNED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="4" width="92" height="16"/>
+				<textElement/>
+				<text><![CDATA[S/No.]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="92" y="0" width="256" height="21"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ST_INVENTORY_RFID_UNUSED_RFID_TAG}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="348" y="0" width="148" height="21"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ST_INVENTORY_RFID_UNUSED_CREATE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="496" y="0" width="151" height="21"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{ST_INVENTORY_RFID_UNUSED_CREATEDATESTAMP}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="1" width="92" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,103 @@
+package audit;
+
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import java.util.*;
+//import audit.User;
+import legend.admin.objects.User;
+import legend.admin.handlers.SecurityHandler;
+
+
+
+
+/**
+
+ * The session listener class is used to remove references of stateful EJBs in
+ * the session explicitly to prevent object leaking from the EJB pool.
+ * @author Neelesh
+ * @version 1.0
+ */
+public class LoginSessionListener  implements javax.servlet.http.HttpSessionListener {
+
+  private HttpSession session = null;
+
+
+  /**
+   * The method is called by the servlet container just after http session is
+   * created. The implementation does nothing.
+   *
+   * @param <b>event</b> HttpSessionEvent
+   */
+  public void sessionCreated(HttpSessionEvent event)
+  {
+    session = event.getSession();
+	Random rand = new Random();
+	long seed = rand.nextLong();
+	String SessionID = (session.getId()) + seed;
+	//String UserName = atg.getUserName(loginID, "user_name", "am_gb_user");
+	 session.setAttribute("SessionId", SessionID);
+	// session.setAttribute("UserName", UserName);
+
+  }
+
+
+
+
+  /**
+
+   * The method is called by the servlet container just before http session is
+   * destroyed. The implementation removes any references of ShoppingCart bean
+   *NOTE: TO USE THIS METHOD EFFECTIVELY, SET THE PARAMETERS FOR 'USER' CLASS ON CREATING
+   *           NEW SESSIONS FROM REQUEST PARAMS OR SET THE PARAMETERS >>> CurrentUser, UserCenter
+   *           , WorkstationName, WorkstationIp when creating new sessions.
+   * @param <b>event</b> HttpSessionEvent
+   */
+  public void sessionDestroyed(HttpSessionEvent event)
+  {
+    session = event.getSession();
+    if (session.getAttribute("CurrentUser")!=null){
+	int loginID = 0;
+	//boolean nullflag = false;
+    AuditTrailGen atg = new AuditTrailGen();
+
+	String sessionId = (String)session.getAttribute("SessionId");
+	 String branchCode = (String)session.getAttribute("UserCenter");
+	 String username = (String)session.getAttribute("UserName");
+	 User identity   = (User)session.getAttribute("CurrentUser");
+	 String loginAudit = (String)session.getAttribute("LoginAudit");
+	 String workstationName = (String)session.getAttribute("workstationName");
+	 String workstationIp = (String)session.getAttribute("workstationIp");
+	 //String loginId = (String)session.getAttribute("CurrentUser");
+	 loginID = Integer.parseInt(identity.getUserId());
+
+	     try{
+		     SecurityHandler  usb = new SecurityHandler();
+legend.admin.handlers.AdminHandler admin = new legend.admin.handlers.AdminHandler();
+			System.out.println("LoginSessionListener.login Name >> "+identity.getUserFullName());
+			System.out.println("LoginSessionListener.sessionId >> "+sessionId);
+				System.out.println("LoginSessionListener.workstationIp >> "+workstationIp);
+			if(loginAudit.equals("Y"))
+				{
+					atg.updateLoginAudit(sessionId, loginID);
+				}
+
+			atg.select( 1, "SELECT * FROM  AM_GB_USERS  WHERE userId = '"+ identity.getUserId() +"'");
+			//atg.updateLogin(loginID,  atg.logout);
+			atg.updateLogin(loginID,  atg.logout, "AM_GB_USERS", "userId");
+			usb.updateLogins(identity.getUserId() , "0", workstationIp);
+			atg.select( 2, "SELECT * FROM  AM_GB_USERS  WHERE userId = '"+ identity.getUserId() +"'");
+			atg.logAuditTrail("AM_GB_USERS " ,  admin.getBranchByBranchID(identity.getBranch()).getBranchCode(), loginID, identity.getUserId());
+			System.out.println("INFO:User "+identity.getUserName()+" has logged out.");
+			System.out.println("INFO:          user branch "+ identity.getBranch());
+
+
+			} catch(Throwable ex) { ex.printStackTrace();    }
+
+}
+
+  }
+
+
+}
+
+

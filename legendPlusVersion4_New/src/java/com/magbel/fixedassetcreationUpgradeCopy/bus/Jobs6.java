@@ -1,0 +1,70 @@
+package com.magbel.fixedassetcreationUpgrade.bus;
+ 
+import java.io.PrintStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
+
+import legend.admin.handlers.CompanyHandler;
+ 
+
+
+
+
+
+
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.quartz.*; 
+
+import com.magbel.legend.vao.newAssetTransaction;
+ 
+public class Jobs6
+    implements Job
+{  
+        
+    private static Log _log = LogFactory.getLog(Jobs6.class);
+    CompanyHandler comp = new CompanyHandler();
+
+    public Jobs6()
+    {
+      
+    }
+
+    public void execute(JobExecutionContext context)
+        throws JobExecutionException
+    {
+  //  	int statux = 0;
+//		int statuk = 0;
+  try
+        {
+	  
+	     java.util.ArrayList malilist =comp.getSendMailSqlRecords();
+	     System.out.println("<<<<<<<< Mail To send Record Mail List >> "+malilist.size() );
+	      //================================
+	     for(int i=0;i<malilist.size();i++)
+	     {
+	     com.magbel.legend.vao.SendMail  sendmail = (com.magbel.legend.vao.SendMail)malilist.get(i);    	 
+			int id =  sendmail.getId();
+			String address =  sendmail.getAddress();
+			String header = sendmail.getHeader();
+			String body = sendmail.getBody();
+			String status = sendmail.getStatus();
+			System.out.println("<<<<<<<<<<<<body: "+body);	
+			boolean sent = comp.sendRecordMail(address, header, body);
+			System.out.println("<<<<<<<<<<<<sent: "+sent);
+			if(sent==true){comp.updateSendMailRecords(id);}else{i = 1+1;}
+	     }   
+	     //======================================
+     }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+   
+}
+

@@ -1,0 +1,293 @@
+package magma.net.manager;
+
+import java.text.SimpleDateFormat;
+import java.sql.*;
+import java.util.*;
+import magma.net.dao.MagmaDBConnection;
+import magma.net.vao.AssetPayment;
+
+public class AssetPaymentManager extends MagmaDBConnection {
+	SimpleDateFormat sdf;
+
+	public AssetPaymentManager() {
+		super();
+		sdf = new SimpleDateFormat("dd-MM-yyyy");
+	}
+
+	public boolean createPaymentRecord(String assetId, double pay,
+			String payDate, String raised, String payDesc) {
+
+		String INSERT_QUERY = "INSERT INTO AM_ASSET_PAYMENT "
+				+ "(ASSET_ID,PAYMENT,PAY_DATE,RAISED,PAY_DESC) "
+				+ "VALUES(?,?,?,?,?)";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(INSERT_QUERY);
+			ps.setString(1, assetId);
+			ps.setDouble(2, pay);
+			ps.setDate(3, dateConvert(payDate));
+			ps.setString(4, raised);
+			ps.setString(5, payDesc);
+
+			done = (ps.executeUpdate() != -1);
+			notifyAsset(assetId,pay);
+
+		} catch (Exception ex) {
+
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+	}
+
+	public boolean updatePaymentRecord(double pay,double ppay,
+			 String payDesc,String payId,String assetid) {
+
+		String UPDATE_QUERY = "UPDATE AM_ASSET_PAYMENT "
+				+ "SET PAYMENT=?,PAY_DESC=? WHERE PAY_ID=? ";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(UPDATE_QUERY);
+		
+			ps.setDouble(1, pay);
+			//ps.setString(2, raised);
+			ps.setString(2, payDesc);
+			ps.setString(3, payId);
+
+			done = (ps.executeUpdate() != -1);
+			notifyuAsset(assetid, pay, ppay);
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+	}
+	public boolean raisePaymentRecord(String payId) {
+
+		String UPDATE_QUERY = "UPDATE AM_ASSET_PAYMENT "
+				+ " SET RAISED=? WHERE PAY_ID=? ";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(UPDATE_QUERY);
+		
+		
+			ps.setString(1, "R");
+			ps.setString(2, payId);
+
+			done = (ps.executeUpdate() != -1);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+	}
+	public boolean isRaised(String payId) {
+
+		String QUERY = "SELECT  RAISED FROM AM_ASSET_PAYMENT "
+				+" WHERE PAY_ID=? ";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean done = false;
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(QUERY);
+			ps.setString(1, payId);
+
+			rs=ps.executeQuery();
+			while(rs.next()){
+				done = (rs.getString("RAISED")=="R");
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+	}
+	private ArrayList<AssetPayment> findPayments(String filter) {
+		ArrayList<AssetPayment> found = new ArrayList<AssetPayment>();
+		AssetPayment pay = null;
+		String QUERY = "SELECT PAY_ID,ASSET_ID,PAYMENT,PAY_DATE,"
+				+ "RAISED,PAY_DESC FROM AM_ASSET_PAYMENT ";
+		QUERY += filter;
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(QUERY);
+			rs = ps.executeQuery();
+			while(rs.next()){
+				
+			String assetId = rs.getString("ASSET_ID");
+			double payment = rs.getDouble("PAYMENT");
+			String payDate = sdf.format(rs.getDate("PAY_DATE"));
+			String raised = rs.getString("RAISED");
+			String payDesc = rs.getString("PAY_DESC");
+			String payId =rs.getString("PAY_ID");
+			
+			pay = new AssetPayment( assetId,  payment,  payDate,  raised,  payDesc);
+			pay.setPayId(payId);
+			
+			found.add(pay);
+			}
+			
+
+		} catch (Exception ex) {
+
+		} finally {
+			closeConnection(con, ps);
+		}
+
+		return found;
+
+	}
+	public ArrayList<AssetPayment> findPaymentsByAssetID(String assetId) {
+		ArrayList<AssetPayment> found = new ArrayList<AssetPayment>();
+		String filter =" WHERE ASSET_ID ='"+assetId+"'";
+		found = findPayments(filter);
+		return found;
+	}
+	public AssetPayment findPaymentsByPayID(String payId) {
+		AssetPayment found = null;
+		String filter =" WHERE PAY_ID ="+payId;
+		found = findPayments(filter).get(0);
+		return found;
+	}
+	public ArrayList<AssetPayment> findPaymentsByQuery(String criterium) {
+		ArrayList<AssetPayment> found = new ArrayList<AssetPayment>();
+		String filter =" WHERE PAY_ID IS NOT NULL "+criterium;
+		found = findPayments(filter);
+		return found;
+	}
+	
+	public boolean notifyAsset(String assetId,double pay) {
+
+		String UPDATE_QUERY = "UPDATE AM_ASSET "
+				+ " SET AMOUNT_PTD=AMOUNT_PTD+?,AMOUNT_REM=AMOUNT_REM-?, " +
+						"FULLY_PAID=? WHERE ASSET_ID=? ";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(UPDATE_QUERY);
+		String paid="N";
+		if(isFullyPaid(assetId)){ paid="Y";}
+		
+			ps.setDouble(1, pay);
+			ps.setDouble(2, pay);
+			ps.setString(3, paid);
+			ps.setString(4, assetId);
+
+			done = (ps.executeUpdate() != -1);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+	}
+	public boolean notifyuAsset(String assetId,double pay,double ppay) {
+
+		String UPDATE_QUERY = "UPDATE AM_ASSET "
+				+ " SET AMOUNT_PTD=AMOUNT_PTD-?,AMOUNT_REM=AMOUNT_REM+?, " +
+						"FULLY_PAID=? WHERE ASSET_ID=? ";
+		
+		String UPDATE_QUERY2 = "UPDATE AM_ASSET "
+			+ " SET AMOUNT_PTD=AMOUNT_PTD+?,AMOUNT_REM=AMOUNT_REM-?, " +
+					"FULLY_PAID=? WHERE ASSET_ID=? ";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		boolean done = false;
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(UPDATE_QUERY);
+		String paid="N";
+		if(isFullyPaid(assetId)){ paid="Y";}
+		
+			ps.setDouble(1, ppay);
+			ps.setDouble(2, ppay);
+			ps.setString(3, paid);
+			ps.setString(4, assetId);
+
+			done = (ps.executeUpdate() != -1);
+			
+			ps = con.prepareStatement(UPDATE_QUERY2);
+			ps.setDouble(1, pay);
+			ps.setDouble(2, pay);
+			ps.setString(3, paid);
+			ps.setString(4, assetId);
+
+			done = (ps.executeUpdate() != -1);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+	}
+	public boolean isFullyPaid(String assetId) {
+
+		String UPDATE_QUERY = "SELECT AMOUNT_REM FROM AM_ASSET "
+				+ " WHERE ASSET_ID=? ";
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean done = false;
+
+		try {
+			con = getConnection("fixedasset");
+			ps = con.prepareStatement(UPDATE_QUERY);
+			ps.setString(1, assetId);
+			while(rs.next()){
+			rs = ps.executeQuery();
+			done = (rs.getDouble("AMOUNT_REM") == 0.);
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			closeConnection(con, ps);
+		}
+		return done;
+	}
+    // lanre new method for getting unique asset part payment
+	public ArrayList<AssetPayment> findPaymentsByAssetID(String assetId,String pid) {
+		ArrayList<AssetPayment> found = new ArrayList<AssetPayment>();
+		String filter =" WHERE ASSET_ID ='"+assetId+"' AND PAY_ID = '"+pid+"' ";
+		found = findPayments(filter);
+		return found;
+	}
+}

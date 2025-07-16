@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<queryString language="SQL">
+		<![CDATA[SELECT
+     am_ad_category."category_ID" AS am_ad_category_category_ID,
+     am_ad_category."category_code" AS am_ad_category_category_code,
+     am_ad_category."category_name" AS am_ad_category_category_name,
+     am_ad_category."category_acronym" AS am_ad_category_category_acronym,
+     am_ad_category."Required_for_fleet" AS am_ad_category_Required_for_fleet,
+     am_ad_category."Category_Class" AS am_ad_category_Category_Class,
+     am_ad_category."PM_Cycle_Period" AS am_ad_category_PM_Cycle_Period,
+     am_ad_category."mileage" AS am_ad_category_mileage,
+     am_ad_category."Notify_Maint_Days" AS am_ad_category_Notify_Maint_Days,
+     am_ad_category."notify_every_days" AS am_ad_category_notify_every_days,
+     am_ad_category."residual_value" AS am_ad_category_residual_value,
+     am_ad_category."Dep_rate" AS am_ad_category_Dep_rate,
+     am_ad_category."Asset_Ledger" AS am_ad_category_Asset_Ledger,
+     am_ad_category."Dep_ledger" AS am_ad_category_Dep_ledger,
+     am_ad_category."Accum_Dep_ledger" AS am_ad_category_Accum_Dep_ledger,
+     am_ad_category."gl_account" AS am_ad_category_gl_account,
+     am_ad_category."insurance_acct" AS am_ad_category_insurance_acct,
+     am_ad_category."license_ledger" AS am_ad_category_license_ledger,
+     am_ad_category."fuel_ledger" AS am_ad_category_fuel_ledger,
+     am_ad_category."accident_ledger" AS am_ad_category_accident_ledger,
+     am_ad_category."Category_Status" AS am_ad_category_Category_Status,
+     am_ad_category."user_id" AS am_ad_category_user_id,
+     am_ad_category."create_date" AS am_ad_category_create_date,
+     am_ad_category."acct_type" AS am_ad_category_acct_type,
+     am_ad_category."currency_Id" AS am_ad_category_currency_Id,
+     am_ad_category."enforceBarcode" AS am_ad_category_enforceBarcode,
+     am_ad_category."category_type" AS am_ad_category_category_type
+FROM
+     "dbo"."am_ad_category" am_ad_category]]>
+	</queryString>
+	<field name="am_ad_category_category_code" class="java.lang.String"/>
+	<field name="am_ad_category_category_name" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

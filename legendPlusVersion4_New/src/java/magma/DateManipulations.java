@@ -1,0 +1,62 @@
+package magma;
+
+import java.util.*;
+
+public class DateManipulations {
+    public static String CalendarToDate(Calendar c) {
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int month = c.get(Calendar.MONTH) + 1;
+        int year = c.get(Calendar.YEAR);
+
+        return "" + day + "/" + month + "/" + year;
+
+       
+    }
+
+    public static String CalendarToDb(Calendar c) {
+        System.out.println("");
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int month = c.get(Calendar.MONTH) + 1;
+        int year = c.get(Calendar.YEAR);
+
+        return "" + month + "/" + day + "/" + year;
+    }
+
+    public static Calendar DateToCalendar(String s) {
+        Calendar c = null;
+        s = s.replaceAll("-", "/");
+//        System.out.println("==========> " + s);
+        StringTokenizer t = new StringTokenizer(s, "/");
+        if (t.countTokens() == 3) {
+            String d = t.nextToken();
+            String m = t.nextToken();
+            String y = t.nextToken();
+
+            int day = Integer.parseInt(d);
+            int month = Integer.parseInt(m) - 1;
+            int year = Integer.parseInt(y);
+
+            c = new GregorianCalendar(year, month, day);
+        }
+
+        return c;
+    }
+    
+
+    public static String CalendarToDate2(Calendar c) {
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int month = c.get(Calendar.MONTH) + 1;
+        int year = c.get(Calendar.YEAR);
+        String mth ="";
+        if(month < 10)
+        {
+        	mth = "-0" + month;
+        }
+        else
+        {
+        	mth = "-"+month;
+        }
+        return "" + day +  mth + "-" + year;
+    }
+
+}

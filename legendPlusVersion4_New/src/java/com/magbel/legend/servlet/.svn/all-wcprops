@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/legend-repos/!svn/ver/4/Legend/src/java/com/magbel/legend/servlet
+END
+AssetPictureServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/legend-repos/!svn/ver/4/Legend/src/java/com/magbel/legend/servlet/AssetPictureServlet.java
+END
+ComponentSetupAction.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/legend-repos/!svn/ver/4/Legend/src/java/com/magbel/legend/servlet/ComponentSetupAction.java
+END
+ComponentCreateAction.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/legend-repos/!svn/ver/4/Legend/src/java/com/magbel/legend/servlet/ComponentCreateAction.java
+END
+ImageActionServlet.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/legend-repos/!svn/ver/4/Legend/src/java/com/magbel/legend/servlet/ImageActionServlet.java
+END
+GetPageInfo.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/legend-repos/!svn/ver/4/Legend/src/java/com/magbel/legend/servlet/GetPageInfo.java
+END
+RejectProcess.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/legend-repos/!svn/ver/4/Legend/src/java/com/magbel/legend/servlet/RejectProcess.java
+END

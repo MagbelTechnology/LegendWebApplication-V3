@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report4" language="groovy" pageWidth="1315" pageHeight="842" columnWidth="1275" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[select m.asset_id,'D' as DrCr, m.cost_price, m.description+' '+m.asset_id as Narration, m.branch_code,c.iso_code +(select accronym from am_ad_ledger_type where series = substring(a.Asset_Ledger,1,1))+ d.branch_code +	a.Asset_Ledger Account_No
+from am_ad_category a,am_ad_branch d, AM_GB_CURRENCY_CODE c, am_gb_company b, am_asset m
+where a.currency_id = c.currency_id and a.category_code = m.category_code and d.branch_code = m.branch_code
+and m.group_id = '1545'
+UNION
+select asset_id, 'C' as DrCr,cost_price,description+' '+asset_id as Narration,branch_code ,Vendor_AC as Account_no
+from am_asset where group_id = '1545'
+order by asset_id, DrCr
+]]>
+	</queryString>
+	<field name="asset_id" class="java.lang.String"/>
+	<field name="DrCr" class="java.lang.String"/>
+	<field name="cost_price" class="java.math.BigDecimal"/>
+	<field name="Narration" class="java.lang.String"/>
+	<field name="branch_code" class="java.lang.String"/>
+	<field name="Account_No" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="31" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[asset_id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="152" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[DrCr]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="279" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[cost_price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="473" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Narration]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="662" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[branch_code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="796" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Account_No]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement x="31" y="0" width="100" height="24"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{asset_id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="152" y="0" width="100" height="24"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DrCr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="279" y="0" width="100" height="24"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cost_price}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="473" y="0" width="100" height="24"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Narration}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="662" y="0" width="100" height="24"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{branch_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="796" y="0" width="100" height="24"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Account_No}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Fixed_Asset_Schedule_SubReport1"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="842"
+		 pageHeight="595"
+		 columnWidth="782"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<queryString><![CDATA[SELECT
+     am_ad_category_class_adjust."FIELD1" AS am_ad_category_class_adjust_FIELD1,
+     am_ad_category_class_adjust."FIELD2" AS am_ad_category_class_adjust_FIELD2,
+     am_ad_category_class_adjust."FIELD3" AS am_ad_category_class_adjust_FIELD3,
+     am_ad_category_class_adjust."FIELD4" AS am_ad_category_class_adjust_FIELD4,
+     am_ad_category_class_adjust."FIELD5" AS am_ad_category_class_adjust_FIELD5,
+     am_ad_category_class_adjust."FIELD6" AS am_ad_category_class_adjust_FIELD6,
+     am_ad_category_class_adjust."FIELD7" AS am_ad_category_class_adjust_FIELD7,
+     am_ad_category_class_adjust."FIELD8" AS am_ad_category_class_adjust_FIELD8,
+     am_ad_category_class_adjust."FIELD9" AS am_ad_category_class_adjust_FIELD9,
+     am_ad_category_class_adjust."FIELD10" AS am_ad_category_class_adjust_FIELD10,
+     am_ad_category_class_adjust."FIELD11" AS am_ad_category_class_adjust_FIELD11,
+     am_ad_category_class_adjust."FIELD12" AS am_ad_category_class_adjust_FIELD12
+FROM
+     "dbo"."am_ad_category_class_adjust" am_ad_category_class_adjust]]></queryString>
+
+	<field name="am_ad_category_class_adjust_FIELD1" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD2" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD3" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD4" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD5" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD6" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD7" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD8" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD9" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD10" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD11" class="java.lang.String"/>
+	<field name="am_ad_category_class_adjust_FIELD12" class="java.lang.String"/>
+
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</title>
+		<pageHeader>
+			<band height="50"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="16"
+						y="14"
+						width="126"
+						height="29"
+						key="textField-1"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_class_adjust_FIELD1}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="150"
+						y="18"
+						width="159"
+						height="25"
+						key="textField-2"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_class_adjust_FIELD2}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="323"
+						y="18"
+						width="159"
+						height="25"
+						key="textField-3"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_class_adjust_FIELD3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="485"
+						y="17"
+						width="146"
+						height="24"
+						key="textField-4"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_class_adjust_FIELD4}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="644"
+						y="18"
+						width="126"
+						height="27"
+						key="textField-5"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_category_class_adjust_FIELD5}]]></textFieldExpression>
+				</textField>
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="100"  isSplitAllowed="true" >
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<lastPageFooter>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</lastPageFooter>
+		<summary>
+			<band height="50"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

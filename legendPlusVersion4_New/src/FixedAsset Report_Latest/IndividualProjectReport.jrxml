@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="IndividualProjectReport" language="groovy" pageWidth="883" pageHeight="842" columnWidth="863" leftMargin="0" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="246"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filter" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT s.DESCRIPTION AS PROJECT_NAME,  a.PROJECT_CODE,SUM(a.COST_PRICE) AS AMT_SPENT,a.PROJECT_CODE,s.COST AS AMT_APPROVED,(CAST(REPLACE(REPLACE(COST, ',', ''), '.', '') AS DECIMAL(18,2))/100) - SUM(a.COST_PRICE) AS BALANCE
+,s.CAPITAL,s.STATUS,s.BRANCH_ID,s.DEPT_ID,s.SBU_CODE,b.BRANCH_ID,b.BRANCH_CODE,b.BRANCH_NAME,st.STATUS_NAME,s.START_DATE,s.END_DATE
+FROM VENDOR_TRANSACTIONS a, ST_GL_PROJECT s,am_ad_branch b,am_ad_department d,AM_SBU_ATTACHEMENT sb, AM_GB_STATUS st
+WHERE  s.BRANCH_ID = b.BRANCH_ID
+AND a.PROJECT_CODE = s.CODE
+AND s.DEPT_ID = d.Dept_ID
+AND s.SBU_CODE = sb.SBU_CODE
+AND s.STATUS = st.STATUS_CODE
+$P!{filter}
+GROUP BY a.PROJECT_CODE,s.DESCRIPTION,a.PROJECT_CODE,s.COST,s.CAPITAL,s.STATUS,s.BRANCH_ID,s.DEPT_ID,s.SBU_CODE,b.BRANCH_ID,b.BRANCH_CODE,b.BRANCH_NAME,st.STATUS_NAME,s.START_DATE,s.END_DATE
+
+]]>
+	</queryString>
+	<field name="PROJECT_NAME" class="java.lang.String"/>
+	<field name="PROJECT_CODE" class="java.lang.String"/>
+	<field name="AMT_SPENT" class="java.math.BigDecimal"/>
+	<field name="AMT_APPROVED" class="java.lang.String"/>
+	<field name="BALANCE" class="java.math.BigDecimal"/>
+	<field name="CAPITAL" class="java.lang.String"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="BRANCH_ID" class="java.lang.String"/>
+	<field name="DEPT_ID" class="java.lang.String"/>
+	<field name="SBU_CODE" class="java.lang.String"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="STATUS_NAME" class="java.lang.String"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="369" height="20" forecolor="#3300FF"/>
+				<textElement>
+					<font size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[INDIVIDUAL PROJECT REPORT]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="40" y="0" width="329" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PROJECT NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="369" y="0" width="124" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[AMOUNT SPENT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="493" y="0" width="125" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[AMOUNT APPROVED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="733" y="0" width="129" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PROJECT STATUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="40" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[S/No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="618" y="0" width="115" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BALANCE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="40" y="0" width="329" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{PROJECT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="369" y="0" width="124" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{AMT_SPENT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="493" y="0" width="125" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{AMT_APPROVED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="733" y="0" width="129" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{STATUS_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="618" y="0" width="115" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{BALANCE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

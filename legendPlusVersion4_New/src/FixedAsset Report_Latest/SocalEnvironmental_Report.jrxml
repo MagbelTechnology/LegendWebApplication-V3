@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SocalEnvironmental_Report" language="groovy" pageWidth="1459" pageHeight="842" columnWidth="1419" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="555"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select b.BRANCH_NAME,c.Region_Name,z.Zone_Name,a.BRANCH_CODE, isnull([001], 0) AS '001',isnull([002], 0) AS '002',isnull([003], 0) AS '003',isnull([004], 0) AS '004',isnull([005], 0) AS '005',isnull([006], 0) AS '006' from SocialEnvPvt a, am_ad_branch b, am_ad_region c,am_ad_Zone z
+where a.BRANCH_CODE = b.BRANCH_CODE
+and b.REGION_CODE = c.Region_Code
+and b.ZONE_CODE = z.Zone_Code
+]]>
+	</queryString>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="Region_Name" class="java.lang.String"/>
+	<field name="Zone_Name" class="java.lang.String"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="001" class="java.math.BigDecimal"/>
+	<field name="002" class="java.math.BigDecimal"/>
+	<field name="003" class="java.math.BigDecimal"/>
+	<field name="004" class="java.math.BigDecimal"/>
+	<field name="005" class="java.math.BigDecimal"/>
+	<field name="006" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="106" height="20"/>
+				<textElement/>
+				<text><![CDATA[Branch Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="212" y="0" width="108" height="20"/>
+				<textElement/>
+				<text><![CDATA[REGION_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="0" width="106" height="20"/>
+				<textElement/>
+				<text><![CDATA[ZONE_CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="426" y="0" width="182" height="20"/>
+				<textElement/>
+				<text><![CDATA[Total Pool Car Fuel Use (Petrol) (Ltr)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="610" y="0" width="158" height="20"/>
+				<textElement/>
+				<text><![CDATA[Total Gen Fuel Use (Diesel) (Ltr)
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="768" y="0" width="140" height="20"/>
+				<textElement/>
+				<text><![CDATA[Total Electricity Usage (Kwh)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="908" y="0" width="129" height="20"/>
+				<textElement/>
+				<text><![CDATA[Paper Usage (1 Rim/Pack) (Qty)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1037" y="0" width="142" height="20"/>
+				<textElement/>
+				<text><![CDATA[Water Usage (Ltr)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="106" y="0" width="106" height="20"/>
+				<textElement/>
+				<text><![CDATA[Sol ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1179" y="0" width="108" height="20"/>
+				<textElement/>
+				<text><![CDATA[Waste Generated (kg)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement x="428" y="0" width="182" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{001}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00" isBlankWhenNull="true">
+				<reportElement x="610" y="0" width="158" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{002}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="768" y="0" width="140" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{003}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="908" y="0" width="129" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{004}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="1037" y="0" width="142" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{005}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0" isBlankWhenNull="true">
+				<reportElement x="1179" y="0" width="108" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{006}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="106" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="212" y="0" width="112" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Region_Name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="324" y="0" width="104" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Zone_Name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="0" width="106" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BRANCH_CODE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

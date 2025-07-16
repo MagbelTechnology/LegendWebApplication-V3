@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="RFQ Letter_old"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Landscape"
+		 pageWidth="1019"
+		 pageHeight="842"
+		 columnWidth="959"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="BaseDir" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="filterClause" isForPrompting="true" class="java.lang.String"/>
+	<queryString><![CDATA[SELECT
+     PR_REQUEST_FOR_QUOTATION."RFQ_NO" AS PR_REQUEST_FOR_QUOTATION_RFQ_NO,
+     PR_REQUEST_FOR_QUOTATION."Vendor_Code" AS PR_REQUEST_FOR_QUOTATION_Vendor_Code,
+     PR_REQUEST_FOR_QUOTATION."ReqnID" AS PR_REQUEST_FOR_QUOTATION_ReqnID,
+     PR_REQUEST_FOR_QUOTATION."Reference_No" AS PR_REQUEST_FOR_QUOTATION_Reference_No,
+     PR_REQUEST_FOR_QUOTATION."Issue_Date" AS PR_REQUEST_FOR_QUOTATION_Issue_Date,
+     PR_REQUEST_FOR_QUOTATION."Instruction" AS PR_REQUEST_FOR_QUOTATION_Instruction,
+     PR_REQUEST_FOR_QUOTATION."Instruction1" AS PR_REQUEST_FOR_QUOTATION_Instruction1,
+     PR_REQUEST_FOR_QUOTATION."Instruction2" AS PR_REQUEST_FOR_QUOTATION_Instruction2,
+     PR_REQUEST_FOR_QUOTATION."Return_QuoteTo" AS PR_REQUEST_FOR_QUOTATION_Return_QuoteTo,
+     PR_REQUEST_FOR_QUOTATION."Return_QuoteTo1" AS PR_REQUEST_FOR_QUOTATION_Return_QuoteTo1,
+     PR_REQUEST_FOR_QUOTATION."Return_QuoteTo2" AS PR_REQUEST_FOR_QUOTATION_Return_QuoteTo2,
+     PR_REQUEST_FOR_QUOTATION."Award_Status" AS PR_REQUEST_FOR_QUOTATION_Award_Status,
+     PR_REQUISITION."UserID" AS PR_REQUISITION_UserID,
+     PR_REQUISITION."ReqnBranch" AS PR_REQUISITION_ReqnBranch,
+     PR_REQUISITION."ReqnSection" AS PR_REQUISITION_ReqnSection,
+     PR_REQUISITION."ReqnDepartment" AS PR_REQUISITION_ReqnDepartment,
+     PR_REQUISITION."ReqnDate" AS PR_REQUISITION_ReqnDate,
+     PR_REQUISITION."ReqnUserID" AS PR_REQUISITION_ReqnUserID,
+     PR_REQUISITION."ItemRequested" AS PR_REQUISITION_ItemRequested,
+     PR_REQUISITION."Status" AS PR_REQUISITION_Status,
+     PR_REQUISITION."Quantity" AS PR_REQUISITION_Quantity,
+     PR_REQUISITION."projectCode" AS PR_REQUISITION_projectCode,
+     PR_REQUISITION."Remark" AS PR_REQUISITION_Remark,
+     am_gb_company."company_name" AS am_gb_company_company_name,
+     am_gb_company."company_code" AS am_gb_company_company_code,
+     PR_REQUEST_FOR_QUOTATION."Company_Code" AS PR_REQUEST_FOR_QUOTATION_Company_Code,
+     am_ad_vendor."Vendor_Name" AS am_ad_vendor_Vendor_Name,
+     am_ad_vendor."Contact_Person" AS am_ad_vendor_Contact_Person,
+     am_ad_vendor."Contact_Address" AS am_ad_vendor_Contact_Address,
+     am_ad_vendor."Vendor_Phone" AS am_ad_vendor_Vendor_Phone,
+     am_ad_vendor."Vendor_fax" AS am_ad_vendor_Vendor_fax,
+     am_ad_vendor."Vendor_email" AS am_ad_vendor_Vendor_email,
+     am_ad_vendor."Vendor_State" AS am_ad_vendor_Vendor_State,
+     am_ad_vendor."Vendor_Status" AS am_ad_vendor_Vendor_Status,
+     am_ad_vendor."Vendor_Code" AS am_ad_vendor_Vendor_Code,
+     am_gb_company."company_address" AS am_gb_company_company_address
+FROM
+     "dbo"."PR_REQUEST_FOR_QUOTATION" PR_REQUEST_FOR_QUOTATION INNER JOIN "dbo"."PR_REQUISITION" PR_REQUISITION ON PR_REQUEST_FOR_QUOTATION."ReqnID" = PR_REQUISITION."ReqnID"
+     INNER JOIN "dbo"."am_ad_vendor" am_ad_vendor ON PR_REQUEST_FOR_QUOTATION."Vendor_Code" = am_ad_vendor."Vendor_Code",
+     "dbo"."am_gb_company" am_gb_company
+where PR_REQUISITION."Status" = 'Active'
+      and PR_REQUEST_FOR_QUOTATION."ReqnID" = $P{filterClause} ]]></queryString>
+
+	<field name="PR_REQUEST_FOR_QUOTATION_RFQ_NO" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Vendor_Code" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_ReqnID" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Reference_No" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Issue_Date" class="java.sql.Timestamp"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Instruction" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Instruction1" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Instruction2" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Return_QuoteTo" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Return_QuoteTo1" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Return_QuoteTo2" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Award_Status" class="java.lang.String"/>
+	<field name="PR_REQUISITION_UserID" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnBranch" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnSection" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnDepartment" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ReqnDate" class="java.sql.Timestamp"/>
+	<field name="PR_REQUISITION_ReqnUserID" class="java.lang.String"/>
+	<field name="PR_REQUISITION_ItemRequested" class="java.lang.String"/>
+	<field name="PR_REQUISITION_Status" class="java.lang.String"/>
+	<field name="PR_REQUISITION_Quantity" class="java.lang.String"/>
+	<field name="PR_REQUISITION_projectCode" class="java.lang.String"/>
+	<field name="PR_REQUISITION_Remark" class="java.lang.String"/>
+	<field name="am_gb_company_company_name" class="java.lang.String"/>
+	<field name="am_gb_company_company_code" class="java.lang.String"/>
+	<field name="PR_REQUEST_FOR_QUOTATION_Company_Code" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Name" class="java.lang.String"/>
+	<field name="am_ad_vendor_Contact_Person" class="java.lang.String"/>
+	<field name="am_ad_vendor_Contact_Address" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Phone" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_fax" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_email" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_State" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Status" class="java.lang.String"/>
+	<field name="am_ad_vendor_Vendor_Code" class="java.lang.String"/>
+	<field name="am_gb_company_company_address" class="java.lang.String"/>
+
+	<sortField name="PR_REQUEST_FOR_QUOTATION_Vendor_Code" />
+	<sortField name="PR_REQUEST_FOR_QUOTATION_ReqnID" />
+	<sortField name="PR_REQUEST_FOR_QUOTATION_RFQ_NO" />
+
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="285"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="7"
+						y="13"
+						width="282"
+						height="25"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_gb_company_company_name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="7"
+						y="95"
+						width="202"
+						height="22"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_vendor_Vendor_Name}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="209"
+						y="123"
+						width="162"
+						height="36"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="textField-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_REQUEST_FOR_QUOTATION_Reference_No}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="209"
+						y="97"
+						width="162"
+						height="28"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Reference Number]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="381"
+						y="123"
+						width="162"
+						height="36"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="textField-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[$F{PR_REQUEST_FOR_QUOTATION_Issue_Date}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="381"
+						y="97"
+						width="162"
+						height="27"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Issue Date]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="560"
+						y="123"
+						width="180"
+						height="36"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="textField-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_REQUEST_FOR_QUOTATION_RFQ_NO}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="560"
+						y="97"
+						width="180"
+						height="27"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[RFQ Number]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="289"
+						y="60"
+						width="273"
+						height="29"
+						forecolor="#FF3300"
+						key="staticText-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-BoldOblique" size="18" isBold="true" isItalic="true"/>
+					</textElement>
+				<text><![CDATA[Request For Quotation]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="618"
+						y="7"
+						width="94"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-8"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="7"
+						y="40"
+						width="134"
+						height="49"
+						key="textField-9"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_gb_company_company_address}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="7"
+						y="117"
+						width="134"
+						height="68"
+						key="textField-10"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_ad_vendor_Contact_Address}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="88"
+						y="189"
+						width="219"
+						height="26"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="18" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Instructions]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="307"
+						y="189"
+						width="239"
+						height="26"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="18" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Return Quote To]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="546"
+						y="189"
+						width="194"
+						height="26"
+						forecolor="#FFFFFF"
+						backcolor="#000099"
+						key="staticText-7"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" size="18" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Prices]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="88"
+						y="218"
+						width="219"
+						height="15"
+						key="staticText-8"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Please Return your Quote not later than:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="88"
+						y="233"
+						width="219"
+						height="15"
+						key="staticText-9"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Friday 24-09-2010]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="88"
+						y="248"
+						width="219"
+						height="15"
+						key="staticText-10"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<text><![CDATA[Please quote your test price and delivery ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="88"
+						y="263"
+						width="219"
+						height="15"
+						key="staticText-11"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<text><![CDATA[according to the attached specification]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="317"
+						y="218"
+						width="219"
+						height="15"
+						key="staticText-12"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica" isBold="false"/>
+					</textElement>
+				<text><![CDATA[Vtrax Nigeria Limited ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="317"
+						y="233"
+						width="219"
+						height="15"
+						key="staticText-13"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica" isBold="false"/>
+					</textElement>
+				<text><![CDATA[15, Joseph Street,]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="317"
+						y="248"
+						width="219"
+						height="15"
+						key="staticText-14"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<text><![CDATA[Marina, ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="317"
+						y="263"
+						width="219"
+						height="15"
+						key="staticText-15"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<text><![CDATA[Lagos]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="559"
+						y="218"
+						width="181"
+						height="15"
+						key="staticText-16"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Please quote all prices in:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						mode="Opaque"
+						x="559"
+						y="233"
+						width="181"
+						height="15"
+						key="staticText-17"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica" isBold="false"/>
+					</textElement>
+				<text><![CDATA[Euro Dollar]]></text>
+				</staticText>
+				<image  evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="151"
+						y="45"
+						width="122"
+						height="44"
+						key="image-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<graphicElement stretchType="NoStretch"/>
+					<imageExpression class="java.io.File"><![CDATA[new File($P{BaseDir}, "../images/client.gif")]]></imageExpression>
+				</image>
+			</band>
+		</title>
+		<pageHeader>
+			<band height="36"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="88"
+						y="9"
+						width="68"
+						height="17"
+						key="staticText-18"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Item]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="160"
+						y="10"
+						width="229"
+						height="17"
+						key="staticText-19"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="395"
+						y="10"
+						width="73"
+						height="17"
+						key="staticText-20"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Unit]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="503"
+						y="10"
+						width="99"
+						height="17"
+						key="staticText-21"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Quantity]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="614"
+						y="10"
+						width="108"
+						height="17"
+						key="staticText-22"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Delivery Required]]></text>
+				</staticText>
+				<line direction="TopDown">
+					<reportElement
+						x="83"
+						y="5"
+						width="657"
+						height="0"
+						key="line-3"/>
+					<graphicElement stretchType="NoStretch"/>
+				</line>
+				<line direction="TopDown">
+					<reportElement
+						x="83"
+						y="30"
+						width="657"
+						height="0"
+						key="line-4"/>
+					<graphicElement stretchType="NoStretch"/>
+				</line>
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="12"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="23"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="88"
+						y="1"
+						width="68"
+						height="20"
+						key="textField-11"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$V{COLUMN_COUNT}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="165"
+						y="1"
+						width="216"
+						height="20"
+						key="textField-12"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_REQUISITION_ItemRequested}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="510"
+						y="-1"
+						width="92"
+						height="22"
+						key="textField-14"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{PR_REQUISITION_Quantity}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="dd/MM/yyyy" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="614"
+						y="1"
+						width="108"
+						height="20"
+						key="textField-15"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.util.Date"><![CDATA[$F{PR_REQUEST_FOR_QUOTATION_Issue_Date}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="395"
+						y="1"
+						width="73"
+						height="20"
+						key="staticText-23"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Center">
+						<font/>
+					</textElement>
+				<text><![CDATA[Each]]></text>
+				</staticText>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="30"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="50"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="631"
+						y="17"
+						width="101"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Report" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="732"
+						y="17"
+						width="36"
+						height="19"
+						forecolor="#000000"
+						backcolor="#FFFFFF"
+						key="textField-7"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["" + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+			</band>
+		</pageFooter>
+		<lastPageFooter>
+			<band height="16"  isSplitAllowed="true" >
+			</band>
+		</lastPageFooter>
+		<summary>
+			<band height="88"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="92"
+						y="4"
+						width="353"
+						height="18"
+						key="staticText-24"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Signed:_____________________________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="132"
+						y="26"
+						width="103"
+						height="15"
+						key="staticText-25"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[ For and on behalf of ]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="237"
+						y="26"
+						width="340"
+						height="15"
+						key="textField-16"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{am_gb_company_company_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</summary>
+</jasperReport>

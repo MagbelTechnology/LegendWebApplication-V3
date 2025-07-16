@@ -1,0 +1,48 @@
+[PropertyInfo]
+accumulated_depreciation,String,false,false, , ,true,<default>
+asset_id,String,false,false, , ,true,<default>
+asset_status,String,false,false, , ,true,<default>
+authorized_by,String,false,false, , ,true,<default>
+branch,String,false,false, , ,true,<default>
+brought_forward,String,false,false, , ,true,<default>
+category,String,false,false, , ,true,<default>
+cost_price,String,false,false, , ,true,<default>
+date_of_purchase,String,false,false, , ,true,<default>
+dateFormat,com.magbel.util.DatetimeFormat,false,false, , ,false,<default>
+dbConnect,magma.net.dao.MagmaDBConnection,false,false, , ,false,<default>
+department,String,false,false, , ,true,<default>
+depreciation_end_date,String,false,false, , ,true,<default>
+depreciation_rate,String,false,false, , ,true,<default>
+depreciation_start_date,String,false,false, , ,true,<default>
+description,String,false,false, , ,true,<default>
+engine_number,String,false,false, , ,true,<default>
+maintained_by,String,false,false, , ,true,<default>
+make,String,false,false, , ,true,<default>
+model,String,false,false, , ,true,<default>
+monthly_depreciation,String,false,false, , ,true,<default>
+nbv,String,false,false, , ,true,<default>
+new_category,String,false,false, , ,true,<default>
+new_code,String,false,false, , ,true,<default>
+new_depreciation_rate,String,false,false, , ,true,<default>
+posting_date,String,false,false, , ,true,<default>
+raise_entry,String,false,false, , ,true,<default>
+reason,String,false,false, , ,true,<default>
+recalculate_depreciation,String,false,false, , ,true,<default>
+reclassification_date,String,false,false, , ,true,<default>
+reclassification_reason,String,false,false, , ,true,<default>
+registration_no,String,false,false, , ,true,<default>
+scrap_value,String,false,false, , ,true,<default>
+sdf,java.text.SimpleDateFormat,false,false, , ,false,<default>
+serial_number,String,false,false, , ,true,<default>
+subject_to_vat,String,false,false, , ,true,<default>
+supplied_by,String,false,false, , ,true,<default>
+user,String,false,false, , ,true,<default>
+user_id,String,false,false, , ,true,<default>
+vat_amount,String,false,false, , ,true,<default>
+vatable_cost,String,false,false, , ,true,<default>
+vendor_account,String,false,false, , ,true,<default>
+[IconNames]
+
+
+
+

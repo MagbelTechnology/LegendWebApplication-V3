@@ -1,0 +1,107 @@
+package magma.net.vao;
+
+import java.io.Serializable;
+
+/**
+ <p><b>Title:</b> AssetTransaction.java</p>
+ *
+ * <p><b>Description:</b> Transaction Object for the<br>
+ * Depreciation processing.</p>
+ *
+ * <p>Copyright: Copyright (c) 2006</p>
+ *
+ * <p>Company: Magbel Technologies LTD</p>
+ *
+ * @author Jejelowo.B.Festus
+ * @author www.ocular-minds.com
+ * @author festus.jejelowo@ocular-minds.com
+ * @version 1.0
+ */
+public class AssetTransaction implements Serializable {
+
+    private String assetId;
+    private int frequency;
+    private double cost;
+    private double monthlyDepreciation;
+    private String branchCode;
+    private String departmentCode;
+    private String sectorCode;
+    private double improvMonthlyDepreciation;
+    
+    public AssetTransaction(String assetId, int frequency, double cost,
+                            double monthlyDepreciation,
+                            String branchCode, String departmentCode,
+                            String sectorCode) {
+        setAssetId(assetId);
+        setFrequency(frequency);
+        setCost(cost);
+        setMonthlyDepreciation(monthlyDepreciation);
+        setBranchCode(branchCode);
+        setDepartmentCode(departmentCode);
+        setSectorCode(sectorCode);
+        setMonthlyDepreciation(improvMonthlyDepreciation);
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
+    }
+    public void setMonthlyDepreciation(double monthlyDepreciation) {
+        this.monthlyDepreciation = monthlyDepreciation;
+    }
+
+    public void setBranchCode(String branchCode) {
+        this.branchCode = branchCode;
+    }
+
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
+    }
+
+    public void setSectorCode(String sectorCode) {
+        this.sectorCode = sectorCode;
+    }
+
+    public void setImprovMonthlyDepreciation(double improvMonthlyDepreciation) {
+        this.improvMonthlyDepreciation = improvMonthlyDepreciation;
+    }
+    
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public double getMonthlyDepreciation() {
+        return monthlyDepreciation;
+    }
+
+    public String getBranchCode() {
+        return branchCode;
+    }
+
+    public String getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public String getSectorCode() {
+        return sectorCode;
+    }
+
+    public double getImprovMonthlyDepreciation() {
+        return improvMonthlyDepreciation;
+    }    
+}

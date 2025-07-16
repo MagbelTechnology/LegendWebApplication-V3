@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="storeSRINMovementReport" language="groovy" pageWidth="1315" pageHeight="841" columnWidth="1275" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="387"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<parameter name="requester" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT a.STOCK_CODE, a.Description,b.BRANCH_NAME, a.CREATE_DATE,s.UNIT_CODE,s.QUANTITY,s.Cost_Price/s.QUANTITY AS NetPrice_List,s.Cost_Price  FROM ST_DISTRIBUTION_ITEM a, am_ad_branch b, ST_STOCK s,am_asset_approval d
+where a.STOCK_CODE = s.asset_id
+and d.branchCode = b.BRANCH_ID
+and a.REQNID = d.asset_id
+$P!{filterClause}]]>
+	</queryString>
+	<field name="STOCK_CODE" class="java.lang.String"/>
+	<field name="Description" class="java.lang.String"/>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="CREATE_DATE" class="java.sql.Timestamp"/>
+	<field name="UNIT_CODE" class="java.lang.String"/>
+	<field name="QUANTITY" class="java.lang.Integer"/>
+	<field name="NetPrice_List" class="java.math.BigDecimal"/>
+	<field name="Cost_Price" class="java.math.BigDecimal"/>
+	<group name="BU" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{BRANCH_NAME}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<staticText>
+					<reportElement x="0" y="0" width="115" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Product]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="115" y="0" width="198" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Description]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="313" y="0" width="115" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Issuing Site]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="428" y="0" width="115" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Issuing Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="543" y="0" width="115" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Stock Unit]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="658" y="0" width="115" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Issued Qty]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="773" y="0" width="115" height="20"/>
+					<textElement textAlignment="Center">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[           Net Price list]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="888" y="0" width="115" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Expense Account]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="1003" y="0" width="115" height="20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Stock Account]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="60" splitType="Stretch">
+			<textField>
+				<reportElement x="115" y="20" width="198" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="20" width="115" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Request site]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="115" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Request date]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="false">
+				<reportElement key="textField-13" x="115" y="40" width="198" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="115" y="0" width="198" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{requester}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="115" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Query tool]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="115" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{STOCK_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="115" y="0" width="198" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="428" y="0" width="115" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{CREATE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="543" y="0" width="115" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{UNIT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="658" y="0" width="115" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{QUANTITY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="313" y="0" width="115" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="773" y="0" width="115" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NetPrice_List}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

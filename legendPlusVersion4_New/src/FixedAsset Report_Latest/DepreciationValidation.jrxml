@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DepreciationValidation" language="groovy" pageWidth="1099" pageHeight="842" columnWidth="1059" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="filterClause" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select ROUND(CAST(DATEDIFF(MONTH, effective_date, $P!{filterClause}) AS float) -
+  (DATEPART(dd,effective_date)*1.0 - 1.0) / DAY(EOMONTH(effective_date)) +
+  ((DATEPART(dd,$P!{filterClause})*1.0 ) / DAY(EOMONTH($P!{filterClause}))),0) AS USED,Monthly_Dep, USEFUL_LIFE,effective_date,
+  (ROUND(CAST(DATEDIFF(MONTH, effective_date, $P!{filterClause}) AS float) -
+  (DATEPART(dd,effective_date)*1.0 - 1.0) / DAY(EOMONTH(effective_date)) +
+  ((DATEPART(dd,$P!{filterClause})*1.0 ) / DAY(EOMONTH($P!{filterClause}))),0)) - USEFUL_LIFE AS DIFF,ASSET_ID, DESCRIPTION, NBV,
+  a.BRANCH_CODE,a.CATEGORY_CODE,b.BRANCH_NAME,c.category_name from AM_ASSET a, am_ad_branch b, am_ad_category c
+  WHERE ASSET_STATUS = 'ACTIVE' AND NBV > 20
+  AND (ROUND(CAST(DATEDIFF(MONTH, effective_date, $P!{filterClause}) AS float) -
+  (DATEPART(dd,effective_date)*1.0 - 1.0) / DAY(EOMONTH(effective_date)) +
+  ((DATEPART(dd,$P!{filterClause})*1.0 ) / DAY(EOMONTH($P!{filterClause}))),0)) - USEFUL_LIFE  <> 0
+  AND a.BRANCH_CODE = b.BRANCH_CODE
+  AND a.CATEGORY_CODE = c.CATEGORY_CODE]]>
+	</queryString>
+	<field name="USED" class="java.lang.Double"/>
+	<field name="Monthly_Dep" class="java.math.BigDecimal"/>
+	<field name="USEFUL_LIFE" class="java.lang.Integer"/>
+	<field name="effective_date" class="java.sql.Timestamp"/>
+	<field name="DIFF" class="java.lang.Double"/>
+	<field name="ASSET_ID" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="NBV" class="java.math.BigDecimal"/>
+	<field name="BRANCH_CODE" class="java.lang.String"/>
+	<field name="CATEGORY_CODE" class="java.lang.String"/>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="category_name" class="java.lang.String"/>
+	<variable name="totalNumber" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{ASSET_ID}]]></variableExpression>
+	</variable>
+	<group name="category">
+		<groupExpression><![CDATA[$F{CATEGORY_CODE}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[ASSET_ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="168" height="20"/>
+				<textElement/>
+				<text><![CDATA[DESCRIPTION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="268" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Monthly_Dep]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="368" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[NBV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="468" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[USED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="568" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[USEFUL_LIFE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="668" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[effective_date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="768" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[DIFF]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ASSET_ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="0" width="168" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="268" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Monthly_Dep}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="368" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NBV}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement x="468" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{USED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="568" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{USEFUL_LIFE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="668" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{effective_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0">
+				<reportElement x="768" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{DIFF}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="146" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Records]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="146" y="0" width="100" height="20"/>
+				<textElement>
+					<font isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{totalNumber}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

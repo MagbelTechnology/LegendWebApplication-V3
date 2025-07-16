@@ -1,0 +1,60 @@
+[PropertyInfo]
+accum_dep,String,false,false, , ,true,<default>
+accum_dep,double,false,false, , ,true,<default>
+asset_id,String,false,false, , ,true,<default>
+authorized_by,String,false,false, , ,true,<default>
+branch_id,String,false,false, , ,true,<default>
+category_id,String,false,false, , ,true,<default>
+cost_price,String,false,false, , ,true,<default>
+date_of_purchase,String,false,false, , ,true,<default>
+dbConnection,magma.net.dao.MagmaDBConnection,false,false, , ,false,<default>
+department_id,String,false,false, , ,true,<default>
+depreciation_end_date,String,false,false, , ,true,<default>
+depreciation_rate,String,false,false, , ,true,<default>
+depreciation_start_date,String,false,false, , ,true,<default>
+description,String,false,false, , ,true,<default>
+driver,String,false,false, , ,true,<default>
+email2,String,false,false, , ,true,<default>
+email_1,String,false,false, , ,true,<default>
+engine_number,String,false,false, , ,true,<default>
+expiryDate,String,false,false, , ,true,<default>
+location,String,false,false, , ,true,<default>
+maintained_by,String,false,false, , ,true,<default>
+make,String,false,false, , ,true,<default>
+model,String,false,false, , ,true,<default>
+multiple,String,false,false, , ,true,<default>
+noOfMonths,String,false,false, , ,true,<default>
+posting_date,String,false,false, , ,true,<default>
+province,String,false,false, , ,true,<default>
+raise_entry,String,false,false, , ,true,<default>
+reason,String,false,false, , ,true,<default>
+registration_no,String,false,false, , ,true,<default>
+require_depreciation,String,false,false, , ,true,<default>
+require_redistribution,String,false,false, , ,true,<default>
+residual_value,String,false,false, , ,true,<default>
+section,String,false,false, , ,true,<default>
+section_id,String,false,false, , ,true,<default>
+serial_number,String,false,false, , ,true,<default>
+spare_1,String,false,false, , ,true,<default>
+spare_2,String,false,false, , ,true,<default>
+state,String,false,false, , ,true,<default>
+status,String,false,false, , ,true,<default>
+subject_to_vat,String,false,false, , ,true,<default>
+supplied_by,String,false,false, , ,true,<default>
+user,String,false,false, , ,true,<default>
+user_id,String,false,false, , ,true,<default>
+vat_amount,String,false,false, , ,true,<default>
+vatable_cost,String,false,false, , ,true,<default>
+vendor_account,String,false,false, , ,true,<default>
+warrantyStartDate,String,false,false, , ,true,<default>
+wh_tax_amount,String,false,false, , ,true,<default>
+wh_tax_cb,String,false,false, , ,true,<default>
+who_to_remind,String,false,false, , ,true,<default>
+who_to_remind_2,String,false,false, , ,true,<default>
+auth_user,String,false,false,auth_user,auth_user,true,<default>
+authuser,String,false,false,authuser,authuser,true,<default>
+[IconNames]
+
+
+
+
