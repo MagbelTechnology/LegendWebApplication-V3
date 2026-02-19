@@ -36,6 +36,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -6167,6 +6168,7 @@ return dateDifferencesMills;
 //        return done;
 //    }
     
+    
     public boolean deleteObject(String query) {
         try (
             Connection con = getConnection();
@@ -6826,7 +6828,7 @@ return dateDifferencesMills;
             return result;
     }
 
-    public void updateAssetStatusChange(String query_r){
+    public void updateAssetStatusChangeOld(String query_r){
     Connection con = null;
             PreparedStatement ps = null;
     try {
@@ -6843,6 +6845,20 @@ return dateDifferencesMills;
             }
 //    	closeConnection(con, ps);
     }
+    
+    public void updateAssetStatusChange(String query) {
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            int rowsUpdated = ps.executeUpdate();
+            System.out.println("updateAssetStatusChange: Rows affected = " + rowsUpdated);
+
+        } catch (Exception ex) {
+        	 System.out.println("Error in updateAssetStatusChange" + ex);
+        }
+    }
+
+    
     public void updateRaiseEntry(String assetid) {
 
         Connection con = null;
@@ -10649,7 +10665,7 @@ catch (Exception r) {
     		}
 
 
-public java.util.ArrayList getUsernotSignOutRecords(String sessionTimeOut)
+public java.util.ArrayList getUsernotSignOutRecordsOld(String sessionTimeOut)
  {
 	Connection c = null;
 	ResultSet rs = null;
@@ -10692,42 +10708,103 @@ public java.util.ArrayList getUsernotSignOutRecords(String sessionTimeOut)
  	return list;
  }
 
-public boolean updateUsernotSignOutRecords( String userId,String mtid) throws SQLException
-{
-	Connection con = null;
-	PreparedStatement ps = null;
-	PreparedStatement ps1 = null;
-	boolean done = false; 
-	//String date = String.valueOf(dateConvert(new java.util.Date()));
- 	//date = date.substring(0, 10);
-//	System.out.println("======> userId in updateUsernotSignOutRecords: "+userId);
-	String query = "UPDATE am_gb_User SET login_status=0   where user_id = " + userId + "  and login_status != 0 ";
-//	 System.out.println("======> query in updateUsernotSignOutRecords: "+query);
-//	String mtid = htmlUtil.getCodeName("SELECT MAX(mtid) FROM  gb_user_login where USER_ID = " + userId + " ");
-//	System.out.println("======> mtid in updateUsernotSignOutRecords: "+mtid);
-	String loginquery = "UPDATE gb_user_login SET time_out = session_time WHERE user_id =? AND MTID = ?";
-//	System.out.println("query in updateUsernotSignOutRecords: "+query);
-//	System.out.println("query in updateUsernotSignOutRecords: "+loginquery+"    <<<<<<mtid is : "+mtid);
-	try {    
-		con = getConnection();
-		ps = con.prepareStatement(query);
-//		ps.setString(1, userId);
-		done = (ps.executeUpdate() != -1);
-		ps1 = con.prepareStatement(query);
-		ps1.setString(1, userId);
-		ps1.setString(2, mtid);
-		done=( ps1.executeUpdate()!=-1);
-	} catch (Exception e) { 
-//		e.printStackTrace();
-		e.getMessage();
-	} finally {
-    	closeConnection(con, ps);
-    	closeConnection(con, ps1);
-//		con.close();
+
+public List<String> getUsernotSignOutRecords(String sessionTimeOut) {
+
+    List<String> list = new ArrayList<>();
+
+    String notSignOutquery =
+        "SELECT user_id, session_time, create_date, " +
+        "DATEDIFF(second, session_time, CONVERT(VARCHAR, getdate(), 108)) AS difference " +
+        "FROM gb_user_login " +
+        "WHERE time_out IS NULL " +
+        "AND DATEDIFF(second, session_time, CONVERT(VARCHAR, getdate(), 108)) > 60 * ?";
+
+    try (Connection c = getConnection();
+         PreparedStatement s = c.prepareStatement(notSignOutquery)) {
+
+        s.setInt(1, Integer.parseInt(sessionTimeOut));
+
+        try (ResultSet rs = s.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(rs.getString("user_id"));
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
 
-//	closeConnection(con, ps);
-	return done;
+    return list;
+}
+
+
+//public boolean updateUsernotSignOutRecords( String userId,String mtid) throws SQLException
+//{
+//	Connection con = null;
+//	PreparedStatement ps = null;
+//	PreparedStatement ps1 = null;
+//	boolean done = false; 
+//	//String date = String.valueOf(dateConvert(new java.util.Date()));
+// 	//date = date.substring(0, 10);
+////	System.out.println("======> userId in updateUsernotSignOutRecords: "+userId);
+//	String query = "UPDATE am_gb_User SET login_status=0   where user_id = " + userId + "  and login_status != 0 ";
+////	 System.out.println("======> query in updateUsernotSignOutRecords: "+query);
+////	String mtid = htmlUtil.getCodeName("SELECT MAX(mtid) FROM  gb_user_login where USER_ID = " + userId + " ");
+////	System.out.println("======> mtid in updateUsernotSignOutRecords: "+mtid);
+//	String loginquery = "UPDATE gb_user_login SET time_out = session_time WHERE user_id =? AND MTID = ?";
+////	System.out.println("query in updateUsernotSignOutRecords: "+query);
+////	System.out.println("query in updateUsernotSignOutRecords: "+loginquery+"    <<<<<<mtid is : "+mtid);
+//	try {    
+//		con = getConnection();
+//		ps = con.prepareStatement(query);
+////		ps.setString(1, userId);
+//		done = (ps.executeUpdate() != -1);
+//		ps1 = con.prepareStatement(query);
+//		ps1.setString(1, userId);
+//		ps1.setString(2, mtid);
+//		done=( ps1.executeUpdate()!=-1);
+//	} catch (Exception e) { 
+////		e.printStackTrace();
+//		e.getMessage();
+//	} finally {
+//    	closeConnection(con, ps);
+//    	closeConnection(con, ps1);
+////		con.close();
+//    }
+//
+////	closeConnection(con, ps);
+//	return done;
+//}
+
+public boolean updateUsernotSignOutRecords(String userId, String mtid) throws SQLException {
+
+    String updateUserQuery =
+        "UPDATE am_gb_User SET login_status = 0 WHERE user_id = ? AND login_status != 0";
+
+    String updateLoginQuery =
+        "UPDATE gb_user_login SET time_out = session_time WHERE user_id = ? AND MTID = ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(updateUserQuery);
+         PreparedStatement ps1 = con.prepareStatement(updateLoginQuery)) {
+
+        // First update
+        ps.setString(1, userId);
+        ps.executeUpdate();
+
+        // Second update
+        ps1.setString(1, userId);
+        ps1.setString(2, mtid);
+        ps1.executeUpdate();
+
+        return true;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
 }
 
 public String getValue(String query) {
@@ -10768,7 +10845,7 @@ public String getValue(String query) {
 	return result;
 }
 
-public java.util.ArrayList getSqlAssetFullyDepr(String alertperiod)
+public java.util.ArrayList getSqlAssetFullyDeprOld(String alertperiod)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -10898,6 +10975,93 @@ public java.util.ArrayList getSqlAssetFullyDepr(String alertperiod)
 						closeConnection(c, s, rs);
 					}
 	return _list;
+}
+
+
+public List<newAssetTransaction> getSqlAssetFullyDepr(String alertperiod) {
+
+    List<newAssetTransaction> list = new ArrayList<>();
+
+    String query =
+        "SELECT (SELECT MONTH(GETDATE())), " +
+        "(SELECT MONTH(COALESCE(CONVERT(VARCHAR(10), (SELECT ALERT_DATE FROM ASSET_ALERT_LOG WHERE ASSET_ALERT_LOG.ASSET_ID = AM_ASSET.ASSET_ID), 102), ''))), " +
+        "(SELECT COUNT(*) FROM ASSET_ALERT_LOG WHERE ASSET_ALERT_LOG.ASSET_ID = AM_ASSET.ASSET_ID), " +
+        "DATEDIFF(MONTH, CAST(GETDATE() AS DATE), Dep_End_Date) AS DateDifference, " +
+        "Dep_End_Date, * " +
+        "FROM AM_ASSET " +
+        "WHERE Dep_End_Date > CAST(GETDATE() AS DATE) " +
+        "AND DATEDIFF(MONTH, CAST(GETDATE() AS DATE), Dep_End_Date) < (? + 1) " +
+        "AND (Email1 != '' OR Email2 != '') " +
+        "AND (SELECT COUNT(*) FROM ASSET_ALERT_LOG WHERE ASSET_ALERT_LOG.ASSET_ID = AM_ASSET.ASSET_ID) < (? + 1) " +
+        "AND (SELECT MONTH(GETDATE())) != (SELECT MONTH(COALESCE(CONVERT(VARCHAR(10), (SELECT DISTINCT ALERT_DATE FROM ASSET_ALERT_LOG WHERE ASSET_ALERT_LOG.ASSET_ID = AM_ASSET.ASSET_ID), 102), '')))";
+
+    try (Connection c = getConnection();
+         PreparedStatement s = c.prepareStatement(query)) {
+
+        int period = Integer.parseInt(alertperiod);
+        s.setInt(1, period);
+        s.setInt(2, period);
+
+        try (ResultSet rs = s.executeQuery()) {
+
+            while (rs.next()) {
+                newAssetTransaction newTransaction = new newAssetTransaction();
+
+                newTransaction.setAssetId(rs.getString("ASSET_ID"));
+                newTransaction.setDescription(rs.getString("DESCRIPTION"));
+                newTransaction.setRegistrationNo(rs.getString("Registration_No"));
+                newTransaction.setNbv(rs.getDouble("NBV"));
+                newTransaction.setDatepurchased(rs.getString("Date_purchased"));
+                newTransaction.setAssetMake(rs.getString("Asset_Make"));
+                newTransaction.setAssetModel(rs.getString("Asset_Model"));
+                newTransaction.setAssetSerialNo(rs.getString("Asset_Serial_No"));
+                newTransaction.setAssetEngineNo(rs.getString("Asset_Engine_No"));
+                newTransaction.setSupplierName(rs.getString("Supplier_Name"));
+                newTransaction.setAssetUser(rs.getString("Asset_User"));
+                newTransaction.setAssetMaintenance(rs.getString("Asset_Maintenance"));
+                newTransaction.setCostPrice(rs.getDouble("Cost_Price"));
+                newTransaction.setAuthorizedBy(rs.getString("Authorized_By"));
+                newTransaction.setWhTax(rs.getString("Wh_Tax"));
+                newTransaction.setPostingDate(rs.getString("Posting_Date"));
+                newTransaction.setEffectiveDate(rs.getString("Effective_Date"));
+                newTransaction.setPurchaseReason(rs.getString("Purchase_Reason"));
+                newTransaction.setSubjectTOVat(rs.getString("Subject_TO_Vat"));
+                newTransaction.setAssetStatus(rs.getString("Asset_Status"));
+                newTransaction.setState(rs.getString("State"));
+                newTransaction.setDriver(rs.getString("Driver"));
+                newTransaction.setUserID(rs.getString("User_ID"));
+                newTransaction.setBranchCode(rs.getString("BRANCH_CODE"));
+                newTransaction.setSectionCode(rs.getString("SECTION_CODE"));
+                newTransaction.setDeptCode(rs.getString("DEPT_CODE"));
+                newTransaction.setCategoryCode(rs.getString("CATEGORY_CODE"));
+                newTransaction.setSubcategoryCode(rs.getString("SUB_CATEGORY_CODE"));
+                newTransaction.setBarCode(rs.getString("BAR_CODE"));
+                newTransaction.setSbuCode(rs.getString("SBU_CODE"));
+                newTransaction.setLpo(rs.getString("LPO"));
+                newTransaction.setAssetCode(rs.getString("ASSET_CODE"));
+                newTransaction.setNoofitems(rs.getInt("QUANTITY"));
+                newTransaction.setLocation(rs.getString("Location"));
+                newTransaction.setSpare1(rs.getString("email1"));
+                newTransaction.setSpare2(rs.getString("email2"));
+                newTransaction.setSpare3(rs.getString("Spare_3"));
+                newTransaction.setSpare4(rs.getString("Spare_4"));
+                newTransaction.setSpare5(rs.getString("Spare_5"));
+                newTransaction.setSpare6(rs.getString("Spare_6"));
+                newTransaction.setMultiple(rs.getString("Multiple"));
+                newTransaction.setMemo(rs.getString("Memo"));
+                newTransaction.setMemovalue(rs.getString("MemoValue"));
+                newTransaction.setUsefullife(rs.getInt("IMPROV_USEFULLIFE"));
+                newTransaction.setProjectCode(rs.getString("PROJECT_CODE"));
+
+                list.add(newTransaction);
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
 }
  
 public java.util.ArrayList getNewAssetSqlRecordsForUnCapitalised()
@@ -11205,7 +11369,7 @@ public java.util.ArrayList getNewAssetSqlRecords()
 } 
 
 
-public boolean assetalertNotifications(String asset_Id, int assetCode,int alertNo) {
+public boolean assetalertNotificationsOld(String asset_Id, int assetCode,int alertNo) {
 	Connection con = null;
 	PreparedStatement ps = null;
 	boolean done = false;
@@ -11231,6 +11395,28 @@ public boolean assetalertNotifications(String asset_Id, int assetCode,int alertN
 	}
 	return done;
 }
+
+public boolean assetalertNotifications(String assetId, int assetCode, int alertNo) {
+    String query = "INSERT INTO ASSET_ALERT_LOG (ASSET_ID, ASSET_CODE, ALERT_DATE, ALERT_NO) "
+                 + "VALUES (?, ?, ?, ?)";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, assetId);
+        ps.setInt(2, assetCode);
+        ps.setDate(3, dateConvert(new java.util.Date()));
+        ps.setInt(4, alertNo);
+
+        int rowsAffected = ps.executeUpdate();
+        return rowsAffected > 0;
+
+    } catch (Exception e) {
+    	System.out.println("Error executing assetalertNotifications for assetId=" + assetId + e);
+        return false;
+    }
+}
+
 
 public java.util.ArrayList getPPMRecords()
  {
@@ -11331,7 +11517,7 @@ public boolean ppmlog(String transId,String branchCode, String subcatCode, Strin
 	return done;
 }
 
-public java.util.ArrayList getSendMailSqlRecords()
+public java.util.ArrayList getSendMailSqlRecordsOld()
 { 
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -11372,7 +11558,33 @@ public java.util.ArrayList getSendMailSqlRecords()
 	return _list;
 } 
 
-public boolean updateSendMailRecords( int id)
+public java.util.ArrayList<SendMail> getSendMailSqlRecords() { 
+    java.util.ArrayList<SendMail> mailList = new java.util.ArrayList<>();
+    String query = "SELECT * FROM MAILS_TO_SEND WHERE STATUS IS NULL AND MAIL_ADDRESS IS NOT NULL AND MAIL_ADDRESS != ''";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {                
+            SendMail mail = new SendMail();
+            mail.setId(rs.getInt("ID"));
+            mail.setAddress(rs.getString("MAIL_ADDRESS"));
+            mail.setHeader(rs.getString("MAIL_HEADER"));
+            mail.setBody(rs.getString("MAIL_BODY"));
+            mail.setStatus(rs.getString("STATUS"));
+            mailList.add(mail);
+        }
+
+    } catch (Exception e) {
+    	System.out.println("WARN: getSendMailSqlRecords failed" + e);
+    }
+
+    return mailList;
+}
+
+
+public boolean updateSendMailRecordsOld( int id)
 {
 	Connection con = null;
 	PreparedStatement ps = null;
@@ -11391,6 +11603,25 @@ public boolean updateSendMailRecords( int id)
 	
 	return done;
 }
+
+public boolean updateSendMailRecords(int id) {
+    String query = "UPDATE MAILS_TO_SEND SET SENDDATE = ?, STATUS = 'SENT' WHERE ID = ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setDate(1, dateConvert(new java.util.Date()));
+        ps.setInt(2, id);
+
+        int rowsAffected = ps.executeUpdate();
+        return rowsAffected > 0;
+
+    } catch (Exception e) {
+    	System.out.println("Error updating mail record ID=" + id + e);
+        return false;
+    }
+}
+
 // +++++++++++++Without Authentication++++++++++++++++++++++++++++++++++++++
 //public boolean sendRecordMail(String usermails, String subject,String msgText1)
 //{
@@ -13345,7 +13576,7 @@ public boolean insertFTRecordsFrom_Am_Asset()
 	return done;
 }
 
-public boolean createMonthlyDeprCharges(ArrayList list)
+public boolean createMonthlyDeprChargesOld(ArrayList list)
 {
     Connection con = null;
     PreparedStatement ps = null;
@@ -13453,34 +13684,109 @@ public boolean createMonthlyDeprCharges(ArrayList list)
 return (d.length > 0);
 }
 
+public boolean createMonthlyDeprCharges(List<newAssetTransaction> list) {
+
+    String query =
+        "INSERT INTO MONTHLY_DEPRECIATIONCHARGE " +
+        "(ASSET_ID, Description, BRANCH_CODE, BRANCH_NAME, CATEGORY_CODE, Dept_Code, SBU_CODE, COST_PRICE, Monthly_Dep, YearDeprCharges, Accum_Dep, " +
+        "NBV, TOTAL_NBV, IMPROV_COST, IMPROV_ACCUMDEP, IMPROV_MONTHLYDEP, IMPROV_NBV, Total_Cost_Price, Date_purchased, EFFECTIVE_DATE, DEP_END_DATE, DEP_DATE, " +
+        "CALC_LIFESPAN, TOTAL_LIFE, IMPROV_TOTALLIFE, REMAINING_LIFE, DEP_RATE, CHARGEYEAR, Asset_Status) " +
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        for (newAssetTransaction bd : list) {
+
+            ps.setString(1, bd.getAssetId());
+            ps.setString(2, bd.getDescription());
+            ps.setString(3, bd.getBranchCode());
+            ps.setString(4, bd.getBranchName());
+            ps.setString(5, bd.getCategoryCode());
+            ps.setString(6, bd.getDeptCode());
+            ps.setString(7, bd.getSbuCode());
+            ps.setDouble(8, bd.getCostPrice());
+            ps.setDouble(9, bd.getMonthlyDep());
+            ps.setDouble(10, bd.getDeprChargeToDate());
+            ps.setDouble(11, bd.getAccumDep());
+            ps.setDouble(12, bd.getNbv());
+            ps.setDouble(13, bd.getTotalnbv());
+            ps.setDouble(14, bd.getImprovcostPrice());
+            ps.setDouble(15, bd.getImprovaccumDep());
+            ps.setDouble(16, bd.getImprovmonthlyDep());
+            ps.setDouble(17, bd.getImprovnbv());
+            ps.setDouble(18, bd.getTotalCost());
+            ps.setString(19, bd.getDatepurchased());
+            ps.setString(20, bd.getEffectiveDate());
+            ps.setString(21, bd.getDependDate());
+            ps.setString(22, bd.getDepDate());
+            ps.setInt(23, bd.getCalcLifeSpan());
+            ps.setInt(24, bd.getUsefullife());
+            ps.setInt(25, bd.getImprovtotallife());
+            ps.setInt(26, bd.getRemainLife());
+            ps.setDouble(27, bd.getDepRate());
+            ps.setString(28, bd.getChargeYear());
+            ps.setString(29, bd.getAssetStatus());
+
+            ps.addBatch();
+        }
+
+        int[] result = ps.executeBatch();
+        return result.length > 0;
+
+    } catch (Exception ex) {
+        System.out.println("Error createMonthlyDeprCharges() -> " + ex.getMessage());
+        return false;
+    }
+}
+
+
+//public boolean monthlyDeprChargeComplete(String reportDate) {
+//
+//	Connection con = null;
+//	PreparedStatement ps = null;
+//	boolean done = false;
+//	String query = "INSERT INTO monthly_Depr_Charge(REPORT_DATE,REPORT_GENERATE) VALUES (?,?)";
+//
+//	try {
+//		con = getConnection();
+//		ps = con.prepareStatement(query);
+//
+//		ps.setString(1, reportDate);
+//		ps.setString(2, "Y");
+//
+//		done = (ps.executeUpdate() != -1);
+//
+//	} catch (Exception e) {
+//		System.out.println("WARNING:Error executing Query for monthly_Depr_Charge ->"
+//				+ e.getMessage());
+//	} finally {
+//		closeConnection(con, ps);
+//	}
+//	return done;
+//
+//}
 
 public boolean monthlyDeprChargeComplete(String reportDate) {
 
-	Connection con = null;
-	PreparedStatement ps = null;
-	boolean done = false;
-	String query = "INSERT INTO monthly_Depr_Charge(REPORT_DATE,REPORT_GENERATE) VALUES (?,?)";
+    String query = "INSERT INTO monthly_Depr_Charge(REPORT_DATE, REPORT_GENERATE) VALUES (?, ?)";
 
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
 
-		ps.setString(1, reportDate);
-		ps.setString(2, "Y");
+        ps.setString(1, reportDate);
+        ps.setString(2, "Y");
 
-		done = (ps.executeUpdate() != -1);
+        return ps.executeUpdate() > 0;
 
-	} catch (Exception e) {
-		System.out.println("WARNING:Error executing Query for monthly_Depr_Charge ->"
-				+ e.getMessage());
-	} finally {
-		closeConnection(con, ps);
-	}
-	return done;
-
+    } catch (Exception e) {
+        System.out.println("WARNING: Error executing Query for monthly_Depr_Charge -> "
+                + e.getMessage());
+        return false;
+    }
 }
 
-public java.util.ArrayList getDepreciationChargesExportRecords(String query)
+public java.util.ArrayList getDepreciationChargesExportRecordsOld(String query)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -13584,6 +13890,56 @@ public java.util.ArrayList getDepreciationChargesExportRecords(String query)
 	return _list;
 }
 
+
+public java.util.ArrayList getDepreciationChargesExportRecords(String query) {
+
+	java.util.ArrayList list = new java.util.ArrayList();
+
+    try (Connection c = getConnection();
+         PreparedStatement ps = c.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+
+        	newAssetTransaction newTransaction = new newAssetTransaction();
+
+            newTransaction.setAssetId(rs.getString("ASSET_ID"));
+            newTransaction.setBranchCode(rs.getString("BRANCH_CODE"));
+            newTransaction.setCategoryCode(rs.getString("CATEGORY_CODE"));
+            newTransaction.setSbuCode(rs.getString("SBU_CODE"));
+            newTransaction.setDescription(rs.getString("Description"));
+            newTransaction.setMonthlyDep(rs.getDouble("Monthly_Dep"));
+            newTransaction.setEffectiveDate(rs.getString("EFFECTIVE_DATE"));
+            newTransaction.setCostPrice(rs.getDouble("COST_PRICE"));
+            newTransaction.setTotalnbv(rs.getDouble("TOTAL_NBV"));
+            newTransaction.setAccumDep(rs.getDouble("Accum_Dep"));
+            newTransaction.setDeprChargeToDate(rs.getDouble("YearDeprCharges"));
+            newTransaction.setNbv(rs.getDouble("NBV"));
+            newTransaction.setImprovcostPrice(rs.getDouble("IMPROV_COST"));
+            newTransaction.setImprovaccumDep(rs.getDouble("IMPROV_ACCUMDEP"));
+            newTransaction.setImprovmonthlyDep(rs.getDouble("IMPROV_MONTHLYDEP"));
+            newTransaction.setImprovnbv(rs.getDouble("IMPROV_NBV"));
+            newTransaction.setTotalCost(rs.getDouble("Total_Cost_Price"));
+            newTransaction.setDatepurchased(rs.getString("Date_purchased"));
+            newTransaction.setDependDate(rs.getString("DEP_END_DATE"));
+            newTransaction.setDepDate(rs.getString("DEP_DATE"));
+            newTransaction.setDepRate(rs.getDouble("DEP_RATE"));
+            newTransaction.setCalcLifeSpan(rs.getInt("CALC_LIFESPAN"));
+            newTransaction.setUsefullife(rs.getInt("TOTAL_LIFE"));
+            newTransaction.setImprovtotallife(rs.getInt("IMPROV_TOTALLIFE"));
+            newTransaction.setRemainLife(rs.getInt("REMAINING_LIFE"));
+            newTransaction.setChargeYear(rs.getString("CHARGEYEAR"));
+            newTransaction.setAssetStatus(rs.getString("Asset_Status"));
+
+            list.add(newTransaction);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
 
 public java.util.ArrayList getExpensesSqlRecords()
 {
@@ -14957,7 +15313,7 @@ public opexAcctType getOpexAcctTypeByTypeCode(String TypeCode) {
 
 }
 
-public boolean dropObject(String query)
+public boolean dropObjectOld(String query)
 {
 //	System.out.println("====findObject query=====  "+query);
 	boolean done = false;
@@ -14981,7 +15337,24 @@ public boolean dropObject(String query)
     return done;
 }
 
-public boolean runDropTables(String record) {
+public boolean dropObject(String query) {
+    boolean done = false;
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        done = ps.executeUpdate() > 0; 
+
+    } catch (Exception e) {
+        System.out.println("WARN: ERROR dropObject -> " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return done;
+}
+
+
+public boolean runDropTablesOld(String record) {
 
 	Connection con = null;
 	PreparedStatement ps = null;
@@ -15001,7 +15374,28 @@ public boolean runDropTables(String record) {
 
 }
 
-public java.util.ArrayList getDropTableRecords()
+public boolean runDropTables(String sql) {
+    boolean done = false;
+
+    if (sql == null || sql.trim().isEmpty()) {
+        return false;
+    }
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        done = (ps.executeUpdate() != -1);
+
+    } catch (Exception e) {
+        System.out.println("WARNING: Error executing runDropTables -> " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return done;
+}
+
+
+public java.util.ArrayList getDropTableRecordsOld()
 { 
 	java.util.ArrayList _list = new java.util.ArrayList();  
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -15038,6 +15432,35 @@ public java.util.ArrayList getDropTableRecords()
 					}
 	return _list;
 } 
+
+public java.util.ArrayList<SendMail> getDropTableRecords() { 
+    java.util.ArrayList<SendMail> list = new java.util.ArrayList<>();
+
+    String query = "SELECT * FROM DROP_TABLE";
+
+    try (Connection conn = getConnection();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(query)) {
+
+        while (rs.next()) {                
+            int id = rs.getInt("ID"); 
+            String recordStr = rs.getString("RECORD");
+
+            SendMail record = new SendMail();
+            record.setId(id);
+            record.setAddress(recordStr);
+
+            list.add(record);
+        }
+
+    } catch (Exception e) {
+        System.out.println("WARN: getDropTableRecords failed -> " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    return list;
+}
+
 
 public String createAssetDescriptions(
 		legend.admin.objects.AssetDescription descript) {
@@ -15432,7 +15855,7 @@ public String getLegacyBranchRecords(String legacyTransId)
 //}
 
 
-public java.util.ArrayList<Branch> getNewBranchRecordsFromLegacySystem() { 
+public java.util.ArrayList<Branch> getNewBranchRecordsFromLegacySystemOld() { 
     java.util.ArrayList<Branch> branchList = new java.util.ArrayList<>();
     
     String query = "SELECT * FROM ZENITHUBS.NEW_BRANCH_DETAILS";
@@ -15468,9 +15891,33 @@ public java.util.ArrayList<Branch> getNewBranchRecordsFromLegacySystem() {
     return branchList;
 }
 
+public java.util.ArrayList<Branch> getNewBranchRecordsFromLegacySystem() { 
+    java.util.ArrayList<Branch> branchList = new java.util.ArrayList<>();
+    String query = "SELECT * FROM ZENITHUBS.NEW_BRANCH_DETAILS";
+
+    try (Connection conn = getFinacleConnection();
+         PreparedStatement ps = conn.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            Branch branch = new Branch();
+            branch.setBranchCode(rs.getString("BRANCH_CODE"));
+            branch.setBranchName(rs.getString("BRANCH_NAME"));
+            branch.setBranchAddress(rs.getString("BRANCH_ADDR1"));
+            branchList.add(branch);
+        }
+
+    } catch (Exception e) {
+    	System.out.println("Error fetching branches from legacy system" + e);
+    }
+
+    return branchList;
+}
 
 
-public boolean InsertNewBranch(String branchCode, String branchName, String branchAddress,String stateId)
+
+
+public boolean InsertNewBranchOld(String branchCode, String branchName, String branchAddress,String stateId)
 {
     Connection con;
     PreparedStatement ps;
@@ -15520,6 +15967,51 @@ public boolean InsertNewBranch(String branchCode, String branchName, String bran
 	}   
     return done;
 }
+
+public boolean InsertNewBranch(String branchCode, String branchName, String branchAddress, String stateId) {
+    boolean done = false;
+    String query = "INSERT INTO AM_AD_BRANCH("
+            + "BRANCH_ID, BRANCH_CODE, BRANCH_NAME, BRANCH_ACRONYM, GL_PREFIX, "
+            + "BRANCH_ADDRESS, STATE, REGION_CODE, BRANCH_STATUS, CREATE_DATE, EMAIL, PHONE_NO, USER_ID) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        // Generate ID
+        String branchId = new ApplicationHelper().getGeneratedId("AM_AD_BRANCH");
+
+        // Generate acronym safely
+        String acronym = branchName.length() >= 3 ? branchName.substring(0, 3).toUpperCase() : branchName.toUpperCase();
+        int count = Integer.parseInt(getCodeName("SELECT COUNT(*) FROM am_ad_branch WHERE BRANCH_ACRONYM='" + acronym + "'"));
+        if (count > 0) acronym += count;  // Append number if duplicate
+
+        String email = getCodeName("SELECT companyMail FROM am_gb_company");
+
+        ps.setString(1, branchId);
+        ps.setString(2, branchCode);
+        ps.setString(3, branchName);
+        ps.setString(4, acronym);
+        ps.setString(5, branchCode);
+        ps.setString(6, branchAddress);
+        ps.setString(7, stateId != null ? stateId : "1");
+        ps.setString(8, "001");
+        ps.setString(9, "ACTIVE");
+        ps.setDate(10, dateConvert(new Date()));
+        ps.setString(11, email != null ? email : "");
+        ps.setString(12, "012665944"); 
+        ps.setString(13, "0");         
+
+        done = ps.executeUpdate() > 0;
+
+    } catch (Exception e) {
+    	System.out.println("Error inserting new branch: " + branchCode + e);
+    }
+
+    return done;
+}
+
+
 
 public java.util.ArrayList getLegacyTransactionRecords(String fromDate, String toDate,String bankingApp, String legacySysId)
 { 
@@ -15755,7 +16247,7 @@ public boolean InsertLegacyTransactions(String makerId, String serialNo, String 
 }
 
 
-public boolean InsertNewVendor(String branchCode, String branchName, String branchAddress,String stateId)
+public boolean InsertNewVendorOld(String branchCode, String branchName, String branchAddress,String stateId)
 {
     Connection con;
     PreparedStatement ps;
@@ -15798,6 +16290,45 @@ public boolean InsertNewVendor(String branchCode, String branchName, String bran
 	}   
     return done;
 }
+
+public boolean InsertNewVendor(String branchCode, String branchName, String branchAddress, String stateId) {
+    boolean done = false;
+    String query = "INSERT INTO am_ad_vendor("
+            + "Vendor_ID, Vendor_Code, Vendor_Name, Contact_Person, Contact_Address, "
+            + "account_number, Vendor_Status, Create_date, RCNo) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        // Generate unique Vendor ID
+        String vendorId = new ApplicationHelper().getGeneratedId("AM_AD_VENDOR");
+
+        // Construct vendor details
+        String vendorName = "FIXED ASSET TRANSIT - " + branchName;
+        String contactPerson = "BRANCH MANAGER";
+        String accountNumber = "120100015"; 
+        String rcNumber = "RC150224";      
+
+        ps.setString(1, vendorId);
+        ps.setString(2, branchCode);
+        ps.setString(3, vendorName);
+        ps.setString(4, contactPerson);
+        ps.setString(5, branchAddress != null ? branchAddress : "");
+        ps.setString(6, accountNumber);
+        ps.setString(7, "ACTIVE");
+        ps.setDate(8, dateConvert(new Date()));
+        ps.setString(9, rcNumber);
+
+        done = ps.executeUpdate() > 0;
+
+    } catch (Exception e) {
+    	 System.out.println("Error executing InsertNewVendor for branch: " + branchCode + e);
+    }
+
+    return done;
+}
+
 
 public java.util.ArrayList getNewBranchRecordsFromFinacleLegacySystem()
 { 

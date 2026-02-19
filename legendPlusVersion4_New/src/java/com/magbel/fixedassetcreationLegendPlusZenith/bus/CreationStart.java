@@ -51,7 +51,8 @@ public class CreationStart {
             Trigger trigger3 = TriggerBuilder.newTrigger()
                     .withIdentity("triggerJobs3", "group3")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 0 0/3 * * ?"))
+                            CronScheduleBuilder.cronSchedule("0 0 0/3 * * ?")
+                            .withMisfireHandlingInstructionDoNothing())
                     .build();
 
             scheduler.scheduleJob(job3, trigger3);
@@ -72,7 +73,8 @@ public class CreationStart {
             Trigger trigger4 = TriggerBuilder.newTrigger()
                     .withIdentity("triggerJobs4", "group4")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 0/5 * * * ?"))
+                            CronScheduleBuilder.cronSchedule("0 0/5 * * * ?")
+                            .withMisfireHandlingInstructionDoNothing())
                     .build();
 
             scheduler.scheduleJob(job4, trigger4);
@@ -93,7 +95,8 @@ public class CreationStart {
             Trigger trigger6 = TriggerBuilder.newTrigger()
                     .withIdentity("triggerJobs6", "group6")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 0/10 * * * ?"))
+                            CronScheduleBuilder.cronSchedule("0 0/10 * * * ?")
+                            .withMisfireHandlingInstructionDoNothing())
                     .build();
 
             scheduler.scheduleJob(job6, trigger6);
@@ -114,7 +117,8 @@ public class CreationStart {
             Trigger trigger11 = TriggerBuilder.newTrigger()
                     .withIdentity("triggerJobs11", "group11")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 0 0/1 * * ?"))
+                            CronScheduleBuilder.cronSchedule("0 0 0/1 * * ?")
+                            .withMisfireHandlingInstructionDoNothing())
                     .build();
 
             scheduler.scheduleJob(job11, trigger11);
@@ -135,7 +139,8 @@ public class CreationStart {
             Trigger triggerDrop = TriggerBuilder.newTrigger()
                     .withIdentity("triggerDropTemp", "group19")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 59 23 * * ?"))
+                            CronScheduleBuilder.cronSchedule("0 59 23 * * ?")
+                            .withMisfireHandlingInstructionDoNothing())
                     .build();
 
             scheduler.scheduleJob(jobDrop, triggerDrop);
@@ -156,7 +161,9 @@ public class CreationStart {
             Trigger trigger20 = TriggerBuilder.newTrigger()
                     .withIdentity("jobsBranchTable", "group20")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 59 23 * * ?"))
+                            CronScheduleBuilder.cronSchedule("0 59 23 * * ?")
+                            .withMisfireHandlingInstructionDoNothing())
+                    
                     .build();
 
             scheduler.scheduleJob(jobKeyBranchDrop, trigger20);
