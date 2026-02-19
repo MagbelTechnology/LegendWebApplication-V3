@@ -732,10 +732,10 @@ public class DepreciationChecks extends MagmaDBConnection {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        DepreciationProcessingManager dpm = new DepreciationProcessingManager();
+        DepreciationLegendPlusProcessingManager dpm = new DepreciationLegendPlusProcessingManager();
         try {
             //String[][] users = new String[1][20];
-            legend.admin.objects.User users = new legend.admin.handlers.SecurityHandler_07_11_2024().getUserByUserID(userid);
+            legend.admin.objects.User users = new legend.admin.handlers.SecurityHandler().getUserByUserID(userid);
             
 
             con = getConnection("legendPlus");
@@ -751,7 +751,7 @@ public class DepreciationChecks extends MagmaDBConnection {
                 String currid = rs.getString("currency_id");
                 double amount = rs.getDouble("Amount");
                 String tblid = rs.getString("tblid");
-                dpm = new DepreciationProcessingManager();
+                dpm = new DepreciationLegendPlusProcessingManager();
                 String narration = "Being Depreciation For " +
                                    sdf2.format(pinfo.getProcessingDate());
                 dpm.logRaisedEntryTransaction(drno, accttype, "",

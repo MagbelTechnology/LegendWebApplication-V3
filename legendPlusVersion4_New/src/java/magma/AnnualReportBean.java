@@ -18,10 +18,12 @@ private String cost_TransferFrom="0";
 private String cost_TransferTo="0";
 private String cost_additions="0";
 private String cost_reclass="0";
+private String cost_CloseAsset="0";
 private String dep_open_bal="0";
 private String dep_charge="0";
 private String dep_disposal="0";
 private String dep_Transfer="0";
+private String dep_CloseAsset="0";
 private String dep_reclass="0";
 private String revaluation="0";
 private String improvement="0";
@@ -345,6 +347,34 @@ private String nbv_closing_bal="0";
      */
     public void setCost_additionsImprovement(String cost_additionsImprovement) {
         this.cost_additionsImprovement = cost_additionsImprovement;
+    }
+
+    /**
+     * @return the cost_CloseAsset
+     */
+    public String getCost_CloseAsset() {
+        return cost_CloseAsset;
+    }
+
+    /**
+     * @param cost_CloseAsset the cost_CloseAsset to set
+     */
+    public void setCost_CloseAsset(String cost_CloseAsset) {
+        this.cost_CloseAsset = cost_CloseAsset;
+    }
+            
+    /**
+     * @return the dep_CloseAsset
+     */
+    public String getDep_CloseAsset() {
+        return dep_CloseAsset;
+    }
+
+    /**
+     * @param dep_CloseAsset the dep_CloseAsset to set
+     */
+    public void setDep_CloseAsset(String dep_CloseAsset) {
+        this.dep_CloseAsset = dep_CloseAsset;
     }
 
 

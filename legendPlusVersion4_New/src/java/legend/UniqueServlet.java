@@ -116,63 +116,62 @@ if(operation.equals("3"))
         PrintWriter out = response.getWriter();
 
     
-        String userClass = (String)request.getSession().getAttribute("UserClass");
+//        String userClass = (String)request.getSession().getAttribute("UserClass");
     
      try {
-    	 if (!userClass.equals("NULL") || userClass!=null){  
-            System.out.println("============inside processrequest method========");
-           String bar_code = request.getParameter("bar_code");
-           String lpo = request.getParameter("lpo");
-	  //String role = request.getParameter("role");
-	  String operation = request.getParameter("OPT").trim();
-          String invNo = request.getParameter("inv");
-          String assetID=request.getParameter("id");
-          String vendorNo = request.getParameter("sb");
-	if(operation.equals("1"))
-      {
-          if ((bar_code != null)||(bar_code != ""))
-          {
-        	  String bar_codeFound = getCodeName("SELECT bar_code  FROM am_asset WHERE bar_code='"+bar_code+"'");
-              String result = bar_codeFound;
-              processBarCode(request, response, result);
-          }
-      }
+    	 String userClass = (String) request.getSession().getAttribute("UserClass");
 
-if(operation.equals("2"))
-      {
-          if ((lpo != null)||(lpo != ""))
-          {
-        	  String lpoFound = getCodeName("SELECT lpo  FROM am_asset WHERE lpo='"+lpo+"'");
-              String result = lpoFound;
-              processBarCode(request, response, result);
-          }
-      }
+    	 if (userClass != null && !"NULL".equals(userClass)) {
+    	     System.out.println("============inside processrequest method========");
+    	     
+    	     String bar_code = request.getParameter("bar_code");
+    	     String lpo = request.getParameter("lpo");
+    	     String operation = request.getParameter("OPT");
+    	     String invNo = request.getParameter("inv");
+    	     String assetID = request.getParameter("id");
+    	     String vendorNo = request.getParameter("sb");
 
-if(operation.equals("3"))
-      {
-          if ((invNo != null)||(invNo != ""))
-          {
-          System.out.println("InvoiceNumber <<<<<<<<<<< " +invNo );
-        	  String invFound = getCodeName("SELECT INVOICE_NO  FROM am_invoice_no WHERE INVOICE_NO='"+invNo+"'");
-                 System.out.println("invFound <<<<<<<< " +invFound );
-              String result = invFound;
-              processBarCode(request, response, result);
-          }
-      }
-if(operation.equals("4"))
-      {
-          if (((invNo != null)||(invNo != ""))&&((lpo != null)||(lpo != "")))
-          {
-              String invQry="Select invoice_no from am_invoice_no where INVOICE_NO='"+invNo+"' and lpo='"+lpo+"'" +
-                      " and asset_id='"+assetID+"'";
-              System.out.println("invQry >>>>>>>>>> " + invQry);
-              String invFound = getCodeName(invQry);
-                  System.out.println("invFound >>>>>>>> " +invFound );
-              String result = invFound;
-              processBarCode(request, response, result);
-          }
-      }
-     }
+    	     if (operation != null) {
+    	         operation = operation.trim();
+
+    	         if (operation.equals("1")) {
+    	             if (bar_code != null && !bar_code.isEmpty()) {
+    	                 String bar_codeFound = getCodeName("SELECT bar_code FROM am_asset WHERE bar_code='" + bar_code + "'");
+    	                 processBarCode(request, response, bar_codeFound);
+    	             }
+    	         }
+
+    	         if (operation.equals("2")) {
+    	             if (lpo != null && !lpo.isEmpty()) {
+    	                 String lpoFound = getCodeName("SELECT lpo FROM am_asset WHERE lpo='" + lpo + "'");
+    	                 processBarCode(request, response, lpoFound);
+    	             }
+    	         }
+
+    	         if (operation.equals("3")) {
+    	             if (invNo != null && !invNo.isEmpty()) {
+    	                 System.out.println("InvoiceNumber <<<<<<<<<<< " + invNo);
+    	                 String invFound = getCodeName("SELECT INVOICE_NO FROM am_invoice_no WHERE INVOICE_NO='" + invNo + "'");
+    	                 System.out.println("invFound <<<<<<<< " + invFound);
+    	                 processBarCode(request, response, invFound);
+    	             }
+    	         }
+
+    	         if (operation.equals("4")) {
+    	             if (invNo != null && !invNo.isEmpty() && lpo != null && !lpo.isEmpty()) {
+    	                 String invQry = "SELECT invoice_no FROM am_invoice_no " +
+    	                                 "WHERE INVOICE_NO='" + invNo + "' " +
+    	                                 "AND lpo='" + lpo + "' " +
+    	                                 "AND asset_id='" + assetID + "'";
+    	                 System.out.println("invQry >>>>>>>>>> " + invQry);
+    	                 String invFound = getCodeName(invQry);
+    	                 System.out.println("invFound >>>>>>>> " + invFound);
+    	                 processBarCode(request, response, invFound);
+    	             }
+    	         }
+    	     }
+    	 }
+
         }
     
     finally { 

@@ -17,6 +17,7 @@ public class Mobiles {
 	private String userId;
 	private String createDate;
 	private String macAddress;
+	private String staffEnabled;
 
 	
 	public Mobiles(){
@@ -129,9 +130,21 @@ public class Mobiles {
 	 */
 	public void setMacAddress(String macAddress) {
 		this.macAddress = macAddress;
-	}	
+	}
 	
 	
+	
+	
+	public String getStaffEnabled() {
+		return staffEnabled;
+	}
+
+
+	public void setStaffEnabled(String staffEnabled) {
+		this.staffEnabled = staffEnabled;
+	}
+
+
 	public void DeleteExistingMobile()
 			throws Exception
 			{
@@ -141,7 +154,7 @@ public class Mobiles {
 				String id = "";
 
 			String query2 = "delete from AM_GB_REGMAC where USER_NAME in (select USER_NAME from AM_GB_REGMAC_UPLOAD)";
-			String query  = "insert into AM_GB_REGMAC_UPLOAD (USER_NAME, MAC_ADDRESS, STATUS, CREATE_DATE, USER_ID) values(?,?,?,?,?);";
+			String query  = "insert into AM_GB_REGMAC_UPLOAD (USER_NAME, MAC_ADDRESS, STATUS, CREATE_DATE, USER_ID, Staff_Enabled) values(?,?,?,?,?,?);";
 			try {     
 				con = getConnection();  
 				ps = con.prepareStatement(query);
@@ -150,6 +163,7 @@ public class Mobiles {
 				ps.setString(3, mobileStatus);
 				ps.setString(4, createDate);
 				ps.setString(5, userId);
+				ps.setString(6, staffEnabled);
 			    
 				//System.out.println("<<<<<<<DeleteExistingStaff staffId: "+staffId+"   fullName: "+fullName+"    branchCode: "+branchCode+"   createdBy: "+createdBy);
 				done = (ps.executeUpdate() != -1);
@@ -178,7 +192,7 @@ public class Mobiles {
 				boolean done = false;
 				String id = "";
 
-			String query = "insert into AM_GB_REGMAC_UPLOAD (USER_NAME, MAC_ADDRESS, STATUS, CREATE_DATE, USER_ID) values(?,?,?,?,?);";
+			String query = "insert into AM_GB_REGMAC_UPLOAD (USER_NAME, MAC_ADDRESS, STATUS, CREATE_DATE, USER_ID, Staff_Enabled) values(?,?,?,?,?,?);";
 
 			try {   
 				con = getConnection();  
@@ -188,6 +202,7 @@ public class Mobiles {
 				ps.setString(3, mobileStatus);
 				ps.setString(4, createDate);
 				ps.setString(5, userId);
+				ps.setString(6, staffEnabled);
 				
 				
 			
@@ -229,7 +244,7 @@ public class Mobiles {
           Mobiles mobile = null;
           ArrayList finder = new ArrayList();
           String selectQuery =
-          			"select USER_NAME, MAC_ADDRESS, STATUS, CREATE_DATE, USER_ID from AM_GB_REGMAC_UPLOAD ";
+          			"select USER_NAME, MAC_ADDRESS, STATUS, CREATE_DATE, USER_ID, Staff_Enabled from AM_GB_REGMAC_UPLOAD ";
           try {
               con = getConnection();
               ps = con.prepareStatement(selectQuery);
@@ -241,12 +256,14 @@ public class Mobiles {
   			   String userStatus = rs.getString("STATUS");
   			   String createDate = rs.getString("CREATE_DATE");
   			   String userId = rs.getString("USER_ID");
+  			   String staffEnabled = rs.getString("Staff_Enabled");
   			   	  mobile = new Mobiles();
   			   	mobile.setUserName(userName);
   			   	mobile.setMacAddress(macAddress);
   			   	mobile.setMobileStatus(userStatus);
   			   	mobile.setCreateDate(createDate);
   			   	mobile.setUserId(userId);
+  			   	mobile.setStaffEnabled(staffEnabled);
                 
                   finder.add(mobile);
 

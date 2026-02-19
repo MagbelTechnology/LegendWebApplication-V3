@@ -34,7 +34,7 @@ import magma.util.Codes;
 // Referenced classes of package com.magbel.legend.bus:
 //            ApprovalManager
 
-public class ApprovalRecords extends MagmaDBConnection
+public class ApprovalRecords_23_10_2025 extends MagmaDBConnection
 {
 
     private CurrencyNumberformat formata;
@@ -47,7 +47,7 @@ public class ApprovalRecords extends MagmaDBConnection
     AssetManager asset_manager;
     CompanyHandler comp;
   
-    public ApprovalRecords()
+    public ApprovalRecords_23_10_2025()
     {
         Alist = new ArrayList(); 
         qryCheck = "";
@@ -2147,6 +2147,24 @@ public class ApprovalRecords extends MagmaDBConnection
             	  ps.setString(6, fromDate);
             	  ps.setString(7, toDate);
               }
+            if(Filter.contains("cost_price") && Filter.contains("p.posting_DATE") && Filter.contains("id")){
+//            	System.out.println("=======cost_price, p.posting_DATE and Id  ======");
+          	  ps.setString(1, apprvLimit_min);
+          	  ps.setString(2, apprvLimit_max);
+          	  ps.setString(3, Id);
+          	  ps.setString(4, fromDate);
+          	  ps.setString(5, toDate);   
+          	  ps.setString(6, apprvLimit_min);
+          	  ps.setString(7, apprvLimit_max);
+          	  ps.setString(8, Id);
+          	  ps.setString(9, fromDate);
+          	  ps.setString(10, toDate);
+          	  ps.setString(11, apprvLimit_min);
+          	  ps.setString(12, apprvLimit_max);
+          	  ps.setString(13, Id);
+          	  ps.setString(14, fromDate);
+          	  ps.setString(15, toDate);
+              }  
             rs = ps.executeQuery();
 
             
@@ -2356,6 +2374,39 @@ public class ApprovalRecords extends MagmaDBConnection
             con = getConnection("legendPlus");
             ps = con.prepareStatement(FINDER_QUERY);
             ps.setInt(1, tranId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                user_id = rs.getString("user_Id");
+            }
+
+            System.out.println((new StringBuilder("\n\n the user id is")).append(user_id).toString());
+        } catch (Exception ex) {
+            System.out.println("WARNING: cannot fetch user id ->"
+                    + ex.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return user_id;
+    }
+    
+    public String userToEmailTransInitiator(Long tranId)
+    {
+        Connection con;
+        PreparedStatement ps;
+        ResultSet rs;
+        String user_id;
+        String FINDER_QUERY;
+        con = null;
+        ps = null;
+        rs = null;
+        user_id = "";
+        FINDER_QUERY = "SELECT user_Id from am_asset_approval WHERE transaction_Id = ? ";
+        try
+        {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(FINDER_QUERY);
+            ps.setLong(1, tranId);
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -2776,6 +2827,39 @@ public class ApprovalRecords extends MagmaDBConnection
         }
     }
 
+    public void updateAssetStatus2(long mtid, String status, String status1)
+    {
+        Connection con;
+        PreparedStatement ps;
+        String NOTIFY_QUERY;
+        con = null;
+        ps = null;
+        NOTIFY_QUERY = " update am_asset_approval set process_status=?,approval_level_count=?,approval1=" +
+"?,approval2=?,approval3=?,approval4=?,approval5=?,asset_status=? where transacti" +
+"on_id=? "
+;
+        try
+        {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(NOTIFY_QUERY);
+            ps.setString(1, status);
+            ps.setInt(2, 0);
+            ps.setInt(3, 0);
+            ps.setInt(4, 0);
+            ps.setInt(5, 0);
+            ps.setInt(6, 0);
+            ps.setInt(7, 0);
+            ps.setString(8, status1);
+            ps.setLong(9, mtid);
+            ps.executeUpdate();
+
+        } catch (Exception ex) {
+            System.out.println("WARNING: cannot update am_asset_approval in updateAssetStatus2 +" + ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+ 
     public void updateAssetStatus3(int mtid, String status, String status1, String rejectReason)
     {
         Connection con;
@@ -2809,6 +2893,42 @@ public class ApprovalRecords extends MagmaDBConnection
             closeConnection(con, ps);
         }
     }
+    
+    public void updateAssetStatus3(int mtid, String status, String status1, String rejectReason,String approveDate)
+    {
+        Connection con;
+        PreparedStatement ps;
+        String NOTIFY_QUERY;
+        con = null;
+        ps = null;
+        NOTIFY_QUERY = " update am_asset_approval set process_status=?,approval_level_count=?,approval1=" +
+"?,approval2=?,approval3=?,approval4=?,approval5=?,asset_status=?,reject_reason=?,DATE_APPROVED = ?" +
+" where transaction_id=? "
+;
+        try
+        {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(NOTIFY_QUERY);
+            ps.setString(1, status);
+            ps.setInt(2, 0);
+            ps.setInt(3, 0);
+            ps.setInt(4, 0);
+            ps.setInt(5, 0);
+            ps.setInt(6, 0);
+            ps.setInt(7, 0);
+            ps.setString(8, status1);
+            ps.setString(9, rejectReason);
+            ps.setString(10, approveDate);
+            ps.setInt(11, mtid);
+            ps.executeUpdate();
+
+        } catch (Exception ex) {
+            System.out.println("WARNING: cannot update am_asset_approval in updateAssetStatus3 +" + ex.getMessage());
+        } finally {
+            closeConnection(con, ps);
+        }
+    }
+
 
     public int getTranIdForRejetPost(String pageName, String asset_id)
     {
@@ -3435,6 +3555,12 @@ Finder_qry_Last = Finder_qry_Last + " " + ordering;
         	  ps.setString(3, FromDate);
         	  ps.setString(4, ToDate);
           } 
+          if(!Filter.contains("USERID") && Filter.contains("id") && Filter.contains("POSTING_DATE")){  
+//        	  System.out.println("<========getAssetByQuery=======>0 FromDate: "+FromDate+"     ToDate: "+ToDate);
+        	  ps.setString(1, assetId);
+        	  ps.setString(2, FromDate);
+        	  ps.setString(3, ToDate);
+          } 
           rs = ps.executeQuery();
             while (rs.next()) { 
                 String id = rs.getString("Id");
@@ -3660,7 +3786,7 @@ Finder_qry_Last = Finder_qry_Last + " " + ordering;
     }
 
     public boolean insertApprovalx(String id, String description, String page, String flag, String partPay, String UserId, String Branch, 
-            String subjectToVat, String whTax, String url, int transID, int assetCode)
+            String subjectToVat, String whTax, String url, long transID, int assetCode)
     {
         boolean done;
         Connection con;
@@ -3688,7 +3814,7 @@ Finder_qry_Last = Finder_qry_Last + " " + ordering;
             ps.setString(8, subjectToVat);
             ps.setString(9, whTax);
             ps.setString(10, url);
-            ps.setInt(11, transID);
+            ps.setLong(11, transID);
             ps.setInt(12, assetCode);
          //   ps.setString(13, String.valueOf(df.dateConvert(new java.util.Date())));
         //    ps.setTimestamp(13, dbConnection.getDateTime(new java.util.Date()));
@@ -3834,7 +3960,7 @@ String Finder_qryOld = (new StringBuilder(" select Id,p.Description,Page,p.posti
 Finder_qryOld = (new StringBuilder(String.valueOf(Finder_qryOld))).append(" ").append(ordering).toString();
         
         Finder_qry = "SELECT *FROM UncapitalizedRaiseEntry WHERE ID IS NOT NULL "+Filter;
-        System.out.println("findApprovalInitiator6 "+Finder_qry+"   ====apprvLimit_min: "+apprvLimit_min+"      apprvLimit_max: "+apprvLimit_max+"   FromDate: "+FromDate+"   ToDate: "+ToDate+"    ordering: "+ordering); 
+//        System.out.println("findApprovalInitiator6 "+Finder_qry+"   ====apprvLimit_min: "+apprvLimit_min+"      apprvLimit_max: "+apprvLimit_max+"   FromDate: "+FromDate+"   ToDate: "+ToDate+"    ordering: "+ordering); 
         try
         {
 //            con = getConnection("legendPlus");
@@ -4272,7 +4398,7 @@ Finder_qryOld = (new StringBuilder(String.valueOf(Finder_qryOld))).append(" ").a
     }
 
     public boolean insertApprovalx2(String id, String description, String page, String flag, String partPay, String UserId, String Branch, 
-            String subjectToVat, String whTax, String url, int transID, int assetCode)
+            String subjectToVat, String whTax, String url, long transID, int assetCode)
     {
         boolean done;
         Connection con;
@@ -4301,7 +4427,7 @@ Finder_qryOld = (new StringBuilder(String.valueOf(Finder_qryOld))).append(" ").a
             ps.setString(8, subjectToVat);
             ps.setString(9, whTax);
             ps.setString(10, url);
-            ps.setInt(11, transID);
+            ps.setLong(11, transID);
             ps.setString(12, "N");
             ps.setInt(13, assetCode);
  //           System.out.println("<<<<<getDate: "+new java.util.Date());
@@ -4329,13 +4455,15 @@ Finder_qryOld = (new StringBuilder(String.valueOf(Finder_qryOld))).append(" ").a
         String NOTIFY_QUERY;
         con = null;
         ps = null;
-        NOTIFY_QUERY = "UPDATE am_asset_uncapitalized SET raise_entry = ? WHERE ASSET_ID = ?  ";
+        NOTIFY_QUERY = "UPDATE am_asset_uncapitalized SET raise_entry = ?,Asset_Status = ?,Post_reject_reason = ? WHERE ASSET_ID = ?  ";
         try
         {
             con = getConnection("legendPlus");
             ps = con.prepareStatement(NOTIFY_QUERY);
             ps.setString(1, status);
-            ps.setString(2, assetid);
+            ps.setString(2, "ACTIVE");
+            ps.setString(3, "NULL");
+            ps.setString(4, assetid);            
             ps.executeUpdate();
 
         } catch (Exception ex) {
@@ -4959,7 +5087,7 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
     }
 
     public boolean insertApprovalxFT(String id, String description, String page, String flag, String partPay, String UserId, String Branch, 
-            String subjectToVat, String whTax, String url, int transID, int assetCode)
+            String subjectToVat, String whTax, String url, long transID, int assetCode)
     {
         boolean done;
         Connection con;
@@ -4986,7 +5114,7 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
             ps.setString(8, subjectToVat);
             ps.setString(9, whTax);
             ps.setString(10, url);
-            ps.setInt(11, transID);
+            ps.setLong(11, transID);
             ps.setInt(12, assetCode);
             ps.setString(13, "N");
             ps.setString(14, "N");
@@ -5503,7 +5631,7 @@ public void updateBatchPostingWithBatchId(String tableName,String columnName, St
 	Connection con = null;
     PreparedStatement ps = null;
     String query_r ="update " +tableName+ " set "+columnName+"=? where "+columnName+" = ?  " ;
-//    System.out.println("query_r updateBatchPostingWithBatchId>>>> "+query_r);
+    System.out.println("query_r updateBatchPostingWithBatchId>>>> "+query_r);
     try 
     	{
     	con = dbConnection.getConnection("legendPlus");
@@ -6043,86 +6171,86 @@ public String updateTablesWithGroupId(String Id, String tranType,String groupId)
     if(Id.equals("3")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_group_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b  "
-    		+ "where convert(varchar,a.Group_id) = p.Id and convert(varchar,a.Group_id) = b.Asset_id and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where convert(varchar,a.Group_id) = p.Id and convert(varchar,a.Group_id) = b.Asset_id and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("24")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_group_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b  "
-    		+ "where convert(varchar,a.Group_id) = p.Id and convert(varchar,a.Group_id) = b.Asset_id and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where convert(varchar,a.Group_id) = p.Id and convert(varchar,a.Group_id) = b.Asset_id and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("1")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b  "
-    		+ "where a.Asset_Id = p.Id and a.asset_id = b.Asset_id and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where a.Asset_Id = p.Id and a.asset_id = b.Asset_id and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("74")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  AM_GROUP_DISPOSAL a, am_raisentry_post p,am_ad_category c, am_asset s, am_asset_approval b "
-    		+ "where CONVERT(varchar,a.disposal_ID) = CONVERT(varchar,p.Id)  and a.asset_id = s.Asset_id and convert(varchar,a.disposal_ID) = b.Asset_id and CONVERT(varchar,a.disposal_ID) = b.Asset_Id and s.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where CONVERT(varchar,a.disposal_ID) = CONVERT(varchar,p.Id)  and a.asset_id = s.Asset_id and convert(varchar,a.disposal_ID) = b.Asset_id and CONVERT(varchar,a.disposal_ID) = b.Asset_Id and s.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("2")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_assetdisposal a, am_raisentry_post p,am_ad_category c, am_AssetDisposal d, am_asset_approval b, am_asset s   "
-    		+ "where a.Asset_id = p.Id and a.Asset_id = d.asset_id and a.Asset_Id = b.asset_id and a.asset_id = s.Asset_id and s.Category_ID = c.category_ID and b.process_status='A' and entryPostFlag = 'N' and GroupIdStatus = 'N' "
+    		+ "where a.Asset_id = p.Id and a.Asset_id = d.asset_id and a.Asset_Id = b.asset_id and a.asset_id = s.Asset_id and s.Category_ID = c.category_ID and b.process_status='A' and entryPostFlag = 'N' and GroupIdStatus = 'N' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("6")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_assetTransfer a, am_raisentry_post p,am_ad_category c, am_asset s, am_asset_approval b "
-    		+ "where a.asset_id = p.Id and a.asset_id = s.Asset_id and a.Asset_Id = b.asset_Id and s.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where a.asset_id = p.Id and a.asset_id = s.Asset_id and a.Asset_Id = b.asset_Id and s.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("4")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_assetReclassification a, am_raisentry_post p,am_asset s, am_asset_approval b "
-    		+ "where  a.new_asset_id = p.Id and a.asset_id = s.Asset_id and convert(varchar,a.asset_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where  a.new_asset_id = p.Id and a.asset_id = s.Asset_id and convert(varchar,a.asset_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("10")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_asset_improvement a, am_raisentry_post p,am_ad_category c, am_asset_approval b "
-    		+ "where a.Asset_Id = p.Id and a.asset_Id = b.asset_Id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where a.Asset_Id = p.Id and a.asset_Id = b.asset_Id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("13")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c, am_asset_approval b "
-    		+ "where a.Revalue_ID = p.Id and convert(varchar,a.Revalue_ID) = b.asset_Id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where a.Revalue_ID = p.Id and convert(varchar,a.Revalue_ID) = b.asset_Id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }
     if(Id.equals("16")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  AM_WIP_RECLASSIFICATION a, am_raisentry_post p,am_ad_category c, am_asset_approval b "
-    		+ "where a.Asset_id = p.Id and a.OLD_CAT_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' "
+    		+ "where a.Asset_id = p.Id and a.OLD_CAT_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }  
     if(Id.equals("12")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_assetUpdate a,am_asset t, am_raisentry_post p,am_ad_category c, am_asset_approval b "
-    		+ "where a.Asset_id = p.Id and a.Asset_id = t.Asset_id and a.asset_Id = b.asset_Id and t.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+    		+ "where a.Asset_id = p.Id and a.Asset_id = t.Asset_id and a.asset_Id = b.asset_Id and t.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
     		+ "and page = ? ";
     }    
     if(Id.equals("28")) {    	
         NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
         		+ "from  am_gb_bulkTransfer a,am_asset t, am_raisentry_post p, am_asset_approval b "
-        		+ "where convert(varchar, a.Batch_id) = p.Id and a.Asset_id = t.Asset_id and convert(varchar, a.Batch_id) = b.asset_Id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+        		+ "where convert(varchar, a.Batch_id) = p.Id and a.Asset_id = t.Asset_id and convert(varchar, a.Batch_id) = b.asset_Id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
         		+ "and page = ? ";  
     } 
     if(Id.equals("29")) {
         NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
         		+ "from  am_AcceleratedDepreciation a,am_asset t, am_raisentry_post p, am_asset_approval b  "
-        		+ "where convert(varchar, a.Asset_Id) = p.Id and a.Asset_id = t.Asset_id and a.asset_Id = b.asset_Id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+        		+ "where convert(varchar, a.Asset_Id) = p.Id and a.Asset_id = t.Asset_id and a.asset_Id = b.asset_Id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) "
         		+ "and page = ? ";      	
     }     
     if(Id.equals("90")) {
     NOTIFY_QUERY = "UPDATE a SET a.POSTING_BATCH = ? "
     		+ "from  am_raisentry_post p,am_asset_approval b, Approval_Level_setup s, FT_MAINTENANCE_HISTORY a, FT_MAINTENANCE_DETAILS_TMP ft "
     		+ "where a.HIST_ID = ft.HIST_ID AND P.Id = b.Batch_Id and ft.Batch_Id = p.Id AND s.Transaction_type = b.tran_type and p.entryPostFlag = 'N' "
-    		+ "AND b.process_status = 'A' and ft.STATUS = 'APPROVED' and page = ? ";
+    		+ "AND b.process_status = 'A' and ft.STATUS = 'APPROVED' and (a.POSTING_BATCH = '' OR a.POSTING_BATCH IS NULL) and page = ? ";
     }    
     boolean done;
 //    System.out.println("====>NOTIFY_QUERY: "+NOTIFY_QUERY+"     groupId: "+groupId+"     tranType: "+tranType);
@@ -6206,12 +6334,12 @@ public String postingUncapGroupId(String Id,String tranType)
   			+ "and d.Category_Id = c.category_Id and a.am.asset = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
   			+ "and d.branch_name = b.BRANCH_NAME and page = ? --UnCapitalised Asset Disposal Debit  ";    
     } 
-    if(Id.equals("10")) {
+    if(Id.equals("71")) {
     	FINDER_QUERY =	"select distinct POSTING_BATCH from am_Uncapitalized_improvement a, "
   			+ "am_raisentry_post p,am_ad_category c, am_asset_approval b where a.asset_id = p.Id and a.am.asset = b.asset_id and a.CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
   			+ "and page = ? --UnCapitalised Asset Improvement Debit ";    
     }     
-    if(Id.equals("6")) {
+    if(Id.equals("22")) {
     	FINDER_QUERY =	"select distinct POSTING_BATCH from am_UncapitalizedTransfer a, "
   			+ "am_raisentry_post p,am_ad_category c, am_asset_approval b where a.asset_id = p.Id and a.am.asset = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
   			+ "and page = ? --UnCapitalised Asset Transfer Debit ";    
@@ -6468,17 +6596,17 @@ public void updatePostWithBatchId(String tableName,String posttable, String batc
         }
 }
 
-public void updateImprovementWithBatchId(String tableName,String posttable, String batchId)
+public void updateImprovementWithBatchId(String tableName,String tableName2,String posttable, String batchId)
 {
 	Connection con = null;
     PreparedStatement ps = null;
     PreparedStatement ps1 = null;
     PreparedStatement ps2 = null;
     String query_a ="UPDATE a SET a.Cost_Price  = a.Cost_Price+b.cost_increase,a.nbv = a.nbv+b.cost_increase, a.Monthly_Dep = 0.00,a.TOTAL_NBV = a.TOTAL_NBV+b.cost_increase,a.Vatable_Cost = a.Vatable_Cost+b.vatable_cost "
-    		+ "from  "+tableName+" a, "+posttable+" b where a.Asset_id = b.Asset_id and b.IMPROV_USEFULLIFE = 0 and b.POSTING_BATCH = ? " ;
-    String query_b ="update a set a.IMPROV_COST = coalesce(a.IMPROV_COST,0) + b.cost_increase, a.IMPROV_NBV = coalesce(a.IMPROV_NBV,0) + b.cost_increase, a.TOTAL_NBV = coalesce(a.TOTAL_NBV,0) + b.cost_increase, a.IMPROVED = 'P' "
+    		+ "from  "+tableName+" a, "+posttable+" b, "+tableName2+" p where a.Asset_id = b.Asset_id and CONVERT(VARCHAR, b.Revalue_ID) = p.asset_id and b.IMPROV_USEFULLIFE = 0 and IMPROVED = 'Y' and p.process_status = 'A' and b.POSTING_BATCH = ? " ;
+    String query_b ="update a set a.IMPROV_COST = coalesce(a.IMPROV_COST,0) + b.cost_increase, a.IMPROV_NBV = coalesce(a.IMPROV_NBV,0) + b.cost_increase, a.TOTAL_NBV = coalesce(a.TOTAL_NBV,0) + b.cost_increase "
     		+ "a.IMPROV_VATABLECOST = coalesce(a.IMPROV_VATABLECOST,0) + a.Vatable_Cost, IMPROV_MONTHLYDEP = 0.00, IMPROV_REMAINLIFE = coalesce(IMPROV_REMAINLIFE,0) + b.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE = coalesce(a.IMPROV_TOTALLIFE,0) + b.IMPROV_USEFULLIFE "
-    		+ "from  "+tableName+" a, "+posttable+" b where a.Asset_id = b.Asset_id and b.IMPROV_USEFULLIFE > 0 and b.POSTING_BATCH = ? " ;
+    		+ "from  "+tableName+" a, "+posttable+" b, "+tableName2+" p where a.Asset_id = b.Asset_id and CONVERT(VARCHAR, b.Revalue_ID) = p.asset_id and b.IMPROV_USEFULLIFE > 0  and IMPROVED = 'Y' and p.process_status = 'A' and b.POSTING_BATCH = ? " ;
 //    	System.out.println("=====query_a in updateImprovementWithBatchId: "+query_a+" batchId: "+batchId);
 //    	System.out.println("=====query_b in updateImprovementWithBatchId: "+query_b+" batchId: "+batchId);
 //    String query_c ="UPDATE a SET a.MAINT_LTD = coalesce(a.MAINT_LTD,0) + b.cost_increase, a.MAINT_PTD = coalesce(a.MAINT_PTD,0) + b.cost_increase "
@@ -6598,7 +6726,7 @@ public void updatePostAssetWithBatchId(String tableName,String posttable, String
 {
 	Connection con = null;
     PreparedStatement ps = null;
-    String query_r ="update a SET a.entryPostFlag = ?,a.GroupIdStatus = ? from " +posttable+ " a, "+tableName+" g where CONVERT(VARCHAR, a.id) = CONVERT(VARCHAR, g.Asset_Id) and POSTING_BATCH = ? " ;
+    String query_r ="update a SET a.entryPostFlag = ?,a.GroupIdStatus = ? from " +posttable+ " a, "+tableName+" g where CONVERT(VARCHAR, a.id) = CONVERT(VARCHAR, g.Asset_Id) and entryPostFlag = 'Y' and GroupIdStatus = 'Y' and POSTING_BATCH = ? " ;
  //   System.out.println("query_r updateAssetWithBatchId>>>> "+query_r);
     try 
     	{
@@ -6620,12 +6748,12 @@ public void updatePostAssetWithBatchId(String tableName,String posttable, String
 
 }
 
-public void updateAssetApprovalWithBatchId(String tableName,String posttable, String batchId,String status1,String status2)
+public void updateAssetApprovalWithBatchId(String tableName,String posttable,String tableName2, String batchId,String status1,String status2)
 {
 	Connection con = null;
     PreparedStatement ps = null;
 //    String query_r ="update " +tableName+ " set "+columnName1+"=?, "+columnName2+"=? where "+whereFld+" = ? " ;
-    String query_r ="update a set a.process_status = ?,a.Asset_Status = ? from " +posttable+ " a, "+tableName+" g where convert(varchar, a.asset_id) = convert(varchar, g.Asset_Id) and convert(varchar, g.POSTING_BATCH) = ? ";
+    String query_r ="update a set a.process_status = ?,a.Asset_Status = ? from " +posttable+ " a, "+tableName+" g, "+tableName2+" p where convert(varchar, a.asset_id) = convert(varchar, g.Asset_Id) and convert(varchar,a.Asset_id) = convert(varchar,p.Id) and process_status = 'A' and entryPostFlag = 'N' and GroupIdStatus = 'N' and page = 'ASSET CREATION RAISE ENTRY' and convert(varchar, g.POSTING_BATCH) = ? ";
 
 //    System.out.println("query_r updateAssetWithBatchId>>>> "+query_r);
     try 

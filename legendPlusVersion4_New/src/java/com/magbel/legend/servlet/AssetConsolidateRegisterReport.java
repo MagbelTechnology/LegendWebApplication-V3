@@ -109,13 +109,14 @@ public class AssetConsolidateRegisterReport extends HttpServlet
     	    ColQuery ="select 'C' AS transType,a.BRANCH_CODE,b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id, a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
     	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
     	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from am_asset a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-    	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.Cost_Threshold - 0.01  "
+    	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.old_threshhold  "
     	    		+ "and a.branch_id = ? and a.category_Id = ? "
     	    		+ "UNION  "
     	    		+ "select 'U' AS transType,a.BRANCH_CODE, b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id,a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
     	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
     	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from AM_ASSET_UNCAPITALIZED a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-    	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price < p.Cost_Threshold + 0.01   "
+    	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' "
+    	    		//+ "and a.Cost_Price < p.old_threshhold + 0.01   "
     	    		+ "and a.branch_id = ? and a.category_Id = ? ";     
 	}      
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){	   
@@ -123,13 +124,14 @@ public class AssetConsolidateRegisterReport extends HttpServlet
 	    ColQuery ="select 'C' AS transType,a.BRANCH_CODE,b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id, a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
 	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
 	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from am_asset a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.Cost_Threshold - 0.01  "
+	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.old_threshhold  "
 	    		+ "and a.category_Id = ? "
 	    		+ "UNION  "
 	    		+ "select 'U' AS transType,a.BRANCH_CODE, b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id,a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
 	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
 	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from AM_ASSET_UNCAPITALIZED a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price < p.Cost_Threshold + 0.01   "
+	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' "
+	    		//+ "and a.Cost_Price < p.old_threshhold + 0.01   "
 	    		+ "and a.category_Id = ? ";
 	    }
 	 
@@ -138,13 +140,14 @@ public class AssetConsolidateRegisterReport extends HttpServlet
 	    ColQuery ="select 'C' AS transType,a.BRANCH_CODE,b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id, a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
 	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
 	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from am_asset a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.Cost_Threshold - 0.01  "
+	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.old_threshhold  "
 	    		+ "and a.branch_id = ?  "
 	    		+ "UNION  "
 	    		+ "select 'U' AS transType,a.BRANCH_CODE, b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id,a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
 	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
 	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from AM_ASSET_UNCAPITALIZED a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price < p.Cost_Threshold + 0.01   "
+	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' "
+	    		//+ "and a.Cost_Price < p.old_threshhold + 0.01   "
 	    		+ "and a.branch_id = ? ";
 	    }
    if(branch_Id.equals("0")  && categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){
@@ -152,25 +155,28 @@ public class AssetConsolidateRegisterReport extends HttpServlet
 	    ColQuery ="select 'C' AS transType,a.BRANCH_CODE,b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id, a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
 	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
 	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from am_asset a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.Cost_Threshold - 0.01  "
+	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.old_threshhold  "
 	    		+ "UNION  "
 	    		+ "select 'U' AS transType,a.BRANCH_CODE, b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id,a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
 	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
 	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from AM_ASSET_UNCAPITALIZED a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price < p.Cost_Threshold + 0.01   ";    
+	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' "
+	    	//	+ "and a.Cost_Price < p.old_threshhold + 0.01 "
+	    		+ "  ";    
 	}   
    if(!FromDate.equals("")  && !ToDate.equals("") && branch_Id.equals("0")  && categoryCode.equals("0")){
 	System.out.println("======>>>>>>> Date selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
     ColQuery ="select 'C' AS transType,a.BRANCH_CODE,b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id, a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
     		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
     		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from am_asset a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.Cost_Threshold - 0.01  "
+    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.old_threshhold  "
     		+ "and a.Posting_Date between ? and ? "
     		+ "UNION  "
     		+ "select 'U' AS transType,a.BRANCH_CODE, b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id,a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
     		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
     		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from AM_ASSET_UNCAPITALIZED a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price < p.Cost_Threshold + 0.01   "
+    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' "
+    		//+ "and a.Cost_Price < p.old_threshhold + 0.01   "
     		+ "and a.Posting_Date between ? and ? ";		     
 	} 
    if(!branch_Id.equals("0")  && categoryCode.equals("0") && !FromDate.equals("")  && !ToDate.equals("")){
@@ -178,13 +184,14 @@ public class AssetConsolidateRegisterReport extends HttpServlet
     ColQuery ="select 'C' AS transType,a.BRANCH_CODE,b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id, a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
     		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
     		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from am_asset a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.Cost_Threshold - 0.01 "
+    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.old_threshhold "
     		+ "and a.branch_id = ? and a.Posting_Date between ? and ? "
     		+ "UNION  "
     		+ "select 'U' AS transType,a.BRANCH_CODE, b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id,a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
     		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
     		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from AM_ASSET_UNCAPITALIZED a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price < p.Cost_Threshold + 0.01  "
+    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE'"
+    	//	+ " and a.Cost_Price < p.old_threshhold + 0.01  "
     		+ "and a.branch_id = ? and a.Posting_Date between ? and ? ";	    
 	}    
    if(!FromDate.equals("")  && !ToDate.equals("") && !branch_Id.equals("0")  && !categoryCode.equals("0")){
@@ -192,13 +199,14 @@ public class AssetConsolidateRegisterReport extends HttpServlet
     ColQuery ="select 'C' AS transType,a.BRANCH_CODE,b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id, a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
     		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
     		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from am_asset a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.Cost_Threshold - 0.01  "
+    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.old_threshhold  "
     		+ "and a.branch_id = ? and a.category_Id = ? and a.Posting_Date between ? and ? "
     		+ "UNION  "
     		+ "select 'U' AS transType,a.BRANCH_CODE, b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id,a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
     		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
     		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from AM_ASSET_UNCAPITALIZED a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price < p.Cost_Threshold + 0.01   "
+    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE'"
+    	//	+ " and a.Cost_Price < p.old_threshhold + 0.01   "
     		+ "and a.branch_id = ? and a.category_Id = ? and a.Posting_Date between ? and ? ";	
     }    
 
@@ -207,13 +215,14 @@ public class AssetConsolidateRegisterReport extends HttpServlet
 	    ColQuery ="select 'C' AS transType,a.BRANCH_CODE,b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id, a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
 	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
 	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from am_asset a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.Cost_Threshold - 0.01  "
+	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price > p.old_threshhold  "
 	    		+ "and a.category_Id = ? and a.Posting_Date between ? and ? "
 	    		+ "UNION  "
 	    		+ "select 'U' AS transType,a.BRANCH_CODE, b.BRANCH_NAME,c.category_name,d.Dept_name,a.Old_Asset_Id,a.Asset_id,Description,Cost_Price,a.Monthly_Dep,a.Accum_Dep,a.nbv, "
 	    		+ "a.Posting_Date,a.Date_purchased,a.Effective_Date,a.Dep_End_Date,a.Dep_Rate,a.Asset_User,a.VENDOR_NAME, a.Dep_Rate,a.Total_Life,a.Remaining_Life, a.IMPROV_COST, a.IMPROV_ACCUMDEP, a.IMPROV_NBV, "
 	    		+ "a.IMPROV_MONTHLYDEP, a.IMPROV_REMAINLIFE, a.IMPROV_USEFULLIFE, a.IMPROV_TOTALLIFE, a.BAR_CODE AS TAG, a.Registration_No from AM_ASSET_UNCAPITALIZED a, am_ad_branch b, am_ad_category c, am_ad_department d,am_gb_company p  "
-	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' and a.Cost_Price < p.Cost_Threshold + 0.01   "
+	    		+ "where a.BRANCH_CODE = b.BRANCH_CODE and a.Category_ID= c.category_ID and a.DEPT_CODE = d.Dept_code and a.asset_status='ACTIVE' "
+	    	//	+ "and a.Cost_Price < p.old_threshhold + 0.01   "
 	    		+ "and a.category_Id = ? and a.Posting_Date between ? and ? ";		
 	    }   
 //   System.out.println("======>>>>>>>ColQuery: "+ColQuery);

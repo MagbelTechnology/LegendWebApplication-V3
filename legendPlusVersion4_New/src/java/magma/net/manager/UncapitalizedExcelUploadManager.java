@@ -242,17 +242,17 @@ public class UncapitalizedExcelUploadManager extends MagmaDBConnection
                 date_of_purchase = cell[7].getContents();        
                 depreciation_start_date = cell[7].getContents();            
                 require_depreciation = "N";            
-                lpo_no = cell[9].getContents();         
-                bar_code = cell[10].getContents();
-                invoice_No = cell[11].getContents();
-                Vendor_Account = cell[12].getContents();
-                asset_user = cell[13].getContents();
+                lpo_no = cell[8].getContents();         
+                bar_code = cell[9].getContents();
+                invoice_No = cell[10].getContents();
+                Vendor_Account = cell[11].getContents();
+                asset_user = cell[12].getContents();
                 make = "0";
                 location = "0";
-                vendor = cell[14].getContents();
+                vendor = cell[13].getContents();
                 assetMaintainBy = vendor;
-                purchaseReason = cell[15].getContents();
-                vendorName = cell[16].getContents();
+                purchaseReason = cell[14].getContents();
+                vendorName = cell[15].getContents();
     			//System.out.println("<<<<<<branch_code: "+branch_code+"   sNo: "+sNo+"   model: "+model+"  make: "+make+"  vendor: "+vendor+"  assetMaintainBy: "+assetMaintainBy+"  purchaseReason: "+purchaseReason+"  location: "+location+"   projectCode: "+projectCode);
     			sheetno = sheetno + 1;
             	   }

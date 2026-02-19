@@ -166,23 +166,42 @@ public class MagmaDBConnection implements eConnection {
      * @return Connection
      * @todo Implement this magma.net.dao.eConnection method
      */
-    public Connection getConnection(String jndi) {
-        Connection con = null;
-        try {  
+    
+//    public Connection getConnection(String jndi) {
+//        Connection con = null;
+//        try {  
+//            Context initContext = new InitialContext();
+//            String dsJndi = "java:/legendPlus";
+//
+//            DataSource ds = (DataSource) initContext.lookup(
+//            		dsJndi);
+//            con = ds.getConnection();
+//
+//        } catch (Exception e) {
+//            System.out.println("WARNING:Error closing Connection Parameter Jndi ->" +
+//                               e.getMessage());
+//        }
+// 
+//        return con;
+//    }
+    
+    public Connection getConnection(String jndi) throws SQLException {
+        try {
             Context initContext = new InitialContext();
-            String dsJndi = "java:/legendPlus";
-
-            DataSource ds = (DataSource) initContext.lookup(
-            		dsJndi);
-            con = ds.getConnection();
-
+            DataSource ds = (DataSource) initContext.lookup("java:/legendPlus");
+            return ds.getConnection();
+        } catch (SQLException e) {
+            System.out.println("SQL Error getting connection: " + e.getMessage());
+            throw e; // rethrow because method signature requires it
+        } catch (NamingException e) {
+            System.out.println("JNDI lookup failed: " + e.getMessage());
+            throw new SQLException("Failed to lookup datasource", e);
         } catch (Exception e) {
-            System.out.println("WARNING:Error closing Connection Parameter Jndi ->" +
-                               e.getMessage());
+            System.out.println("Unknown error: " + e.getMessage());
+            throw new SQLException("Unexpected connection error", e);
         }
- 
-        return con;
     }
+
 
     public java.sql.Date dateConvert(String strDate) {
 

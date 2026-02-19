@@ -102,12 +102,14 @@ public class MobileRegistrationUploadExecutionServlet extends HttpServlet {
 			   String userStatus = mobile.getMobileStatus();
 			   String createDate = mobile.getCreateDate();
 			   String userId = mobile.getUserId();
+			   String staffEnabled = mobile.getStaffEnabled();
 			
 			   mobile.setUserName(userName);
  			   	mobile.setMacAddress(macAddress);
  			   	mobile.setMobileStatus(userStatus);
  			   	mobile.setCreateDate(createDate);
  			   	mobile.setUserId(userId);
+ 			   	mobile.setStaffEnabled(staffEnabled);
 		
 	       
          //  System.out.println("staffId ================= "+staffId+"  fullname: "+fullname+"  createdBy: "+user_Id);
@@ -157,6 +159,7 @@ public class MobileRegistrationUploadExecutionServlet extends HttpServlet {
     	  			   String userStatus = rs.getString("STATUS");
     	  			   String createDate = rs.getString("CREATE_DATE");
     	  			   String userId = rs.getString("USER_ID");
+    	  			   String staffEnabled = rs.getString("Staff_Enabled");
                     
                     
                     mobile = new legend.admin.objects.Mobiles();
@@ -165,6 +168,7 @@ public class MobileRegistrationUploadExecutionServlet extends HttpServlet {
       			   	mobile.setMobileStatus(userStatus);
       			   	mobile.setCreateDate(createDate);
       			   	mobile.setUserId(userId);
+      			   	mobile.setStaffEnabled(staffEnabled);
                   
                     _list.add(mobile);				
     			   }
@@ -182,7 +186,7 @@ public class MobileRegistrationUploadExecutionServlet extends HttpServlet {
     
     public boolean MobileUpload(Mobiles mobile) {
 
-		String UPDATE_QUERY = "insert into AM_GB_REGMAC (USER_NAME, MAC_ADDRESS, STATUS, CREATE_DATE, USER_ID) values (?, ?, ?, ?, ?)";
+		String UPDATE_QUERY = "insert into AM_GB_REGMAC (USER_NAME, MAC_ADDRESS, STATUS, CREATE_DATE, USER_ID, Staff_Enabled) values (?, ?, ?, ?, ?, ?)";
 
 		String UPDATE_QUERY2 = "delete from AM_GB_REGMAC_UPLOAD ";
 		Connection con = null;
@@ -197,6 +201,7 @@ public class MobileRegistrationUploadExecutionServlet extends HttpServlet {
 			ps.setString(3, mobile.getMobileStatus());
 			ps.setString(4, mobile.getCreateDate());
 			ps.setString(5, mobile.getUserId());
+			ps.setString(6, mobile.getStaffEnabled());
 			done = ps.execute();
 			//System.out.println("<<<<====Query: "+UPDATE_QUERY+"   done: "+done);
 			closeConnection(con, ps);

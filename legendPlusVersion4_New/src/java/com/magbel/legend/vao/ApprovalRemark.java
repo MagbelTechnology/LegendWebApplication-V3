@@ -31,7 +31,7 @@ public class ApprovalRemark {
 	    private int ApprovalLevel  =0;
 	    private String  RemarkDate ="";
 	    private String  IPAddress="";
-        private int transactionId = 0;
+        private Long transactionId ;
         private String tranType ="";
 
     public ApprovalRemark() {
@@ -46,10 +46,10 @@ public class ApprovalRemark {
    this.Remark  = remarks;
 
     }
-
+	
 	public ApprovalRemark(String asset_id, int supervisorID,
 			String dateRequisitioned, String remark, String status,
-			int approvalLevel, String remarkDate, String address, int tranId,String tranType) {
+			int approvalLevel, String remarkDate, String address, Long tranId,String tranType) {
 		super();
 		this.assetId = asset_id;
 		this.supervisorID = supervisorID;
@@ -63,9 +63,10 @@ public class ApprovalRemark {
         this.tranType = tranType;
 	}
 
+	
 	public ApprovalRemark(String asset_id, int supervisorID,
 			String dateRequisitioned, String remark, String status,
-			int approvalLevel, String remarkDate, String address, int tranId) {
+			int approvalLevel, String remarkDate, String address, Long tranId) {
 		super();
 		this.assetId = asset_id;
 		this.supervisorID = supervisorID;
@@ -78,16 +79,17 @@ public class ApprovalRemark {
                 this.transactionId = tranId;
 	}
 
-        public ApprovalRemark(String asset_id, int supervisorID, String address, int tranId,String tranType) {
-		super();
-		this.assetId = asset_id;
-		this.supervisorID = supervisorID;
-		this.IPAddress = address;
-                this.transactionId = tranId;
-                this.tranType = tranType;
-	}
+        
+        public ApprovalRemark(String asset_id, int supervisorID, String address, Long tranId,String tranType) {
+    		super();
+    		this.assetId = asset_id;
+    		this.supervisorID = supervisorID;
+    		this.IPAddress = address;
+                    this.transactionId = tranId;
+                    this.tranType = tranType;
+    	}
 
-        public ApprovalRemark(String asset_id, int supervisorID, int tranId) {
+        public ApprovalRemark(String asset_id, int supervisorID, Long tranId) {
 		super();
 		this.assetId = asset_id;
 		this.supervisorID = supervisorID;
@@ -163,14 +165,14 @@ public class ApprovalRemark {
     /**
      * @return the transactionId
      */
-    public int getTransactionId() {
+    public long getTransactionId() {
         return transactionId;
     }
 
     /**
      * @param transactionId the transactionId to set
      */
-    public void setTransactionId(int transactionId) {
+    public void setTransactionId(long transactionId) {
         this.transactionId = transactionId;
     }
 

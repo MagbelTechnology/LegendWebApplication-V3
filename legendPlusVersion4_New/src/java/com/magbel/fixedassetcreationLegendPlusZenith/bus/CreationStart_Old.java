@@ -18,7 +18,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 //import com.magbel.fixedassetcreation.bus.CronTriggerMail;
 //import com.magbel.fixedassetcreation.bus.CronTriggerExample;;
-public class CreationStart
+public class CreationStart_Old
 {
 static Scheduler scheduler = null;
 
@@ -33,7 +33,7 @@ public static void init(){
 	}
 }
 
-public CreationStart()
+public CreationStart_Old()
 {  
 
 }
@@ -45,7 +45,7 @@ public static void start()
 	{
 
 //		System.out.println(" Here is calling the scheduler==");
-		 scheduler = StdSchedulerFactory.getDefaultScheduler();
+//		 scheduler = StdSchedulerFactory.getDefaultScheduler();
 //		 JobDetail jobA = newJob(Jobs2.class).withIdentity("cronJob", "jobs2").build();
 //		 System.out.println(" Calling the scheduler Start 1");
 //		 JobDetail jobB = newJob(Jobs3.class).withIdentity("cronJobB", "jobs3").build();
@@ -180,14 +180,14 @@ public static void start()
 	.newTrigger()
 	.withIdentity("dummyTriggerName3", "group3")
 	.withSchedule(
-		CronScheduleBuilder.cronSchedule("0/5 * * * * ?"))
+	CronScheduleBuilder.cronSchedule("0 0 0/3 * * ?"))
 	.build();
 	
 	Trigger trigger4 = TriggerBuilder
 	.newTrigger()
 	.withIdentity("dummyTriggerName4", "group4")
 	.withSchedule(
-	CronScheduleBuilder.cronSchedule("0/5 * * * * ?"))
+	CronScheduleBuilder.cronSchedule("0 0/5 * * * ?"))
 	.build();
 //	
 //	Trigger trigger5 = TriggerBuilder
@@ -201,7 +201,7 @@ public static void start()
 	.newTrigger()
 	.withIdentity("dummyTriggerName6", "group6")
 	.withSchedule(
-	CronScheduleBuilder.cronSchedule("0/5 * * * * ?"))
+	CronScheduleBuilder.cronSchedule("0 0/10 * * * ?"))
 	.build();
 //	
 //	Trigger trigger7 = TriggerBuilder
@@ -236,7 +236,7 @@ public static void start()
 	.newTrigger()
 	.withIdentity("dummyTriggerName11", "group11")
 	.withSchedule(
-	CronScheduleBuilder.cronSchedule("0/5 * * * * ?"))
+	CronScheduleBuilder.cronSchedule("0 0 0/1 * * ?"))
 	.build();
 //	
 //	Trigger trigger12 = TriggerBuilder
@@ -292,17 +292,20 @@ public static void start()
 	.newTrigger()
 	.withIdentity("dummyTriggerName11", "group19")
 	.withSchedule(
-	CronScheduleBuilder.cronSchedule("0 24 23 * * ? *"))
+	CronScheduleBuilder.cronSchedule("0 59 23 * * ? *"))
 	.build();
 
 	Trigger trigger20 = TriggerBuilder
 	.newTrigger()
 	.withIdentity("dummyTriggerName20", "group4")
 	.withSchedule(
-	CronScheduleBuilder.cronSchedule("0/5 * * * * ?"))
+	CronScheduleBuilder.cronSchedule("0 59 23 * * ? *"))
 	.build();
 	
-	Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+	//Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+	
+	scheduler = StdSchedulerFactory.getDefaultScheduler();
+
 	
 	scheduler.start();
 //	scheduler.scheduleJob(jobA, trigger1);

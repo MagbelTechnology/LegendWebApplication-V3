@@ -29,7 +29,7 @@ import magma.AssetRecordsBean;
 
 import legend.admin.handlers.CompanyHandler;
 
-public class RejectProcessBranch extends HttpServlet {
+public class RejectProcessBranch_01_12_2025 extends HttpServlet {
 
     private ApprovalRecords service;
     private AssetRecordsBean bean;
@@ -39,7 +39,8 @@ public class RejectProcessBranch extends HttpServlet {
     private ApprovalManager approvalManager;
     private AssetRecordsBean assetRecordBeans;
     private CompanyHandler comp;
-    public RejectProcessBranch() {
+    java.text.SimpleDateFormat sdf;
+    public RejectProcessBranch_01_12_2025() {
     }
 
     public void init(ServletConfig config)
@@ -53,6 +54,7 @@ public class RejectProcessBranch extends HttpServlet {
             approvalManager = new ApprovalManager();
             assetRecordBeans = new AssetRecordsBean();
             comp = new CompanyHandler();
+            sdf = new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             // mail = new BulkMail();
         } catch (Exception et) {
             et.printStackTrace();
@@ -73,13 +75,14 @@ public class RejectProcessBranch extends HttpServlet {
         String id = request.getParameter("asset_id");
         String page1 = request.getParameter("page1");
         String reject_reason = request.getParameter("reject_reason");
-        System.out.println("VVVVVVVVVVVVVVVV tranId " + request.getParameter("tranId"));
+//        System.out.println("VVVVVVVVVVVVVVVV tranId " + request.getParameter("tranId"));
         int tranIdRepost = Integer.parseInt(request.getParameter("tranId"));
         String systemIp= request.getRemoteAddr();
         reject_reason = "Posting Level: " + reject_reason;
         int userId = request.getParameter("userid")==null?Integer.parseInt(userID):Integer.parseInt(request.getParameter("userid"));
-        //System.out.println("JJJJJJJJJJJ the asset id is JJJJJJ "+ id);
-       // System.out.println("JJJJJJJJJJJ the page1 is JJJJJJ "+ page1);
+//        System.out.println("JJJJJJJJJJJ the asset id is JJJJJJ "+ id);
+//        System.out.println("JJJJJJJJJJJ the page1 is JJJJJJ "+ page1);
+        String dateApproved = sdf.format(new java.util.Date());
 
         try {
         	 if (!userClass.equals("NULL") || userClass!=null){
@@ -87,31 +90,28 @@ public class RejectProcessBranch extends HttpServlet {
 
             approvalManager.infoFromRejection(tranIdRepost,userId,systemIp,reject_reason);
 
-
-
-
                 tranId = service.getTranIdForRejetPost(page1, id);
 
 
             //delete record from raise entry list base on asset id and page name
            // System.out.println(",,,,,,,,,,,,,,,,,,, the asset id is " + id);
            // System.out.println(",,,,,,,,,,,,,,,,,,, the page name is " + page1);3333
-            if (service.deleteRaiseEntry(id, page1) && !setRejectReasonBranch(id, reject_reason)) {
+            if (service.deleteRaiseEntry(id, page1) && !setRejectReasonBranch(id, reject_reason,page1,tranIdRepost)) {
 
 
 
-                service.updateRaiseEntryBranch(id, "N");
-                service.updateAssetStatus3(tranId, "RP", "Rejected",reject_reason);
+            	if(!page1.equals("UNCAPITALIZED IMPROVEMENT RAISE ENTRY")) {service.updateRaiseEntryBranch(id, "N");}
+                service.updateAssetStatus3(tranIdRepost, "R", "Rejected",reject_reason,dateApproved);
+                System.out.println(",,,,,,,,,,,,,,,,,,, the asset id is " + tranIdRepost);
+               // assetRecordBeans.updateAssetStatusChange("update AM_ASSET_UNCAPITALIZED set Asset_Status = 'REJECTED' where ASSET_ID ='"+id +"'");
                 //service.updateAssetStatus2(tranIdRepost, "RP", "Rejected");
 
-             
-
-
+//                System.out.println("JJJJJJJJJJJ %%%%%%%%%%% JJJJJJ ");
 
                 String from = "";
                 String msgText1 = "Rejection of asset with Asset Id '" + id + "' due to '" + reject_reason + "'";
                 String subject = "Asset Creation Rejection";
-                String url = "E:/jboss-4.0.5.GA/server/epostserver/deploy/legend2.net.war";
+                String url = "E:/jboss-4.0.5.GA/server/epostserver/deploy/legendPlus.war";
                 String to = "";
                 String userid = "";
                 //send mail
@@ -160,7 +160,7 @@ public class RejectProcessBranch extends HttpServlet {
             // System.out.println("=====the after successful updating with execute() command is " + b);
 
         } catch (Exception ex) {
-            System.out.println("WARNING: cannot update am_asset [setRejectReason]- > " +
+            System.out.println("WARNING: cannot update tables [setRejectReason]- > " +
                     ex.getMessage());
         } finally {
             closeConnection(con, ps, rs);
@@ -187,12 +187,18 @@ public class RejectProcessBranch extends HttpServlet {
             System.out.println("WANR:postingServlet Error closing connection >>" + e);
         }
     }
-       private boolean setRejectReasonBranch(String asset_id, String rejectReason) {
+       private boolean setRejectReasonBranch(String asset_id, String rejectReason,String page1,int tranIdRepost) {
 
         boolean b = true;
-        String query = "update am_asset_uncapitalized set asset_status='Rejected', post_reject_reason='" + rejectReason + "' where asset_id='" + asset_id + "'";
+        String query = "";
+        if(!page1.equals("UNCAPITALIZED IMPROVEMENT RAISE ENTRY")) {
+         query = "update am_asset_uncapitalized set asset_status='Rejected', post_reject_reason='" + rejectReason + "' where asset_id='" + asset_id + "'";
+        }
+        if(page1.equals("UNCAPITALIZED IMPROVEMENT RAISE ENTRY")) {
+            query = "update am_Uncapitalized_improvement set approval_status='Rejected' where Revalue_ID='" + tranIdRepost + "'";
+           }
         Connection con = null;
-
+ //       System.out.println("=====About to Reject the transaction " + asset_id);
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -201,7 +207,7 @@ public class RejectProcessBranch extends HttpServlet {
 
             ps = con.prepareStatement(query);
             b = ps.execute();
-            // System.out.println("=====the after successful updating with execute() command is " + b);
+//             System.out.println("=====the after successful updating with execute() command is " + b);
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot update am_asset [setRejectReason]- > " +

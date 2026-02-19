@@ -73,8 +73,9 @@ public class AssetRegisterListExport extends HttpServlet
     System.out.println("<<<<<<branch_Code: "+branch_Code);
 //    String userName = request.getParameter("userName");
     String fileName = "";
-    if(report.equalsIgnoreCase("rptMenuBCRList")){fileName = branchCode+"By"+userName+"AssetRegisterListReport.xls";}
-    if(report.equalsIgnoreCase("rptMenuBCLDTL")){fileName = branchCode+"By"+userName+"AssetDetailReport.xls";}
+    if(report.equalsIgnoreCase("rptMenuBCRList")){fileName = branchCode+"By"+userName+"AssetRegisterListReport.xlsx";}
+    if(report.equalsIgnoreCase("rptMenuBCLDTL")){fileName = branchCode+"By"+userName+"AssetDetailReport.xlsx";}
+    if(report.equalsIgnoreCase("rptMenuBCL")){fileName = branchCode+"By"+userName+"AssetListReport.xlsx";}
     
     String filePath = System.getProperty("user.home")+"\\Downloads";
     System.out.println("<<<<<<filePath: "+filePath);
@@ -118,7 +119,7 @@ public class AssetRegisterListExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND branch_id = ? AND CATEGORY_CODE = ?"
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND branch_id = ? AND CATEGORY_CODE = ?"
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}      
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){	   
@@ -137,7 +138,7 @@ public class AssetRegisterListExport extends HttpServlet
 	 + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
 	 + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
 	 + " FROM AssetRegister"
-	 + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND CATEGORY_CODE = ? "
+	 + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND CATEGORY_CODE = ? "
 	 + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";     
    }
 	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){	   
@@ -156,7 +157,7 @@ public class AssetRegisterListExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND branch_id = ? "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND branch_id = ? "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";
 	}
    if(branch_Id.equals("0")  && categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){
@@ -175,7 +176,7 @@ public class AssetRegisterListExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01)  "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01)  "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}   
    if(!FromDate.equals("")  && !ToDate.equals("") && branch_Id.equals("0")  && categoryCode.equals("0")){
@@ -194,7 +195,7 @@ public class AssetRegisterListExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) and Posting_Date between ? and ?  "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) and Posting_Date between ? and ?  "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	} 
    if(!FromDate.equals("")  && !ToDate.equals("") && !branch_Id.equals("0")  && categoryCode.equals("0")){
@@ -213,7 +214,7 @@ public class AssetRegisterListExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND branch_id = ? AND Posting_Date between ? and ?  "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND branch_id = ? AND Posting_Date between ? and ?  "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}    
    if(!FromDate.equals("")  && !ToDate.equals("") && !branch_Id.equals("0")  && !categoryCode.equals("0")){
@@ -232,7 +233,7 @@ public class AssetRegisterListExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND branch_id = ? AND CATEGORY_CODE = ? and Posting_Date between ? and ?  "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND branch_id = ? AND CATEGORY_CODE = ? and Posting_Date between ? and ?  "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}    
    if(!asset_Id.equals("") && FromDate.equals("")  && ToDate.equals("") && branch_Id.equals("0")  && categoryCode.equals("0")){
@@ -251,7 +252,7 @@ public class AssetRegisterListExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND Asset_id = ? "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND Asset_id = ? "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}    
 
@@ -271,7 +272,7 @@ public class AssetRegisterListExport extends HttpServlet
 	     + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
 	     + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
 	     + " FROM AssetRegister"
-	     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND CATEGORY_CODE = ? AND Posting_Date between ? and ? "
+	     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND CATEGORY_CODE = ? AND Posting_Date between ? and ? "
 	     + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 		}   
 //   System.out.println("======>>>>>>>ColQuery: "+ColQuery);

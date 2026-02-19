@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/json-20240303.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/annotations-22.0.0.jar"/>
@@ -105,7 +100,7 @@
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/mssqlserver.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/msutil.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/okhttp-3.4.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/okio-1.9.0.jar"/>
+	<classpathentry kind="lib" path="/Users/ayomidematanmi/Downloads/lib/okio-1.9.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/ooxml-schemas-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/openpdf-1.2.16.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/opens-library.jar"/>
@@ -121,7 +116,6 @@
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/PostIso.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/protobuf-java-2.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/quartz-2.2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/saaj-api-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/serializer-3.1.2 .jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/servlet-api-2.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/servlet-api-6.0.36.jar"/>
@@ -137,9 +131,6 @@
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/utils-3.1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/xalan-2.7.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/xalan-serializer-2.7.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/xercesImpl.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/xml-apis-1.0.b2.jar"/>
-	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/xml-apis.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/zxing-javase.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/zxing.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/ayomidematanmi/Downloads/lib/jakarta.activation-api-2.1.3.jar"/>
@@ -156,5 +147,13 @@
 	<classpathentry kind="lib" path="/Users/ayomidematanmi/Downloads/jars/poi-ooxml-5.2.3.jar"/>
 	<classpathentry kind="lib" path="/Users/ayomidematanmi/Downloads/jars/poi-ooxml-full-5.2.3.jar"/>
 	<classpathentry kind="lib" path="/Users/ayomidematanmi/Downloads/jars/xmlbeans-5.1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/ayomidematanmi/Downloads/jakarta.xml.soap-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/ayomidematanmi/Downloads/saaj-impl-3.0.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/ayomidematanmi/Downloads/javax.xml.soap-api-1.3.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

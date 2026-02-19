@@ -1,7 +1,7 @@
 /**
  * 
  */
-package legend.admin.handlers;
+package legend.admin.handlers ;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,7 +35,7 @@ import legend.admin.objects.Branch;
 
 
 
-public class AdminHandler {
+public class AdminHandler_17_11_2025 {
 
 	/**
 	 * @Entities Department,Branch,Section,States,Category,Region,Province
@@ -66,7 +66,7 @@ public class AdminHandler {
       ApplicationHelper apph;
 
 
-	public AdminHandler() {
+	public AdminHandler_17_11_2025() {
 
 		sdf = new SimpleDateFormat("dd-MM-yyyy");
 		df = new com.magbel.util.DatetimeFormat();
@@ -132,8 +132,8 @@ public class AdminHandler {
 				+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
 				+ ",license_ledger ,fuel_ledger,accident_ledger"
 				+ ",Category_Status ,user_id,create_date"
-				+ ",acct_type ,currency_Id, category_id,enforceBarcode,category_Type)"
-		+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				+ ",acct_type ,currency_Id, category_id,enforceBarcode,category_Type,maxNo_Dep_Improve)"
+		+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		try {
 			con = getConnection();
@@ -167,6 +167,7 @@ public class AdminHandler {
 			
                         ps.setString(26, category.getEnforceBarcode());
                         ps.setString(27, category.getCategoryType());
+                        ps.setInt(28, category.getNoOfImproveMnth());
 			done=( ps.executeUpdate()!=-1);
 
 		} catch (Exception e) {
@@ -395,7 +396,7 @@ public class AdminHandler {
 				+ " , Dep_ledger = ?,Accum_Dep_ledger = ?,gl_account = ?"
 				+ " , insurance_acct = ?,license_ledger = ?,fuel_ledger = ?"
 				+ " , accident_ledger = ?,Category_Status = ?,user_id = ?"
-				+ " , create_date = ?,acct_type = ?,currency_Id = ?,enforceBarcode=?,category_Type=?"
+				+ " , create_date = ?,acct_type = ?,currency_Id = ?,enforceBarcode=?,category_Type=?,maxNo_Dep_Improve=?"
 				+ " WHERE category_ID =?";
 
 		try {
@@ -431,6 +432,7 @@ public class AdminHandler {
 			ps.setString(26, category.getCategoryType());
 			//System.out.println("-----------getCategoryId>---------->"+category.getCategoryId());
 			ps.setString(27, category.getCategoryId());
+			ps.setInt(28, category.getNoOfImproveMnth());
 		//	System.out.println("----------->"+query);
 			done=( ps.executeUpdate()!=-1);
 
@@ -1338,7 +1340,7 @@ public class AdminHandler {
 				+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
 				+ ",license_ledger ,fuel_ledger,accident_ledger"
 				+ ",Category_Status ,user_id,create_date"
-				+ ",acct_type ,currency_Id,enforceBarcode" + " FROM am_ad_category  ";
+				+ ",acct_type ,currency_Id,enforceBarcode,maxNo_Dep_Improve" + " FROM am_ad_category  ";
 
 		query = query + filter;
 		Connection c = null;
@@ -1376,6 +1378,7 @@ public class AdminHandler {
 				String acctType = rs.getString("acct_type");
 				String currencyId = rs.getString("currency_Id");
                                 String enforeBarcode = rs.getString("enforceBarcode");
+                                int noOfImproveMnths = rs.getInt("maxNo_Dep_Improve");
 				category = new legend.admin.objects.Category(categoryId,
 						categoryCode, categoryName, categoryAcronym,
 						requiredforFleet, categoryClass, pmCyclePeriod,
@@ -1384,7 +1387,7 @@ public class AdminHandler {
 						accumDepLedger, glAccount, insuranceAcct,
 						licenseLedger, fuelLedger, accidentLedger,
 						categoryStatus, userId, createDate, acctType,
-						currencyId,enforeBarcode);
+						currencyId,enforeBarcode,noOfImproveMnths);
 				_list.add(category);
 			}
 
@@ -1409,7 +1412,7 @@ public class AdminHandler {
 				+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
 				+ ",license_ledger ,fuel_ledger,accident_ledger"
 				+ ",Category_Status ,user_id,create_date"
-				+ ",acct_type ,currency_Id,enforceBarcode" + " FROM am_ad_category ";
+				+ ",acct_type ,currency_Id,enforceBarcode,maxNo_Dep_Improve" + " FROM am_ad_category ";
 
 		query = query + filter+" AND Category_Status = 'ACTIVE'";
 	//	System.out.println("<<<<getACategory query: "+query);
@@ -1448,6 +1451,7 @@ public class AdminHandler {
 				String acctType = rs.getString("acct_type");
 				String currencyId = rs.getString("currency_Id");
                                 String enforeBarcode = rs.getString("enforceBarcode");
+                                int maxNo_Dep_Improve = rs.getInt("maxNo_Dep_Improve");
 				category = new legend.admin.objects.Category(categoryId,
 						categoryCode, categoryName, categoryAcronym,
 						requiredforFleet, categoryClass, pmCyclePeriod,
@@ -1456,7 +1460,7 @@ public class AdminHandler {
 						accumDepLedger, glAccount, insuranceAcct,
 						licenseLedger, fuelLedger, accidentLedger,
 						categoryStatus, userId, createDate, acctType,
-						currencyId,enforeBarcode);
+						currencyId,enforeBarcode,maxNo_Dep_Improve);
 
 			}
 
@@ -2093,18 +2097,40 @@ public class AdminHandler {
 		return (d.length > 0);
 	}
 
+//	private Connection getConnection() {
+//		Connection con = null;
+//		dc = new DataConnect("legendPlus");
+//              
+//		try { 
+//			con = dc.getConnection();
+//		} catch (Exception e) {
+//			System.out.println("WARNING: Error getting connection ->"
+//					+ e.getMessage());
+//		}
+//		return con;
+//	}
+	
 	private Connection getConnection() {
 		Connection con = null;
-		dc = new DataConnect("legendPlus");
-              
-		try { 
-			con = dc.getConnection();
+		try {
+//        	if(con==null){
+                Context initContext = new InitialContext();
+                String dsJndi = "java:/legendPlus";
+                DataSource ds = (DataSource) initContext.lookup(
+                		dsJndi);
+                con = ds.getConnection();
+//        	}
 		} catch (Exception e) {
-			System.out.println("WARNING: Error getting connection ->"
+			System.out.println("WARNING: Error 1 getting connection in AdminHandler ->"
 					+ e.getMessage());
 		}
+		//finally {
+//			closeConnection(con);
+//		}
 		return con;
 	}
+
+	
 //
 //	public Connection getConnection() {
 //		System.out.println("About to refreshConnection connection in AdminHandler");
@@ -5399,7 +5425,7 @@ private legend.admin.objects.Category getACategory2(String filter) {
 			+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
 			+ ",license_ledger ,fuel_ledger,accident_ledger"
 			+ ",Category_Status ,user_id,create_date"
-			+ ",acct_type ,currency_Id,enforceBarcode,category_type" + " FROM am_ad_category ";
+			+ ",acct_type ,currency_Id,enforceBarcode,category_type,maxNo_Dep_Improve" + " FROM am_ad_category ";
 
 	query = query + filter;
 	Connection c = null;
@@ -5438,6 +5464,7 @@ private legend.admin.objects.Category getACategory2(String filter) {
 			String currencyId = rs.getString("currency_Id");
                             String enforeBarcode = rs.getString("enforceBarcode");
                             String categorytype = rs.getString("category_type");
+                            int maxNoDepImprove = rs.getInt("maxNo_Dep_Improve");
 			category = new legend.admin.objects.Category(categoryId,
 					categoryCode, categoryName, categoryAcronym,
 					requiredforFleet, categoryClass, pmCyclePeriod,
@@ -5446,7 +5473,7 @@ private legend.admin.objects.Category getACategory2(String filter) {
 					accumDepLedger, glAccount, insuranceAcct,
 					licenseLedger, fuelLedger, accidentLedger,
 					categoryStatus, userId, createDate, acctType,
-					currencyId,enforeBarcode,categorytype);
+					currencyId,enforeBarcode,categorytype,maxNoDepImprove);
 
 		}
 
@@ -5728,20 +5755,30 @@ public legend.admin.objects.BranchManager getBranchByBranchManagerID2(String mti
 
 }
 
+public legend.admin.objects.BranchManager getBranchByBranchManagerID3(String mtid) {
+	String filter = " WHERE MTID = " + mtid;
+	legend.admin.objects.BranchManager branch = getABranchManager2(filter);
+	return branch;
+
+}
+
 private BranchManager getABranchManager(String filter)
     {
         BranchManager branch;
         branch = null;
         String query = "SELECT MTID,BRANCH_CODE,MANAGER_NAME,EMAIL_ADDRESS,STATUS,USER_ID,CREATE_DATE FROM am_branch_Manager " ;
         query = query + filter+" AND STATUS = 'ACTIVE'";
-    //    System.out.println("filter in getABranch: "+query);
+//        System.out.println("filter in getABranch: "+query);
         Connection c = null;
-        ResultSet rs = null;
-        Statement s = null;
+//        ResultSet rs = null;
+//        Statement s = null;
+	    PreparedStatement s = null;
+	    ResultSet rs = null;
         try
         {
-            c = getConnection();
-            s = c.createStatement();
+    	    c = getConnection();
+    	    s = c.prepareStatement(query);
+    	    rs = s.executeQuery();  	    
             while (rs.next()) 
             {
                 String mtid = rs.getString("MTID");
@@ -5773,14 +5810,19 @@ private BranchManager getABranchManager2(String filter)
         branch = null;
         String query = "SELECT MTID,BRANCH_CODE,MANAGER_NAME,EMAIL_ADDRESS,STATUS,USER_ID,CREATE_DATE FROM am_branch_Manager " ;
         query = query + filter+" AND STATUS = 'ACTIVE'";
-    //    System.out.println("filter in getABranch: "+query);
+//        System.out.println("filter in getABranch: "+query);
         Connection c = null;
-        ResultSet rs = null;
-        Statement s = null;
+//        ResultSet rs = null;
+//        Statement s = null;
+	    PreparedStatement s = null;
+	    ResultSet rs = null;
         try
         {
-            c = getConnection();
-            s = c.createStatement();
+//            c = getConnection();
+//            s = c.createStatement();
+    	    c = getConnection();
+    	    s = c.prepareStatement(query);
+    	    rs = s.executeQuery();  
             while (rs.next()) 
             {
                 String mtid = rs.getString("MTID");
@@ -7396,8 +7438,9 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 				+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
 				+ ",license_ledger ,fuel_ledger,accident_ledger"
 				+ ",Category_Status ,user_id,create_date"
-				+ ",acct_type ,currency_Id, category_id,enforceBarcode,category_Type,TMP_CREATE_DATE,RECORD_TYPE,TMPID)"
-		+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				+ ",acct_type ,currency_Id, category_id,enforceBarcode,category_Type,TMP_CREATE_DATE,RECORD_TYPE,TMPID,"
+				+ "upexassets,recaldep,residualchange,maxNo_Dep_Improve)"
+		+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		try {
 			con = getConnection();
@@ -7435,6 +7478,10 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
             ps.setDate(28, df.dateConvert(new java.util.Date()));
             ps.setString(29, "I");
             ps.setString(30, tmpId);
+            ps.setString(31, category.getUpexassets());
+            ps.setString(32, category.getRecaldep());
+            ps.setString(33, category.getResidualchange());
+            ps.setInt(34, category.getNoOfImproveMnth());
 			done=( ps.executeUpdate()!=-1);
 			if(done) result = tmpId;
 
@@ -7457,8 +7504,8 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 				+ ",Dep_rate ,Asset_Ledger,Dep_ledger"
 				+ ",Accum_Dep_ledger ,gl_account,insurance_acct"
 				+ ",license_ledger ,fuel_ledger,accident_ledger"
-				+ ",Category_Status ,user_id,create_date"
-				+ ",acct_type ,currency_Id,enforceBarcode,category_type" + " FROM am_ad_categoryTmp ";
+				+ ",Category_Status ,user_id,create_date,upexassets,recaldep,residualchange"
+				+ ",acct_type ,currency_Id,enforceBarcode,category_type,maxNo_Dep_Improve " + " FROM am_ad_categoryTmp ";
 
 		query = query + filter;
 		Connection c = null;
@@ -7495,8 +7542,14 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 				String createDate = sdf.format(rs.getDate("create_date"));
 				String acctType = rs.getString("acct_type");
 				String currencyId = rs.getString("currency_Id");
-	                            String enforeBarcode = rs.getString("enforceBarcode");
-	                            String categorytype = rs.getString("category_type");
+                String enforeBarcode = rs.getString("enforceBarcode");
+                String categorytype = rs.getString("category_type");
+                String upexassets = rs.getString("upexassets");
+                String recaldep = rs.getString("recaldep");
+                String residualchange = rs.getString("residualchange");
+                int maxNoDepImprove = rs.getInt("maxNo_Dep_Improve");
+                System.out.println("===> maxNoDepImprove: "+maxNoDepImprove);
+                
 				category = new legend.admin.objects.Category(categoryId,
 						categoryCode, categoryName, categoryAcronym,
 						requiredforFleet, categoryClass, pmCyclePeriod,
@@ -7505,8 +7558,10 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 						accumDepLedger, glAccount, insuranceAcct,
 						licenseLedger, fuelLedger, accidentLedger,
 						categoryStatus, userId, createDate, acctType,
-						currencyId,enforeBarcode,categorytype);
-
+						currencyId,enforeBarcode,categorytype,upexassets,recaldep,residualchange,maxNoDepImprove);
+//						category.setUpexassets(upexassets);
+//						category.setRecaldep(recaldep);
+//						category.setResidualchange(residualchange);
 			}
 
 		} catch (Exception e) {
@@ -7695,7 +7750,7 @@ public void updateTimeOutSession(String userName) {
 //			System.out.print("<<<<<getDateTime(): "+df.getDateTime().substring(10)+"   mtid: "+mtid+"   userid: "+userid);
 			ps.setString(1,df.getDateTime().substring(10));
 			ps.setString(2, userid);
-			ps.setString(3, mtid);
+			ps.setInt(3, Integer.parseInt(mtid)); 
 			done=( ps.executeUpdate()!=-1);
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
@@ -7706,21 +7761,6 @@ public void updateTimeOutSession(String userName) {
 		}
 }
 
-
-private String encodeForHTML(String s) {
-	StringBuilder out = new StringBuilder(Math.max(16, s.length()));
-    for (int i = 0; i < s.length(); i++) {
-        char c = s.charAt(i);
-        if (c > 127 || c == '"' || c == '\'' || c == '<' || c == '>' || c == '&') {
-            out.append("&#");
-            out.append((int) c);
-            out.append(';');
-        } else {
-            out.append(c);
-        }
-    }
-    return out.toString();
-}
 
 
 }

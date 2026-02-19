@@ -27,7 +27,7 @@ import magma.net.vao.FleetManatainanceRecord;
  *
  *  @author Kareem Wasiu Aderemi
  */
-public class Report extends PersistenceServiceDAO {
+public class Report_19_01_2026 extends PersistenceServiceDAO {
 
 
 
@@ -2314,7 +2314,7 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 
 
 
-public java.util.ArrayList getFinacleAssetImprovedUploadExportRecords(String query,String branchCode, String groupid)
+public java.util.ArrayList getFinacleAssetImprovedUploadExportRecords(String query,String branchCode, String groupid,String subjectTovat,String subjectTowhTax)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -2324,19 +2324,54 @@ public java.util.ArrayList getFinacleAssetImprovedUploadExportRecords(String que
 	ResultSet rs = null;
 //	Statement s = null; 
 	PreparedStatement s = null;
-//	System.out.println("query in getFinacleAssetUploadExportRecords: "+query);
+	System.out.println("query in getFinacleAssetUploadExportRecords: "+query);
 	try {
 		    c = getConnection();
 			 s = c.prepareStatement(query.toString());
-	          if(query.contains("Revalue_ID") && query.contains("Revalue_ID") && query.contains("d.branch_code")){
+//	          if(query.contains("Revalue_ID") && query.contains("Revalue_ID") && query.contains("d.branch_code")){
+			 if(subjectTovat.equals("N")  && subjectTowhTax.equals("N")){ 
 	        	  s.setString(1, groupid);
 	        	  s.setString(2, groupid);
-	        	  s.setString(3, branchCode);
+	        	  s.setString(3, groupid);
 	        	  s.setString(4, groupid);
-	        	  s.setString(5, branchCode);
+	          }
+			 if(subjectTovat.equals("Y")  && subjectTowhTax.equals("Y")){ 
+	        	  s.setString(1, groupid);
+	        	  s.setString(2, groupid);
+	        	  s.setString(3, groupid);
+	        	  s.setString(4, groupid);
+	          }
+			 if(subjectTovat.equals("N")  && subjectTowhTax.equals("S")){ 
+	        	  s.setString(1, groupid);
+	        	  s.setString(2, groupid);
+	        	  s.setString(3, groupid);
+	        	  s.setString(4, groupid);
+	          }
+			 if(subjectTovat.equals("Y")  && subjectTowhTax.equals("S")){ 
+	        	  s.setString(1, groupid);
+	        	  s.setString(2, groupid);
+	        	  s.setString(4, groupid);
+	        	  s.setString(5, groupid);
 	        	  s.setString(6, groupid);
 	          }
-	          
+			 if(subjectTovat.equals("Y")  && subjectTowhTax.equals("F")){ 
+	        	  s.setString(1, groupid);
+	        	  s.setString(2, groupid);
+	        	  s.setString(3, groupid);
+	        	  s.setString(4, groupid);
+	        	  s.setString(5, groupid);
+	        	  s.setString(6, groupid);
+	          }
+			 if(subjectTovat.equals("N")  && subjectTowhTax.equals("F")){ 
+	        	  s.setString(1, groupid);
+	        	  s.setString(2, groupid);
+	        	  s.setString(3, groupid);
+	        	  s.setString(4, groupid);
+	          }
+			 if(subjectTovat.equals("N")  && subjectTowhTax.equals("N")){ 
+	        	  s.setString(1, groupid);
+	        	  s.setString(2, groupid);
+	          }
 			rs = s.executeQuery();
 			while (rs.next())
 			   {				
@@ -3039,6 +3074,7 @@ public java.util.ArrayList getAssetDepreciationComparismRecords(String query)
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			 s = c.prepareStatement(query.toString());
+			 s.setQueryTimeout(300);
 	          rs = s.executeQuery();  
 			while (rs.next())
 			   {				
@@ -3184,9 +3220,11 @@ public java.util.ArrayList getAssetAdditionRecords(String query,String branch_Id
 //System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
 	try {
 		    c = getConnection();
+		   
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			 s = c.prepareStatement(query.toString());
+			 s.setQueryTimeout(180); 
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -4128,6 +4166,7 @@ System.out.println("query in getAssetDisposalReportRecords: "+" branch_Id: "+bra
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			 s = c.prepareStatement(query.toString());
+			 s.setQueryTimeout(180); 
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && fromDate.equals("") && endDate.equals("") && disposalReason.equals("0")) {
@@ -4595,6 +4634,7 @@ public java.util.ArrayList getAssetListRecords(String query,String branch_Id,Str
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			 s = c.prepareStatement(query.toString());
+			 s.setQueryTimeout(180); 
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -4970,6 +5010,7 @@ public java.util.ArrayList getAssetRegisterConcolidatedRecords(String query,Stri
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			 s = c.prepareStatement(query.toString());
+			 s.setQueryTimeout(180); 
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -5291,6 +5332,7 @@ System.out.println("query in getAssetTransferRecords: "+query+"  branch_Id: "+br
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			 s = c.prepareStatement(query.toString());
+			 s.setQueryTimeout(180); 
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -5838,7 +5880,7 @@ public java.util.ArrayList getAuditLogRecords(String query,String branch_Id,Stri
 	return _list;
 }
 
-public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String query,String region,String FromDate, String ToDate, String assetId)
+public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String query,String region,String FromDate, String ToDate, String assetId, String ThirdPartyLabel)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -5848,7 +5890,7 @@ public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String q
 	ResultSet rs = null; 
 //	Statement s = null;
 	PreparedStatement s = null;
-//System.out.println("query in getAssetTransferRecords: "+query+"  region: "+region+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
+//	System.out.println("query in getConsolidatedFixedAssetVerificationRecords: "+query+"  region: "+region+"  FromDate: "+FromDate+"  ToDate: "+ToDate+"  ThirdPartyLabel: "+ThirdPartyLabel);
 	try {
 		    c = getConnection();
 //			s = c.createStatement();
@@ -5881,7 +5923,80 @@ public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String q
 
 	          rs = s.executeQuery();  
 			while (rs.next())
-			   {			
+			   {	
+
+				if(ThirdPartyLabel.equals("ZENITH")) {
+				String level =  rs.getString("LEVEL");
+				String clasification = rs.getString("CLASIFICATION");
+				String branchCode = rs.getString("BRANCH_CODE");
+				String branchName = rs.getString("BRANCH_NAME");
+				String zoneCode = rs.getString("ZONE_CODE");  
+				String regionCode = rs.getString("REGION_CODE");  
+				String zoneName = rs.getString("ZONE_NAME");
+				String regionName = rs.getString("REGION_NAME");			
+				String computer = rs.getString("OFFICE EQUIPMENT - COMPUTER");
+				String furniture_and_Fitting = rs.getString("HOUSEHOLD FURNITURE & FITTING");
+				String machine_and_equipment = rs.getString("OFFICE EQUIPMENT - OTHERS");
+				String building = rs.getString("BUILDING");
+				String motorVehicle = rs.getString("MOTOR VEHICLES");
+				String staff_Furniture_and_Fitting = rs.getString("OFFICE FURNITURE & FITTINGS");
+				String leaseholdImprovement1 = rs.getString("LEASEHOLD IMPROVEMENT - HOUSE");
+				String intangibleAsset = rs.getString("COMPUTER SOFTWARE");
+				String leaseholdLand = rs.getString("LEASEHOLD IMPROVEMENT");
+				String leaseholdImprovement2 = rs.getString("WIP-LEASEHOLD IMPROVEMENT");
+				String leaseholdImprovement3 = rs.getString("WIP-LEASEHOLD IMPROVEMENT-HOUSE");
+				String leaseholdImprovement4 = rs.getString("WIP-HOUSEHOLD FURNITURE AND FITTINGS");
+				String leaseholdImprovement5 = rs.getString("WIP-OFFICE FURNITURE AND FITTINGS");
+				String staff_Machine_and_Equipments = rs.getString("WIP-OFFICE EQUIPMENT - OTHERS"); 
+				String work_In_Progress = rs.getString("WIP-BUILDING"); 
+				String airCraft = rs.getString("AIRCRAFT"); 
+				String land = rs.getString("LAND"); 
+				String wipLand = rs.getString("WIP-LAND");
+				String wipComputerSoftware = rs.getString("WIP-COMPUTER SOFTWARE"); 
+				String wipGenerators = rs.getString("WIP-GENERATORS");
+				String wipGeneratorsHouse = rs.getString("WIP-GENERATORS-HOUSE");
+				String wipMotorVehicles = rs.getString("WIP-MOTOR VEHICLES");
+				String wipOfficeEquipmentComputers = rs.getString("WIP-OFFICE EQUIPMENT - COMPUTERS");
+				
+                
+				newAssetTransaction newTransaction = new newAssetTransaction();
+				
+				newTransaction.setAssetId(level);
+				newTransaction.setCategoryName(clasification);
+				newTransaction.setBranchCode(branchCode);
+				newTransaction.setBranchName(branchName);
+				newTransaction.setDeptCode(zoneCode);
+				newTransaction.setSbuCode(regionCode);
+				newTransaction.setDeptName(zoneName);
+				newTransaction.setSbuName(regionName);
+				newTransaction.setGlAccount(computer);
+				newTransaction.setAssetLedger(furniture_and_Fitting);
+				newTransaction.setOldBranchId(machine_and_equipment);
+				newTransaction.setOldDeptId(building);
+				newTransaction.setTransDate(motorVehicle);
+				newTransaction.setOldAssetUser(staff_Furniture_and_Fitting);
+				newTransaction.setOldSection(leaseholdImprovement1);
+				newTransaction.setOldBranchCode(intangibleAsset);
+				newTransaction.setOldSectionCode(leaseholdLand);
+				newTransaction.setOldDeptCode(leaseholdImprovement2);
+				newTransaction.setApprovalStatus(leaseholdImprovement3);
+				newTransaction.setOldCategoryCode(leaseholdImprovement4);
+				newTransaction.setDescription(leaseholdImprovement5);
+				newTransaction.setNewSectionCode(staff_Machine_and_Equipments);
+				newTransaction.setNewBranchCode(work_In_Progress);
+				newTransaction.setAirCraft(airCraft);				
+				newTransaction.setLand(wipLand);
+				newTransaction.setWipLand(wipLand);
+				newTransaction.setWipComputerSoftware(wipComputerSoftware);
+				newTransaction.setWipGenerators(wipGeneratorsHouse);
+				newTransaction.setWipGeneratorsHouse(wipGeneratorsHouse);
+				newTransaction.setWipMotorVehicles(wipMotorVehicles);
+				newTransaction.setWipOfficeEquipmentComputers(wipOfficeEquipmentComputers);
+
+				_list.add(newTransaction);
+			   }
+				
+				if(ThirdPartyLabel.equals("INTEGRIFY")) {
 				String level = rs.getString("LEVEL");
 				String classification = rs.getString("CLASIFICATION");
 				String branchCode = rs.getString("BRANCH_CODE");
@@ -5890,6 +6005,7 @@ public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String q
 				String regionCode = rs.getString("REGION_CODE");  
 				String zoneName = rs.getString("ZONE_NAME");
 				String regionName = rs.getString("REGION_NAME");
+				System.out.println("=====>branchCode: "+branchCode+"    branchName: "+branchName+"    regionName"+regionName);
 				String computer = rs.getString("COMPUTER");
 				String furniture_Fittings = rs.getString("FURNITURE & FITTINGS");
 				String machine_Equipment = rs.getString("MACHINE AND EQUIPMENT");
@@ -5904,8 +6020,7 @@ public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String q
 				String leaseholdimprovement4 = rs.getString("LEASEHOLD IMPROVEMENT 4");
 				String leaseholdimprovement5 = rs.getString("LEASEHOLD IMPROVEMENT 5");
 				String staff_Machine_Equipment = rs.getString("STAFF MACHINE & EQUIPMENTS");
-				String work_In_Progress = rs.getString("WORK-IN-PROGRESS");
-         
+				String work_In_Progress = rs.getString("WORK-IN-PROGRESS");        
                 
 				newAssetTransaction newTransaction = new newAssetTransaction();
 				newTransaction.setAssetId(level);
@@ -5935,6 +6050,7 @@ public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String q
 				
 
 				_list.add(newTransaction);
+			   }
 			   }
 	 }   
 				 catch (Exception e)
@@ -6737,7 +6853,7 @@ public java.util.ArrayList getBulkTransferListRecords(String query,String branch
 
 
 
-public java.util.ArrayList getBranchSummaryVerificationRecords(String query,String branch_Id,String departmentCode, String FromDate, String ToDate, String assetId)
+public java.util.ArrayList getBranchSummaryVerificationRecords(String query,String branch_Id,String departmentCode, String FromDate, String ToDate, String assetId, String ThirdPartyLabel)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -6755,6 +6871,7 @@ public java.util.ArrayList getBranchSummaryVerificationRecords(String query,Stri
 			 s = c.prepareStatement(query.toString());
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
+		
 			 if(branch_Id.equals("0") && departmentCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
 				 System.out.println("NO Selection in getBranchSummaryVerificationRecords: ");
 			 }else{
@@ -6804,12 +6921,12 @@ public java.util.ArrayList getBranchSummaryVerificationRecords(String query,Stri
 	          }
 
 			 }
-
+	
 	          rs = s.executeQuery();  
 			while (rs.next())
 			   {			
 
-
+				if(ThirdPartyLabel.equals("ZENITH")) {
 				String level =  rs.getString("LEVEL");
 				String clasification = rs.getString("CLASIFICATION");
 				String branchCode = rs.getString("BRANCH_CODE");
@@ -6875,6 +6992,57 @@ public java.util.ArrayList getBranchSummaryVerificationRecords(String query,Stri
 				newTransaction.setWipOfficeEquipmentComputers(wipOfficeEquipmentComputers);
 
 				_list.add(newTransaction);
+			   }
+
+				if(ThirdPartyLabel.equals("INTEGRIFY")) {
+				String level =  rs.getString("LEVEL");
+				String clasification = rs.getString("CLASIFICATION");
+				String branchCode = rs.getString("BRANCH_CODE");
+				String branchName = rs.getString("BRANCH_NAME");
+				String deptCode = rs.getString("DEPT_CODE");
+				String deptName = rs.getString("DEPT_NAME");
+				String computer = rs.getString("COMPUTER");
+				String furniture_and_Fitting = rs.getString("FURNITURE & FITTINGS");
+				String machine_and_equipment = rs.getString("MACHINE AND EQUIPMENT");
+				String building = rs.getString("BUILDING");
+				String motorVehicle = rs.getString("MOTOR VEHICLE");
+				String staff_Furniture_and_Fitting = rs.getString("STAFF FUNITURE & FITTINGS");
+				String leaseholdImprovement1 = rs.getString("LEASEHOLD IMPROVEMENT 1");
+				String intangibleAsset = rs.getString("INTANGIBLE ASSETS - SOFTWARE");
+				String leaseholdLand = rs.getString("LEASEHOLD LAND");
+				String leaseholdImprovement2 = rs.getString("LEASEHOLD IMPROVEMENT 2");
+				String leaseholdImprovement3 = rs.getString("LEASEHOLD IMPROVEMENT 3");
+				String leaseholdImprovement4 = rs.getString("LEASEHOLD IMPROVEMENT 4");
+				String leaseholdImprovement5 = rs.getString("LEASEHOLD IMPROVEMENT 5");
+				String staff_Machine_and_Equipments = rs.getString("STAFF MACHINE & EQUIPMENTS"); 
+				String work_In_Progress = rs.getString("WORK-IN-PROGRESS"); 
+				               
+				newAssetTransaction newTransaction = new newAssetTransaction();
+				
+				newTransaction.setAssetId(level);
+				newTransaction.setCategoryName(clasification);
+				newTransaction.setBranchCode(branchCode);
+				newTransaction.setBranchName(branchName);
+				newTransaction.setDeptCode(deptCode);
+				newTransaction.setDeptName(deptName);
+				newTransaction.setGlAccount(computer);
+				newTransaction.setAssetLedger(furniture_and_Fitting);
+				newTransaction.setOldBranchId(machine_and_equipment);
+				newTransaction.setOldDeptId(building);
+				newTransaction.setTransDate(motorVehicle);
+				newTransaction.setOldAssetUser(staff_Furniture_and_Fitting);
+				newTransaction.setOldSection(leaseholdImprovement1);
+				newTransaction.setOldBranchCode(intangibleAsset);
+				newTransaction.setOldSectionCode(leaseholdLand);
+				newTransaction.setOldDeptCode(leaseholdImprovement2);
+				newTransaction.setApprovalStatus(leaseholdImprovement3);
+				newTransaction.setOldCategoryCode(leaseholdImprovement4);
+				newTransaction.setDescription(leaseholdImprovement5);
+				newTransaction.setNewSectionCode(staff_Machine_and_Equipments);
+				newTransaction.setNewBranchCode(work_In_Progress);
+
+				_list.add(newTransaction);
+			   }				
 			   }
 	 }   
 				 catch (Exception e)
@@ -8492,7 +8660,7 @@ public java.util.ArrayList getLegendLegacyTransactionComparismRecords(String que
 	          rs = ps.executeQuery();
 			while (rs.next())
 			   {	
-			if(BankingApp.equalsIgnoreCase("FLEXICUBE")) { 
+			if(BankingApp.equalsIgnoreCase("FLEXCUBE")) { 
 //				String strgroupId = rs.getString("ID_GROUP_ID");
 				String strbatchNo = rs.getString("BATCH_NO");
 				String strDescription = rs.getString("Description");
@@ -8577,37 +8745,16 @@ public java.util.ArrayList getLegacyTransactionImportRecords(String query,String
 //	System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
 	try {
         	
-        	
         ConnectionClass connection = new ConnectionClass();
         	conn = connection.getConnection();
         	ps = conn.prepareStatement(query.toString());        	
         	
-//			 if(branch_Id.equals("0") && FromDate.equals("") && ToDate.equals("")) {
-//				 System.out.println("NO Selection in getAssetManagementRecords: ");
-//			 }else{
-//				 System.out.println("Selection in getLegacyTransactionImportRecords branch_Id: "+query.contains("a.branch_id")+"   categoryCode: "+query.contains("a.CATEGORY_CODE"));
-//				 System.out.println("Selection in getLegacyTransactionImportRecords branch_Id: "+branch_Id+"   FromDate: "+FromDate+"    ToDate: "+ToDate);
-//	          if(!branch_Id.equals("0") && !FromDate.equals("") && !ToDate.equals("")){
-//	      //  	  System.out.println("getAssetManagementRecords with Branch but No Category: ");
-//	        	  ps.setString(1, branch_Id);
-//	        	  ps.setString(2, FromDate);
-//	        	  ps.setString(3, ToDate);
-//	          }
-//	          if(branch_Id.equals("0") && !FromDate.equals("") && !ToDate.equals("")){
-//	        //	  System.out.println("getAssetManagementRecords with No Branch but Category Only: ");
-//	        	  ps.setString(2, FromDate);
-//	        	  ps.setString(3, ToDate);
-//	          }
-//	          if(!branch_Id.equals("0") && FromDate.equals("") && ToDate.equals("")){
-//	        //	  System.out.println("getAssetManagementRecords with Branch and Category: ");
-//	        	  ps.setString(1, branch_Id);
-//	          }	  				 
-//			 }
+
 	          rs = ps.executeQuery();
 			while (rs.next())
 			   {	
 				newAssetTransaction newTransaction = new newAssetTransaction();
-				if(BankingApp.equalsIgnoreCase("FLEXICUBE")) {
+				if(BankingApp.equalsIgnoreCase("FLEXCUBE")) {
 //				String strgroupId = rs.getString("GROUP_ID");
 				String strbatchNo = rs.getString("BATCH_NO");
 				String strserialNo = rs.getString("SERIAL_NO");
@@ -8678,71 +8825,38 @@ public java.util.ArrayList getLegacyTransactionImportRecords(String query,String
 
 
 public ArrayList<newAssetTransaction> getPendingConsolidatedRecords(
-	    String query, String branch_Id, String categoryCode, String FromDate, String ToDate) {
+	    String baseQuery, String branch_Id, String categoryCode, String FromDate, String ToDate) {
 
-	    ArrayList<newAssetTransaction> _list = new ArrayList<>();
-	    Connection c = null;
-	    PreparedStatement s = null;
-	    ResultSet rs = null;
+	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
+	 List<String> params = new ArrayList<>();
+	 ArrayList<newAssetTransaction> _list = new ArrayList<>();
+	 Connection c = null;
+	 PreparedStatement ps = null;
+	 ResultSet rs = null;
 
-	    try {
-	        c = getConnection();
-	        s = c.prepareStatement(query);
-	        int paramIndex = 1;
+try {
+    c = getConnection();
 
-	        // Log filters for traceability
-	        System.out.printf("Executing getPendingConcolidatedRecords with Branch: %s, Category: %s, From: %s, To: %s%n",
-	                branch_Id, categoryCode, FromDate, ToDate);
+    if (!branch_Id.equals("0")) {
+        sqlQuery.append(" AND branch_code = ?");
+        params.add(branch_Id);
+        System.out.println("Branch selected");
+    }
+    
 
-	        // Bind parameters dynamically based on filter combination
-	        if (!branch_Id.equals("0") && categoryCode.equals("0") && FromDate.isEmpty() && ToDate.isEmpty()) {
-	            s.setString(paramIndex++, branch_Id);
-	            s.setString(paramIndex++, branch_Id);
+    if (!FromDate.isEmpty() && !ToDate.isEmpty()) {
+        sqlQuery.append(" AND transaction_date BETWEEN ? AND ?");
+        params.add(FromDate);
+        params.add(ToDate);
+        System.out.println("Date selected");
+    }
+    
 
-	        } else if (branch_Id.equals("0") && !categoryCode.equals("0") && FromDate.isEmpty() && ToDate.isEmpty()) {
-	            s.setString(paramIndex++, categoryCode);
-	            s.setString(paramIndex++, categoryCode);
-
-	        } else if (!branch_Id.equals("0") && !categoryCode.equals("0") && FromDate.isEmpty() && ToDate.isEmpty()) {
-	            s.setString(paramIndex++, branch_Id);
-	            s.setString(paramIndex++, categoryCode);
-	            s.setString(paramIndex++, branch_Id);
-	            s.setString(paramIndex++, categoryCode);
-
-	        } else if (branch_Id.equals("0") && categoryCode.equals("0") && !FromDate.isEmpty() && !ToDate.isEmpty()) {
-	            s.setString(paramIndex++, FromDate);
-	            s.setString(paramIndex++, ToDate);
-	            s.setString(paramIndex++, FromDate);
-	            s.setString(paramIndex++, ToDate);
-
-	        } else if (!branch_Id.equals("0") && categoryCode.equals("0") && !FromDate.isEmpty() && !ToDate.isEmpty()) {
-	            s.setString(paramIndex++, branch_Id);
-	            s.setString(paramIndex++, FromDate);
-	            s.setString(paramIndex++, ToDate);
-	            s.setString(paramIndex++, branch_Id);
-	            s.setString(paramIndex++, FromDate);
-	            s.setString(paramIndex++, ToDate);
-
-	        } else if (!branch_Id.equals("0") && !categoryCode.equals("0") && !FromDate.isEmpty() && !ToDate.isEmpty()) {
-	            s.setString(paramIndex++, branch_Id);
-	            s.setString(paramIndex++, categoryCode);
-	            s.setString(paramIndex++, FromDate);
-	            s.setString(paramIndex++, ToDate);
-	            s.setString(paramIndex++, branch_Id);
-	            s.setString(paramIndex++, categoryCode);
-	            s.setString(paramIndex++, FromDate);
-	            s.setString(paramIndex++, ToDate);
-
-	        } else if (branch_Id.equals("0") && !categoryCode.equals("0") && !FromDate.isEmpty() && !ToDate.isEmpty()) {
-	            s.setString(paramIndex++, categoryCode);
-	            s.setString(paramIndex++, FromDate);
-	            s.setString(paramIndex++, ToDate);
-	            s.setString(paramIndex++, categoryCode);
-	            s.setString(paramIndex++, FromDate);
-	            s.setString(paramIndex++, ToDate);
-	        }
-
-	        rs = s.executeQuery();
+    ps = c.prepareStatement(sqlQuery.toString());
+    for (int i = 0; i < params.size(); i++) {
+        ps.setString(i + 1, params.get(i));
+    }
+    rs = ps.executeQuery();
 	        while (rs.next()) {
 	            _list.add(mapResultSetToTransaction(rs));
 	        }
@@ -8750,49 +8864,235 @@ public ArrayList<newAssetTransaction> getPendingConsolidatedRecords(
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    } finally {
-	        closeConnection(c, s, rs);
+	        closeConnection(c, ps, rs);
 	    }
 
 	    return _list;
 	}
 
-
 private newAssetTransaction mapResultSetToTransaction(ResultSet rs) throws SQLException {
     newAssetTransaction tx = new newAssetTransaction();
 
-    tx.setOldassetId(rs.getString("Old_Asset_Id"));
+   
     tx.setAssetId(rs.getString("ASSET_ID"));
     tx.setBranchCode(rs.getString("BRANCH_CODE"));
-    tx.setBranchName(rs.getString("BRANCH_NAME"));
-    tx.setCategoryName(rs.getString("category_name"));
-    tx.setDeptName(rs.getString("Dept_name"));
     tx.setDescription(rs.getString("Description"));
-    tx.setCostPrice(rs.getDouble("COST_PRICE"));
-    tx.setMonthlyDep(rs.getDouble("Monthly_Dep"));
-    tx.setAccumDep(rs.getDouble("Accum_Dep"));
-    tx.setNbv(rs.getDouble("NBV"));
-    tx.setDatepurchased(rs.getString("Date_purchased"));
-    tx.setPostingDate(rs.getString("Posting_Date"));
-    tx.setEffectiveDate(rs.getString("EFFECTIVE_DATE"));
-    tx.setDepRate(rs.getDouble("Dep_Rate"));
-   // tx.setDepEndDate(rs.getString("Dep_End_Date"));
-    tx.setAssetUser(rs.getString("ASSET_USER"));
-    tx.setVendorName(rs.getString("VENDOR_NAME"));
-    tx.setAssetStatus(rs.getString("transType"));
-    tx.setUsefullife(rs.getInt("Total_Life"));
-    tx.setRemainLife(rs.getInt("Remaining_Life"));
-    tx.setImprovcostPrice(rs.getDouble("IMPROV_COST"));
-    tx.setImprovaccumDep(rs.getDouble("IMPROV_ACCUMDEP"));
-    tx.setImprovnbv(rs.getDouble("IMPROV_NBV"));
-    tx.setImprovmonthlyDep(rs.getDouble("IMPROV_MONTHLYDEP"));
-    tx.setImproveRemainLife(rs.getInt("IMPROV_REMAINLIFE"));
-    tx.setNoofitems(rs.getInt("IMPROV_USEFULLIFE"));
-    tx.setImprovtotallife(rs.getInt("IMPROV_TOTALLIFE"));
-    tx.setBarCode(rs.getString("Tag"));
+    tx.setPostingDate(rs.getString("Transaction_Date"));
+    tx.setAssetStatus(rs.getString("Asset_Status"));
+    tx.setTranType(rs.getString("tran_type"));
+   
 
     return tx;
 }
 
+public java.util.ArrayList getAssetDisposedUploadExportRecords(String query,String branchCode, String groupid)
+{
+	java.util.ArrayList _list = new java.util.ArrayList();
+	String date = String.valueOf(dateConvert(new java.util.Date()));
+	date = date.substring(0, 10);
+	String finacleTransId= null;
+	Connection c = null; 
+	ResultSet rs = null;
+//	Statement s = null; 
+	PreparedStatement s = null;
+//	System.out.println("query in getFinacleAssetUploadExportRecords: "+query);
+	try {
+		    c = getConnection();
+			 s = c.prepareStatement(query.toString());
+//	          if(query.contains("disposal_ID") && query.contains("disposal_ID") && query.contains("d.branch_code")){
+	        	  s.setString(1, groupid);
+	        	  s.setString(2, groupid);
+	        	  s.setString(3, groupid);
+	        	  s.setString(4, groupid);
+	        	  s.setString(5, groupid);
+	        	  s.setString(6, groupid);
+	        	  s.setString(7, groupid);
+	        	  s.setString(8, groupid);
+//	          }
+	          
+			rs = s.executeQuery();
+			while (rs.next())
+			   {				
+				String strDescription = rs.getString("Description");
+				String StrassetId = rs.getString("ASSET_ID");
+				String barcode = rs.getString("TRANSTYPE");
+				String sbuCode = rs.getString("SBU_CODE");
+				double costPrice = rs.getDouble("costPrice");
+				String E = rs.getString("E");
+                String F = rs.getString("F");
+                String accountNo = rs.getString("ACCOUNTNO");
+                String H = rs.getString("H");
+                String I = rs.getString("I");
 
+				newAssetTransaction newTransaction = new newAssetTransaction();
+				newTransaction.setAssetId(StrassetId);
+				newTransaction.setBarCode(barcode);
+				newTransaction.setSbuCode(sbuCode);
+				newTransaction.setDescription(strDescription);
+				newTransaction.setAssetUser(E);
+				newTransaction.setAssetCode(F);
+				newTransaction.setVendorAC(accountNo);
+				newTransaction.setCostPrice(costPrice);
+//				newTransaction.setPostingDate(depDate);
+				newTransaction.setCategoryCode(H);
+				newTransaction.setIntegrifyId(I);
+				_list.add(newTransaction);
+			   }
+	 }   
+				 catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+					finally
+					{
+						closeConnection(c, s, rs);
+					}
+	return _list;
+}
+
+
+public ArrayList<newAssetTransaction> getFixedTagUpdateReportRecords(String baseQuery, String branch_Id, String categoryCode) {
+	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
+	 List<String> params = new ArrayList<>();
+	 ArrayList<newAssetTransaction> list = new ArrayList<>();
+	 Connection c = null;
+	 PreparedStatement ps = null;
+	 ResultSet rs = null;
+
+try {
+  c = getConnection();
+
+  //StringBuilder query = new StringBuilder(baseQuery);
+
+  if (!branch_Id.equals("0")) {
+	   System.out.println("BRANCH OWN");
+      sqlQuery.append(" AND a.branch_id =?");
+      params.add(branch_Id);
+      System.out.println("Branch selected");
+  }
+  
+  if (!categoryCode.equals("0")) {
+	   System.out.println("catEGORY OWN");
+      sqlQuery.append(" AND a.Category_ID =?");
+      params.add(categoryCode);
+      System.out.println("Category selected");
+  }
+  
+  sqlQuery.append(" GROUP BY a.ASSET_ID,DESCRIPTION,BAR_CODE,a.BRANCH_CODE,a.CATEGORY_CODE,b.BRANCH_NAME,c.CATEGORY_NAME");
+
+  ps = c.prepareStatement(sqlQuery.toString());
+  for (int i = 0; i < params.size(); i++) {
+      ps.setString(i + 1, params.get(i));
+  }
+  rs = ps.executeQuery();
+
+  while (rs.next()) {
+      newAssetTransaction newTransaction = new newAssetTransaction();
+      
+      newTransaction.setAssetId(rs.getString("ASSET_ID"));
+      newTransaction.setDescription(rs.getString("DESCRIPTION"));
+      newTransaction.setBarCode(rs.getString("NEW_TAG"));
+      newTransaction.setAssetEngineNo(rs.getString("COMPONENT_TAG"));
+      newTransaction.setBranchCode(rs.getString("BRANCH_CODE"));
+      newTransaction.setAssetModel(rs.getString("OLD_TAG"));
+      newTransaction.setCategoryCode(rs.getString("CATEGORY_CODE"));
+      newTransaction.setBranchName(rs.getString("BRANCH_NAME"));
+      newTransaction.setCategoryName(rs.getString("CATEGORY_NAME"));
+      
+      
+
+      list.add(newTransaction);
+  }
+
+} catch (Exception e) {
+  e.printStackTrace();
+} finally {
+  closeConnection(c, ps, rs);
+}
+
+return list;
+}
+
+
+public ArrayList<newAssetTransaction> getFullyDepreciatedAssetImprovementRecords(
+	    String baseQuery, String branch_Id, String categoryCode, String FromDate, String ToDate, String assetID) {
+
+	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
+	 List<String> params = new ArrayList<>();
+	 ArrayList<newAssetTransaction> _list = new ArrayList<>();
+	 Connection c = null;
+	 PreparedStatement ps = null;
+	 ResultSet rs = null;
+
+try {
+    c = getConnection();
+    
+    if (!baseQuery.toLowerCase().contains("where")) {
+        sqlQuery.append(" WHERE 1=1");
+    }
+
+    if (!branch_Id.equals("0")) {
+        sqlQuery.append(" AND branch_code = ?");
+        params.add(branch_Id);
+       // System.out.println("Branch selected");
+    }
+    
+
+    if (!FromDate.isEmpty() && !ToDate.isEmpty()) {
+        sqlQuery.append(" AND Posting_Date BETWEEN ? AND ?");
+        params.add(FromDate);
+        params.add(ToDate);
+       // System.out.println("Date selected");
+    }
+    
+    if (!categoryCode.equals("0")) {
+        sqlQuery.append(" AND CATEGORY_CODE =?");
+        params.add(categoryCode);
+      //  System.out.println("Category selected");
+    }
+    
+    if (assetID != null && !assetID.trim().isEmpty()) {
+        sqlQuery.append(" AND Asset_id =?");
+        params.add(assetID);
+       // System.out.println("asset selected");
+    }
+    
+    
+
+    ps = c.prepareStatement(sqlQuery.toString());
+    for (int i = 0; i < params.size(); i++) {
+        ps.setString(i + 1, params.get(i));
+    }
+    rs = ps.executeQuery();
+	        while (rs.next()) {
+	        	
+	        	   newAssetTransaction newTransaction = new newAssetTransaction();
+            
+	        	   newTransaction.setBranchCode(rs.getString("BRANCH_CODE"));       	   
+	        	   newTransaction.setCategoryCode(rs.getString("CATEGORY_CODE"));
+	        	   newTransaction.setAssetId(rs.getString("Asset_id"));
+	        	   newTransaction.setDescription(rs.getString("Description"));
+	        	   newTransaction.setImprovcostPrice(rs.getDouble("IMPROV_COST"));
+	        	   newTransaction.setImprovmonthlyDep(rs.getDouble("IMPROV_MONTHLYDEP"));
+	        	   newTransaction.setImprovnbv(rs.getDouble("IMPROV_NBV"));
+	        	   newTransaction.setUsefullife(rs.getInt("IMPROV_USEFULLIFE"));
+	        	   newTransaction.setImproveRemainLife(rs.getInt("IMPROV_REMAINLIFE"));
+	        	   newTransaction.setImprovtotallife(rs.getInt("IMPROV_TOTALLIFE"));
+	        	   newTransaction.setEffectiveDate(rs.getString("DEP_START_DATE"));
+	        	   newTransaction.setDepDate(rs.getString("last_dep_date"));
+	        	   newTransaction.setPostingDate(rs.getString("Posting_Date"));
+
+	        	   
+	            _list.add(newTransaction);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        closeConnection(c, ps, rs);
+	    }
+
+	    return _list;
+	}
 
 }

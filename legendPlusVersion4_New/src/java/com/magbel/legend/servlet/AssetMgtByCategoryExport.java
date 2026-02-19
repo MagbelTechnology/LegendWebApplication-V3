@@ -3,49 +3,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
    
-
-
-
-
-
-
-
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import magma.AssetRecordsBean;
 
@@ -87,7 +51,7 @@ public class AssetMgtByCategoryExport extends HttpServlet
     }
     System.out.println("<<<<<<branch_Code: "+branch_Code);
     String userName = request.getParameter("userName");
-    String fileName = branch_Code+"By"+userName+"AssetManagementSummaryByCategoryReport.XLS";    	
+    String fileName = branch_Code+"By"+userName+"AssetManagementSummaryByCategoryReport.XLSX";    	
     String filePath = System.getProperty("user.home")+"\\Downloads";
 	File tmpDir = new File(filePath);
 	boolean exists = tmpDir.exists();	
@@ -122,7 +86,7 @@ public class AssetMgtByCategoryExport extends HttpServlet
      + "am_Asset.Cost_Price + (coalesce(am_Asset.IMPROV_COST,0)) AS Final_Total_Cost,am_Asset.Accum_dep + (coalesce(am_Asset.IMPROV_ACCUMDEP,0)) AS Final_Total_Accum"
 + " FROM dbo.am_ad_branch am_ad_branch INNER JOIN dbo.am_Asset am_Asset ON am_ad_branch.BRANCH_CODE = am_Asset.BRANCH_CODE "
 + " INNER JOIN dbo.am_ad_category am_ad_category ON am_Asset.CATEGORY_CODE = am_ad_category.category_code,dbo.am_gb_company am_gb_company"
-+ " where am_Asset.Asset_Status = 'ACTIVE' and am_Asset.Cost_Price >  (am_gb_company.Cost_Threshold - 0.01) "
++ " where am_Asset.Asset_Status = 'ACTIVE' and am_Asset.Cost_Price >  (am_gb_company.old_threshhold - 0.01) "
 + " order by am_ad_category_category_name,am_ad_branch_BRANCH_CODE";
 	}      
    if(!branch_Id.equals("***")  && categoryCode.equals("***")){
@@ -133,7 +97,7 @@ public class AssetMgtByCategoryExport extends HttpServlet
 	    	     + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
 	    	     + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
 	    	     + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-	    	+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND b.branch_id = '"+branch_Id+"' "
+	    	+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND b.branch_id = '"+branch_Id+"' "
 	    	+ " AND am_ad_branch.branch_id = "+branch_Id+" "
 	    	+ " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
    }
@@ -145,7 +109,7 @@ public class AssetMgtByCategoryExport extends HttpServlet
 	    	     + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
 	    	     + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
 	    	     + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-	    	+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND b.branch_id = '"+branch_Id+"' "
+	    	+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND b.branch_id = '"+branch_Id+"' "
 	    	+ " AND am_ad_category.category_id = "+categoryCode+" "
 	    	+ " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
 	}
@@ -157,7 +121,7 @@ public class AssetMgtByCategoryExport extends HttpServlet
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND b.branch_id = '"+branch_Id+"' AND a.CATEGORY_CODE = '"+categoryCode+"' "
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND b.branch_id = '"+branch_Id+"' AND a.CATEGORY_CODE = '"+categoryCode+"' "
 + " AND am_ad_branch.branch_id = "+branch_Id+" AND am_ad_category.category_id = "+categoryCode+" "
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
 	}   

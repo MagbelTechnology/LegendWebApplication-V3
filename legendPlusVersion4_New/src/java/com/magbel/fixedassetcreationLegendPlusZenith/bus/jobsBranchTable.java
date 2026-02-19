@@ -20,7 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.quartz.*; 
 
 import com.magbel.legend.vao.newAssetTransaction;
- 
+
+@DisallowConcurrentExecution
 public class jobsBranchTable
     implements Job
 {  

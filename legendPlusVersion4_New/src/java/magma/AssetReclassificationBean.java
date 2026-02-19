@@ -1986,7 +1986,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         return result;
     }
 
-    public void updateAssetReclassification(String id,int tranId) {
+    public void updateAssetReclassification(String id,Long tranId) {
 
         int new_category = 0;
         double new_depr_rate = 0;

@@ -107,9 +107,9 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
 
             String newAssetID = request.getParameter("newAssetID");
  //           System.out.println("here >>>>>>Approval tranId " +request.getParameter("tranId"));
-            int tranId = Integer.parseInt(request.getParameter("tranId"));
+            long tranId = Long.parseLong(request.getParameter("tranId"));
  //           System.out.println("here >>>>>>Approval transactionId " +request.getParameter("transactionId"));
-            int transactionId = Integer.parseInt(request.getParameter("transactionId"));
+            long transactionId = Long.parseLong(request.getParameter("transactionId"));
 //            System.out.println("tranId here >>>>>>>>>>>>>>>>>>>> "+ tranId+" transactionId: "+transactionId);
             String prooftranId = request.getParameter("prooftranId");
 //            System.out.println("here >>>>>>>>Approval prooftranId " +prooftranId);
@@ -160,12 +160,12 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
                         String[] raiseEntryInfo=null;
 
             String branch_id = "";
-            String oldAssetStatus = arb.getCodeName("select asset_status from am_asset_approval where transaction_id="+Integer.toString(tranId));
+            String oldAssetStatus = arb.getCodeName("select asset_status from am_asset_approval where transaction_id="+tranId);
 
             if(oldAssetStatus != null && oldAssetStatus.equalsIgnoreCase("RP")){
 
                 raiseEntryInfo = aprecords.raiseEntryInfoRepost(asset_id);
-               branch_id = arb.getCodeName("select old_branch_id from am_assettransfer where transfer_id="+Integer.toString(tranId));
+               branch_id = arb.getCodeName("select old_branch_id from am_assettransfer where transfer_id="+tranId);
             }else{
             raiseEntryInfo = aprecords.raiseEntryInfo(asset_id);
             branch_id = raiseEntryInfo[1];
@@ -214,7 +214,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
 //                        System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Long.parseLong(batchId),assetCode,userid); 
                         aprecords.updateRaiseEntry(asset_id);
                         }
                         if (approvalCount == tranLevel && transAvailable != "0")
@@ -412,7 +412,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
 
                                 String q = "update am_asset_approval set process_status='A', asset_status='ACCELERATED',DATE_APPROVED = '"+approveddate+"' where transaction_id = '" + tranId + "'";
                                 arb.updateAssetStatusChange(q);
-                                   String q3 = "update am_AcceleratedDepreciation set ACCELERATED_STATUS='Y' where Accelerated_ID = '" + Integer.toString(tranId) + "'";
+                                   String q3 = "update am_AcceleratedDepreciation set ACCELERATED_STATUS='Y' where Accelerated_ID = '" + tranId + "'";
                                    arb.updateAssetStatusChange(q3);
                             	   String updateqry = "UPDATE a SET a.Accum_Dep  = b.Accum_Dep+b.ACCELERATED_AMOUNT,a.nbv = a.nbv-b.ACCELERATED_AMOUNT, a.Useful_Life = b.Useful_life,a.Remaining_Life = b.Remaining_life "                               	   	
                                	   		+ "from  AM_ASSET a, am_AcceleratedDepreciation b where a.Asset_id = b.Asset_id and b.Asset_id = '"+ asset_id + "' ";
@@ -461,7 +461,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
                             if (singleApproval.equalsIgnoreCase("N")) {
                               	pa = arb.setApprovalData(asset_id);
                               	pa[9]="Asset Reclassification";
-                              arb.setPendingMultiApprTransArchive(pa,"4",Integer.parseInt(batchId),assetCode,userid);
+                              arb.setPendingMultiApprTransArchive(pa,"4",Long.parseLong(batchId),assetCode,userid);
 //                              System.out.println("Value of userid is >>>>>> " + userid);
                               aprecords.updateRaiseEntry(asset_id);
                               }
@@ -568,7 +568,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
 
                //            System.out.println("===============here in revalued=============");
                             String q = "update am_asset_approval set process_status='A',asset_status='Revalued',DATE_APPROVED = '"+approveddate+"' where transaction_id = '" + tranId + "'";
-                            String q3 = "update am_assetrevalue set approval_Status='ACTIVE' where revalue_id = '" + Integer.toString(tranId) + "'";
+                            String q3 = "update am_assetrevalue set approval_Status='ACTIVE' where revalue_id = '" + tranId + "'";
                             arb.updateAssetStatusChange(q);
                             arb.updateAssetStatusChange(q3);
                             asset_manager.updateAssetRevalue(asset_id);
@@ -626,7 +626,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
                             if (singleApproval.equalsIgnoreCase("N")) {
                                pa = arb.setApprovalData(asset_id);
                                pa[9] = "Asset Transfer";
-                               arb.setPendingMultiApprTransArchive(pa, "6", Integer.parseInt(batchId), assetCode, userid);
+                               arb.setPendingMultiApprTransArchive(pa, "6", Long.parseLong(batchId), assetCode, userid);
                                aprecords.updateRaiseEntry(asset_id);
                             }                     	
                         	//System.out.println("===============here in transfered Date of approval servlet============="+approveddate);
@@ -796,7 +796,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
                             	   
                                    q = "update am_asset_approval set process_status='A',asset_status='Transferred',DATE_APPROVED = '"+approveddate+"' where transaction_id = '" + tranId + "'";
                                    arb.updateAssetStatusChange(q);
-                                   String q3 = "update am_assettransfer set approval_Status='APPROVED', new_asset_id ='"+newAsset_id+"' where transfer_id = '" + Integer.toString(tranId) + "'";
+                                   String q3 = "update am_assettransfer set approval_Status='APPROVED', new_asset_id ='"+newAsset_id+"' where transfer_id = '" + tranId + "'";
                                    arb.updateAssetStatusChange(q3);
                                    String revalue_query = "update am_assettransfer set approval_Status='ACTIVE' where transfer_id = '" + tranId + "'";
                                    arb.updateAssetStatusChange(revalue_query);
@@ -924,7 +924,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
 
                                 newAsset_id = aid_setup.getIdentity(newBranch, newDept, newSec, cat_id);
 
-                                String q3 = "update am_assettransfer set approval_Status='APPROVED', new_asset_id ='"+newAsset_id+"' where transfer_id = '" + Integer.toString(tranId) + "'";
+                                String q3 = "update am_assettransfer set approval_Status='APPROVED', new_asset_id ='"+newAsset_id+"' where transfer_id = '" + tranId + "'";
                                 arb.updateAssetStatusChange(q3);
 
                                 String revalue_query = "update am_assettransfer set approval_Status='APPROVED' where transfer_id = '" + tranId + "'";
@@ -1090,7 +1090,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
 
                                 newAsset_id = aid_setup.getIdentity(newBranch, newDept, newSec, cat_id);
 
-                                String q3 = "update am_assettransfer set approval_Status='APPROVED', new_asset_id ='"+newAsset_id+"' where transfer_id = '" + Integer.toString(tranId) + "'";
+                                String q3 = "update am_assettransfer set approval_Status='APPROVED', new_asset_id ='"+newAsset_id+"' where transfer_id = '" + tranId + "'";
                                 arb.updateAssetStatusChange(q3);
 
                                 String revalue_query = "update am_assettransfer set approval_Status='APPROVED' where transfer_id = '" + tranId + "'";
@@ -1252,7 +1252,7 @@ int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(req
 
                                 newAsset_id = aid_setup.getIdentity(newBranch, newDept, newSec, cat_id);
 
-                                String q3 = "update am_asset2transfer set approval_Status='ACTIVE', new_asset_id ='"+newAsset_id+"' where transfer_id = '" + Integer.toString(tranId) + "'";
+                                String q3 = "update am_asset2transfer set approval_Status='ACTIVE', new_asset_id ='"+newAsset_id+"' where transfer_id = '" + tranId + "'";
                                 arb.updateAssetStatusChange(q3);
 
                                 String revalue_query = "update am_asset2transfer set approval_Status='ACTIVE' where transfer_id = '" + tranId + "'";
@@ -1326,7 +1326,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                 "'" + tranId + "'";
 
         String q3 = "update AM_WIP_RECLASSIFICATION set approval_Status='ACTIVE' where transfer_id = " +
-                "'" + Integer.toString(tranId) + "'";
+                "'" + tranId + "'";
 
         arb.updateAssetStatusChange(q);
         arb.updateAssetStatusChange(q3);
@@ -1537,7 +1537,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
 //                        System.out.println("Value of batchId is >>>>>> " + batchId+"Value of assetCode is >>>>>> " + assetCode+"Value of userid is >>>>>> " + userid);
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Long.parseLong(batchId),assetCode,userid); 
                         }
                         
                         if (approvalCount == tranLevel && transAvailable != "0") {
@@ -1549,7 +1549,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                             String q = "update am_asset_approval set process_status='A', asset_status='Asset Maintained',DATE_APPROVED = '"+approveddate+"' where transaction_id = '" + tranId + "'";
                             arb.updateAssetStatusChange(q);
 
-                            String q3 = "update am_asset_improvement set approval_Status='ACTIVE' where revalue_id = '" + Integer.toString(tranId) + "'";
+                            String q3 = "update am_asset_improvement set approval_Status='ACTIVE' where revalue_id = '" + tranId + "'";
 
                             String q4 = "update am_asset set asset_status='Active',post_reject_reason='' where asset_id ='" + asset_id + "'";
 
@@ -1626,7 +1626,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                             	   magma.asset.dto.Improvement revalue = (magma.asset.dto.Improvement)assetMan.getMaintenanceAssetRepost(asset_id,tranId); 
                             	   if(revalue!=null){
                             	   vendorAcct = revalue.getRevVendorAcct();
-                            	   cost = revalue.getCost();
+                            	   cost = revalue.getCost(); 
                             	   vatAmt = revalue.getVatAmt();
                             	   whtAmt = revalue.getWhtAmt();
                             	   revalueReason = revalue.getRevalueReason();
@@ -1677,7 +1677,7 @@ if (full_status.equalsIgnoreCase("WIP"))
 //                                String page1 = "ASSET IMPROVEMENT RAISE ENTRY";
                                 String iso = "000";
                                 String costdebitAcctName = "";
-                                String costcreditAcctName = "";
+                                String costcreditAcctName = ""; 
                                 String raiseEntryNarration = Description;
                                 String costDrAcct = ""; String costCrAcct = "";
                                 String finacleTransId = "1";
@@ -1718,7 +1718,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                         System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Long.parseLong(batchId),assetCode,userid); 
                         }
                         
                         if (approvalCount == tranLevel && transAvailable != "0") {
@@ -1730,7 +1730,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                             String q = "update am_asset_approval set process_status='A', asset_status='Asset Maintained',DATE_APPROVED = '"+approveddate+"' where transaction_id = '" + tranId + "'";
                             arb.updateAssetStatusChange(q);
 
-                            String q3 = "update am_Uncapitalized_improvement set approval_Status='ACTIVE' where revalue_id = '" + Integer.toString(tranId) + "'";
+                            String q3 = "update am_Uncapitalized_improvement set approval_Status='ACTIVE' where revalue_id = '" + tranId + "'";
 
                             String q4 = "update AM_ASSET_UNCAPITALIZED set asset_status='Active',post_reject_reason='' where asset_id ='" + asset_id + "'";
 
@@ -1773,7 +1773,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                         System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Long.parseLong(batchId),assetCode,userid); 
                         }
                         
                         if (approvalCount == tranLevel && transAvailable != "0") {
@@ -1785,7 +1785,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                             String q = "update am_asset_approval set process_status='A', asset_status='Asset Revalued',DATE_APPROVED = '"+approveddate+"' where transaction_id = '" + tranId + "'";
                             arb.updateAssetStatusChange(q);
 
-                            String q3 = "update am_asset_revaluation set approval_Status='ACTIVE' where revalue_id = '" + Integer.toString(tranId) + "'";
+                            String q3 = "update am_asset_revaluation set approval_Status='ACTIVE' where revalue_id = '" + tranId + "'";
 
                             String q4 = "update am_asset set asset_status='Active',post_reject_reason='' where asset_id ='" + asset_id + "'";
 
@@ -1833,7 +1833,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                             String q = "update am_asset_approval set process_status='A', asset_status='Asset Depreciation Adjusted',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
                             arb.updateAssetStatusChange(q);
 
-                            String q3 = "update AM_ASSET_DEP_ADJUSTMENT set approval_Status='ACTIVE',raise_entry = 'Y' where id = '" + Integer.toString(tranId) + "'";
+                            String q3 = "update AM_ASSET_DEP_ADJUSTMENT set approval_Status='ACTIVE',raise_entry = 'Y' where id = '" + tranId + "'";
                             arb.updateAssetStatusChange(q3);
                             
                             if(assetRaiseEntry != null && assetRaiseEntry.equalsIgnoreCase("Y")){
@@ -1866,7 +1866,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                         System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"15",Integer.parseInt(batchId),assetCode,userid);  
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"15",Long.parseLong(batchId),assetCode,userid);  
                         }
                         if (approvalCount == tranLevel && transAvailable != "0") {
                             
@@ -1915,7 +1915,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                         System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"15",Integer.parseInt(batchId),assetCode,userid);  
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"15",Long.parseLong(batchId),assetCode,userid);  
                         }
                         if (approvalCount == tranLevel && transAvailable != "0") {
                             
@@ -1959,7 +1959,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                         System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"23",Integer.parseInt(batchId),assetCode,userid);  
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"23",Long.parseLong(batchId),assetCode,userid);  
                         }
                         
                         if (approvalCount == tranLevel && transAvailable != "0") {
@@ -2009,7 +2009,7 @@ if (full_status.equalsIgnoreCase("WIP"))
          //               System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Long.parseLong(batchId),assetCode,userid); 
                         }
                         
                         if (approvalCount == tranLevel && transAvailable != "0") {
@@ -2070,7 +2070,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                            if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                            if (singleApproval.equalsIgnoreCase("N")) {
 //                        	   System.out.println("Value of batchId is >>>>>> " + batchId+" Value of assetCode is >>>>>> " + assetCode+" Value of userid is >>>>>> " + userid);
-                           arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"28",Integer.parseInt(batchId),assetCode,userid); 
+                           arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"28",Long.parseLong(batchId),assetCode,userid); 
                            }
                            
                            if (approvalCount == tranLevel && transAvailable != "0") {
@@ -2097,7 +2097,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                        		String revalue_query = "update am_assettransfer set approval_Status='APPROVED' where substring(CAST(transfer_id AS varchar(38)),1,"+tranlent+") = '"+tranId+"'";
                        		arb.updateAssetStatusChange(revalue_query);
 //                          	 System.out.println("the for the revalue_query is >>>>>>>>>>>>>>>> " + revalue_query); 
-                                String q3 = "update am_gb_bulkTransfer set Status='APPROVED' where Batch_id = '"+ Integer.toString(tranId)+"'";
+                                String q3 = "update am_gb_bulkTransfer set Status='APPROVED' where Batch_id = '"+ tranId+"'";
                                    arb.updateAssetStatusChange(q3);
                             if(assetRaiseEntry != null && assetRaiseEntry.equalsIgnoreCase("Y") && !userName.equalsIgnoreCase("")){
                                   System.out.println("about to send Bulk raiseentry for trasfer " + tranId);
@@ -2109,13 +2109,13 @@ if (full_status.equalsIgnoreCase("WIP"))
                                         "a.BRANCH_CODE = b.NEW_BRANCH_CODE,a.SBU_CODE = b.newSBU_CODE,a.Section_id = b.newsection_id," +
                                         "a.dept_id = b.newdept_id,a.DEPT_CODE = b.NEW_DEPT_CODE,a.SECTION_CODE = b.NEW_SECTION_CODE," +
                                         "a.Asset_User = b.newAsset_User FROM am_asset a,am_gb_bulkTransfer b WHERE a.Asset_Id = b.Asset_Id " +
-                                        "AND b.Batch_Id = '"+Integer.toString(tranId)+"'";
+                                        "AND b.Batch_Id = '"+tranId+"'";
                                 arb.updateAssetStatusChange(query);
 //                                System.out.println("======query in GroupPrpcess: "+query);
                                 
-                            	String qb = "update am_gb_bulkTransfer set STATUS = 'APPROVED' where Batch_id = '"+Integer.toString(tranId)+"'";
+                            	String qb = "update am_gb_bulkTransfer set STATUS = 'APPROVED' where Batch_id = '"+tranId+"'";
                             	arb.updateAssetStatusChange(qb);
-                            	String aq = "update am_raisentry_post set entryPostFlag = 'Y',GroupIdStatus = 'Y' where id = '"+Integer.toString(tranId)+"'";
+                            	String aq = "update am_raisentry_post set entryPostFlag = 'Y',GroupIdStatus = 'Y' where id = '"+tranId+"'";
                             	arb.updateAssetStatusChange(aq);	
                                 String qa = "update am_asset_approval set asset_status='Bulk Asset Transfer',process_status = 'A' where transaction_id = '" + tranId + "'";
                                 arb.updateAssetStatusChange(qa);
@@ -2190,7 +2190,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                        		String revalue_query = "update am_assettransfer set approval_Status='APPROVED' where substring(CAST(transfer_id AS varchar(38)),1,"+tranlent+") = '"+tranId+"'";
                        		arb.updateAssetStatusChange(revalue_query);
 //                       	 System.out.println("the for the revalue_query is >>>>>>>>>>>>>>>> " + revalue_query); 
-                                String q3 = "update am_gb_bulkTransfer set Status='APPROVED' where Batch_id = '"+ Integer.toString(tranId)+"'";
+                                String q3 = "update am_gb_bulkTransfer set Status='APPROVED' where Batch_id = '"+ tranId+"'";
                                    arb.updateAssetStatusChange(q3);
                             if(assetRaiseEntry != null && assetRaiseEntry.equalsIgnoreCase("Y")){
 //                                  System.out.println("about to send Bulk raiseentry for trasfer " + tranId);
@@ -2202,13 +2202,13 @@ if (full_status.equalsIgnoreCase("WIP"))
                                         "a.BRANCH_CODE = b.NEW_BRANCH_CODE,a.SBU_CODE = b.newSBU_CODE,a.Section_id = b.newsection_id," +
                                         "a.dept_id = b.newdept_id,a.DEPT_CODE = b.NEW_DEPT_CODE,a.SECTION_CODE = b.NEW_SECTION_CODE," +
                                         "a.Asset_User = b.newAsset_User FROM am_asset a,am_gb_bulkTransfer b WHERE a.Asset_Id = b.Asset_Id " +
-                                        "AND b.Batch_Id = '"+Integer.toString(tranId)+"'";
+                                        "AND b.Batch_Id = '"+tranId+"'";
                                 arb.updateAssetStatusChange(query);
 //                                System.out.println("======query in GroupPrpcess: "+query);
                                 
-                            	String qb = "update am_gb_bulkTransfer set STATUS = 'POSTED' where Batch_id = '"+Integer.toString(tranId)+"'";
+                            	String qb = "update am_gb_bulkTransfer set STATUS = 'POSTED' where Batch_id = '"+tranId+"'";
                             	arb.updateAssetStatusChange(qb);
-                            	String aq = "update am_raisentry_post set entryPostFlag = 'Y',GroupIdStatus = 'Y' where id = '"+Integer.toString(tranId)+"'";
+                            	String aq = "update am_raisentry_post set entryPostFlag = 'Y',GroupIdStatus = 'Y' where id = '"+tranId+"'";
                             	arb.updateAssetStatusChange(aq);	
                                 String qa = "update am_asset_approval set asset_status='Bulk Asset Transfer',process_status = 'A' where transaction_id = '" + tranId + "'";
                                 arb.updateAssetStatusChange(qa);
@@ -2260,7 +2260,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                            System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                            if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                            if (singleApproval.equalsIgnoreCase("N")) {
-                           arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
+                           arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Long.parseLong(batchId),assetCode,userid); 
                            }
                            if (approvalCount == tranLevel && transAvailable != "0") {
                         //       System.out.println("here >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 1.3");
@@ -2331,7 +2331,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                         System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Long.parseLong(batchId),assetCode,userid); 
                         }
                         
                         if (approvalCount == tranLevel && transAvailable != "0") {
@@ -2385,7 +2385,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                         System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                         if (singleApproval.equalsIgnoreCase("N")) {
-                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
+                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Long.parseLong(batchId),assetCode,userid); 
                         }
                         
                         if (approvalCount == tranLevel && transAvailable != "0") {
@@ -2440,7 +2440,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                     System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                     if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                     if (singleApproval.equalsIgnoreCase("N")) {
-                    arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"44",Integer.parseInt(batchId),assetCode,userid);  
+                    arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"44",Long.parseLong(batchId),assetCode,userid);  
                     }
 
                     if (approvalCount == tranLevel && transAvailable != "0") {
@@ -2503,7 +2503,7 @@ if (full_status.equalsIgnoreCase("WIP"))
                     System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                     if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
                     if (singleApproval.equalsIgnoreCase("N")) {
-                    	 arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"45",Integer.parseInt(batchId),assetCode,userid);  
+                    	 arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(tranId,tableName),"45",Long.parseLong(batchId),assetCode,userid);  
                     }
                     
                     if (approvalCount == tranLevel && transAvailable != "0") {
@@ -2915,6 +2915,8 @@ if (full_status.equalsIgnoreCase("WIP"))
                         String q = "update am_asset_approval set process_status='R', asset_status='Asset reclassification rejected', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
                         alertmessage = "Transaction Rejected";
                         arb.updateAssetStatusChange(q);
+                        String rq = "update am_assetReclassification set STATUS = 'REJECTED' where Reclassify_ID='"+tranId+"'";
+                        arb.updateAssetStatusChange(rq);
                         approvalRemark.setApprovalLevel(approvalCount += 1);
                         approvalRemark.setRemark(rr);
                         approvalRemark.setStatus("Rejected");
@@ -2933,20 +2935,21 @@ if (full_status.equalsIgnoreCase("WIP"))
                     if (full_status.equalsIgnoreCase("Disposed") && astatus.equalsIgnoreCase("R")) {
 
                         arb.deleteOtherSupervisorswithAssetId(asset_id,userid);
-                        System.out.println("Value of singleApproval is >>>>>> " + singleApproval);
+//                        System.out.println("Value of singleApproval is >>>>>> " + singleApproval);
                         String transAvailable=arb.getCodeName("select count(*) from am_asset_approval WHERE asset_Id = '"+asset_id+"' and super_Id = '"+userid+"'  and asset_status = 'PENDING' ");
-                        System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
+//                        System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
                         if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
 //                        if (singleApproval.equalsIgnoreCase("N")) {
 //                        arb.setPendingMultiApprTransArchive(arb.setApprovalData(asset_id),"1",Integer.parseInt(batchId),assetCode,userid); 
 //                        }
 //                        
                         // String q= "update am_asset_approval set asset_status='Asset Depreciation Adjusted' where asset_id = '"+asset_id+"'and transaction_id="+tranId;
-                        String q = "update am_asset_approval set asset_status='Asset disposal rejected'," +
+                        String q = "update am_asset_approval set asset_status='Rejected'," +
                                 "process_status='R', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
                         arb.updateAssetStatusChange(q);
 
                         String q1 = "update am_asset set Asset_Status='ACTIVE' where asset_id = '" + asset_id + "' ";
+      //                  System.out.println("Value of Q1 is >>>>>> " + q1);
                         arb.updateAssetStatusChange(q1);
 
                         String q2 = "update am_AssetDisposal set disposal_status='R' where asset_id = '" + asset_id + "' and disposal_status='P'";

@@ -87,8 +87,8 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 "ASSET_ENGINE_NO,SUPPLIER_NAME," +
                 "ASSET_USER,ASSET_MAINTENANCE," +
                 "AUTHORIZED_BY,PURCHASE_REASON,SBU_CODE," +
-                "SPARE_1,SPARE_2,SPARE_3,SPARE_4,SPARE_5,SPARE_6,BAR_CODE, ASSET_ID,BATCH_ID,BRANCH_ID,DEPT_ID,SUB_CATEGORY_ID )" +
-                " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "SPARE_1,SPARE_2,SPARE_3,SPARE_4,SPARE_5,SPARE_6,BAR_CODE, ASSET_ID,BATCH_ID,BRANCH_ID,DEPT_ID,SUB_CATEGORY_ID,LOCATION )" +
+                " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 
         Connection con = null;
@@ -127,6 +127,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 String asset_id1 = bd.getAsset_id();
                 String branchId = bd.getBranch_id();
                 String subcat = bd.getSub_category_id();
+                int location = Integer.parseInt(bd.getLocation());
 
                 if (registration == null || registration.equals("")) {
                     registration = "0";
@@ -225,6 +226,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 ps.setString(22, branchId);
                 ps.setString(23, dept);
                 ps.setString(24, subcat);
+                ps.setInt(25, location);
 
                 ps.addBatch();
             }
@@ -372,6 +374,8 @@ public class BulkUpdateManager extends legend.ConnectionClass {
         return assetCode;
     }
     
+   
+    
     public boolean setBatchId(String batchId) throws Exception {
 
         String query = "update am_asset_approval set asset_id=? where transaction_id=? ";
@@ -430,6 +434,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 int assetMaintenance = rs.getInt("Asset_Maintenance");
                 String authorizedBy = rs.getString("Authorized_By");
                 String purchaseReason = rs.getString("Purchase_Reason");
+                int location = rs.getInt("LOCATION");
                 String sbuCode = rs.getString("SBU_CODE");
                 String spare1 = rs.getString("Spare_1");
                 String spare2 = rs.getString("Spare_2");
@@ -451,6 +456,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 aset.setSerialNo(AssetSerialNo);
                 aset.setEngineNo(AssetEngineNo);
                 aset.setSupplierName(SupplierName);
+                aset.setLocation(location);
                 aset.setAssetUser(assetUser);
                 aset.setAssetMaintain(assetMaintenance);
                 aset.setAuthorizeBy(authorizedBy);

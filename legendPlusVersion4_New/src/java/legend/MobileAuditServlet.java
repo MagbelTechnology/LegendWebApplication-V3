@@ -111,12 +111,15 @@ public class MobileAuditServlet extends HttpServlet {
     	 String userName = request.getParameter("userName");
     	 String description = request.getParameter("macAddress");
     	 String mobileStatus =  request.getParameter("mobileStatus");
+    	 String staffEnabled = request.getParameter("staffEnabled");
+    	 System.out.println("Thsis is the staffenabled value reaching here" + staffEnabled);
     	 String userId =  (String)session.getAttribute("CurrentUser");
            
     	 legend.admin.objects.Mobiles mobile = new legend.admin.objects.Mobiles();
 	    	 mobile.setUserName(userName) ;
 	    	 mobile.setMacAddress(description);
 	    	 mobile.setMobileStatus(mobileStatus);
+	    	 mobile.setStaffEnabled(staffEnabled);
 	    	 mobile.setUserId(userId);
 
              String computerName = null;

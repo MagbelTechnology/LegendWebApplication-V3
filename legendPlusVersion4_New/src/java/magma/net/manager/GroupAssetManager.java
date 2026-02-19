@@ -1659,16 +1659,17 @@ public class GroupAssetManager extends MagmaDBConnection {
               ArrayList finder = new ArrayList();
               String selectQuery = "";
               if(Id.equals("3")) {
-              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT,'D' AS transType,"
               			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
               			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
               			+ "and page = ? --Capitalised Group Asset Creation ";
               }
               if(Id.equals("24")) {
-              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where a.Group_id = p.Id and convert(varchar,a.Group_id) = b.asset_id "
-            			+ "and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            			+ "and page = ? --Capitalised Upload Asset Creation Debit ";    
+              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where a.Group_id = p.Id and convert(varchar,a.Group_id) = b.asset_id "
+              		+ "and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Upload Asset Creation Debit "
+              		+ "";    
               }
               if(Id.equals("1")) {
               selectQuery = "select a.Group_id, a.Asset_id,Vendor_AC AS CREDIT_ACCOUNT,c.Asset_Ledger AS DEBIT_ACCOUNT,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
@@ -1676,66 +1677,83 @@ public class GroupAssetManager extends MagmaDBConnection {
               		+ "where a.Asset_id = p.Id and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' and page = ? --Single Asset Creation Debit";    
               }
               if(Id.equals("74")) {
-              selectQuery =	"select a.disposal_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "a.BRANCH_CODE,a.Disposal_Date AS Date_purchased,a.effDate AS effective_date,p.Posting_Date,c.category_code from AM_GROUP_DISPOSAL a, am_asset s, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.disposal_ID) = p.Id "
-            			+ "and a.asset_id = s.asset_id and convert(varchar,a.disposal_ID) = b.asset_id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            			+ "and page = ? --Capitalised Upload Disposal Assset ";    
+              selectQuery =	" select distinct a.disposal_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE,a.Disposal_Date AS Date_purchased,a.effDate AS effective_date,p.Posting_Date,c.category_code, "
+              		+ "(select DISTINCT b.suspense_acct asd from am_ad_category a,  am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b,AM_GROUP_DISPOSAL g where a.currency_id = c.currency_id   "
+              		+ "and a.category_code = a.CATEGORY_CODE and d.branch_code = g.branch_code) AS DEBIT_ACCOUNT, "
+              		+ "(select TOP 1 a.Asset_Ledger asd from am_ad_category a, am_ad_branch d, AM_GB_CURRENCY_CODE c, am_gb_company b,AM_GROUP_DISPOSAL g where a.currency_id = c.currency_id  "
+              		+ "and a.category_code = g.category_code and d.branch_code = g.branch_code) AS CREDIT_ACCOUNT "
+              		+ "from AM_GROUP_DISPOSAL a, am_asset s, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.disposal_ID) = p.Id "
+              		+ "and a.asset_id = s.asset_id and convert(varchar,a.disposal_ID) = b.asset_id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page =  ? --Capitalised Upload Disposal Assset";    
               }
               if(Id.equals("2")) {
-              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice,c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code from am_AssetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s,am_asset_approval ap where a.asset_id = p.Id "
-            			+ "and a.asset_id = s.Asset_id and a.Asset_id = ap.asset_id and s.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and ap.process_status = 'A' "
-            			+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit  ";    
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice,c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code, "
+              		+ "(select b.suspense_acct asd from am_ad_category a,  am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b where a.currency_id = c.currency_id and a.category_code = s.CATEGORY_CODE "
+              		+ "and d.branch_code = s.BRANCH_CODE)AS DEBIT_ACCOUNT, "
+              		+ "(select b.suspense_acct asd from am_ad_category a, am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b where a.currency_id = c.currency_id and a.category_code = s.CATEGORY_CODE  "
+              		+ "and d.branch_code = S.BRANCH_CODE) AS CREDIT_ACCOUNT "
+              		+ "from am_AssetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s,am_asset_approval ap where a.asset_id = p.Id "
+              		+ "and a.asset_id = s.Asset_id and a.Asset_id = ap.asset_id and s.Category_ID = c.category_ID and disposal_status='P' and entryPostFlag = 'N' and GroupIdStatus = 'N' and ap.process_status = 'A' "
+              		+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit ";    
               }
               if(Id.equals("6")) {
-              selectQuery =	"select DISTINCT a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,Date_purchased,a.effDate AS effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_assetTransfer a, "
-            			+ "am_raisentry_post p,am_ad_category c, am_asset t,am_asset_approval b where a.asset_id = p.Id and a.asset_id = t.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and a.approval_status='ACTIVE' AND b.process_status = 'A' and b.tran_type = 'Asset Transfer' "
-            			+ "and page = ? --Capitalised Asset Transfer Debit ";    
+              selectQuery =	"select DISTINCT a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,Date_purchased,a.effDate AS effective_date,a.Transfer_Date AS Posting_Date,c.category_code, "
+              		+ "a.NEW_BRANCH_CODE+'-'+ c.Asset_Ledger AS DEBIT_ACCOUNT,a.OLD_BRANCH_CODE+'-'+c.Asset_Ledger AS CREDIT_ACCOUNT from am_assetTransfer a, "
+              		+ "am_raisentry_post p,am_ad_category c, am_asset t,am_asset_approval b where a.asset_id = p.Id and a.asset_id = t.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and a.approval_status='ACTIVE' AND b.process_status = 'A' and b.tran_type = 'Asset Transfer' "
+              		+ "and page = ? --Capitalised Asset Transfer Debit ";    
               }
               if(Id.equals("28")) {
-              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "t.BRANCH_CODE, Date_purchased,t.effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_gb_bulkTransfer a, "
-            			+ "am_raisentry_post p,am_ad_category c, am_asset t, am_asset_approval b where convert(varchar,a.Batch_id) = p.Id and a.asset_id = t.Asset_id and convert(varchar,a.Batch_id) = b.asset_id and t.CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            			+ "and page = ? --Capitalised Bulk Asset Transfer ";    
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "t.BRANCH_CODE, Date_purchased,t.effective_date,a.Transfer_Date AS Posting_Date,c.category_code, "
+              		+ "a.NEW_BRANCH_CODE+'-'+ c.Asset_Ledger AS DEBIT_ACCOUNT,(select BRANCH_CODE from am_ad_branch where BRANCH_ID = a.oldbranch_id)+'-'+c.Asset_Ledger AS CREDIT_ACCOUNT from am_gb_bulkTransfer a, "
+              		+ "am_raisentry_post p,am_ad_category c, am_asset t, am_asset_approval b where convert(varchar,a.Batch_id) = p.Id and a.asset_id = t.Asset_id and convert(varchar,a.Batch_id) = b.asset_id and t.CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Bulk Asset Transfer ";    
               }              
               if(Id.equals("4")) {
-              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.reclassify_date AS effective_date,p.Posting_Date,c.category_code from am_assetReclassification a,"
-            			+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = s.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            			+ "and page = ? --Capitalised Asset Reclasification Debit ";    
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.reclassify_date AS effective_date,p.Posting_Date,c.category_code, "
+              		+ "(select Asset_Ledger from am_ad_category where CATEGORY_CODE = a.old_category_code) AS CREDIT_ACCOUNT, "
+              		+ "(select Asset_Ledger from am_ad_category where category_Id = a.new_category_Id) AS DEBIT_ACCOUNT from am_assetReclassification a, "
+              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = s.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Asset Reclasification Debit ";    
               }
               if(Id.equals("12")) {
-              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
-            			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            			+ "and page = ? --Single Close Asset  Debit ";    
+              selectQuery =	"select distinct a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code, "
+              		+ "a.Vendor_AC AS DEBIT_ACCOUNT,(select Asset_Ledger from am_ad_category where category_code = a.category_code) AS CREDIT_ACCOUNT from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
+              		+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Single Close Asset  Debit ";    
               }
               if(Id.equals("10")) {
-              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-              		+ "a.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from am_asset_improvement a, "
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT from am_asset_improvement a, "
               		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and a.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
               		+ "and approval_status = 'ACTIVE' and revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
               		+ "and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
               		+ "and page = ? --Capitalised Asset Improvement Debit ";    
               }              
               if(Id.equals("13")) {
-              selectQuery =	"select a.Revalue_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-              			+ "a.BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where CONVERT(varchar, a.Revalue_ID) = p.Id "
-              			+ "and a.Category_Code = c.category_Code and a.asset_id = s.Asset_id and CONVERT(varchar, a.Revalue_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-              			+ "and page = ? --Capitalised Asset Improvement Upload ";
+              selectQuery =	"select distinct a.Revalue_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where CONVERT(varchar, a.Revalue_ID) = p.Id "
+              		+ "and a.Category_Code = c.category_Code and a.asset_id = s.Asset_id and CONVERT(varchar, a.Revalue_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Asset Improvement Upload ";
               }
               if(Id.equals("16")) {
-                  selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-                			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id and a.asset_id = b.asset_id "
-                			+ "and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-                			+ "and page = ? --Single WIP RECLASSIFICATION";  
+                  selectQuery = "select distinct a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+                  		+ "  a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code, "
+                  		+ "  c.Asset_Ledger CREDIT_ACCOUNT,c.Asset_Ledger DEBIT_ACCOUNT from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id and a.asset_id = b.asset_id "
+                  		+ "  and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+                  		+ "  and page = ? --Single WIP RECLASSIFICATION";  
               }
               if(Id.equals("29")) {
-              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-              		+ "s.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effective_date,a.Accelerated_Date AS Posting_Date,c.category_code from am_AcceleratedDepreciation a, "
+              selectQuery =	" select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "s.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effective_date,a.Accelerated_Date AS Posting_Date,c.category_code, "
+              		+ "c.Dep_ledger AS DEBIT_ACCOUNT,c.Accum_Dep_ledger AS CREDIT_ACCOUNT from am_AcceleratedDepreciation a, "
               		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and s.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-              		+ "and page = ? --Capitalised Accelerated Depreciation ";    
+              		+ "and page = ? --Capitalised Accelerated Depreciation";    
               }              
               if(Id.equals("EXCPT")) {
                   selectQuery = "select a.Group_id, '' AS Asset_id,a.Description,a.Cost_Price AS costPrice, a.ACCOUNT_NO AS accountNo,'D' AS transType,"
@@ -1759,6 +1777,8 @@ public class GroupAssetManager extends MagmaDBConnection {
       			   String depreciationStartDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
       			   String branchCode = rs.getString("BRANCH_CODE");
       			   String categoryCode = rs.getString("CATEGORY_CODE");
+      			   String creditAccount =  rs.getString("CREDIT_ACCOUNT");
+      			 String debitAccount =  rs.getString("DEBIT_ACCOUNT");
                       
                       groupAsset = new GroupAsset();
                       groupAsset.setId(assetId); 
@@ -1769,6 +1789,8 @@ public class GroupAssetManager extends MagmaDBConnection {
                       groupAsset.setDate_of_purchase(purchaseDate);
                       groupAsset.setDepreciation_start_date(depreciationStartDate);
                       groupAsset.setCategory_code(categoryCode);
+                      groupAsset.setSpare1(creditAccount);
+                      groupAsset.setSpare2(debitAccount);
                       finder.add(groupAsset);
 
                   }
@@ -1970,7 +1992,7 @@ public class GroupAssetManager extends MagmaDBConnection {
               if(Id.equals("2")) {
               selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
               		+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code from am_assetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s, am_asset_approval ab where a.asset_id = p.Id "
-              		+ "and a.asset_id = s.Asset_id and s.Category_ID = c.category_ID and a.asset_id = ab.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
+              		+ "and a.asset_id = s.Asset_id and s.Category_ID = c.category_ID and a.asset_id = ab.asset_id and disposal_status='P' and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
               		+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit  ";    
               }            
               if(Id.equals("6")) {
@@ -1986,16 +2008,17 @@ public class GroupAssetManager extends MagmaDBConnection {
             			+ " AND ab.process_status = 'A' and page = ? --Capitalised Bulk Asset Transfer ";    
               }                 
               if(Id.equals("4")) {
-              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.reclassify_date AS effective_date,p.Posting_Date,c.category_code from am_assetReclassification a,"
-            			+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = s.Asset_id and a.OLD_CATEGORY_CODE = c.category_Code and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-            			+ "and page = ? --Capitalised Asset Reclasification Debit ";    
+              selectQuery =	"select sum(a.Cost_Price) AS costPrice from am_assetReclassification a, am_raisentry_post p,am_asset s, "
+              		+ "am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = b.asset_id "
+              		+ "and a.asset_id = s.Asset_id and b.tran_type='Asset Reclassification' "
+              		+ "and b.process_status = 'A' and entryPostFlag = 'N' "
+              		+ "and GroupIdStatus = 'N' and page = ? --Capitalised Asset Reclasification Debit  ";    
               }
               if(Id.equals("12")) {
-              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
-            			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
-            			+ "and page = ? --Single Close Asset  Debit ";    
+              selectQuery =	"select sum(a.Cost_Price) AS costPrice from am_asset a, am_raisentry_post p, am_asset_approval b "
+              		+ "where a.asset_id = p.Id and a.Asset_id = b.asset_id and b.tran_type='CloseAsset' "
+              		+ "and  b.process_status = 'A' and entryPostFlag = 'N' and GroupIdStatus = 'N' "
+              		+ "and page = ? --Single Close Asset  Debit ";    
               }
               if(Id.equals("10")) {
               selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
@@ -2009,10 +2032,15 @@ public class GroupAssetManager extends MagmaDBConnection {
               		+ "and page = ? --Capitalised Asset Improvement Debit ";    
               }              
               if(Id.equals("13")) {
-              selectQuery =	"select a.Revalue_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-              			+ "a.BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where CONVERT(varchar, a.Revalue_ID) = p.Id "
-              			+ "and a.Category_Code = c.category_Code and a.asset_id = s.Asset_id and CONVERT(varchar, a.Revalue_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
-              			+ "and page = ? --Capitalised Asset Improvement Upload ";
+              selectQuery =	" select sum(a.Cost_Price) AS costPrice from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c, am_asset_approval b "
+              		+ "where a.Revalue_ID = p.Id "
+              		+ "and convert(varchar, a.Revalue_ID) = b.asset_id "
+              		+ "and a.Category_Code = c.category_Code "
+              		+ "and b.tran_type='Asset Improve Upload' "
+              		+ "and  b.process_status = 'A' "
+              		+ "and entryPostFlag = 'N' "
+              		+ "and GroupIdStatus = 'N' "
+              		+ "and page = ? --Capitalised Asset Improvement Upload ";
               }
               if(Id.equals("16")) {
                   selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
@@ -2026,10 +2054,13 @@ public class GroupAssetManager extends MagmaDBConnection {
                   		+ "where a.GROUP_ID = P.GROUP_ID and a.ID = P.SERIAL_NO and a.GROUP_DESCRIPTION = ? --Exception Transaction Posting";  
               }    
               if(Id.equals("29")) {
-              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-              		+ "s.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effective_date,a.Accelerated_Date AS Posting_Date,c.category_code from am_AcceleratedDepreciation a, "
-              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and s.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' "
-              		+ " AND ab.process_status = 'A' and page = ? --Capitalised Accelerated Depreciation ";    
+              selectQuery =	"select sum(s.Cost_Price) AS costPrice from am_AcceleratedDepreciation a, am_raisentry_post p,am_ad_category c, am_asset s, am_asset_approval b  "
+              		+ "where a.Asset_id = p.Id and a.asset_id = b.asset_id and a.Asset_id = s.Asset_id "
+              		+ "and s.Category_ID = c.category_ID "
+              		+ "and b.tran_type='Accelerated Depreciation' "
+              		+ "and  b.process_status = 'A' "
+              		+ "and entryPostFlag = 'N' "
+              		+ "and GroupIdStatus = 'N' and page = ? --Capitalised Accelerated Depreciation ";    
               }               
 //              System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
 

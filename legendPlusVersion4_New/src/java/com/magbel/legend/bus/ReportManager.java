@@ -14,6 +14,7 @@ import java.util.Date;
 
 import magma.net.dao.MagmaDBConnection;
 import magma.AnnualReportBean;
+import magma.AssetRecordsBean;
 
 import com.magbel.util.HtmlUtility;
 /**
@@ -34,6 +35,7 @@ public class ReportManager extends MagmaDBConnection {
         ResultSet rs = null;
         boolean outcome = false;  
         String sql = "";
+       
 //        System.out.println("===yearEnd in runStoredProcedure:"+yearEnd+"     reportType: "+reportType);
         if(reportType.equals("BankWide")) {     
 //        	System.out.println("===reportType in BankWide: "+reportType+"   BranchCode: "+branchCode);
@@ -42,7 +44,7 @@ public class ReportManager extends MagmaDBConnection {
 //        }else{
 //        	sql = "EXEC msp_fixed_assets_schedule'" + startDate + "','" + endDate + "'";
 //        	}
-
+        	System.out.println("===reportType in BankWide: "+reportType+"   BranchCode: "+branchCode+" startDate: "+startDate+"  endDate: "+endDate);
         	sql = "EXEC msp_fixed_assets_schedule'" + startDate + "','" + endDate + "'";     	
         }
         if(reportType.equals("ByBranch")) {
@@ -73,6 +75,8 @@ public ArrayList getReportBean(String reportType){
 ArrayList list = new ArrayList();
 AnnualReportBean arb = null;//new AnnualReportBean();
 String sql = "";
+String q = "update fixed_asset_schedule set nbv_open_bal = (cost_open_bal-Dep_open_bal)";
+htmlUtil.updateAssetStatusChange(q);        
 if(reportType.equals("BankWide")) {  
  sql = "select * from fixed_asset_schedule order by class_code";
 }
@@ -98,15 +102,16 @@ arb.setCost_TransferFrom(rs.getString("cost_TransferFrom"));
 arb.setCost_TransferTo(rs.getString("cost_TransferTo"));
 arb.setCost_additions(rs.getString("cost_additions"));
 arb.setCost_reclass(rs.getString("cost_reclass"));
+arb.setCost_CloseAsset(rs.getString("cost_CloseAsset"));
 arb.setDep_open_bal(rs.getString("dep_open_bal"));
 arb.setDep_charge(rs.getString("dep_charge"));
 arb.setDep_disposal(rs.getString("dep_disposal"));
-//arb.setDep_Transfer(rs.getString("dep_Transfer"));
+arb.setDep_CloseAsset(rs.getString("dep_CloseAsset"));
 arb.setDep_reclass(rs.getString("dep_reclass"));
 //arb.setRevaluation(rs.getString("revaluation"));
 arb.setImprovement(rs.getString("improvement"));
 arb.setAccelerate_charge(rs.getString("Accelerate_charge"));
-arb.setNbv_open_bal(rs.getString("nbv_open_bal"));
+arb.setNbv_open_bal(rs.getString("nbv_open_bal")); 
 arb.setNbv_closing_bal(rs.getString("nbv_closing_bal"));
 //arb.setCost_additionsGroupAssets(rs.getString("cost_additionsGroupAssets"));
 //arb.setCost_additionsImprovement(rs.getString("cost_additionsImprovement"));
@@ -131,7 +136,7 @@ public String getCostBalance(String classcode){
 String ans="";
 //String sql = "select cost_open_bal + improvement + cost_additions+cost_reclass + revaluation + cost_disposal"+
 //        " from fixed_asset_schedule where class_code='"+classcode+"'";
-String sql = "select cost_open_bal + improvement + cost_additions+cost_reclass + cost_disposal + cost_TransferFrom + cost_TransferTo"+
+String sql = "select cost_open_bal + improvement + cost_additions+cost_reclass + cost_disposal + cost_TransferFrom + cost_TransferTo + cost_CloseAsset "+
         " from fixed_asset_schedule where class_code='"+classcode+"'";
 
 Connection con = null;
@@ -162,7 +167,7 @@ return ans;
 
 public String getDepBalance(String classcode){
 String ans="";
-String sql = "select dep_open_bal + dep_charge + dep_disposal + dep_reclass + accelerate_charge "+
+String sql = "select dep_open_bal + dep_charge + dep_disposal + dep_reclass + accelerate_charge + dep_CloseAsset "+
         " from fixed_asset_schedule where class_code='"+classcode+"'";
 
 Connection con = null;
@@ -240,7 +245,7 @@ public boolean updatefixed_asset_schedule ()
     boolean done = false;   
     //String query = "Update fixed_asset_schedule set cost_open_bal =  cost_open_bal - "+SumCost+" where class_code='"+code+"'";
     //String query = "update fixed_asset_schedule set cost_open_bal = (cost_open_bal - (cost_additions+cost_reclass+improvement+revaluation))-cost_disposal, dep_open_bal = (dep_open_bal-(dep_charge +dep_reclass))-dep_disposal";
-    String query = "update fixed_asset_schedule set cost_open_bal = (cost_open_bal - (cost_additions+cost_reclass+improvement))-cost_disposal, dep_open_bal = (dep_open_bal-(dep_charge +dep_reclass))-dep_disposal";
+    String query = "update fixed_asset_schedule set cost_open_bal = (cost_open_bal - (cost_additions+cost_reclass+improvement))-cost_disposal-cost_CloseAsset, dep_open_bal = (dep_open_bal-(dep_charge +dep_reclass))-dep_disposal - dep_CloseAsset";
        try { 
     	con = getConnection("legendPlus");    	   
         ps = con.prepareStatement(query); 
@@ -277,13 +282,14 @@ arb.setCost_open_bal(rs.getString("cost_open_bal"));
 arb.setCost_disposal(rs.getString("cost_disposal"));
 arb.setCost_TransferFrom(rs.getString("cost_TransferFrom"));
 arb.setCost_TransferTo(rs.getString("cost_TransferTo"));
+arb.setCost_CloseAsset(rs.getString("cost_CloseAsset"));
 arb.setCost_additions(rs.getString("cost_additions"));
 arb.setCost_reclass(rs.getString("cost_reclass"));
 arb.setDep_open_bal(rs.getString("dep_open_bal"));
 arb.setDep_charge(rs.getString("dep_charge"));
 arb.setDep_disposal(rs.getString("dep_disposal"));
 arb.setDep_reclass(rs.getString("dep_reclass"));
-//arb.setRevaluation(rs.getString("revaluation"));
+arb.setDep_CloseAsset(rs.getString("dep_CloseAsset"));
 arb.setImprovement(rs.getString("improvement"));
 arb.setAccelerate_charge(rs.getString("Accelerate_charge"));
 arb.setNbv_open_bal(rs.getString("nbv_open_bal"));
@@ -308,7 +314,7 @@ return list;
 public String getConsolidatedDepBalance(String classcode){
 String ans="";
 //System.out.println("getConsolidatedDepBalance Class Code: "+classcode);
-String sql = "select dep_open_bal + dep_charge + dep_disposal + dep_reclass + Accelerate_charge "+
+String sql = "select dep_open_bal + dep_charge + dep_disposal + dep_reclass + Accelerate_charge + dep_CloseAsset"+
         " from fixed_asset_schedule_archive where class_code='"+classcode+"'";
 //System.out.println("getConsolidatedDepBalance sql: "+sql);
 Connection con = null;
@@ -338,7 +344,7 @@ public String getConsolidateCostBalance(String classcode){
 String ans="";
 //String sql = "select cost_open_bal + improvement + cost_additions+cost_reclass + revaluation + cost_disposal"+
 //        " from fixed_asset_schedule_archive where class_code='"+classcode+"'";
-String sql = "select cost_open_bal + improvement + cost_additions+cost_reclass + cost_disposal + cost_TransferFrom + cost_TransferTo"+
+String sql = "select cost_open_bal + improvement + cost_additions+cost_reclass + cost_disposal + cost_TransferFrom + cost_TransferTo + cost_CloseAsset"+
         " from fixed_asset_schedule_archive where class_code='"+classcode+"'";
 
 Connection con = null;
@@ -402,8 +408,8 @@ public boolean Insertfixed_asset_schedule_archive ()
 //    		" FROM fixed_asset_schedule WHERE SUBSTRING(CAST(end_date AS varchar(12)), 0, 4) = '"+strnewDateMonth+"' AND SUBSTRING(CAST(end_date AS varchar(12)), 8, 4)  = '"+ProcessYear+"' ";
    
    String query = "INSERT INTO fixed_asset_schedule_archive SELECT MTID,class_code,start_date,end_date,class_name," +
-   		"cost_open_bal,cost_disposal,cost_TransferFrom,cost_TransferTo,cost_additions,cost_additionsUpload,cost_additionsNoRateUpload,cost_WipReclas,cost_reclass,dep_open_bal,dep_charge,dep_disposal," +
-   		"dep_reclass,improvement,Accelerate_charge,nbv_open_bal,nbv_closing_bal," +		   
+   		"cost_open_bal,cost_disposal,cost_TransferFrom,cost_TransferTo,cost_CloseAsset,cost_additions,cost_additionsUpload,cost_additionsNoRateUpload,cost_WipReclas,cost_reclass,dep_open_bal,dep_charge,dep_disposal," +
+   		"dep_reclass,dep_CloseAsset,improvement,Accelerate_charge,nbv_open_bal,nbv_closing_bal," +		   
    		"'"+ProcessDay+"','"+ProcessMonth+"','"+ProcessYear+"','"+Processdate+"'  " +
    		" FROM fixed_asset_schedule WHERE SUBSTRING(CAST(end_date AS varchar(12)), 0, 4) = '"+strnewDateMonth+"' AND SUBSTRING(CAST(end_date AS varchar(12)), 8, 4)  = '"+ProcessYear+"' ";
 

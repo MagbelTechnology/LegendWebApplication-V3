@@ -73,7 +73,7 @@ public class AssetRegisterExport extends HttpServlet
     }
     System.out.println("<<<<<<branch_Code: "+branch_Code);
 //    String userName = request.getParameter("userName");
-    String fileName = branchCode+"By"+userName+"AssetRegisterListReport.xls";    	
+    String fileName = branchCode+"By"+userName+"AssetRegisterReport.xlsx";    	
     String filePath = System.getProperty("user.home")+"\\Downloads";
     System.out.println("<<<<<<filePath: "+filePath);
 	File tmpDir = new File(filePath);
@@ -102,7 +102,7 @@ public class AssetRegisterExport extends HttpServlet
      String ColQuery = "";
      if(!branch_Id.equals("0")  && !categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){
     	 System.out.println("======>>>>>>>Branch and Category Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);	     
-	     ColQuery ="SELECT company_name,Cost_Threshold, Asset_id, Description, BRANCH_CODE, BRANCH_NAME, category_name, Accum_Dep,"
+	     ColQuery ="SELECT company_name,old_threshhold, Asset_id, Description, BRANCH_CODE, BRANCH_NAME, category_name, Accum_Dep,"
 	 + "Monthly_Dep, Cost_Price, NBV, IMPROV_COST, IMPROV_ACCUMDEP, IMPROV_MONTHLYDEP, IMPROV_NBV,"
 	 + "Cost_Price + IMPROV_COST AS Total_Cost_Price, TOTAL_NBV, Date_purchased, Dep_rate AS am_ad_category_Dep_rate, Accum_Dep_ledger," 
      + "Dep_ledger, Asset_Ledger, gl_account, Dep_End_Date, Effective_Date, Posting_Date, Dept_name, Asset_User,"
@@ -116,7 +116,7 @@ public class AssetRegisterExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND branch_id = ? AND CATEGORY_CODE = ?"
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND branch_id = ? AND CATEGORY_CODE = ?"
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	
 	}      
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){	   
@@ -135,7 +135,7 @@ public class AssetRegisterExport extends HttpServlet
 	 + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
 	 + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
 	 + " FROM AssetRegister"
-	 + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND CATEGORY_CODE = ? "
+	 + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND CATEGORY_CODE = ? "
 	 + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";     
    }
 	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){	   
@@ -154,7 +154,7 @@ public class AssetRegisterExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND branch_id = ? "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND branch_id = ? "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";
 	}
    if(branch_Id.equals("0")  && categoryCode.equals("0") && FromDate.equals("")  && ToDate.equals("")){
@@ -173,7 +173,7 @@ public class AssetRegisterExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01)  "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01)  "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}   
    if(!FromDate.equals("")  && !ToDate.equals("") && branch_Id.equals("0")  && categoryCode.equals("0")){
@@ -192,7 +192,7 @@ public class AssetRegisterExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) and Posting_Date between ? and ?  "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) and Posting_Date between ? and ?  "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	} 
    if(!FromDate.equals("")  && !ToDate.equals("") && !branch_Id.equals("0")  && categoryCode.equals("0")){
@@ -211,7 +211,7 @@ public class AssetRegisterExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND branch_id = ? AND Posting_Date between ? and ?  "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND branch_id = ? AND Posting_Date between ? and ?  "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}    
    if(!FromDate.equals("")  && !ToDate.equals("") && !branch_Id.equals("0")  && !categoryCode.equals("0")){
@@ -230,7 +230,7 @@ public class AssetRegisterExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND branch_id = ? AND CATEGORY_CODE = ? and Posting_Date between ? and ?  "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND branch_id = ? AND CATEGORY_CODE = ? and Posting_Date between ? and ?  "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}    
    if(!asset_Id.equals("") && FromDate.equals("")  && ToDate.equals("") && branch_Id.equals("0")  && categoryCode.equals("0")){
@@ -249,7 +249,7 @@ public class AssetRegisterExport extends HttpServlet
      + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
      + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
      + " FROM AssetRegister"
-     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND Asset_id = ? "
+     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND Asset_id = ? "
      + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 	}    
 
@@ -269,7 +269,7 @@ public class AssetRegisterExport extends HttpServlet
 	     + "GROUP_ID, SBU_CODE, LPO, supervisor, defer_pay, OLD_ASSET_ID, WHT_PERCENT, Post_reject_reason, Finacle_Posted_Date, "
 	     + "system_ip, mac_address, asset_code, memo, memovalue, state_name, Section_Name, Vendor_Name"
 	     + " FROM AssetRegister"
-	     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (Cost_Threshold-0.01) AND CATEGORY_CODE = ? AND Posting_Date between ? and ? "
+	     + " WHERE Asset_Status = 'ACTIVE' and Cost_Price > (old_threshhold-0.01) AND CATEGORY_CODE = ? AND Posting_Date between ? and ? "
 	     + " ORDER BY BRANCH_CODE ASC,CATEGORY_CODE ASC ";	     
 		}
 //   System.out.println("======>>>>>>>ColQuery: "+ColQuery);
@@ -284,42 +284,41 @@ public class AssetRegisterExport extends HttpServlet
          rowhead.createCell((short) 0).setCellValue("S/No.");
          rowhead.createCell((short) 1).setCellValue("Asset ID");
          rowhead.createCell((short) 2).setCellValue("Asset Description"); 
-         rowhead.createCell((short) 3).setCellValue("Branch Code");
-         rowhead.createCell((short) 4).setCellValue("Branch Name");
-         rowhead.createCell((short) 5).setCellValue("Category Name");
-         rowhead.createCell((short) 6).setCellValue("Department Name");
-         rowhead.createCell((short) 7).setCellValue("Purchase Date");
-         rowhead.createCell((short) 8).setCellValue("Depr. Start Date");
-         rowhead.createCell((short) 9).setCellValue("Depr. End Date");
-         rowhead.createCell((short) 10).setCellValue("Cost Price");
-         rowhead.createCell((short) 11).setCellValue("Depr. Rate %");
-         rowhead.createCell((short) 12).setCellValue("Monthly Depr.");
-         rowhead.createCell((short) 13).setCellValue("Accum Depr.");
-         rowhead.createCell((short) 14).setCellValue("NBV");
-         rowhead.createCell((short) 15).setCellValue("Improv Cost Price");
-		 rowhead.createCell((short) 16).setCellValue("Improv Monthly Depr.");
-		 rowhead.createCell((short) 17).setCellValue("Improv Accum Depr.");
-		 rowhead.createCell((short) 18).setCellValue("Improve NBV");
-		 rowhead.createCell((short) 19).setCellValue("Total Cost Price");
-		 rowhead.createCell((short) 20).setCellValue("Total NBV");
-		 rowhead.createCell((short) 21).setCellValue("USER");
-		 rowhead.createCell((short) 22).setCellValue("Engine No.");
-		 rowhead.createCell((short) 23).setCellValue("SBU CODE");
-		 rowhead.createCell((short) 24).setCellValue("QRCode/Vehicle");
-		 rowhead.createCell((short) 25).setCellValue("Serial No");
-		 rowhead.createCell((short) 26).setCellValue("Asset Model");
-		 rowhead.createCell((short) 27).setCellValue("Asset Make");
-		 rowhead.createCell((short) 28).setCellValue("Purchase Reason");
+         rowhead.createCell((short) 3).setCellValue("Branch Name");
+         rowhead.createCell((short) 4).setCellValue("Category Name");
+         rowhead.createCell((short) 5).setCellValue("Department Name");
+         rowhead.createCell((short) 6).setCellValue("Purchase Date");
+         rowhead.createCell((short) 7).setCellValue("Depr. Start Date");
+         rowhead.createCell((short) 8).setCellValue("Depr. End Date");
+         rowhead.createCell((short) 9).setCellValue("Cost Price");
+         rowhead.createCell((short) 10).setCellValue("Depr. Rate %");
+         rowhead.createCell((short) 11).setCellValue("Monthly Depr.");
+         rowhead.createCell((short) 12).setCellValue("Accum Depr.");
+         rowhead.createCell((short) 13).setCellValue("NBV");
+         rowhead.createCell((short) 14).setCellValue("Improv Cost Price");
+		 rowhead.createCell((short) 15).setCellValue("Improv Monthly Depr.");
+		 rowhead.createCell((short) 16).setCellValue("Improv Accum Depr.");
+		 rowhead.createCell((short) 17).setCellValue("Improve NBV");
+		 rowhead.createCell((short) 18).setCellValue("Total Cost Price");
+		 rowhead.createCell((short) 19).setCellValue("Total NBV");
+		 rowhead.createCell((short) 20).setCellValue("USER");
+		 rowhead.createCell((short) 21).setCellValue("Engine No.");
+		 rowhead.createCell((short) 22).setCellValue("SBU CODE");
+		 rowhead.createCell((short) 23).setCellValue("QRCode/Vehicle");
+		 rowhead.createCell((short) 24).setCellValue("Serial No");
+		 rowhead.createCell((short) 25).setCellValue("Asset Model");
+		 rowhead.createCell((short) 26).setCellValue("Asset Make");
+		 rowhead.createCell((short) 27).setCellValue("Purchase Reason");
 		 rowhead.createCell((short) 28).setCellValue("Location");
-		 rowhead.createCell((short) 30).setCellValue("State");
-		 rowhead.createCell((short) 31).setCellValue("Section/Unit");
-		 rowhead.createCell((short) 32).setCellValue("LPO Number");
-		 rowhead.createCell((short) 33).setCellValue("Vendor");
-		 rowhead.createCell((short) 34).setCellValue("Spare Field 1");
-		 rowhead.createCell((short) 35).setCellValue("Spare Field 2");
-		 rowhead.createCell((short) 36).setCellValue("Registration No");
-		 rowhead.createCell((short) 37).setCellValue("Vendor Account");
-		 rowhead.createCell((short) 38).setCellValue("Old Asset Id");
+		 rowhead.createCell((short) 29).setCellValue("State");
+		 rowhead.createCell((short) 30).setCellValue("Section/Unit");
+		 rowhead.createCell((short) 31).setCellValue("LPO Number");
+		 rowhead.createCell((short) 32).setCellValue("Vendor");
+		 rowhead.createCell((short) 33).setCellValue("Spare Field 1");
+		 rowhead.createCell((short) 34).setCellValue("Spare Field 2");
+		 rowhead.createCell((short) 35).setCellValue("Registration No");
+		 rowhead.createCell((short) 36).setCellValue("Vendor Account");
+		 rowhead.createCell((short) 37).setCellValue("Old Asset Id");
 
      int i = 1;
      System.out.println("<<<<<<list.size(): "+list.size());
@@ -334,7 +333,7 @@ public class AssetRegisterExport extends HttpServlet
 			String deptName =  newassettrans.getDeptName();
 			//System.out.println("======>deptName: "+deptName);
 			String Description = newassettrans.getDescription();   
-			String branch_code = newassettrans.getBranchCode();
+			branchCode = newassettrans.getBranchCode();
 			String branchName =  newassettrans.getBranchName();
 			String categoryName =  newassettrans.getCategoryName();
 			double depRate = newassettrans.getDepRate();
@@ -424,42 +423,41 @@ String value = "16/06/2023";
 			row.createCell((short) 0).setCellValue(i);
 			row.createCell((short) 1).setCellValue(assetId);
             row.createCell((short) 2).setCellValue(Description);
-            row.createCell((short) 3).setCellValue(branch_code);
-            row.createCell((short) 4).setCellValue(branchName);
-            row.createCell((short) 5).setCellValue(categoryName);
-            row.createCell((short) 6).setCellValue(deptName);
-            row.createCell((short) 7).setCellValue(purchaseDate);
-           row.createCell((short) 8).setCellValue(depr_startDate);
-           row.createCell((short) 9).setCellValue(depr_endDate);
-            row.createCell((short) 10).setCellValue(costprice);
-            row.createCell((short) 11).setCellValue(depRate);
-            row.createCell((short) 12).setCellValue(monthlyDepr);
-            row.createCell((short) 13).setCellValue(accumDepr);
-            row.createCell((short) 14).setCellValue(nbv);
-            row.createCell((short) 15).setCellValue(improvCostPrice);
-            row.createCell((short) 16).setCellValue(improvmonthldepr);
-            row.createCell((short) 17).setCellValue(improvAccumDepr);
-            row.createCell((short) 18).setCellValue(improvNbv);
-            row.createCell((short) 19).setCellValue(totalCost); 
-            row.createCell((short) 20).setCellValue(totalnbv); 
-            row.createCell((short) 21).setCellValue(assetUser);
-            row.createCell((short) 22).setCellValue(engineNo);
-			row.createCell((short) 23).setCellValue(sbucode);
-			row.createCell((short) 24).setCellValue(barcode);
-			row.createCell((short) 25).setCellValue(serialNo);
-			row.createCell((short) 26).setCellValue(model);
-			row.createCell((short) 27).setCellValue(make);
-			row.createCell((short) 28).setCellValue(purchaseReason);
-			row.createCell((short) 29).setCellValue(location);
-			row.createCell((short) 30).setCellValue(state);
-			row.createCell((short) 31).setCellValue(sectionName);
-			row.createCell((short) 32).setCellValue(lpo);
-			row.createCell((short) 33).setCellValue(vendorName);
-			row.createCell((short) 34).setCellValue(spare1);
-			row.createCell((short) 35).setCellValue(spare2);
-			row.createCell((short) 36).setCellValue(registrationNo);
-			row.createCell((short) 37).setCellValue(vendoAcct);
-			row.createCell((short) 38).setCellValue(oldAssetId);
+            row.createCell((short) 3).setCellValue(branchName);
+            row.createCell((short) 4).setCellValue(categoryName);
+            row.createCell((short) 5).setCellValue(deptName);
+            row.createCell((short) 6).setCellValue(purchaseDate);
+           row.createCell((short) 7).setCellValue(depr_startDate);
+           row.createCell((short) 8).setCellValue(depr_endDate);
+            row.createCell((short) 9).setCellValue(costprice);
+            row.createCell((short) 10).setCellValue(depRate);
+            row.createCell((short) 11).setCellValue(monthlyDepr);
+            row.createCell((short) 12).setCellValue(accumDepr);
+            row.createCell((short) 13).setCellValue(nbv);
+            row.createCell((short) 14).setCellValue(improvCostPrice);
+            row.createCell((short) 15).setCellValue(improvmonthldepr);
+            row.createCell((short) 16).setCellValue(improvAccumDepr);
+            row.createCell((short) 17).setCellValue(improvNbv);
+            row.createCell((short) 18).setCellValue(totalCost); 
+            row.createCell((short) 19).setCellValue(totalnbv); 
+            row.createCell((short) 20).setCellValue(assetUser);
+            row.createCell((short) 21).setCellValue(engineNo);
+			row.createCell((short) 22).setCellValue(sbucode);
+			row.createCell((short) 23).setCellValue(barcode);
+			row.createCell((short) 24).setCellValue(serialNo);
+			row.createCell((short) 25).setCellValue(model);
+			row.createCell((short) 26).setCellValue(make);
+			row.createCell((short) 27).setCellValue(purchaseReason);
+			row.createCell((short) 28).setCellValue(location);
+			row.createCell((short) 29).setCellValue(state);
+			row.createCell((short) 30).setCellValue(sectionName);
+			row.createCell((short) 31).setCellValue(lpo);
+			row.createCell((short) 32).setCellValue(vendorName);
+			row.createCell((short) 33).setCellValue(spare1);
+			row.createCell((short) 34).setCellValue(spare2);
+			row.createCell((short) 35).setCellValue(registrationNo);
+			row.createCell((short) 36).setCellValue(vendoAcct);
+			row.createCell((short) 37).setCellValue(oldAssetId);
 		
 			
 		//	System.out.println("======>oldAssetId====: "+oldAssetId+"  Index: "+i);

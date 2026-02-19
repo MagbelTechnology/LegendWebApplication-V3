@@ -109,10 +109,11 @@ public class ImprovementUncapAssetServlet extends HttpServlet
 	  //String strAccumDep = request.getParameter("accumDep");
 	  String effDate = request.getParameter("effDate");
 	  String supervisor = request.getParameter("supervisor");
-	  String wh_tax_cb = request.getParameter("wh_tax_cb");
-	  String selectTax = request.getParameter("selectTax");
-	  String subject2vat = request.getParameter("SUBJ2VAT");
-
+	  String wh_tax_cb = request.getParameter("wh_tax_cb") == null ? "N" : request.getParameter("wh_tax_cb");
+	  String selectTax = request.getParameter("selectTax") == null ? "0.00" : request.getParameter("selectTax");
+	  String subject2vat = request.getParameter("SUBJ2VAT") == null ? "N" : request.getParameter("SUBJ2VAT");
+	  System.out.println("=====subject2vat: "+subject2vat+"   wh_tax_cb: "+wh_tax_cb+"    selectTax: "+selectTax);
+	  
 	 String supplier_name = request.getParameter("supbynew");
 	 String supplier_nameOld = request.getParameter("supbyold");
 	 String vendorAcctOld = request.getParameter("vendorAcct2");
@@ -124,11 +125,13 @@ public class ImprovementUncapAssetServlet extends HttpServlet
 	 String invoiceNo = request.getParameter("invNo");
 	 String vendorNo = request.getParameter("supbynew");
 	  String usefullife = request.getParameter("usefullife");
+	  System.out.println("usefullife(1) >>>>>>>>>>> " + usefullife); 
 	  
 	String location = request.getParameter("location");
 	String projectCode = request.getParameter("projectCode");  
 	String sbuCode = request.getParameter("sbuCode");
 	  usefullife = (usefullife == null) ? "0" : usefullife;
+	  System.out.println("usefullife (2) >>>>>>>>>>> " + usefullife); 
 	 String branchCode = "";
 	 String categoryCode ="";
 	//  System.out.println("the value of usefullife is >>>>>>>>>>>>>>>> "+ usefullife);
@@ -316,8 +319,8 @@ public class ImprovementUncapAssetServlet extends HttpServlet
 	 }
 	if(singleApproval.equalsIgnoreCase("Y")){ 
 	pa[8]="PENDING";    
-	mtid  =  ad.setPendingTrans2(pa,"71",assetCode);
-	mtid = mtid + user_Id;
+//	mtid  =  ad.setPendingTrans2(pa,"71",assetCode);
+//	mtid = mtid + user_Id;
 	  System.out.println("mtid >>>>>>>>>>> " + mtid);  
 
 	  System.out.println("usefullife >>>>>>>>>>> " + usefullife); 

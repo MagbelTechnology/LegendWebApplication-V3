@@ -72,7 +72,7 @@ public class ApprovalManager extends ConnectionClass {
             ps.setString(4, remark.getStatus());
             ps.setInt(5, remark.getApprovalLevel());
             ps.setString(6, remark.getIPAddress());
-            ps.setInt(7, remark.getTransactionId());
+            ps.setLong(7, remark.getTransactionId());
             ps.setTimestamp(8, dbConnection.getDateTime(new java.util.Date()));
             ps.setTimestamp(9,getPostingTime(remark.getTransactionId()));
             ps.setString(10,remark.getTranType());
@@ -105,7 +105,7 @@ public class ApprovalManager extends ConnectionClass {
             ps.setString(1, remark.getAssetId());
             ps.setInt(2, remark.getSupervisorID());
             ps.setDate(3, dbConnection.dateConvert(new java.util.Date()));
-            ps.setInt(4, remark.getTransactionId());
+            ps.setLong(4, remark.getTransactionId());
 
             ps.execute();
             done = true;
@@ -154,7 +154,7 @@ public class ApprovalManager extends ConnectionClass {
     }
 
 
-    public java.sql.Timestamp getPostingTime(int tranId) {
+    public java.sql.Timestamp getPostingTime(long tranId) {
 
         String query =
                 "select posting_date from am_asset_approval where transaction_id=?";
@@ -166,7 +166,7 @@ public class ApprovalManager extends ConnectionClass {
         try {
             con = dbConnection.getConnection("legendPlus");
                        ps = con.prepareStatement(query);
-                       ps.setInt(1, tranId);
+                       ps.setLong(1, tranId);
                        rs = ps.executeQuery();
 
             while (rs.next()) {

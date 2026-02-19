@@ -148,6 +148,7 @@ public class ExcelMobileRegistrationUploadManager extends MagmaDBConnection
         String sNo = "";
         String userName = "";
         String macAddress = "";
+        String staffEnabled  = "";
         String userStatus = "";
         String errorMessage = "";
         String narration = "Mobile Registration Upload";
@@ -165,6 +166,7 @@ public class ExcelMobileRegistrationUploadManager extends MagmaDBConnection
             userName = cell[1].getContents();      
             macAddress = cell[2].getContents();
             userStatus = cell[3].getContents();
+            staffEnabled = cell[4].getContents();
             
 //           System.out.println("<<<<<<sNo: "+sNo+"  userName: "+userName+"  fullName: "+fullName+"  securityClass: "+securityClass+"   password: "+password+"   userMail: "+userMail);
             sheetno = sheetno + 1;
@@ -227,6 +229,7 @@ public class ExcelMobileRegistrationUploadManager extends MagmaDBConnection
             	mobile.setUserName(userName);
             	mobile.setMacAddress(macAddress);
             	mobile.setMobileStatus(userStatus);
+            	mobile.setStaffEnabled(staffEnabled);
                 mobile.setCreateDate(currentDate);
                mobile.setUserId(userid);
                

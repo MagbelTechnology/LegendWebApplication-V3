@@ -170,7 +170,7 @@ public class CClassAuditServlet extends HttpServlet {
 							out
 									.print("<script>alert('Record saved successfully.')</script>");
 							out
-									.print("<script>window.location = 'categoryClasses.jsp?classId="
+									.print("<script>window.location = 'DocumentHelp.jsp?np=categoryClasses&classId="
 											+ ch.getCategoryClassByClassCode(
 													classCode).getClassId()
 											+ "&PC=13'</script>");
@@ -193,7 +193,7 @@ public class CClassAuditServlet extends HttpServlet {
 						out
 								.print("<script>alert('Update on record is successfull')</script>");
 						out
-								.print("<script>window.location = 'categoryClasses.jsp?classId="
+								.print("<script>window.location = 'DocumentHelp.jsp?np=categoryClasses&classId="
 										+ classId + "&PC=13'</script>");
 						// out.print("<script>window.location =
 						// 'manageBranchs.jsp?status=A'</script>");
@@ -202,7 +202,7 @@ public class CClassAuditServlet extends HttpServlet {
 						out
 								.print("<script>alert('No changes made on record')</script>");
 						out
-								.print("<script>window.location = 'categoryClasses.jsp?classId="
+								.print("<script>window.location = 'DocumentHelp.jsp?np=categoryClasses&classId="
 										+ classId + "&PC=13'</script>");
 					}
 				}
@@ -214,7 +214,7 @@ public class CClassAuditServlet extends HttpServlet {
 			e.printStackTrace();
 			// statusMessage = "Ensure unique record entry";
 			out.print("<script>alert('Ensure unique record entry.')</script>");
-			out.print("<script>window.location = 'categoryClasses.jsp?classId="
+			out.print("<script>window.location = 'DocumentHelp.jsp?np=categoryClasses&classId="
 					+ classId + "&PC=13'</script>");
 			System.err.print(e.getMessage());
 		}

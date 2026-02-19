@@ -37,7 +37,7 @@ import com.magbel.util.HtmlUtility;
 *  @author  Bolaji L. Ogeyingbo.
  * @version 1.0
  */
-public class AuditTrailGen extends Bag{ 
+public class AuditTrailGen_14_11_2025 extends Bag{ 
    
   //String dbname = "accounts";
   //String dsn = "accounts";

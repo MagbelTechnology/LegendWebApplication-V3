@@ -2519,7 +2519,7 @@ ps = con.prepareStatement(query_r);
 
 
 
-public void updateAssetStatusApproval(int transId){
+public void updateAssetStatusApproval(long transId){
 //String query_r ="update am_asset_approval set asset_status=? where asset_id = '"+assetId+"'";
 String query_r ="update am_asset_approval set asset_status=? where transaction_id = ?";
 Connection con = null;
@@ -2535,7 +2535,7 @@ ps = con.prepareStatement(query_r);
 
 
             ps.setString(1,"ACTIVE");
-            ps.setInt(2, transId);
+            ps.setLong(2, transId);
             //ps.setString(2,reject_reason);
            int i =ps.executeUpdate();
             //ps.execute();
@@ -6433,7 +6433,7 @@ ps = con.prepareStatement(query_r);
 		}
 
 
- public void incrementApprovalCount2(int tran_id,int count,int nextSupervisor){
+ public void incrementApprovalCount2(long tran_id,int count,int nextSupervisor){
 String query_r ="update am_asset_approval set approval_level_count=?,super_id=?,posting_date=? where transaction_id =?";
 
 Connection con = null;
@@ -6451,7 +6451,7 @@ ps = con.prepareStatement(query_r);
             ps.setInt(1,count);
             ps.setInt(2, nextSupervisor);
             ps.setTimestamp(3, dbConnection.getDateTime(new java.util.Date()));
-            ps.setInt(4,tran_id);
+            ps.setLong(4,tran_id);
             //ps.setString(2,reject_reason);
            int i =ps.executeUpdate();
             //ps.execute();

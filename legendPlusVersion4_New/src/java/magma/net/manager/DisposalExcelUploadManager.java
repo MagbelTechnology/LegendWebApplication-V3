@@ -9,6 +9,7 @@ import legend.admin.handlers.AdminHandler;
 import legend.admin.objects.*;
 import magma.ExcelAssetDisposalBean;
 import magma.asset.manager.AssetManager;
+import legend.admin.handlers.CompanyHandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,6 +34,7 @@ public class DisposalExcelUploadManager extends MagmaDBConnection
     public ApprovalRecords approve;
     private MagmaDBConnection dbConnection;
     private AssetManager assetMan;
+    private CompanyHandler comp;
     String userid;
     String excelType;
     String groupID;
@@ -49,6 +51,7 @@ public class DisposalExcelUploadManager extends MagmaDBConnection
         approve = new ApprovalRecords(); 
         dbConnection = new MagmaDBConnection();
         assetMan = new AssetManager();
+        comp = new CompanyHandler();
         System.out.println("INFO:Excel AssetDisposalExcelUploadManager instatiated.");
     }
 
@@ -267,11 +270,17 @@ public class DisposalExcelUploadManager extends MagmaDBConnection
         else{error = "pass; ";status = true; statusList[2] = '1';}
         errorMessage = errorMessage+" Record "+sNo+" SBU CODE "+error;
         
-        String availableForTrans = assetMan.checkAssetAvalability(assetId);
-        if((availableForTrans != "")&& (!assetparam.equals(""))){error = " Asset is still pending for approval. Cannot be initiated for Improvement "+"fail; ";
+        String availableForTrans = comp.checkAssetAvalability(assetId);
+        if((availableForTrans != "")&& (!assetparam.equals(""))){error = " Asset is still pending for approval. Cannot be initiated for Disposal "+"fail; ";
         status = false; statusList[3] = '0';}
         else{error = "pass; ";status = true; statusList[3] = '1';}
         errorMessage = errorMessage+" Record "+sNo+" Pending Transaction "+error;
+        
+        String asset_Code = approve.getCodeName("select ASSET_CODE from AM_GROUP_DISPOSAL where ASSET_ID = '"+assetId+"' AND (STATUS IS NULL OR STATUS = 'APPROVED' OR STATUS = 'POSTED') ");
+        if(!asset_Code.equalsIgnoreCase("")){error = "Asset Already Uploaded for Disposal "+"fail; ";
+        status = false; statusList[4] = '0';}
+        else{error = "pass; ";status = true; statusList[4] = '1';}
+        errorMessage = errorMessage+" Record "+sNo+" "+error;
          
         //String convertvalue = approve.getCodeName("SELECT cast(cost_price as varchar(50))+'#'+cast(vatable_cost as varchar(50))+'#'+cast(vat as varchar(50))+'#'+cast(Wh_Tax_Amount as varchar(50))+'#'+cast(nbv as varchar(50))+'#'+cast(accum_dep as varchar(50))+'#'+cast(IMPROV_NBV as varchar(50))+'#'+cast(IMPROV_ACCUMDEP as varchar(50))+'#'+cast(IMPROV_COST as varchar(50))+'#'+cast(IMPROV_VATABLECOST as varchar(50)) FROM am_asset WHERE ASSET_ID = '"+assetId+"'");
         String convvalue = "SELECT DESCRIPTION+'#'+cast(cost_price as varchar(50))+'#'+cast(vatable_cost as varchar(50))+'#'+cast(vat as varchar(50))+'#'+cast(Wh_Tax_Amount as varchar(50))+'#'+cast(nbv as varchar(50))+'#'+cast(accum_dep as varchar(50))+'#'+cast(coalesce(IMPROV_NBV,0) as varchar(50))+'#'+cast(coalesce(IMPROV_ACCUMDEP,0) as varchar(50))+'#'+cast(coalesce(IMPROV_COST,0) as varchar(50))+'#'+cast(coalesce(IMPROV_VATABLECOST,0) as varchar(50)) FROM am_asset WHERE ASSET_ID = ?";
@@ -281,12 +290,18 @@ public class DisposalExcelUploadManager extends MagmaDBConnection
         }
         if(excelType.equalsIgnoreCase("N")){
         	 System.out.println("<<<<<<<<assetId: "+assetId);
-        String availableForTrans = assetMan.checkAssetAvalability(assetId);
-        if((availableForTrans != "")&& (!assetparam.equals(""))){error = " Asset is still pending for approval. Cannot be initiated for Improvement "+"fail; ";
+        String availableForTrans = comp.checkAssetAvalability(assetId);
+        if((availableForTrans != "")&& (!assetparam.equals(""))){error = " Asset is still pending for approval. Cannot be initiated for Disposal "+"fail; ";
         status = false; statusList[2] = '0';}
         else{error = "pass; ";status = true; statusList[2] = '1';}
         errorMessage = errorMessage+" Record "+sNo+" Pending Transaction "+error;
          
+        String asset_Code = approve.getCodeName("select ASSET_CODE from AM_GROUP_DISPOSAL where ASSET_ID = '"+assetId+"' AND (STATUS IS NULL OR STATUS = 'APPROVED' OR STATUS = 'POSTED') ");
+        if(!asset_Code.equalsIgnoreCase("")){error = "Asset Already Uploaded for Disposal "+"fail; ";
+        status = false; statusList[3] = '0';}
+        else{error = "pass; ";status = true; statusList[3] = '1';}
+        errorMessage = errorMessage+" Record "+sNo+" "+error;
+        
         //String convertvalue = approve.getCodeName("SELECT cast(cost_price as varchar(50))+'#'+cast(vatable_cost as varchar(50))+'#'+cast(vat as varchar(50))+'#'+cast(Wh_Tax_Amount as varchar(50))+'#'+cast(nbv as varchar(50))+'#'+cast(accum_dep as varchar(50))+'#'+cast(IMPROV_NBV as varchar(50))+'#'+cast(IMPROV_ACCUMDEP as varchar(50))+'#'+cast(IMPROV_COST as varchar(50))+'#'+cast(IMPROV_VATABLECOST as varchar(50)) FROM am_asset WHERE ASSET_ID = '"+assetId+"'");
         String convvalue = "SELECT DESCRIPTION+'#'+cast(cost_price as varchar(50))+'#'+cast(vatable_cost as varchar(50))+'#'+cast(vat as varchar(50))+'#'+cast(Wh_Tax_Amount as varchar(50))+'#'+cast(nbv as varchar(50))+'#'+cast(accum_dep as varchar(50))+'#'+cast(coalesce(IMPROV_NBV,0) as varchar(50))+'#'+cast(coalesce(IMPROV_ACCUMDEP,0) as varchar(50))+'#'+cast(coalesce(IMPROV_COST,0) as varchar(50))+'#'+cast(coalesce(IMPROV_VATABLECOST,0) as varchar(50)) FROM am_asset WHERE ASSET_ID = ?";
         convertvalue = approve.getCodeName(convvalue,assetId);

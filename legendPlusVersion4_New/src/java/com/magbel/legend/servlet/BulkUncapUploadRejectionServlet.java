@@ -74,7 +74,7 @@ public class BulkUncapUploadRejectionServlet extends HttpServlet {
 		 EmailSmsServiceBus mail = new EmailSmsServiceBus();
 		String groupid = request.getParameter("groupid");
 		String pageName = request.getParameter("MenuPage");
-		System.out.println(">>>>>>>>>>> About Menu Page: "+pageName);
+		System.out.println(">>>>>>>>>>> About Menu Page: "+pageName+"     groupid: "+groupid);
 		
 		HttpSession session = request.getSession();
 		String userClass = (String) session.getAttribute("UserClass");
@@ -108,13 +108,14 @@ public class BulkUncapUploadRejectionServlet extends HttpServlet {
 //		String query2 ="delete from AM_GROUP_ASSET_UNCAPITALIZED where GROUP_ID = ?";
 //		String query3 ="delete from am_group_asset_main where GROUP_ID = ?";
 //		String query4 ="delete from am_asset_approval where batch_id = ?";
-		
+		System.out.println(">>>>>>>>>>> About to Process Transactions in the Batch "+batchId);
         String qa1 = "update AM_ASSET_UNCAPITALIZED SET ASSET_STATUS = 'REJECTED' where GROUP_ID = '"+batchId+"'";
         ad.updateAssetStatusChange(qa1);	 
         String qa2 = "update AM_GROUP_ASSET_UNCAPITALIZED SET ASSET_STATUS = 'REJECTED' where GROUP_ID = '"+batchId+"'";
         ad.updateAssetStatusChange(qa2);	 		
-        String qa3 = "update am_asset_approval SET ASSET_STATUS = 'REJECTED',PROCESS_STATUS = 'R' where batch_id = '"+batchId+"'";
+        String qa3 = "update am_asset_approval SET ASSET_STATUS = 'REJECTED',PROCESS_STATUS = 'R' where ASSET_ID = '"+batchId+"'";
         ad.updateAssetStatusChange(qa3);	 
+//        System.out.println(">>>>>>>>>>> About to update Asset Approval Record Transactions in the Batch "+qa3);
         String qa4 = "update am_group_asset_main SET ASSET_STATUS = 'REJECTED' where GROUP_ID = '"+batchId+"'";
         ad.updateAssetStatusChange(qa4);			
 		

@@ -43,7 +43,7 @@ public class LimitApprovalServlet extends HttpServlet {
 //        double asset_cost = (request.getParameter("asset_cost") == null) ? 0 :Double.parseDouble(request.getParameter("asset_cost"));
         double asset_cost = Double.parseDouble(cost);
         String user_id = request.getParameter("user_id");
-        int tranId = (request.getParameter("tranId") == null) ? 0 : Integer.parseInt(request.getParameter("tranId"));
+        long tranId = (request.getParameter("tranId") == null) ? 0 : Long.parseLong(request.getParameter("tranId"));
 //        System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ tranId////////////////" + tranId);
         response.setContentType("text/xml");
         response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");

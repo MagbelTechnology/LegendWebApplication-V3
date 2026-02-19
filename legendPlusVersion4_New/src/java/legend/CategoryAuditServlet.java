@@ -186,6 +186,8 @@ public class CategoryAuditServlet extends HttpServlet {
         String categoryType = request.getParameter("categoryType");
         String supervisor = request.getParameter("supervisor");
         String numOfTransactionLevel = request.getParameter("numOfTransactionLevel");
+        System.out.println("------noOfImprvMnth"+request.getParameter("noOfImprvMnth"));
+        int noOfImprovementMnths = Integer.parseInt(request.getParameter("noOfImprvMnth"));
 //System.out.println("----------->--------------------------------->"+categoryType);
 		cat.setAccidentLedger(accidentLedger);
 		cat.setAcctType(acctType);
@@ -216,6 +218,7 @@ public class CategoryAuditServlet extends HttpServlet {
         cat.setUpexassets(upexassets);
         cat.setRecaldep(recaldep);
         cat.setResidualchange(residualchange);
+        cat.setNoOfImproveMnth(noOfImprovementMnths);
         
                 String computerName = null;
                 String remoteAddress = request.getRemoteAddr();

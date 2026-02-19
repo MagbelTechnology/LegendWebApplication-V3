@@ -1,6 +1,7 @@
 package com.magbel.fixedassetcreationLegendPlusZenith.bus;
  
 import java.io.PrintStream;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +17,8 @@ import org.quartz.*;
 
 import com.magbel.legend.vao.newAssetTransaction;
 import com.magbel.legend.bus.Report;
+
+@DisallowConcurrentExecution
 public class Jobs11
     implements Job
 {  

@@ -100,8 +100,8 @@ public class AssetMgtSummaryCatExport extends HttpServlet
    		 + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
    		 + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
    		 + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-   		 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
-   		 + " GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME ";	
+   		 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
+   		 + " GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME ORDER BY a.CATEGORY_CODE ASC ";	
 	}      
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0")){	 
 	   System.out.println("======>>>>>>>Category Selected: ");
@@ -112,8 +112,8 @@ public class AssetMgtSummaryCatExport extends HttpServlet
 	 + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
 	 + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
 	 + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-	 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
-	 + " GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME ";	
+	 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.CATEGORY_CODE = ? "
+	 + " GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME ORDER BY a.CATEGORY_CODE ASC ";	
    }
 	 if(!branch_Id.equals("0")  && categoryCode.equals("0")){	   
 	   System.out.println("======>>>>>>>Branch Selected: ");
@@ -124,8 +124,8 @@ public class AssetMgtSummaryCatExport extends HttpServlet
      + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? "
-     + " GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME ";	     
+     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? "
+     + " GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME ORDER BY a.CATEGORY_CODE ASC ";	     
 	}
    if(branch_Id.equals("0")  && categoryCode.equals("0")){
 	   System.out.println("======>>>>>>>No Selection: ");
@@ -136,8 +136,8 @@ public class AssetMgtSummaryCatExport extends HttpServlet
      + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01)  "
-     + " GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME ";
+     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01)  "
+     + " GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME ORDER BY a.CATEGORY_CODE ASC ";
 	}   
    } 
      //***********Asset Management Summary By Branch  
@@ -151,8 +151,8 @@ public class AssetMgtSummaryCatExport extends HttpServlet
    		 + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
    		 + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
    		 + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-   		 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
-   		 + " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";	
+   		 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
+   		 + " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ORDER BY a.CATEGORY_CODE ASC ";	
 	}      
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0")){	 
 	   System.out.println("======>>>>>>>Category Selected: ");
@@ -163,21 +163,21 @@ public class AssetMgtSummaryCatExport extends HttpServlet
 	 + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
 	 + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
 	 + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-	 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
-	 + " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";		
+	 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.CATEGORY_CODE = ? "
+	 + " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ORDER BY a.CATEGORY_CODE ASC ";		
    }
-	 if(!branch_Id.equals("0")  && categoryCode.equals("0")){	   
-	   System.out.println("======>>>>>>>Branch Selected: ");
-	     ColQuery ="SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
-	 + "SUM(a.monthly_dep) AS Total_monthly_dep,SUM(a.Accum_Dep) AS Total_Accum_dep,SUM(a.Cost_Price) AS Total_Cost,SUM(a.NBV) AS TOTAL_NBV,SUM(a.IMPROV_COST) AS TOTAL_IMPROV_COST,"
-	 + "SUM(a.IMPROV_ACCUMDEP) AS TOTAL_IMPROV_ACCUMDEP,SUM(a.IMPROV_MONTHLYDEP) AS TOTAL_IMPROV_MONTHLYDEP,SUM(a.IMPROV_NBV) AS TOTAL_IMPROV_NBV," 
-	 + "SUM(a.Cost_Price + a.IMPROV_COST) AS Total_Final_Cost,SUM(a.NBV+a.IMPROV_NBV) AS FIANL_TOTAL_NBV,SUM(a.Accum_Dep+a.IMPROV_ACCUMDEP) AS FINAL_TOTAL_ACCUM"
-     + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
-     + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
-     + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? "
-	 + " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";		     
-	}
+//	 if(!branch_Id.equals("0")  && categoryCode.equals("0")){	   
+//	   System.out.println("======>>>>>>>Branch Selected: ");
+//	     ColQuery ="SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
+//	 + "SUM(a.monthly_dep) AS Total_monthly_dep,SUM(a.Accum_Dep) AS Total_Accum_dep,SUM(a.Cost_Price) AS Total_Cost,SUM(a.NBV) AS TOTAL_NBV,SUM(a.IMPROV_COST) AS TOTAL_IMPROV_COST,"
+//	 + "SUM(a.IMPROV_ACCUMDEP) AS TOTAL_IMPROV_ACCUMDEP,SUM(a.IMPROV_MONTHLYDEP) AS TOTAL_IMPROV_MONTHLYDEP,SUM(a.IMPROV_NBV) AS TOTAL_IMPROV_NBV," 
+//	 + "SUM(a.Cost_Price + a.IMPROV_COST) AS Total_Final_Cost,SUM(a.NBV+a.IMPROV_NBV) AS FIANL_TOTAL_NBV,SUM(a.Accum_Dep+a.IMPROV_ACCUMDEP) AS FINAL_TOTAL_ACCUM"
+//     + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
+//     + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
+//     + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
+//     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? "
+//	 + " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";		     
+//	}
    if(branch_Id.equals("0")  && categoryCode.equals("0")){
 	   System.out.println("======>>>>>>>No Selection: ");
 	     ColQuery ="SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
@@ -187,8 +187,8 @@ public class AssetMgtSummaryCatExport extends HttpServlet
      + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01)  "
-	 + " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";	
+     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01)  "
+	 + " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ORDER BY a.CATEGORY_CODE ASC ";	
 	}   
    } 
      //***********Asset Management Summary By Department  
@@ -202,8 +202,8 @@ public class AssetMgtSummaryCatExport extends HttpServlet
    		 + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
    		 + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
    		 + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-   		 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
-   		 + " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";	
+   		 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
+   		 + " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ORDER BY a.CATEGORY_CODE ASC ";	
 	}      
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0")){	 
 	   System.out.println("======>>>>>>>Category Selected: ");
@@ -214,21 +214,21 @@ public class AssetMgtSummaryCatExport extends HttpServlet
 	 + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
 	 + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
 	 + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-	 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
-	 + " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";		
+	 + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.CATEGORY_CODE = ? "
+	 + " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ORDER BY a.CATEGORY_CODE ASC ";		
    }
-	 if(!branch_Id.equals("0")  && categoryCode.equals("0")){	   
-	   System.out.println("======>>>>>>>Branch Selected: ");
-	     ColQuery ="SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,a.DEPT_CODE,e.DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
-	 + "SUM(a.monthly_dep) AS Total_monthly_dep,SUM(a.Accum_Dep) AS Total_Accum_dep,SUM(a.Cost_Price) AS Total_Cost,SUM(a.NBV) AS TOTAL_NBV,SUM(a.IMPROV_COST) AS TOTAL_IMPROV_COST,"
-	 + "SUM(a.IMPROV_ACCUMDEP) AS TOTAL_IMPROV_ACCUMDEP,SUM(a.IMPROV_MONTHLYDEP) AS TOTAL_IMPROV_MONTHLYDEP,SUM(a.IMPROV_NBV) AS TOTAL_IMPROV_NBV," 
-	 + "SUM(a.Cost_Price + a.IMPROV_COST) AS Total_Final_Cost,SUM(a.NBV+a.IMPROV_NBV) AS FIANL_TOTAL_NBV,SUM(a.Accum_Dep+a.IMPROV_ACCUMDEP) AS FINAL_TOTAL_ACCUM"
-     + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
-     + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
-     + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? "
-	 + " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";		     
-	}
+//	 if(!branch_Id.equals("0")  && categoryCode.equals("0")){	   
+//	   System.out.println("======>>>>>>>Branch Selected: ");
+//	     ColQuery ="SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,a.DEPT_CODE,e.DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
+//	 + "SUM(a.monthly_dep) AS Total_monthly_dep,SUM(a.Accum_Dep) AS Total_Accum_dep,SUM(a.Cost_Price) AS Total_Cost,SUM(a.NBV) AS TOTAL_NBV,SUM(a.IMPROV_COST) AS TOTAL_IMPROV_COST,"
+//	 + "SUM(a.IMPROV_ACCUMDEP) AS TOTAL_IMPROV_ACCUMDEP,SUM(a.IMPROV_MONTHLYDEP) AS TOTAL_IMPROV_MONTHLYDEP,SUM(a.IMPROV_NBV) AS TOTAL_IMPROV_NBV," 
+//	 + "SUM(a.Cost_Price + a.IMPROV_COST) AS Total_Final_Cost,SUM(a.NBV+a.IMPROV_NBV) AS FIANL_TOTAL_NBV,SUM(a.Accum_Dep+a.IMPROV_ACCUMDEP) AS FINAL_TOTAL_ACCUM"
+//     + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
+//     + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
+//     + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
+//     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? "
+//	 + " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";		     
+//	}
    if(branch_Id.equals("0")  && categoryCode.equals("0")){
 	   System.out.println("======>>>>>>>No Selection: ");
 	     ColQuery ="SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,a.DEPT_CODE,e.DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
@@ -238,8 +238,8 @@ public class AssetMgtSummaryCatExport extends HttpServlet
      + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01)  "
-	 + " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ";	
+     + " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01)  "
+	 + " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name ORDER BY a.CATEGORY_CODE ASC ";	
 	}   
    } 
         

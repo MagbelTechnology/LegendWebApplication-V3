@@ -30,7 +30,7 @@ import magma.net.vao.ProcesingInfo;
 // Referenced classes of package magma.net.manager:
 //            FleetHistoryManager, DepreciationChecks
 
-public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
+public class DepreciationLegendPlusProcessingManager_07_01_2026 extends MagmaDBConnection
 {
 
     private FleetHistoryManager historyManager;
@@ -44,9 +44,10 @@ public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
     private boolean sucessful;
     private ProcesingInfo process;
     private HtmlUtility htmlCombo;
+    private ApprovalRecords records;
     ArrayList Alist;
 
-    public DepreciationLegendPlusProcessingManager()
+    public DepreciationLegendPlusProcessingManager_07_01_2026()
     {
         Alist = new ArrayList();
  //       System.out.println("INFO:Enter Depreciation Transaction Processing ..");
@@ -59,6 +60,7 @@ public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
         currentProcessingDate = process.getProcessingDate();
         lastDate = process.getNextProcessingDate();
         nextProcessingDate = process.getNextProcessingDate();
+        records = new ApprovalRecords();
     }
 
     public void setSucessful(boolean sucessful)
@@ -94,7 +96,7 @@ public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
         //System.out.println(" The value of frequency is LLLLLLLLLLLL " + frequency);
         String startMonth = startDate.substring(3, 5);
         String lastMonth = endDate.substring(3, 5);
-        String processDate = getCompSystemDate();
+        String processDate = getCompSystemDate();  
         String systemdate = sdf.format(new java.util.Date());
  //       System.out.println("=====>systemdate: "+systemdate+"    processDate: "+processDate);
         String prodate = df.formatDate(process.getProcessingDate());
@@ -121,7 +123,7 @@ public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
         int proDay0 = Integer.parseInt(proDay)+1;
         String processEndDate = proYear+"-"+proMonth+"-"+String.valueOf(proDay0);
         String lastProcessingDate = proYear+"-"+proMonth+"-"+proDay;
-        System.out.println("======>processEndDate: "+processEndDate);
+//        System.out.println("======>processEndDate: "+processEndDate);
 //        System.out.println("<<<<<<<<<<<<<processStartDate: "+processStartDate+"  <<<<<<<processEndDate: "+processEndDate);
         String processingDay = depreciationProcessDate.substring(0, 2);
         String processingMonth = depreciationProcessDate.substring(3, 5);
@@ -143,24 +145,31 @@ public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
         /*
         0. It Disable Users before starting Depreciation
         1. About to Remove Pending Transactions Before Depreciation for the new month
-        1. If Total Life is wrong
-        2. If first Month set DPY to Date = 0.00;
-        3. if last month, update acc period with months specified.
-        4. start from where processing Date less or equals start date.
-        5. check if SBU for GL prefix to use.
-        6. If depreciation is new i.e ACCUM DEP = 0.00
-        7. Determine months based on start date.
-        8. if processing month = last depreciation date: dep = NBV - residual
-        9. if is fully depreciated NBV = residual
-       10. if(distribution required: distribute else skip.
+        2. If Total Life is wrong
+        3. If first Month set DPY to Date = 0.00;
+        4. if last month, update acc period with months specified.
+        5. start from where processing Date less or equals start date.
+        6. check if SBU for GL prefix to use.
+        7. If depreciation is new i.e ACCUM DEP = 0.00
+        8. Determine months based on start date.
+        9. if processing month = last depreciation date: dep = NBV - residual
+       10. if is fully depreciated NBV = residual
+       11. if(distribution required: distribute else skip.
+       12. If Assets migrated to Legend, when they become fully depreciated, has cost value equal to accumulated depreciated value. Whereas the NBV is showing N10
+ 
          */
 //        if(tableExists.equals("1")){DisableUsers(systemdate);}  //Disable Users before depreciation commences
         
         // About to Remove Pending Transactions Before Depreciation for the new month
         	boolean pending = pendingTrancations();
+        	System.out.println("======>Pending: "+pending);
        // Pending Transactions Removed
         	
         WrongTotalLife(FirstDayProcessDate,endProcessDate);
+     //About to Recalculate Depreciation End Date for New Assets
+    	RecalculationOfNewAssetDepreciationEndDate(FirstDayProcessDate,endProcessDate,costthreshold);
+    //End of Recalculating Depreciation End Date for New Assets	  
+    	
 //        System.out.println("====proMonth: "+proMonth+"   lastMonth: "+lastMonth+"  proYear: "+proYear+"  lastYear: "+lastYear);
         if (Integer.parseInt(proMonth) == Integer.parseInt(lastMonth) && Integer.parseInt(proYear) == Integer.parseInt(lastYear)) {
             updateYearEnd();
@@ -173,34 +182,38 @@ public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
         // End
 	    // Assets that fully depreciated During Monthly Depreciation Last Month 	
         	FullyDepreciated(FirstDayProcessDate,endProcessDate, frequency,processDate);
-        // End     	
+        // End   
+        	//Asset Reclassification Starts
+        	reclassificationProcessing(processStartDate, processEndDate); 
+        	//Asset Reclassification Ends
     	//About to depreciate Old Assets that has NBV less than monthly Depreciation
 	    	OldAssetDepreciationNBVLessMonthly();
-	    //End of Old Asset Depreciation that has NBV less than monthly Depreciation         	
+	    //End of Old Asset Depreciation that has NBV less than monthly Depreciation  
+//	    //About to depreciate Old Assets
+//    	OldAssetDepreciationMonthlyCalculation(FirstDayProcessDate,endProcessDate, frequency,processDate);
+//	    //End of Old Asset Depreciation  	    	
 	    //About to depreciate Old Assets
-	    	OldAssetDepreciation(FirstDayProcessDate,endProcessDate, frequency,processDate);
+    	OldAssetDepreciation(FirstDayProcessDate,endProcessDate, frequency,processDate);
 	    //End of Old Asset Depreciation  
 		// Back Dated Assets Last Month 	
-	    	BackDateDepreciated(FirstDayProcessDate,endProcessDate, frequency,processDate);
+//1	    	BackDateDepreciated(FirstDayProcessDate,endProcessDate, frequency,processDate);
         // End 	  
-	        //About to Recalculate Depreciation End Date for New Assets
-	    	RecalculationOfNewAssetDepreciationEndDate(FirstDayProcessDate,endProcessDate,costthreshold);
-        //End of Recalculating Depreciation End Date for New Assets	    	
+  	
         //About to depreciate New Assets
         	NewAssetDepreciation(FirstDayProcessDate,endProcessDate, frequency,processDate, costthreshold,nextProcessingDate);
         //End of New Asset Depreciation
             //About to Zerorise assets with Less remaining Life 
         	NewAssetDepreciationLess();
         //End of Zerorising assets with Less remaining Life
-        
+       
         //About to Extract Improved assets with Assets that has NBV Ten(10) Naira  
-        	extractMonthlyImprovementTransactions(processStartDate, processEndDate);
+        	extractMonthlyImprovementSingleTransactions(processStartDate, processEndDate);
         	extractMonthlyUploadImprovementTransactions(processStartDate, processEndDate);
         //End of Extract Improved assets with Assets that has NBV Ten(10) Naira
-        	
+       	
         //About to depreciate Assets that fully depreciate but later improved
         	executeNbvResidual(FirstDayProcessDate,endProcessDate, frequency,processDate,lastProcessingDate);
-       //End of Assets that fully depreciate but later improved
+        //End of Assets that fully depreciate but later improved
        //About to Zerorise assets with NBV ZEROES 
         	AssetDepreciationWithNBVZeros();
         //End of Zerorising assets with NBV ZEROS         	
@@ -215,29 +228,36 @@ public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
         	AssetDepreciationWithMonthlyEqualsResidual();
         	//End of Zerorising assets with NBV ZEROS        
         	
-            //About to Correct Reclassified Transaction with Negative Remaining Life 
-        	AssetReclassificationWithNegativeRemainingLife();
-        	//End of Reclassified Transaction with Negative Remaining Life      
-        	// Assets Reclassified with Old Rate Lower Than New Rate and New Remaining Life is Zero 	
-        	AssetReclassifiedWithOldRateGreaterThanNewRate(FirstDayProcessDate,endProcessDate, frequency,processDate);
-        	// End             	
+//            //About to Correct Reclassified Transaction with Negative Remaining Life 
+//        	AssetReclassificationWithNegativeRemainingLife();
+//        	//End of Reclassified Transaction with Negative Remaining Life      
+//        	// Assets Reclassified with Old Rate Lower Than New Rate and New Remaining Life is Zero 	
+//        	AssetReclassifiedWithOldRateGreaterThanNewRate(FirstDayProcessDate,endProcessDate, frequency,processDate);
+//        	// End             	
 //            notifyLastDepAsset(depreciationProcessDate,endProcessDate, frequency, userid);
             logDeprecitionTransaction(depreciationProcessDate,endProcessDate, frequency, userid);
-            
-             
+            //Start Migrated Asset to Legend when they become fully depreciated, has cost value equal to accumulated depreciated value and NBV is showing N10 
+            MigratedAssetWithWrongAccum();
+            //End Migrated Asset to Legend when they become fully depreciated, has cost value equal to accumulated depreciated value and NBV is showing N10                
+            //About to Correct NBV Value for LAND ASSETS 
+            	LANDAssetNBVValue();
+        	//End of Correcting NBV Value for LAND ASSETS                  
         logDepreciationTransactionSummary(systemdate, nextdate, userid);
         notifyNextProcessingDate(this.nextProcessingDate, this.lastDate);
         removeCarriageandSpace();
-        monthlyAssetDepreciation(FirstDayProcessDate,endProcessDate, frequency,processDate);
+//11/10/2025        monthlyAssetDepreciation(FirstDayProcessDate,endProcessDate, frequency,processDate);
 //           System.out.println("About to Backup the AM_ASSET File");
             depdonesap();
             depdoneInsert();  
 //            System.out.println("Backup of AM_ASSET File has been completed"); 
 //          System.out.println("About to Insert Assets Addition for the month into Addition table ");            
-            assetAdditionsInserted(); 
-//          System.out.println("Insertion of Assets Addition for the month into Addition table has been completed");             
+            assetAdditionsSystemRejection(); 
+//          System.out.println("Insertion of Assets Addition for the month into Addition table has been completed");  
+//            System.out.println("Check--------1");
         depchk.archiveEntrytable();
+//        System.out.println("Check--------2");
         depchk.clearEntrytable();
+ //       System.out.println("Check--------3");
         depchk.TransfertoEntrytable(userid);
     }
 
@@ -2409,11 +2429,13 @@ try {
         ResultSet rs;
         PreparedStatement ps;
         PreparedStatement ps2;
+        PreparedStatement ps3;
         String query;
         con = null;
         rs = null;
         ps = null;
         ps2 = null;
+        ps3 = null;
         //"UPDATE AM_ASSET SET Monthly_Dep = ((NBV/Remaining_Life)*1), " +
         query = "UPDATE AM_ASSET SET DEP_END_DATE = (SELECT DATEADD(month, TOTAL_LIFE, EFFECTIVE_DATE)) WHERE Accum_Dep = 0.00 AND EFFECTIVE_DATE BETWEEN EFFECTIVE_DATE AND DEP_END_DATE AND Req_Depreciation = 'Y' AND ASSET_STATUS != 'REJECTED' "
         		+ "AND (SELECT (DATEDIFF(MONTH,EFFECTIVE_DATE,DEP_END_DATE))) > -1 "
@@ -2421,21 +2443,26 @@ try {
 
       String  query2 = "UPDATE a SET DEP_END_DATE = (SELECT DATEADD(month, b.TOTAL_LIFE, b.EFFECTIVE_DATE)) FROM AM_GROUP_ASSET a, AM_ASSET b WHERE a.Asset_id = b.Asset_id and b.Accum_Dep = 0.00 AND b.EFFECTIVE_DATE BETWEEN b.EFFECTIVE_DATE AND b.DEP_END_DATE AND b.Req_Depreciation = 'Y' AND b.ASSET_STATUS != 'REJECTED' "
         		+ "AND (SELECT (DATEDIFF(MONTH,b.EFFECTIVE_DATE,b.DEP_END_DATE))) > -1 "
-        		+ "AND b.TOTAL_LIFE = b.REMAINING_LIFE AND b.COST_PRICE > 50000.00 AND b.ACCUM_DEP = 0.00 AND b.REMAINING_LIFE <> 0 AND b.Dep_Rate > 0.00 AND a.Posting_Date between '"+FirstDayProcessDate+"' AND '"+endProcessDate+"' " ;
-         
+        		+ "AND b.TOTAL_LIFE = b.REMAINING_LIFE AND b.COST_PRICE > "+thresholdcost+" AND b.ACCUM_DEP = 0.00 AND b.REMAINING_LIFE <> 0 AND b.Dep_Rate > 0.00 AND a.Posting_Date between '"+FirstDayProcessDate+"' AND '"+endProcessDate+"' " ;
+
+//      String query3 = "UPDATE am_asset_improvement SET IMPROVED = 'P' WHERE IMPROVED = 'Y' and IMPROV_USEFULLIFE = 0 and revalue_Date between '"+FirstDayProcessDate+"' AND '"+endProcessDate+"' ";
+      
 //        System.out.println("<<<<<<query in RecalculationOfNewAssetDepreciation: "+query);
         try {
         con = getConnection("legendPlus");
         ps = con.prepareStatement(query);
         ps.execute();
         ps2 = con.prepareStatement(query2);
-        ps2.execute();        
+        ps2.execute();  
+//        ps3 = con.prepareStatement(query3);
+//        ps3.execute();            
     } catch (Exception ex) {  
         System.out.println("WARN: Computing New Asset Depreciaon in RecalculationOfNewAssetDepreciation ->" +
                 ex.getMessage());
     } finally {
         closeConnection(con, ps, rs);
         closeConnection(con, ps2, rs);
+        closeConnection(con, ps3, rs);
     }        
     }
 
@@ -2471,42 +2498,47 @@ try {
         Connection con;
         ResultSet rs;
         PreparedStatement ps;
+        PreparedStatement ps1;
         PreparedStatement ps2;
         String query;
         String query2;
+        String monthlyDepquery;
         con = null;
-        rs = null;
+        rs = null;  
         ps = null;
+        ps1 = null;
         ps2 = null;
+//      System.out.println("monthlyDepquery in OldAssetDepreciation to recalculate Asset monthly Depreciations: "+monthlyDepquery);
 //        System.out.println("FirstDayProcessDate in OldAssetDepreciation: "+depreciationProcessDate+"  endProcessDate: "+endProcessDate+"  frequency: "+frequency);
-        query = "UPDATE AM_ASSET SET Accum_Dep = Accum_Dep + ((NBV/Remaining_Life)*"+frequency+"), NBV = NBV - ((NBV/Remaining_Life)*"+frequency+"), " +
-        		 "Monthly_Dep = ((NBV/Remaining_Life)*"+frequency+"), Useful_Life = Useful_Life + "+frequency+", " +
+        query = "UPDATE AM_ASSET SET Accum_Dep = Accum_Dep + ((NBV/Remaining_Life)*"+frequency+"),Monthly_Dep = ((NBV/Remaining_Life)*"+frequency+"), " +
+        		 " NBV = NBV - ((NBV/Remaining_Life)*"+frequency+"),Useful_Life = Useful_Life + "+frequency+", " +
         		"Remaining_Life = Remaining_Life - "+frequency+", " +
         		"last_dep_date = '"+depreciationProcessDate+"' "+
                 " WHERE Accum_dep > 0.00 AND DEP_RATE > 0.00 AND DEP_END_DATE > '"+depreciationProcessDate+"' AND Req_Depreciation = 'Y' AND ASSET_STATUS = 'ACTIVE' " +
                 " AND NBV > 10  AND Monthly_Dep > 0.00 AND REMAINING_LIFE <> 0";
- //       System.out.println("query in OldAssetDepreciation: "+query);
-        query2 = "UPDATE AM_ASSET SET Accum_Dep = Accum_Dep + ((NBV/Remaining_Life)*"+frequency+"), NBV = NBV - ((NBV/Remaining_Life)*"+frequency+"), " +
-       		 "Monthly_Dep = (NBV/Remaining_Life)*"+frequency+", Useful_Life = Useful_Life + "+frequency+", " +
+//        System.out.println("query in OldAssetDepreciation: "+query);
+        query2 = "UPDATE AM_ASSET SET Accum_Dep = Accum_Dep + ((NBV/Remaining_Life)*"+frequency+"), Monthly_Dep = (NBV/Remaining_Life)*"+frequency+", " +
+       		 "NBV = NBV - ((NBV/Remaining_Life)*"+frequency+"),Useful_Life = Useful_Life + "+frequency+", " +
        		"Remaining_Life = Remaining_Life - "+frequency+", " +
        		"last_dep_date = '"+depreciationProcessDate+"' "+
                " WHERE Accum_dep > 0.00 AND DEP_RATE > 0.00 AND DEP_END_DATE > '"+depreciationProcessDate+"' AND Req_Depreciation = 'Y' AND ASSET_STATUS = 'ACTIVE' " +
                " AND NBV > 10  AND Monthly_Dep = 0.00 AND REMAINING_LIFE > 0";
-//       System.out.println("query2 in OldAssetDepreciation: "+query2);
+//       System.out.println("query2 in OldAssetDepreciation to recalculate Asset Improved: "+query2);
         try {
         con = getConnection("legendPlus");
         ps = con.prepareStatement(query);
-        ps.execute();
-      ps2 = con.prepareStatement(query2);
-      ps2.execute();
+        ps.execute();          
+        ps1 = con.prepareStatement(query2);
+        ps1.execute();
     } catch (Exception ex) {  
         System.out.println("WARN: Computing Old Asset Depreciaon in OldAssetDepreciation ->" +
                 ex.getMessage());
     } finally {
         closeConnection(con, ps, rs);
-        closeConnection(con, ps2, rs);
+        closeConnection(con, ps1, rs);
     }        
     }
+
 
     public void executeNbvResidual(String FirstDayProcessDate, String endProcessDate, int frequency,String nextdate,String lastProcessingDate)
     {
@@ -2552,7 +2584,7 @@ try {
         query3 = "update a SET a.IMPROV_COST = b.IMPROV_COST,a.IMPROV_MONTHLYDEP = b.IMPROV_MONTHLYDEP, "+
         		 "a.IMPROV_ACCUMDEP = b.IMPROV_ACCUMDEP,a.IMPROV_NBV = b.IMPROV_NBV,a.TOTAL_NBV = a.TOTAL_NBV+b.TOTAL_NBV, "+
         		 "last_dep_date = '"+lastProcessingDate+"' "+
-        		 "from AM_ASSET a, Asset_Improvement_Depreciation b where a.Asset_Id = b.Asset_Id  ";
+        		 "from AM_ASSET a, Asset_Improvement_Depreciation b where a.Asset_Id = b.Asset_Id and b.IMPROV_COST != b.IMPROV_ACCUMDEP ";
         
         query4 = "UPDATE AM_ASSET SET NBV = RESIDUAL_VALUE WHERE NBV < RESIDUAL_VALUE AND ASSET_STATUS = 'ACTIVE' ";
 //       System.out.println("query in executeNbvResidual: "+query);
@@ -2616,28 +2648,36 @@ try {
         ResultSet rs;
         PreparedStatement ps;
         PreparedStatement ps2;
+        PreparedStatement ps3;
         String query; 
         String query2;
+        String query3;
         con = null;
         rs = null;
         ps = null;
         ps2 = null;
+        ps3 = null;
         query = "UPDATE AM_ASSET SET MONTHLY_DEP = 0.00, NBV = 10 WHERE REMAINING_LIFE = 0 ";
-        query2 = "UPDATE AM_ASSET SET IMPROV_MONTHLYDEP = 0.00, NBV = 10 WHERE IMPROV_ACCUMDEP = IMPROV_COST and IMPROV_MONTHLYDEP > 0 ";
+        query2 = "UPDATE AM_ASSET SET IMPROV_MONTHLYDEP = 0.00 WHERE IMPROV_ACCUMDEP = IMPROV_COST and IMPROV_MONTHLYDEP > 0 ";
+        query3 = "UPDATE Am_Improvement_Depreciation SET IMPROV_MONTHLYDEP = 0.00 WHERE IMPROV_ACCUMDEP = IMPROV_COST and IMPROV_MONTHLYDEP > 0 ";
 //        System.out.println("query in FullyDepreciated: "+query);
-//        System.out.println("query in FullyDepreciated Improved Assets: "+query2);
+//        System.out.println("query2 in FullyDepreciated Improved Assets: "+query2);
+//        System.out.println("query3 in FullyDepreciated Improved Assets: "+query3);
         try {
         con = getConnection("legendPlus");
         ps = con.prepareStatement(query);
         ps.execute();
         ps2 = con.prepareStatement(query2);
         ps2.execute();
+        ps3 = con.prepareStatement(query3);
+        ps3.execute();        
     } catch (Exception ex) {  
         System.out.println("WARN: Fully Depreciated Asset Depreciaon  in FullyDepreciated ->" +
                 ex.getMessage());
     } finally {
         closeConnection(con, ps, rs);
         closeConnection(con, ps2, rs);
+        closeConnection(con, ps3, rs);
     }        
     }
     
@@ -2979,17 +3019,19 @@ public void monthlyAssetDepreciation(String depreciationProcessDate, String endP
 }        
 }
 
-public boolean extractMonthlyImprovementTransactions(String startDate, String endDate)
+public boolean extractMonthlyImprovementSingleTransactions(String startDate, String endDate)
 {
     boolean exists;
-    System.out.println("About to Insert Improved Asset records have NBV Ten(10) naira into file Am_Improvement_Depreciation ");
+    System.out.println("About to Insert Improved Asset records that have NBV Ten(10) naira in the file Am_Improvement_Depreciation ");
     String qw = "insert into Am_Improvement_Depreciation(BRANCH_CODE,CATEGORY_CODE,Asset_id,Description,cost_increase,vatable_cost,vat_amount,wht_amount,Posting_Date,LPO,"+
     		 "IMPROV_TOTALLIFE,IMPROV_REMAINLIFE,IMPROV_EffectiveDate,ASSET_STATUS,IMPROVED) "+
     		 "select branch_code,category_code, Asset_id,Description,cost_increase,vatable_cost,vat_amount,wht_amount,revalue_Date,lpoNum,"+
-    		 "IMPROV_USEFULLIFE,IMPROV_USEFULLIFE,effDate,'ACTIVE',IMPROVED from am_asset_improvement where IMPROVED = 'P' "+
+    		 "IMPROV_USEFULLIFE,IMPROV_USEFULLIFE,effDate,'ACTIVE',IMPROVED from am_asset_improvement where IMPROVED = 'Y' AND APPROVAL_STATUS = 'POSTED' "+
     		 "and IMPROV_USEFULLIFE > 0 and revalue_Date between '"+startDate+"' and '"+endDate+"' ";
     updateAssetStatusChange(qw);
-//       System.out.println("qw in extractMonthlyImprovementTransactions: "+qw);
+    String query5 = "UPDATE am_asset_improvement SET IMPROVED = 'P' WHERE IMPROVED = 'Y' AND APPROVAL_STATUS = 'POSTED' and IMPROV_USEFULLIFE > 0 and revalue_Date between '"+startDate+"' and '"+endDate+"' ";
+    updateAssetStatusChange(query5);
+//       System.out.println("qw in extractMonthlyImprovementSingleTransactions: "+qw);
     exists = true;
     return exists;
 }    
@@ -2999,11 +3041,15 @@ public boolean extractMonthlyUploadImprovementTransactions(String startDate, Str
     boolean exists;
     System.out.println("About to Insert Improved Asset records have NBV Ten(10) naira into file Am_Improvement_Depreciation ");
     String qw = "insert into Am_Improvement_Depreciation(BRANCH_CODE,CATEGORY_CODE,Asset_id,Description,cost_increase,vatable_cost,vat_amount,wht_amount,Posting_Date,LPO,"+
+    		 "IMPROV_COST,IMPROV_NBV,"+
     		 "IMPROV_TOTALLIFE,IMPROV_REMAINLIFE,IMPROV_EffectiveDate,ASSET_STATUS,IMPROVED) "+
     		 "select branch_code,category_code, Asset_id,Description,cost_increase,vatable_cost,vat_amount,wht_amount,revalue_Date,lpoNum,"+
-    		 "IMPROV_USEFULLIFE,IMPROV_USEFULLIFE,effDate,'ACTIVE',IMPROVED from am_asset_improvement_Upload where IMPROVED = 'P' "+
+    		 "cost_increase,cost_increase,"+
+    		 "IMPROV_USEFULLIFE,IMPROV_USEFULLIFE,effDate,'ACTIVE',IMPROVED from am_asset_improvement_Upload where IMPROVED = 'Y' AND APPROVAL_STATUS = 'POSTED' "+
     		 "and IMPROV_USEFULLIFE > 0 and revalue_Date between '"+startDate+"' and '"+endDate+"' ";
     updateAssetStatusChange(qw);
+    String query5 = "UPDATE am_asset_improvement_Upload SET IMPROVED = 'P' WHERE IMPROVED = 'Y' AND APPROVAL_STATUS = 'ACTIVE' and IMPROV_USEFULLIFE > 0 and revalue_Date between '"+startDate+"' and '"+endDate+"' ";
+    updateAssetStatusChange(query5);
 //       System.out.println("qw in extractMonthlyUploadImprovementTransactions: "+qw);
     exists = true;
     return exists;
@@ -3031,7 +3077,7 @@ public void clearDepreciationLegacyExport()
     }
 
 }
-public boolean assetAdditionsInserted()
+public boolean assetAdditionsSystemRejection()
 {
     boolean exists;
     System.out.println("About to Insert records into file AM_ASSETADDITIONS ");
@@ -3053,11 +3099,25 @@ public boolean pendingTrancations(){
 	boolean exists;
 	System.out.println("About to Remove Pending Transactions Before Depreciation for the new month ");
 	//AssetRecordsBean arb = new AssetRecordsBean();
+    String queryBooking= "update a set a.Asset_Status = 'REJECTED-SYSTEM' from am_asset a, am_asset_approval b where a.asset_id = b.Asset_id "
+    		+ "and a.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and a.Asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Creation'";
+    updateAssetStatusChange(queryBooking);
+    String queryBooking1= "update a set a.asset_status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, am_asset b where a.asset_id = b.Asset_id "
+    		+ "and b.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and b.Asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Creation'";
+    updateAssetStatusChange(queryBooking1);	
+    String queryGrpAsset= "update a set a.Asset_Status = 'REJECTED-SYSTEM' from AM_GROUP_ASSET a, am_asset_approval b where CONVERT(VARCHAR,a.GROUP_ID) = b.Asset_id and a.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Group Asset Creation' ";
+    updateAssetStatusChange(queryGrpAsset);
+    String queryGrpAsset2= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, AM_GROUP_ASSET b where a.Asset_id = CONVERT(VARCHAR,b.GROUP_ID) and b.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Group Asset Creation' ";
+    updateAssetStatusChange(queryGrpAsset2);    
     String query= "update a set a.approval_status = 'REJECTED-SYSTEM' from am_asset_improvement a, am_asset_approval b where a.asset_id = b.Asset_id "
     		+ "and a.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.approval_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Improvement'";
     updateAssetStatusChange(query);
-    String query1= "update a set a.Asset_Status = 'REJECTED-SYSTEM' from am_asset_approval a, am_asset_improvement b where a.asset_id = b.Asset_id "
+    String query1= "update a set a.asset_status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, am_asset_improvement b where a.asset_id = b.Asset_id "
     		+ "and b.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.approval_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Improvement'";
     updateAssetStatusChange(query1);
@@ -3109,5 +3169,91 @@ public boolean pendingTrancations(){
     exists = true;
     return exists;
 }
+
+
+//public boolean pendingTrancations() throws Exception {
+public boolean reclassificationProcessing(String startDate, String endDate){
+	boolean exists;
+//	System.out.println("About to Remove Pending Transactions Before Depreciation for the new month ");
+	//AssetRecordsBean arb = new AssetRecordsBean();
+	   updateAssetStatusChange("UPDATE a SET a.Asset_id  = b.new_asset_id,a.OLD_ASSET_ID = b.Asset_id, a.Category_ID = b.new_category_id,a.CATEGORY_CODE = c.category_code,a.NBV = a.residual_value, "
+ 	   		+ "a.Monthly_Dep = b.old_nbv,a.Accum_Dep = a.Accum_Dep+b.old_nbv,a.Dep_Rate = b.new_depr_rate,a.Dep_End_Date = b.new_dep_end_date,a.Remaining_Life = 0,a.Total_Life = new_total_life,Useful_Life = new_total_life "
+ 	   		+ "from  am_asset a, am_assetReclassification b, am_ad_category c where a.Asset_id = b.Asset_id and b.new_category_Id = c.category_Id and b.status = 'ACTIVE' and a.NBV != 10.00 and b.new_remaining_life < 0 and reclassify_date between '"+startDate+"' and '"+endDate+"'");
+ 	   updateAssetStatusChange("UPDATE a SET a.Asset_id  = b.new_asset_id,a.OLD_ASSET_ID = b.Asset_id, a.Category_ID = b.new_category_id,a.CATEGORY_CODE = c.category_code,"
+ 	   		+ "a.Monthly_Dep = b.new_monthly_dep,a.nbv = b.NBV,a.Dep_Rate = b.new_depr_rate,a.Dep_End_Date = b.new_dep_end_date,a.Remaining_Life = new_remaining_life ,a.Total_Life = new_total_life,Useful_Life = new_total_life-new_remaining_life "
+ 	   		+ "from  am_asset a, am_assetReclassification b, am_ad_category c where a.Asset_id = b.Asset_id and b.new_category_Id = c.category_Id and b.status = 'ACTIVE' and a.NBV != 10.00 and old_depr_rate <> new_depr_rate and b.new_remaining_life > 0 and reclassify_date between '"+startDate+"' and '"+endDate+"'");
+ 	   updateAssetStatusChange("UPDATE a SET a.Asset_id  = b.new_asset_id,a.OLD_ASSET_ID = b.Asset_id, a.Category_ID = b.new_category_id,a.CATEGORY_CODE = c.category_code,"
+ 	   		+ "a.Monthly_Dep = b.monthly_dep,a.nbv = b.NBV,a.Dep_Rate = b.new_depr_rate,a.Dep_End_Date = b.new_dep_end_date,a.Remaining_Life = new_remaining_life ,a.Total_Life = new_total_life,Useful_Life = new_total_life-new_remaining_life "
+ 	   		+ "from  am_asset a, am_assetReclassification b, am_ad_category c where a.Asset_id = b.Asset_id and b.new_category_Id = c.category_Id and b.status = 'ACTIVE' and a.NBV != 10.00 and old_depr_rate = new_depr_rate and b.new_remaining_life > 0 and reclassify_date between '"+startDate+"' and '"+endDate+"'");
+ 	   updateAssetStatusChange("UPDATE a SET a.Asset_id  = b.new_asset_id,a.OLD_ASSET_ID = b.Asset_id, a.Category_ID = b.new_category_id,a.CATEGORY_CODE = c.category_code,"
+ 	   		+ "a.Monthly_Dep = b.new_monthly_dep,a.nbv = b.NBV,a.Dep_Rate = b.new_depr_rate,a.Dep_End_Date = b.new_dep_end_date,a.Remaining_Life = new_remaining_life ,a.Total_Life = new_total_life,Useful_Life = new_total_life-new_remaining_life "
+ 	   		+ "from  am_asset a, am_assetReclassification b, am_ad_category c where a.Asset_id = b.Asset_id and b.new_category_Id = c.category_Id and b.status = 'ACTIVE' and a.NBV != 10.00 and b.new_remaining_life = 0 and reclassify_date between '"+startDate+"' and '"+endDate+"' ");
+
+	   updateAssetStatusChange("UPDATE a SET a.Asset_id  = b.new_asset_id,a.OLD_ASSET_ID = b.Asset_id, a.Category_ID = b.new_category_id,a.CATEGORY_CODE = c.category_code,a.NBV = a.residual_value,a.Accum_Dep=b.Cost_Price-a.residual_value, "
+ 	   		+ "a.Monthly_Dep = b.old_nbv,a.Dep_Rate = b.new_depr_rate,a.Dep_End_Date = b.new_dep_end_date,a.Remaining_Life = 0,a.Total_Life = new_total_life,Useful_Life = new_total_life "
+ 	   		+ "from  am_asset a, am_assetReclassification b, am_ad_category c where a.Asset_id = b.Asset_id and b.new_category_Id = c.category_Id and b.status = 'ACTIVE' and a.NBV = 10.00 and b.new_remaining_life < 0 and reclassify_date between '"+startDate+"' and '"+endDate+"' ");
+ 	   updateAssetStatusChange("UPDATE a SET a.Asset_id  = b.new_asset_id,a.OLD_ASSET_ID = b.Asset_id, a.Category_ID = b.new_category_id,a.CATEGORY_CODE = c.category_code,a.Accum_Dep=b.Cost_Price-a.residual_value,"
+ 	   		+ "a.Monthly_Dep = b.new_monthly_dep,a.nbv = b.NBV,a.Dep_Rate = b.new_depr_rate,a.Dep_End_Date = b.new_dep_end_date,a.Remaining_Life = new_remaining_life ,a.Total_Life = new_total_life,Useful_Life = new_total_life-new_remaining_life "
+ 	   		+ "from  am_asset a, am_assetReclassification b, am_ad_category c where a.Asset_id = b.Asset_id and b.new_category_Id = c.category_Id and b.status = 'ACTIVE' and a.NBV = 10.00 and old_depr_rate <> new_depr_rate and b.new_remaining_life > 0 and reclassify_date between '"+startDate+"' and '"+endDate+"' ");
+ 	   updateAssetStatusChange("UPDATE a SET a.Asset_id  = b.new_asset_id,a.OLD_ASSET_ID = b.Asset_id, a.Category_ID = b.new_category_id,a.CATEGORY_CODE = c.category_code, "
+ 	   		+ "a.Monthly_Dep = b.monthly_dep,a.nbv = b.NBV,a.Dep_Rate = b.new_depr_rate,a.Dep_End_Date = b.new_dep_end_date,a.Remaining_Life = new_remaining_life ,a.Total_Life = new_total_life,Useful_Life = new_total_life-new_remaining_life "
+ 	   		+ "from  am_asset a, am_assetReclassification b, am_ad_category c where a.Asset_id = b.Asset_id and b.new_category_Id = c.category_Id and b.status = 'ACTIVE' and a.NBV = 10.00 and old_depr_rate = new_depr_rate and b.new_remaining_life > 0 and reclassify_date between '"+startDate+"' and '"+endDate+"' ");
+ 	   updateAssetStatusChange("UPDATE a SET a.Asset_id  = b.new_asset_id,a.OLD_ASSET_ID = b.Asset_id, a.Category_ID = b.new_category_id,a.CATEGORY_CODE = c.category_code,"
+ 	   		+ "a.Monthly_Dep = b.new_monthly_dep,a.nbv = b.NBV,a.Dep_Rate = b.new_depr_rate,a.Dep_End_Date = b.new_dep_end_date,a.Remaining_Life = new_remaining_life ,a.Total_Life = new_total_life,Useful_Life = new_total_life-new_remaining_life "
+ 	   		+ "from  am_asset a, am_assetReclassification b, am_ad_category c where a.Asset_id = b.Asset_id and b.new_category_Id = c.category_Id and b.status = 'ACTIVE' and a.NBV = 10.00 and b.new_remaining_life = 0 and reclassify_date between '"+startDate+"' and '"+endDate+"' ");
+ //	  System.out.println("I have Removed Pending Transactions Before Depreciation for the new month ");
+  exists = true;
+  return exists;
+}
+
+public void MigratedAssetWithWrongAccum()
+{
+    Connection con;
+    ResultSet rs;
+    PreparedStatement ps;
+    PreparedStatement ps2;
+    String query; 
+    String query2;
+    con = null;
+    rs = null;
+    ps = null;
+    ps2 = null;
+    query = "update a set a.Accum_Dep = a.Accum_Dep-c.residual_value from am_asset a,am_ad_category c  where a.NBV = c.residual_value and Cost_Price = Accum_Dep ";
+//    System.out.println("query in FullyDepreciated: "+query);        
+    try {
+    con = getConnection("legendPlus");
+    ps = con.prepareStatement(query);
+    ps.execute();       
+} catch (Exception ex) {  
+    System.out.println("WARN: Recalssification Correction for Negative Remaining Life ->" +
+            ex.getMessage());
+} finally {
+    closeConnection(con, ps, rs);
+    closeConnection(con, ps2, rs);
+}        
+}
+
+public void LANDAssetNBVValue()
+{
+    Connection con;
+    ResultSet rs;
+    PreparedStatement ps;
+    String query; 
+    con = null;
+    rs = null;
+    ps = null;
+    query = "UPDATE a SET a.NBV = a.Cost_Price - c.residual_value FROM AM_ASSET a, AM_AD_CATEGORY c WHERE a.CATEGORY_CODE = c.category_code AND  c.residual_value = 0.00 ";
+    try {
+    con = getConnection("legendPlus");
+    ps = con.prepareStatement(query);
+    ps.execute();  
+} catch (Exception ex) {  
+    System.out.println("WARN: Recalssification Correction for Negative Remaining Life ->" +
+            ex.getMessage());
+} finally {
+    closeConnection(con, ps, rs);
+}        
+}
+
 
 }

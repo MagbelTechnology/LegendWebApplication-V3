@@ -6,6 +6,7 @@ import java.util.*;
 
 import jxl.*;
 import legend.admin.handlers.AdminHandler;
+import legend.admin.handlers.CompanyHandler;
 import legend.admin.objects.*;
 import magma.ExcelAssetImproveBean;
 import magma.asset.manager.AssetManager;
@@ -33,6 +34,7 @@ public class ImproveExcelUploadManager extends MagmaDBConnection
     public ApprovalRecords approve;
     private MagmaDBConnection dbConnection;
     private AssetManager assetMan;
+    private CompanyHandler comp;
     String userid;
     String excelType;
     String groupID;
@@ -47,6 +49,7 @@ public class ImproveExcelUploadManager extends MagmaDBConnection
         approve = new ApprovalRecords(); 
         dbConnection = new MagmaDBConnection();
         assetMan = new AssetManager();
+        comp = new CompanyHandler();
         //System.out.println("INFO:Excel AssetExcelUploadManager instatiated.");
     }
 
@@ -258,6 +261,7 @@ public class ImproveExcelUploadManager extends MagmaDBConnection
         categoryCode = convertparam[2];
         }
         //System.out.println("<<<<<<<<assetCode: "+assetCode+"   branchCode: "+branchCode+"   categoryCode: "+categoryCode);
+       
         if(assetCode.equalsIgnoreCase("")){error = " "+"fail; ";
         status = false; statusList[1] = '0';}
         else{error = "pass; ";status = true; statusList[1] = '1';}
@@ -268,7 +272,7 @@ public class ImproveExcelUploadManager extends MagmaDBConnection
         else{error = "pass; ";status = true; statusList[2] = '1';}
         errorMessage = errorMessage+sNo+" SBU CODE "+error;
         
-        String availableForTrans = assetMan.checkAssetAvalability(assetId);
+        String availableForTrans = comp.checkAssetAvalability(assetId);
         if((availableForTrans != "")&& (!assetparam.equals(""))){error = " Asset is still pending for approval. Cannot be initiated for Improvement "+"fail; ";
         status = false; statusList[3] = '0';}
         else{error = "pass; ";status = true; statusList[3] = '1';}
@@ -285,6 +289,14 @@ public class ImproveExcelUploadManager extends MagmaDBConnection
         status = false; statusList[5] = '0';}
         else{error = "pass; ";status = true; statusList[5] = '1';}
         errorMessage = errorMessage+" Vendor Code "+error;
+        System.out.println("<<<<<<<invoice_No: "+invoice_No);
+        String invnumb = vendorId+'-'+invoice_No;
+        System.out.println("<<<<<<<invnumb: "+invnumb);
+        String invoiceNumValid = approve.getCodeName("select INVOICE_NO from AM_INVOICE_NO where INVOICE_NO = '"+invnumb+"'");
+		 if(!invoiceNumValid.equalsIgnoreCase("")){error = " "+"fail; "; 
+	        status = false; statusList[14] = '0';}
+		  else{error = "pass; ";status = true; statusList[14] = '1';}        
+	        errorMessage = errorMessage+" Invoice "+error;
         
         //String convertvalue = approve.getCodeName("SELECT cast(cost_price as varchar(50))+'#'+cast(vatable_cost as varchar(50))+'#'+cast(vat as varchar(50))+'#'+cast(Wh_Tax_Amount as varchar(50))+'#'+cast(nbv as varchar(50))+'#'+cast(accum_dep as varchar(50))+'#'+cast(IMPROV_NBV as varchar(50))+'#'+cast(IMPROV_ACCUMDEP as varchar(50))+'#'+cast(IMPROV_COST as varchar(50))+'#'+cast(IMPROV_VATABLECOST as varchar(50)) FROM am_asset WHERE ASSET_ID = '"+assetId+"'");
         String test = "SELECT DESCRIPTION+'#'+cast(cost_price as varchar(50))+'#'+cast(vatable_cost as varchar(50))+'#'+cast(vat as varchar(50))+'#'+cast(Wh_Tax_Amount as varchar(50))+'#'+cast(nbv as varchar(50))+'#'+cast(accum_dep as varchar(50))+'#'+cast(coalesce(IMPROV_NBV,0) as varchar(50))+'#'+cast(coalesce(IMPROV_ACCUMDEP,0) as varchar(50))+'#'+cast(coalesce(IMPROV_COST,0) as varchar(50))+'#'+cast(coalesce(IMPROV_VATABLECOST,0) as varchar(50)) FROM am_asset WHERE ASSET_ID = '"+assetId+"'";
@@ -330,13 +342,14 @@ public class ImproveExcelUploadManager extends MagmaDBConnection
         status = false; statusList[1] = '0';}
         else{error = "pass; ";status = true; statusList[1] = '1';}
         errorMessage = errorMessage+" Record "+sNo+" Asset Id "+error;
-        String availableForTrans = assetMan.checkAssetAvalability(assetId);
+        String availableForTrans = comp.checkAssetAvalability(assetId);
         if((availableForTrans != "")&& (!assetparam.equals(""))){error = " Asset is still pending for approval. Cannot be initiated for Improvement "+"fail; ";
         status = false; statusList[2] = '0';}
         else{error = "pass; ";status = true; statusList[2] = '1';}
         errorMessage = errorMessage+" Pending Transaction "+error;
         vendor = approve.getCodeName("select Vendor_Code from am_ad_vendor where account_number = '"+Vendor_Account+"'");
         vendorId = approve.getCodeName("select Vendor_Id from am_ad_vendor where account_number = '"+Vendor_Account+"'");
+//        System.out.println("<<<<<<< vendor: "+vendor + " vendorId: " + vendorId); 
         String vendorAcctNo = approve.getCodeName("select account_number from am_ad_vendor where account_number = '"+Vendor_Account+"'");
 //        System.out.println("<<<<<<<vendorAcctNo: "+vendorAcctNo); 
         if(vendorAcctNo.equalsIgnoreCase("")){error = "account_number "+"fail; ";
@@ -348,6 +361,7 @@ public class ImproveExcelUploadManager extends MagmaDBConnection
         status = false; statusList[4] = '0';}
         else{error = "pass; ";status = true; statusList[4] = '1';}
         errorMessage = errorMessage+" Vendor Code "+error;
+        
         
         //String convertvalue = approve.getCodeName("SELECT cast(cost_price as varchar(50))+'#'+cast(vatable_cost as varchar(50))+'#'+cast(vat as varchar(50))+'#'+cast(Wh_Tax_Amount as varchar(50))+'#'+cast(nbv as varchar(50))+'#'+cast(accum_dep as varchar(50))+'#'+cast(IMPROV_NBV as varchar(50))+'#'+cast(IMPROV_ACCUMDEP as varchar(50))+'#'+cast(IMPROV_COST as varchar(50))+'#'+cast(IMPROV_VATABLECOST as varchar(50)) FROM am_asset WHERE ASSET_ID = '"+assetId+"'");
         String test = "SELECT DESCRIPTION+'#'+cast(cost_price as varchar(50))+'#'+cast(vatable_cost as varchar(50))+'#'+cast(vat as varchar(50))+'#'+cast(Wh_Tax_Amount as varchar(50))+'#'+cast(nbv as varchar(50))+'#'+cast(accum_dep as varchar(50))+'#'+cast(coalesce(IMPROV_NBV,0) as varchar(50))+'#'+cast(coalesce(IMPROV_ACCUMDEP,0) as varchar(50))+'#'+cast(coalesce(IMPROV_COST,0) as varchar(50))+'#'+cast(coalesce(IMPROV_VATABLECOST,0) as varchar(50)) FROM am_asset WHERE ASSET_ID = '"+assetId+"'";

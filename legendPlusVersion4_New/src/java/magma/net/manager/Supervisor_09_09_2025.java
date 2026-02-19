@@ -14,9 +14,9 @@ import legend.admin.objects.Company;
 
 import com.magbel.legend.bus.ApprovalRecords;
 
-public class Supervisor extends MagmaDBConnection {
+public class Supervisor_09_09_2025 extends MagmaDBConnection {
  ApprovalRecords aprecords = null;
-    public Supervisor() {
+    public Supervisor_09_09_2025() {
             aprecords = new ApprovalRecords();
 	} 
 

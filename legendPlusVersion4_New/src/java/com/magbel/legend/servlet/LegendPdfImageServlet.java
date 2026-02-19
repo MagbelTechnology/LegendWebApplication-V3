@@ -78,8 +78,11 @@ public class LegendPdfImageServlet extends HttpServlet
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error during group ID lookup");
             return;
         }
-
-        String assetCode = (groupId == null || groupId.equals("0") || groupId.trim().isEmpty()) ? assetCodeParam : groupId;
+        
+        int groupCount = Integer.parseInt(approve.getCodeName("select count(*) from am_asset_approval where asset_id = ?", groupId));
+        System.out.println("groupCount : " + groupCount);
+        
+        String assetCode = (groupId == null || groupId.equals("0") || groupId.trim().isEmpty() || groupCount != 0) ? assetCodeParam : groupId;
         System.out.println("assetCode : " + assetCode);
         String newCodeName = "W" + assetCode;
         System.out.println("newCodeName : " + newCodeName);
@@ -92,6 +95,7 @@ public class LegendPdfImageServlet extends HttpServlet
 
         File folder = new File(uploadFolder);
         List<File> files = getMatchingFiles(newCodeName, folder);
+        System.out.println("files : " + files.toString());
 
         // Fallback if no files found
         if (files.isEmpty()) {
@@ -142,7 +146,51 @@ public class LegendPdfImageServlet extends HttpServlet
                 streamFileToClient(file, response, contentType, filename, dispositionType);
             }
 
-        } else {
+        } else if(files.size() > 1) {
+        	 File file = files.get(0);
+       	  String filename = file.getName();
+             String contentType = Files.probeContentType(file.toPath());
+             if (contentType == null) {
+                 contentType = getMimeTypeByExtension(filename);
+             }
+             
+        	 response.setContentType("application/zip");
+        	    response.setHeader("Content-Disposition", "attachment; filename="+newCodeName+".zip");
+        	    response.setHeader("Pragma", "public");
+        	    response.setHeader("Cache-Control", "no-store, max-age=0");
+
+        	    try (ServletOutputStream out = response.getOutputStream();
+        	         ZipOutputStream zipOut = new ZipOutputStream(out)) {
+
+        	        byte[] buffer = new byte[4096];
+
+        	        for (File file1 : files) {
+        	            if (!file1.exists() || file1.length() <= 0) {
+        	                continue;
+        	            }
+
+        	            try (FileInputStream fis = new FileInputStream(file1);
+        	                 BufferedInputStream bis = new BufferedInputStream(fis)) {
+
+        	                ZipEntry zipEntry = new ZipEntry(file.getName());
+        	                zipOut.putNextEntry(zipEntry);
+
+        	                int len;
+        	                while ((len = bis.read(buffer)) > 0) {
+        	                    zipOut.write(buffer, 0, len);
+        	                }
+
+        	                zipOut.closeEntry();
+        	            }
+        	        }
+
+        	        zipOut.finish();
+        	    } catch (IOException e) {
+        	        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to zip files");
+        	    }
+        }
+        
+        else {
             alertClient(response, "No File Available!");
         }
     }
@@ -158,13 +206,19 @@ public class LegendPdfImageServlet extends HttpServlet
 
         if (files != null) {
             for (File file : files) {
-                if (file.getName().contains(codeName)) {
-                    matchedFiles.add(file);
+                String name = file.getName();
+                int dotIndex = name.lastIndexOf('.');
+                if (dotIndex > 0) {
+                    String baseName = name.substring(0, dotIndex); 
+                    if (baseName.equalsIgnoreCase(codeName)) {
+                        matchedFiles.add(file);
+                    }
                 }
             }
         }
         return matchedFiles;
     }
+
 
     private void alertClient(HttpServletResponse response, String message) throws IOException {
         response.setContentType("text/html");

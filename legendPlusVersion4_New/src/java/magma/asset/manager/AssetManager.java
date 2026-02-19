@@ -733,7 +733,7 @@ public class AssetManager extends MagmaDBConnection {
     }
 
     //get all disposed asset
-    public ArrayList getDisposedAssetList(String qryfilter,String branch,String category,String department,String regNumber,String asset_Id,String dFromDate,String toDate,String disposalStatus,String order) {
+    public ArrayList getDisposedAssetListOld(String qryfilter,String branch,String category,String department,String regNumber,String asset_Id,String dFromDate,String toDate,String disposalStatus,String order) {
 
         String query = "SELECT A.DISPOSAL_ID,A.ASSET_ID,A.DISPOSAL_REASON,A.BUYER_ACCOUNT,A.DISPOSAL_AMOUNT,A.RAISE_ENTRY,"
         		+ "A.PROFIT_LOSS,A.DISPOSAL_DATE,A.EFFECTIVE_DATE,A.USER_ID,A.DISPOSAL_STATUS,B.BRANCH_ID,B.DEPT_ID,"
@@ -981,6 +981,113 @@ public class AssetManager extends MagmaDBConnection {
 
         return list;
     }
+    
+     
+    public ArrayList getDisposedAssetList(String qryfilter,String branch,String category,String department,String regNumber,String asset_Id,String dFromDate,String toDate,String disposalStatus,String order) {   	 
+    	 String baseQuery = "select * from View_Disposal_Details WHERE 1=1";
+    	StringBuilder sqlQuery = new StringBuilder(baseQuery);
+    List<String> params = new ArrayList<>();
+   	 ArrayList<Disposal> list = new ArrayList<>();
+   	 Connection c = null;
+     PreparedStatement ps = null;
+     ResultSet rs = null;
+     Disposal dispose = null;
+
+   try {
+	   c = getConnection("legendPlus");
+
+//	   System.out.println("<========qryfilter=======> " + qryfilter);
+
+       if (!branch.equals("ALL")) {
+           sqlQuery.append(" AND BRANCH_ID  = ?");
+           params.add(branch);
+//           System.out.println("<========getDisposedAssetList=======> Branch selected");
+       }
+       
+       if (!category.equals("ALL")) {
+           sqlQuery.append(" AND CATEGORY_ID =?");
+           params.add(category);
+//           System.out.println("<========getDisposedAssetList=======> Category selected");
+       }
+       
+       if (!department.equals("ALL")) {
+           sqlQuery.append(" AND DEPT_ID =?");
+           params.add(department);
+//           System.out.println("<========getDisposedAssetList=======> department selected");
+       }
+       
+       if (!dFromDate.isEmpty() && !toDate.isEmpty()) {
+           sqlQuery.append(" AND DISPOSAL_DATE BETWEEN ? AND ?");
+           params.add(dFromDate);
+           params.add(toDate);
+//           System.out.println("<========getDisposedAssetList=======> Date selected");
+       }
+
+       if (!asset_Id.equals("")) {
+           sqlQuery.append(" AND ASSET_ID =?");
+           params.add(asset_Id);
+//           System.out.println("<========getDisposedAssetList=======> asset_Id selected");
+       }
+
+       if (!disposalStatus.equals("")) {
+           sqlQuery.append(" AND ASSET_STATUS =?");
+           params.add(disposalStatus);
+//           System.out.println("<========getDisposedAssetList=======> disposalStatus selected");
+       }
+       
+       sqlQuery.append(order);
+//       System.out.println("<========sqlQuery=======> : " +sqlQuery.toString());
+       ps = c.prepareStatement(sqlQuery.toString());
+       for (int i = 0; i < params.size(); i++) {
+           ps.setString(i + 1, params.get(i));
+       }
+       rs = ps.executeQuery();
+
+       while (rs.next()) {
+           String disposalId = rs.getString("DISPOSAL_ID");
+           String assetId = rs.getString("ASSET_ID");
+           String reason = rs.getString("DISPOSAL_REASON");
+           String buyerAcct = rs.getString("BUYER_ACCOUNT");
+           double amount = rs.getDouble("DISPOSAL_AMOUNT");
+           String raiseEntry = rs.getString("RAISE_ENTRY");
+           double profitLoss = rs.getDouble("PROFIT_LOSS");
+           String disposalDate = formatDate(rs.getDate("DISPOSAL_DATE"));
+           String effDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+           String userId = rs.getString("USER_ID");
+           String status = rs.getString("DISPOSAL_STATUS");
+           String branchId = rs.getString("BRANCH_ID");
+           String deptId = rs.getString("DEPT_ID");
+           String categoryId = rs.getString("CATEGORY_ID");
+           String regNo = rs.getString("REGISTRATION_NO");
+           String desc = rs.getString("DESCRIPTION");
+           double cost = rs.getDouble("COST_PRICE");
+           String assetUser = rs.getString("ASSET_USER");
+           String assetStatus = rs.getString("ASSET_STATUS");
+          // String partialType = rs.getString("PARTIAL_TYPE");
+//           double partialPercent = rs.getInt("PARTIAL_PERCENT");
+           double partialAmt = rs.getDouble("PARTIAL_AMT");
+           
+           dispose = new Disposal(disposalId, assetId, reason, buyerAcct,
+                                  amount,
+                                  raiseEntry, profitLoss, disposalDate,
+                                  effDate, userId, status,
+                                  branchId, deptId, categoryId, regNo,
+                                  desc, cost, assetUser, assetStatus);
+					               dispose.setPartialAmt(partialAmt);
+					     //          dispose.setPartialPercent(partialPercent);
+			//		               dispose.setDisposalType(partialType);   
+           list.add(dispose);
+
+       }
+
+   } catch (Exception e) {
+       e.printStackTrace();
+   } finally {
+       closeConnection(c, ps, rs);
+   }
+
+   return list;
+   }
 
 
     //get tranfered asset
@@ -1053,6 +1160,10 @@ public class AssetManager extends MagmaDBConnection {
 
         return list;
     }
+    
+    
+    
+    
 
     public String getObjectName(String query) {
         Connection con = null;
@@ -5176,6 +5287,50 @@ public HashSet getUsedSupervisors2(int tranid){
   return hashSet;
 }
 
+public HashSet getUsedSupervisors2(long tranid){
+
+    HashSet hashSet = new HashSet();
+// com.magbel.legend.vao.ApprovalRemark approvalRemark = null;
+     int i = 0;
+
+     String query1= "select supervisorID from am_approval_remark where transaction_id = "+tranid;
+
+
+     Connection con = null;
+     PreparedStatement ps = null;
+     ResultSet rs = null;
+     try {
+         con = getConnection("legendPlus");
+         ps = con.prepareStatement(query1);
+           rs = ps.executeQuery();
+
+         while (rs.next()) {
+          //   rs.getInt(1);
+         //approvalRemark = new com.magbel.legend.vao.ApprovalRemark();
+
+         //approvalRemark.setSupervisorID(rs.getInt(1));
+       hashSet.add(new Integer(rs.getInt(1)));
+
+         }//while
+
+          // approvalRemark = new com.magbel.legend.vao.ApprovalRemark();
+          // approvalRemark.setSupervisorID(findTranInitiator(tranid));
+
+           //list.add(approvalRemark);
+           hashSet.add(new Integer(findTranInitiator(tranid)));
+
+     } catch (Exception e) {
+         String warning = "WARNING:Asset Manager class: getUsedSupervisors2() ->" +
+                          e.getMessage();
+         System.out.println(warning);
+         e.printStackTrace();
+     } finally {
+         closeConnection(con, ps,rs);
+     }
+
+return hashSet;
+}
+
 public int findTranInitiator(int tranid){
 
 
@@ -5211,6 +5366,43 @@ public int findTranInitiator(int tranid){
             closeConnection(con, ps,rs);
         }
   return user_id;
+}
+
+public int findTranInitiator(long tranid){
+
+
+    int user_id = 0;
+
+    String query1= "select user_id from am_asset_approval where transaction_id = "+tranid;
+
+
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+        con = getConnection("legendPlus");
+
+
+        ps = con.prepareStatement(query1);
+          rs = ps.executeQuery();
+
+        while (rs.next()) {
+
+
+        user_id =rs.getInt(1);
+
+
+        }//while
+
+    } catch (Exception e) {
+        String warning = "WARNING:Asset Manager class: findTranInitiator() ->" +
+                         e.getMessage();
+        System.out.println(warning);
+        e.printStackTrace();
+    } finally {
+        closeConnection(con, ps,rs);
+    }
+return user_id;
 }
 
 public String findUserName(int userID){
@@ -7139,7 +7331,7 @@ public String effectiveDate(String  assetId){
 
 
 
- public Improvement getMaintenanceAssetRepost(String id,int tranId) {
+ public Improvement getMaintenanceAssetRepost(String id,Long tranId) {
 
   //String revalue_id  = getMaxTransaction(id);
           String query =
@@ -9191,239 +9383,401 @@ public Asset getAssetByAssetCode(int asseCode) {
     }
 
 
- public String checkAssetAvalability(String assetID){
- //    System.out.println("\nttttttttttttttt");
-ApprovalRecords app = new ApprovalRecords();
-    String query = " SELECT transaction_id from am_asset_approval " +
-                       " WHERE process_status='P' and asset_id = '"+assetID+"'";
-	df = new com.magbel.util.DatetimeFormat();
+// public String checkAssetAvalability(String assetID){
+// //    System.out.println("\nttttttttttttttt");
+//ApprovalRecords app = new ApprovalRecords();
+//    String query = " SELECT transaction_id from am_asset_approval " +
+//                       " WHERE (process_status='P' OR  process_status='WA') and asset_id = '"+assetID+"'";
+//	df = new com.magbel.util.DatetimeFormat();
+//
+//String transactionId ="";
+//String process_status ="";
+//        Connection con = null;
+//        PreparedStatement ps = null;
+//        ResultSet rs = null;
+//        String Datefld = df.formatDate(new java.util.Date());
+//      //  System.out.println("====Datefld== "+Datefld);
+//        String Month = Datefld.substring(3, 5);
+//        String Year = Datefld.substring(6, 10);
+//    //    System.out.println("====Month== "+Month);
+//    //    System.out.println("====Year== "+Year);  
+////        System.out.println("====query== "+query);  
+//              try {
+//            con = getConnection("legendPlus");
+//            ps = con.prepareStatement(query);
+//            rs = ps.executeQuery();
+//
+//            while (rs.next()) { 
+//               transactionId = rs.getString("transaction_id");
+////               String AssetId = rs.getString("ASSET_ID");
+////                System.out.println("\n>>>>> trans id " + transactionId+"   AssetId: "+AssetId);
+// //               System.out.println("\n>>>>> trans id " + transactionId);
+//               process_status =   transactionId;
+//            }
+//// System.out.println(" >>>transactionId>>>  "+transactionId );
+// 
+//            if(transactionId.equalsIgnoreCase("")){
+// //System.out.println("\n >>>>>> here " );
+//           // String query1 = " SELECT transaction_id from am_asset_approval " +
+//             //          " WHERE process_status='A' and asset_id = '"+assetID+"'";
+//               //-- int tranId = Integer.parseInt(app.getCodeName(query1));
+// String query1 = " SELECT asset_code from am_asset WHERE asset_id = ?";
+// String asset_Code = app.getCodeName(query1,assetID);
+// System.out.println("--asset_Code in checkAssetAvalability--> "+asset_Code);
+//              int assetCode = Integer.parseInt(app.getCodeName(query1,assetID));
+//     //     String postFlagQuery="select entryPostFlag from am_raisentry_post where entryPostFlag = 'N' and asset_code="+ assetCode;
+//// System.out.println("--assetCode--> "+assetCode);
+//  String queryTest1 = app.getCodeName("select max(trans_id) from am_raisentry_post where  asset_code=?",Integer.toString(assetCode));  
+////                 System.out.println("--queryTest1--> "+queryTest1);
+////  System.out.println("--queryTest1--> "+queryTest1);
+//  String queryTest2 = app.getCodeName("select max(trans_id)  from am_raisentry_TRANSACTION where asset_code=?",Integer.toString(assetCode));
+////check is record in am_raisentry_TRANSACTION   
+//
+///*  Before legendPlus Upgrade 28/09/2018
+//  String query2 =app.getCodeName("select asset_code from am_asset_improvement where asset_id = '"+assetID+"' and month(revalue_date) = '"+Month+"' and year(revalue_date) = '"+Year+"' and approval_status = 'PENDING' ");
+//  String query3 =app.getCodeName("select asset_code from am_asset_revaluation where asset_id = '"+assetID+"' and month(revalue_date) = '"+Month+"' and year(revalue_date) = '"+Year+"'");
+//  //String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and DISPOSAL_PERCENT = 100  and DISPOSAL_STATUS ='PD'");
+//  String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and month(disposal_date) = '"+Month+"' and year(disposal_date) = '"+Year+"'");
+// String query5 =app.getCodeName("select count(*) from am_raisentry_post where asset_code = '"+assetCode+"'  and entryPostFlag = 'N' ");
+// String query6 =app.getCodeName("select asset_code from am_AcceleratedDepreciation where asset_id = '"+assetID+"' and month(Accelerated_Date) = '"+Month+"' and year(Accelerated_Date) = '"+Year+"'");
+//*/
+//  String query2 =app.getCodeName("select asset_code from am_asset_improvement where asset_id = ? and approval_status = 'PENDING' ",assetID);
+//  if(query2.equals(""))query2 = "0";
+//  String query3 =app.getCodeName("select asset_code from am_asset_revaluation where asset_id = ? ",assetID);
+//  //String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and DISPOSAL_PERCENT = 100  and DISPOSAL_STATUS ='PD'");
+//  String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = ? and DISPOSAL_PERCENT = 100 AND disposal_status != 'R' ",assetID);
+// String query5 =app.getCodeName("select count(*) from am_raisentry_post where asset_code = ?  and entryPostFlag = 'N' ",Integer.toString(assetCode));
+// String query6 =app.getCodeName("select asset_code from am_AcceleratedDepreciation where asset_id = ? and ACCELERATED_STATUS = 'N' ",assetID);
+//// System.out.println("--query2--> "+query2+"  ---query3---> "+query3+"   ---query4-->  "+query4+"  ---query5-->  "+query5+"  ---query6--> "+query6);
+//  // For Revaluation Option if(query2.equalsIgnoreCase("") && query3.equalsIgnoreCase("") && query4.equalsIgnoreCase("") && query5.equalsIgnoreCase("0")){process_status="";}else {process_status="D";}
+//  if(query2.equalsIgnoreCase("0") && query3.equalsIgnoreCase("") && query4.equalsIgnoreCase("") && query6.equalsIgnoreCase("")){process_status="";}else {process_status="D";}  
+////  if(query3.equalsIgnoreCase("")){process_status="";}else {process_status="D";}
+////  System.out.println("--queryTest1--> "+queryTest1+"  ---queryTest2---> "+queryTest2);  
+//  if(queryTest1.equalsIgnoreCase(queryTest2) && !queryTest1.equalsIgnoreCase("") && !queryTest2.equalsIgnoreCase("")){
+//      //check if posted succceffuly on am_raisentry_TRANSACTION
+//String queryTest3 = app.getCodeName("select iso  from am_raisentry_TRANSACTION where asset_code=? and trans_id=? ",Integer.toString(assetCode),queryTest1);
+////  System.out.println("--queryTest2--> "+queryTest2+"  ---queryTest3---> "+queryTest3);    
+//if(process_status.equalsIgnoreCase("")){
+//if(queryTest3.equalsIgnoreCase("000")){process_status="";}else {process_status="N";}
+//}
+////System.out.println("--process_status-1-> "+process_status);
+//  }
+//       else
+//            { 
+//             String queryTest4 = app.getCodeName("SELECT process_status from am_asset_approval WHERE process_status='A' and asset_id = ?",assetID);
+//             if(queryTest4.equalsIgnoreCase("A"))
+//             { 
+//                 String queryTest5 = app.getCodeName("select max(trans_id) from am_raisentry_post where  asset_code=",Integer.toString(assetCode));
+////                 System.out.println("--queryTest1--> "+queryTest1);
+//                 String queryTest6 = app.getCodeName("select max(trans_id)  from am_raisentry_TRANSACTION where asset_code=",Integer.toString(assetCode));
+////check is record in am_raisentry_TRANSACTION
+////     System.out.println("--queryTest2--> "+queryTest2);
+////                  System.out.println("--queryTest5--> "+queryTest5+"--queryTest6--> "+queryTest6);
+//                 if(queryTest5.equalsIgnoreCase(queryTest6) && !queryTest5.equalsIgnoreCase("") && !queryTest6.equalsIgnoreCase(""))
+//                 {
+//      //check if posted succceffuly on am_raisentry_TRANSACTION
+//                 String queryTest7 = app.getCodeName("select iso  from am_raisentry_TRANSACTION where asset_code=? and trans_id=? "+assetCode,queryTest5);
+////  System.out.println("--queryTest7--> "+queryTest7);
+//                 if(process_status.equalsIgnoreCase("")){
+//                 if(queryTest7.equalsIgnoreCase("000")){process_status="";}else {process_status="N";}
+//                 }
+//                 }//else {process_status="N";}
+//             }
+////             System.out.println("--process_status-2-> "+process_status);
+//            }
+//           //  String   process =  app.getCodeName(postFlagQuery);
+// //      System.out.println(" >>>>> process_status main......>>" +process_status);
+//            }
+//      
+//
+//        } catch (Exception e) {
+//            System.out.println(
+//                    "AssetManager: checkAssetAvalability(String assetID):INFO:->" +
+//                    e.getMessage());
+//        } finally {
+//            closeConnection(con, ps, rs);
+//        }
+//            return process_status;
+//    }//
 
-String transactionId ="";
-String process_status ="";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        String Datefld = df.formatDate(new java.util.Date());
-      //  System.out.println("====Datefld== "+Datefld);
-        String Month = Datefld.substring(3, 5);
-        String Year = Datefld.substring(6, 10);
-    //    System.out.println("====Month== "+Month);
-    //    System.out.println("====Year== "+Year);  
-//        System.out.println("====query== "+query);  
-              try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
 
-            while (rs.next()) { 
-               transactionId = rs.getString("transaction_id");
-//               String AssetId = rs.getString("ASSET_ID");
-//                System.out.println("\n>>>>> trans id " + transactionId+"   AssetId: "+AssetId);
- //               System.out.println("\n>>>>> trans id " + transactionId);
-               process_status =   transactionId;
+
+public String checkAssetAvalability(String assetID) {
+    ApprovalRecords app = new ApprovalRecords();
+    String processStatus = "";
+    String transactionId = "";
+
+    try (Connection con = getConnection("legendPlus")) {
+        // Step 1: Check pending approvals
+        String sql = "SELECT transaction_id FROM am_asset_approval " +
+                     "WHERE (process_status IN ('P', 'WA')) AND asset_id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, assetID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    transactionId = rs.getString("transaction_id");
+                    processStatus = transactionId; // preserve original behavior
+                }
             }
-// System.out.println(" >>>transactionId>>>  "+transactionId );
- 
-            if(transactionId.equalsIgnoreCase("")){
- //System.out.println("\n >>>>>> here " );
-           // String query1 = " SELECT transaction_id from am_asset_approval " +
-             //          " WHERE process_status='A' and asset_id = '"+assetID+"'";
-               //-- int tranId = Integer.parseInt(app.getCodeName(query1));
- String query1 = " SELECT asset_code from am_asset WHERE asset_id = ?";
- String asset_Code = app.getCodeName(query1,assetID);
- System.out.println("--asset_Code in checkAssetAvalability--> "+asset_Code);
-              int assetCode = Integer.parseInt(app.getCodeName(query1,assetID));
-     //     String postFlagQuery="select entryPostFlag from am_raisentry_post where entryPostFlag = 'N' and asset_code="+ assetCode;
-// System.out.println("--assetCode--> "+assetCode);
-  String queryTest1 = app.getCodeName("select max(trans_id) from am_raisentry_post where  asset_code=?",Integer.toString(assetCode));  
-//                 System.out.println("--queryTest1--> "+queryTest1);
-//  System.out.println("--queryTest1--> "+queryTest1);
-  String queryTest2 = app.getCodeName("select max(trans_id)  from am_raisentry_TRANSACTION where asset_code=?",Integer.toString(assetCode));
-//check is record in am_raisentry_TRANSACTION   
-
-/*  Before legendPlus Upgrade 28/09/2018
-  String query2 =app.getCodeName("select asset_code from am_asset_improvement where asset_id = '"+assetID+"' and month(revalue_date) = '"+Month+"' and year(revalue_date) = '"+Year+"' and approval_status = 'PENDING' ");
-  String query3 =app.getCodeName("select asset_code from am_asset_revaluation where asset_id = '"+assetID+"' and month(revalue_date) = '"+Month+"' and year(revalue_date) = '"+Year+"'");
-  //String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and DISPOSAL_PERCENT = 100  and DISPOSAL_STATUS ='PD'");
-  String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and month(disposal_date) = '"+Month+"' and year(disposal_date) = '"+Year+"'");
- String query5 =app.getCodeName("select count(*) from am_raisentry_post where asset_code = '"+assetCode+"'  and entryPostFlag = 'N' ");
- String query6 =app.getCodeName("select asset_code from am_AcceleratedDepreciation where asset_id = '"+assetID+"' and month(Accelerated_Date) = '"+Month+"' and year(Accelerated_Date) = '"+Year+"'");
-*/
-  String query2 =app.getCodeName("select asset_code from am_asset_improvement where asset_id = ? and approval_status = 'PENDING' ",assetID);
-  if(query2.equals(""))query2 = "0";
-  String query3 =app.getCodeName("select asset_code from am_asset_revaluation where asset_id = ? ",assetID);
-  //String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and DISPOSAL_PERCENT = 100  and DISPOSAL_STATUS ='PD'");
-  String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = ? and DISPOSAL_PERCENT = 100 AND disposal_status != 'R' ",assetID);
- String query5 =app.getCodeName("select count(*) from am_raisentry_post where asset_code = ?  and entryPostFlag = 'N' ",Integer.toString(assetCode));
- String query6 =app.getCodeName("select asset_code from am_AcceleratedDepreciation where asset_id = ? and ACCELERATED_STATUS = 'N' ",assetID);
-// System.out.println("--query2--> "+query2+"  ---query3---> "+query3+"   ---query4-->  "+query4+"  ---query5-->  "+query5+"  ---query6--> "+query6);
-  // For Revaluation Option if(query2.equalsIgnoreCase("") && query3.equalsIgnoreCase("") && query4.equalsIgnoreCase("") && query5.equalsIgnoreCase("0")){process_status="";}else {process_status="D";}
-  if(query2.equalsIgnoreCase("0") && query3.equalsIgnoreCase("") && query4.equalsIgnoreCase("") && query6.equalsIgnoreCase("")){process_status="";}else {process_status="D";}  
-//  if(query3.equalsIgnoreCase("")){process_status="";}else {process_status="D";}
-//  System.out.println("--queryTest1--> "+queryTest1+"  ---queryTest2---> "+queryTest2);  
-  if(queryTest1.equalsIgnoreCase(queryTest2) && !queryTest1.equalsIgnoreCase("") && !queryTest2.equalsIgnoreCase("")){
-      //check if posted succceffuly on am_raisentry_TRANSACTION
-String queryTest3 = app.getCodeName("select iso  from am_raisentry_TRANSACTION where asset_code=? and trans_id=? ",Integer.toString(assetCode),queryTest1);
-//  System.out.println("--queryTest2--> "+queryTest2+"  ---queryTest3---> "+queryTest3);    
-if(process_status.equalsIgnoreCase("")){
-if(queryTest3.equalsIgnoreCase("000")){process_status="";}else {process_status="N";}
-}
-//System.out.println("--process_status-1-> "+process_status);
-  }
-       else
-            { 
-             String queryTest4 = app.getCodeName("SELECT process_status from am_asset_approval WHERE process_status='A' and asset_id = ?",assetID);
-             if(queryTest4.equalsIgnoreCase("A"))
-             { 
-                 String queryTest5 = app.getCodeName("select max(trans_id) from am_raisentry_post where  asset_code=",Integer.toString(assetCode));
-//                 System.out.println("--queryTest1--> "+queryTest1);
-                 String queryTest6 = app.getCodeName("select max(trans_id)  from am_raisentry_TRANSACTION where asset_code=",Integer.toString(assetCode));
-//check is record in am_raisentry_TRANSACTION
-//     System.out.println("--queryTest2--> "+queryTest2);
-//                  System.out.println("--queryTest5--> "+queryTest5+"--queryTest6--> "+queryTest6);
-                 if(queryTest5.equalsIgnoreCase(queryTest6) && !queryTest5.equalsIgnoreCase("") && !queryTest6.equalsIgnoreCase(""))
-                 {
-      //check if posted succceffuly on am_raisentry_TRANSACTION
-                 String queryTest7 = app.getCodeName("select iso  from am_raisentry_TRANSACTION where asset_code=? and trans_id=? "+assetCode,queryTest5);
-//  System.out.println("--queryTest7--> "+queryTest7);
-                 if(process_status.equalsIgnoreCase("")){
-                 if(queryTest7.equalsIgnoreCase("000")){process_status="";}else {process_status="N";}
-                 }
-                 }//else {process_status="N";}
-             }
-//             System.out.println("--process_status-2-> "+process_status);
-            }
-           //  String   process =  app.getCodeName(postFlagQuery);
- //      System.out.println(" >>>>> process_status main......>>" +process_status);
-            }
-      
-
-        } catch (Exception e) {
-            System.out.println(
-                    "AssetManager: checkAssetAvalability(String assetID):INFO:->" +
-                    e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
         }
-            return process_status;
-    }//
 
- public String checkAssetAvalability(String assetID,String tranType){
- //    System.out.println("\nttttttttttttttt");
-ApprovalRecords app = new ApprovalRecords();
-    String query = " SELECT transaction_id from am_asset_approval " +
-                       " WHERE process_status='P' and asset_id = '"+assetID+"' and tran_type = '"+tranType+"'";
-	df = new com.magbel.util.DatetimeFormat();
-
-String transactionId ="";
-String process_status ="";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        String Datefld = df.formatDate(new java.util.Date());
-      //  System.out.println("====Datefld== "+Datefld);
-        String Month = Datefld.substring(3, 5);
-        String Year = Datefld.substring(6, 10);
-    //    System.out.println("====Month== "+Month);
-    //    System.out.println("====Year== "+Year);  
-//        System.out.println("====query== "+query);  
-              try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
-
-            while (rs.next()) { 
-               transactionId = rs.getString("transaction_id");
-//               String AssetId = rs.getString("ASSET_ID");
-//                System.out.println("\n>>>>> trans id " + transactionId+"   AssetId: "+AssetId);
- //               System.out.println("\n>>>>> trans id " + transactionId);
-               process_status =   transactionId;
+        // Step 2: If no approval, continue checks
+        if (transactionId.isEmpty()) {
+            String assetCodeStr = app.getCodeName("SELECT asset_code FROM am_asset WHERE asset_id = ?", assetID);
+            if (assetCodeStr == null || assetCodeStr.isEmpty()) {
+                return ""; // asset not found
             }
-// System.out.println(" >>>transactionId>>>  "+transactionId );
- 
-            if(transactionId.equalsIgnoreCase("")){
- //System.out.println("\n >>>>>> here " );
-           // String query1 = " SELECT transaction_id from am_asset_approval " +
-             //          " WHERE process_status='A' and asset_id = '"+assetID+"'";
-               //-- int tranId = Integer.parseInt(app.getCodeName(query1));
- String query1 = " SELECT asset_code from am_asset WHERE asset_id = ?";
- String asset_Code = app.getCodeName(query1,assetID);
- System.out.println("--asset_Code in checkAssetAvalability--> "+asset_Code);
-              int assetCode = Integer.parseInt(app.getCodeName(query1,assetID));
-     //     String postFlagQuery="select entryPostFlag from am_raisentry_post where entryPostFlag = 'N' and asset_code="+ assetCode;
-// System.out.println("--assetCode--> "+assetCode);
-  String queryTest1 = app.getCodeName("select max(trans_id) from am_raisentry_post where  asset_code=?",Integer.toString(assetCode));  
-//                 System.out.println("--queryTest1--> "+queryTest1);
-//  System.out.println("--queryTest1--> "+queryTest1);
-  String queryTest2 = app.getCodeName("select max(trans_id)  from am_raisentry_TRANSACTION where asset_code=?",Integer.toString(assetCode));
-//check is record in am_raisentry_TRANSACTION   
+            int assetCode = Integer.parseInt(assetCodeStr);
 
-/*  Before legendPlus Upgrade 28/09/2018
-  String query2 =app.getCodeName("select asset_code from am_asset_improvement where asset_id = '"+assetID+"' and month(revalue_date) = '"+Month+"' and year(revalue_date) = '"+Year+"' and approval_status = 'PENDING' ");
-  String query3 =app.getCodeName("select asset_code from am_asset_revaluation where asset_id = '"+assetID+"' and month(revalue_date) = '"+Month+"' and year(revalue_date) = '"+Year+"'");
-  //String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and DISPOSAL_PERCENT = 100  and DISPOSAL_STATUS ='PD'");
-  String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and month(disposal_date) = '"+Month+"' and year(disposal_date) = '"+Year+"'");
- String query5 =app.getCodeName("select count(*) from am_raisentry_post where asset_code = '"+assetCode+"'  and entryPostFlag = 'N' ");
- String query6 =app.getCodeName("select asset_code from am_AcceleratedDepreciation where asset_id = '"+assetID+"' and month(Accelerated_Date) = '"+Month+"' and year(Accelerated_Date) = '"+Year+"'");
-*/
-  String query2 =app.getCodeName("select asset_code from am_asset_improvement where asset_id = ? and approval_status = 'PENDING' ",assetID);
-  if(query2.equals(""))query2 = "0";
-  String query3 =app.getCodeName("select asset_code from am_asset_revaluation where asset_id = ? ",assetID);
-  //String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and DISPOSAL_PERCENT = 100  and DISPOSAL_STATUS ='PD'");
-  String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = ? and DISPOSAL_PERCENT = 100 AND disposal_status != 'R' ",assetID);
- String query5 =app.getCodeName("select count(*) from am_raisentry_post where asset_code = ?  and entryPostFlag = 'N' ",Integer.toString(assetCode));
- String query6 =app.getCodeName("select asset_code from am_AcceleratedDepreciation where asset_id = ? and ACCELERATED_STATUS = 'N' ",assetID);
-// System.out.println("--query2--> "+query2+"  ---query3---> "+query3+"   ---query4-->  "+query4+"  ---query5-->  "+query5+"  ---query6--> "+query6);
-  // For Revaluation Option if(query2.equalsIgnoreCase("") && query3.equalsIgnoreCase("") && query4.equalsIgnoreCase("") && query5.equalsIgnoreCase("0")){process_status="";}else {process_status="D";}
-  if(query2.equalsIgnoreCase("0") && query3.equalsIgnoreCase("") && query4.equalsIgnoreCase("") && query6.equalsIgnoreCase("")){process_status="";}else {process_status="D";}  
-//  if(query3.equalsIgnoreCase("")){process_status="";}else {process_status="D";}
-//  System.out.println("--queryTest1--> "+queryTest1+"  ---queryTest2---> "+queryTest2);  
-  if(queryTest1.equalsIgnoreCase(queryTest2) && !queryTest1.equalsIgnoreCase("") && !queryTest2.equalsIgnoreCase("")){
-      //check if posted succceffuly on am_raisentry_TRANSACTION
-String queryTest3 = app.getCodeName("select iso  from am_raisentry_TRANSACTION where asset_code=? and trans_id=? ",Integer.toString(assetCode),queryTest1);
-//  System.out.println("--queryTest2--> "+queryTest2+"  ---queryTest3---> "+queryTest3);    
-if(process_status.equalsIgnoreCase("")){
-if(queryTest3.equalsIgnoreCase("000")){process_status="";}else {process_status="N";}
-}
-//System.out.println("--process_status-1-> "+process_status);
-  }
-       else
-            { 
-             String queryTest4 = app.getCodeName("SELECT process_status from am_asset_approval WHERE process_status='A' and asset_id = ? and tran_type = ? ",assetID,tranType);
-             if(queryTest4.equalsIgnoreCase("A"))
-             { 
-                 String queryTest5 = app.getCodeName("select max(trans_id) from am_raisentry_post where  asset_code=",Integer.toString(assetCode));
-//                 System.out.println("--queryTest1--> "+queryTest1);
-                 String queryTest6 = app.getCodeName("select max(trans_id)  from am_raisentry_TRANSACTION where asset_code=",Integer.toString(assetCode));
-//check is record in am_raisentry_TRANSACTION
-//     System.out.println("--queryTest2--> "+queryTest2);
-//                  System.out.println("--queryTest5--> "+queryTest5+"--queryTest6--> "+queryTest6);
-                 if(queryTest5.equalsIgnoreCase(queryTest6) && !queryTest5.equalsIgnoreCase("") && !queryTest6.equalsIgnoreCase(""))
-                 {
-      //check if posted succceffuly on am_raisentry_TRANSACTION
-                 String queryTest7 = app.getCodeName("select iso  from am_raisentry_TRANSACTION where asset_code=? and trans_id=? "+assetCode,queryTest5);
-//  System.out.println("--queryTest7--> "+queryTest7);
-                 if(process_status.equalsIgnoreCase("")){
-                 if(queryTest7.equalsIgnoreCase("000")){process_status="";}else {process_status="N";}
-                 }
-                 }//else {process_status="N";}
-             }
-//             System.out.println("--process_status-2-> "+process_status);
-            }
-           //  String   process =  app.getCodeName(postFlagQuery);
- //      System.out.println(" >>>>> process_status main......>>" +process_status);
-            }
-      
+            // Related checks
+            String improvement = app.getCodeName(
+                "SELECT asset_code FROM am_asset_improvement WHERE asset_id = ? AND approval_status = 'PENDING'", assetID);
+            String revaluation = app.getCodeName(
+                "SELECT asset_code FROM am_asset_revaluation WHERE asset_id = ?", assetID);
+            String disposal = app.getCodeName(
+                "SELECT asset_code FROM am_AssetDisposal WHERE asset_id = ? AND DISPOSAL_PERCENT = 100 AND disposal_status != 'R'", assetID);
+            String accelerated = app.getCodeName(
+                "SELECT asset_code FROM am_AcceleratedDepreciation WHERE asset_id = ? AND ACCELERATED_STATUS = 'N'", assetID);
 
-        } catch (Exception e) {
-            System.out.println(
-                    "AssetManager: checkAssetAvalability(String assetID):INFO:->" +
-                    e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
+            if ((improvement == null || improvement.equals("0")) &&
+                (revaluation == null || revaluation.isEmpty()) &&
+                (disposal == null || disposal.isEmpty()) &&
+                (accelerated == null || accelerated.isEmpty())) {
+                processStatus = "";
+            } else {
+                processStatus = "D"; // something pending
+            }
+
+            // Check raisentry sync
+            String maxPost = app.getCodeName("SELECT MAX(trans_id) FROM am_raisentry_post WHERE asset_code=?", Integer.toString(assetCode));
+            String maxTran = app.getCodeName("SELECT MAX(trans_id) FROM am_raisentry_transaction WHERE asset_code=?", Integer.toString(assetCode));
+
+            if (!maxPost.isEmpty() && maxPost.equals(maxTran)) {
+                String iso = app.getCodeName("SELECT iso FROM am_raisentry_transaction WHERE asset_code=? AND trans_id=?", Integer.toString(assetCode), maxPost);
+                if (processStatus.isEmpty() && !"000".equalsIgnoreCase(iso)) {
+                    processStatus = "N";
+                }
+            } else {
+                // check if approval is already completed
+                String approved = app.getCodeName("SELECT process_status FROM am_asset_approval WHERE process_status='A' AND asset_id = ?", assetID);
+                if ("A".equalsIgnoreCase(approved)) {
+                    String postMax = app.getCodeName("SELECT MAX(trans_id) FROM am_raisentry_post WHERE asset_code=?", Integer.toString(assetCode));
+                    String tranMax = app.getCodeName("SELECT MAX(trans_id) FROM am_raisentry_transaction WHERE asset_code=?", Integer.toString(assetCode));
+
+                    if (!postMax.isEmpty() && postMax.equals(tranMax)) {
+                        String iso = app.getCodeName("SELECT iso FROM am_raisentry_transaction WHERE asset_code=? AND trans_id=?", Integer.toString(assetCode), postMax);
+                        if (processStatus.isEmpty() && !"000".equalsIgnoreCase(iso)) {
+                            processStatus = "N";
+                        }
+                    }
+                }
+            }
         }
-            return process_status;
-    }//
+    } catch (Exception e) {
+        System.err.println("AssetManager: checkAssetAvailability error -> " + e.getMessage());
+    }
+
+    return processStatus;
+}
+
+
+
+// public String checkAssetAvalability(String assetID,String tranType){
+// //    System.out.println("\nttttttttttttttt");
+//ApprovalRecords app = new ApprovalRecords();
+//    String query = " SELECT transaction_id from am_asset_approval " +
+//                       " WHERE (process_status='P' OR  process_status='WA') and asset_id = '"+assetID+"' and tran_type = '"+tranType+"'";
+//	df = new com.magbel.util.DatetimeFormat();
+//
+//String transactionId ="";
+//String process_status ="";
+//        Connection con = null;
+//        PreparedStatement ps = null;
+//        ResultSet rs = null;
+//        String Datefld = df.formatDate(new java.util.Date());
+//      //  System.out.println("====Datefld== "+Datefld);
+//        String Month = Datefld.substring(3, 5);
+//        String Year = Datefld.substring(6, 10);
+//    //    System.out.println("====Month== "+Month);
+//    //    System.out.println("====Year== "+Year);  
+////        System.out.println("====query== "+query);  
+//              try {
+//            con = getConnection("legendPlus");
+//            ps = con.prepareStatement(query);
+//            rs = ps.executeQuery();
+//
+//            while (rs.next()) { 
+//               transactionId = rs.getString("transaction_id");
+////               String AssetId = rs.getString("ASSET_ID");
+////                System.out.println("\n>>>>> trans id " + transactionId+"   AssetId: "+AssetId);
+// //               System.out.println("\n>>>>> trans id " + transactionId);
+//               process_status =   transactionId;
+//            }
+//// System.out.println(" >>>transactionId>>>  "+transactionId );
+// 
+//            if(transactionId.equalsIgnoreCase("")){
+// //System.out.println("\n >>>>>> here " );
+//           // String query1 = " SELECT transaction_id from am_asset_approval " +
+//             //          " WHERE process_status='A' and asset_id = '"+assetID+"'";
+//               //-- int tranId = Integer.parseInt(app.getCodeName(query1));
+// String query1 = " SELECT asset_code from am_asset WHERE asset_id = ?";
+// String asset_Code = app.getCodeName(query1,assetID);
+// System.out.println("--asset_Code in checkAssetAvalability--> "+asset_Code);
+//              int assetCode = Integer.parseInt(app.getCodeName(query1,assetID));
+//     //     String postFlagQuery="select entryPostFlag from am_raisentry_post where entryPostFlag = 'N' and asset_code="+ assetCode;
+//// System.out.println("--assetCode--> "+assetCode);
+//  String queryTest1 = app.getCodeName("select max(trans_id) from am_raisentry_post where  asset_code=?",Integer.toString(assetCode));  
+////                 System.out.println("--queryTest1--> "+queryTest1);
+////  System.out.println("--queryTest1--> "+queryTest1);
+//  String queryTest2 = app.getCodeName("select max(trans_id)  from am_raisentry_TRANSACTION where asset_code=?",Integer.toString(assetCode));
+////check is record in am_raisentry_TRANSACTION   
+//
+///*  Before legendPlus Upgrade 28/09/2018
+//  String query2 =app.getCodeName("select asset_code from am_asset_improvement where asset_id = '"+assetID+"' and month(revalue_date) = '"+Month+"' and year(revalue_date) = '"+Year+"' and approval_status = 'PENDING' ");
+//  String query3 =app.getCodeName("select asset_code from am_asset_revaluation where asset_id = '"+assetID+"' and month(revalue_date) = '"+Month+"' and year(revalue_date) = '"+Year+"'");
+//  //String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and DISPOSAL_PERCENT = 100  and DISPOSAL_STATUS ='PD'");
+//  String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and month(disposal_date) = '"+Month+"' and year(disposal_date) = '"+Year+"'");
+// String query5 =app.getCodeName("select count(*) from am_raisentry_post where asset_code = '"+assetCode+"'  and entryPostFlag = 'N' ");
+// String query6 =app.getCodeName("select asset_code from am_AcceleratedDepreciation where asset_id = '"+assetID+"' and month(Accelerated_Date) = '"+Month+"' and year(Accelerated_Date) = '"+Year+"'");
+//*/
+//  String query2 =app.getCodeName("select asset_code from am_asset_improvement where asset_id = ? and approval_status = 'PENDING' ",assetID);
+//  if(query2.equals(""))query2 = "0";
+//  String query3 =app.getCodeName("select asset_code from am_asset_revaluation where asset_id = ? ",assetID);
+//  //String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = '"+assetID+"' and DISPOSAL_PERCENT = 100  and DISPOSAL_STATUS ='PD'");
+//  String query4 =app.getCodeName("select asset_code from am_AssetDisposal where asset_id = ? and DISPOSAL_PERCENT = 100 AND disposal_status != 'R' ",assetID);
+// String query5 =app.getCodeName("select count(*) from am_raisentry_post where asset_code = ?  and entryPostFlag = 'N' ",Integer.toString(assetCode));
+// String query6 =app.getCodeName("select asset_code from am_AcceleratedDepreciation where asset_id = ? and ACCELERATED_STATUS = 'N' ",assetID);
+//// System.out.println("--query2--> "+query2+"  ---query3---> "+query3+"   ---query4-->  "+query4+"  ---query5-->  "+query5+"  ---query6--> "+query6);
+//  // For Revaluation Option if(query2.equalsIgnoreCase("") && query3.equalsIgnoreCase("") && query4.equalsIgnoreCase("") && query5.equalsIgnoreCase("0")){process_status="";}else {process_status="D";}
+//  if(query2.equalsIgnoreCase("0") && query3.equalsIgnoreCase("") && query4.equalsIgnoreCase("") && query6.equalsIgnoreCase("")){process_status="";}else {process_status="D";}  
+////  if(query3.equalsIgnoreCase("")){process_status="";}else {process_status="D";}
+////  System.out.println("--queryTest1--> "+queryTest1+"  ---queryTest2---> "+queryTest2);  
+//  if(queryTest1.equalsIgnoreCase(queryTest2) && !queryTest1.equalsIgnoreCase("") && !queryTest2.equalsIgnoreCase("")){
+//      //check if posted succceffuly on am_raisentry_TRANSACTION
+//String queryTest3 = app.getCodeName("select iso  from am_raisentry_TRANSACTION where asset_code=? and trans_id=? ",Integer.toString(assetCode),queryTest1);
+////  System.out.println("--queryTest2--> "+queryTest2+"  ---queryTest3---> "+queryTest3);    
+//if(process_status.equalsIgnoreCase("")){
+//if(queryTest3.equalsIgnoreCase("000")){process_status="";}else {process_status="N";}
+//}
+////System.out.println("--process_status-1-> "+process_status);
+//  }
+//       else
+//            { 
+//             String queryTest4 = app.getCodeName("SELECT process_status from am_asset_approval WHERE process_status='A' and asset_id = ? and tran_type = ? ",assetID,tranType);
+//             if(queryTest4.equalsIgnoreCase("A"))
+//             { 
+//                 String queryTest5 = app.getCodeName("select max(trans_id) from am_raisentry_post where  asset_code=",Integer.toString(assetCode));
+////                 System.out.println("--queryTest1--> "+queryTest1);
+//                 String queryTest6 = app.getCodeName("select max(trans_id)  from am_raisentry_TRANSACTION where asset_code=",Integer.toString(assetCode));
+////check is record in am_raisentry_TRANSACTION
+////     System.out.println("--queryTest2--> "+queryTest2);
+////                  System.out.println("--queryTest5--> "+queryTest5+"--queryTest6--> "+queryTest6);
+//                 if(queryTest5.equalsIgnoreCase(queryTest6) && !queryTest5.equalsIgnoreCase("") && !queryTest6.equalsIgnoreCase(""))
+//                 {
+//      //check if posted succceffuly on am_raisentry_TRANSACTION
+//                 String queryTest7 = app.getCodeName("select iso  from am_raisentry_TRANSACTION where asset_code=? and trans_id=? "+assetCode,queryTest5);
+////  System.out.println("--queryTest7--> "+queryTest7);
+//                 if(process_status.equalsIgnoreCase("")){
+//                 if(queryTest7.equalsIgnoreCase("000")){process_status="";}else {process_status="N";}
+//                 }
+//                 }//else {process_status="N";}
+//             }
+////             System.out.println("--process_status-2-> "+process_status);
+//            }
+//           //  String   process =  app.getCodeName(postFlagQuery);
+// //      System.out.println(" >>>>> process_status main......>>" +process_status);
+//            }
+//      
+//
+//        } catch (Exception e) {
+//            System.out.println(
+//                    "AssetManager: checkAssetAvalability(String assetID):INFO:->" +
+//                    e.getMessage());
+//        } finally {
+//            closeConnection(con, ps, rs);
+//        }
+//            return process_status;
+//    }//
+
+
+public String checkAssetAvalability(String assetID, String tranType) {
+    ApprovalRecords app = new ApprovalRecords();
+    String processStatus = "";
+    String transactionId = "";
+
+    try (Connection con = getConnection("legendPlus")) {
+        // Step 1: Check if there is a pending approval
+        String sql = "SELECT transaction_id FROM am_asset_approval " +
+                     "WHERE (process_status IN ('P', 'WA')) AND asset_id = ? AND tran_type = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, assetID);
+            ps.setString(2, tranType);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    transactionId = rs.getString("transaction_id");
+                    processStatus = transactionId; // reuse original behavior
+                }
+            }
+        }
+
+        // Step 2: If no pending approval, check related transactions
+        if (transactionId.isEmpty()) {
+            // Get asset code
+            String queryAssetCode = "SELECT asset_code FROM am_asset WHERE asset_id = ?";
+            String assetCodeStr = app.getCodeName(queryAssetCode, assetID);
+            if (assetCodeStr == null || assetCodeStr.isEmpty()) {
+                return ""; // asset not found
+            }
+            int assetCode = Integer.parseInt(assetCodeStr);
+
+            // Run related checks
+            String query2 = app.getCodeName(
+                "SELECT asset_code FROM am_asset_improvement WHERE asset_id = ? AND approval_status = 'PENDING'", 
+                assetID
+            );
+            String query3 = app.getCodeName(
+                "SELECT asset_code FROM am_asset_revaluation WHERE asset_id = ?", 
+                assetID
+            );
+            String query4 = app.getCodeName(
+                "SELECT asset_code FROM am_AssetDisposal WHERE asset_id = ? AND DISPOSAL_PERCENT = 100 AND disposal_status != 'R'", 
+                assetID
+            );
+            String query6 = app.getCodeName(
+                "SELECT asset_code FROM am_AcceleratedDepreciation WHERE asset_id = ? AND ACCELERATED_STATUS = 'N'", 
+                assetID
+            );
+
+            if ((query2 == null || query2.equals("0")) &&
+                (query3 == null || query3.isEmpty()) &&
+                (query4 == null || query4.isEmpty()) &&
+                (query6 == null || query6.isEmpty())) {
+                processStatus = "";
+            } else {
+                processStatus = "D"; // Something is pending/disposal/etc
+            }
+
+            // Check if transactions are in sync
+            String maxPost = app.getCodeName("SELECT MAX(trans_id) FROM am_raisentry_post WHERE asset_code=?", Integer.toString(assetCode));
+            String maxTran = app.getCodeName("SELECT MAX(trans_id) FROM am_raisentry_transaction WHERE asset_code=?", Integer.toString(assetCode));
+
+            if (!maxPost.isEmpty() && maxPost.equals(maxTran)) {
+                String iso = app.getCodeName("SELECT iso FROM am_raisentry_transaction WHERE asset_code=? AND trans_id=?", Integer.toString(assetCode), maxPost);
+                if (processStatus.isEmpty() && !"000".equalsIgnoreCase(iso)) {
+                    processStatus = "N"; // Not successfully posted
+                }
+            }
+        }
+    } catch (Exception e) {
+        System.err.println("AssetManager: checkAssetAvailability error -> " + e.getMessage());
+    }
+
+    return processStatus;
+}
+
+
+
+
 
  public Transfer getWIPReclassificationAsset3(String asset_code)
  {
@@ -9825,7 +10179,7 @@ if(queryTest3.equalsIgnoreCase("000")){process_status="";}else {process_status="
 }
  public String[] getReclassedOldAssetID3(String asset_code) {
 
-     String[] result = new String[4];
+     String[] result = new String[5];
      //String old_asset_id="";
 
      Connection con = null;
@@ -9836,15 +10190,11 @@ if(queryTest3.equalsIgnoreCase("000")){process_status="";}else {process_status="
 
 
      try {
-        String query = "select old_category_id, reclassify_reason,old_depr_rate,recalc_depr from am_assetReclassification where asset_code ='"+asset_code+"'";
+        String query = "select old_category_id, reclassify_reason,old_depr_rate,recalc_depr,Asset_id from am_assetReclassification where asset_code ='"+asset_code+"'";
 //         System.out.println("the query for getReclassedOldAssetID3 @@@@@@@@@@@@@@@@@@@ " + query);
          con = getConnection("legendPlus");
          ps = con.prepareStatement(query);
          rs = ps.executeQuery();
-
-
-
-
 
         // rs = ps.executeQuery(query);
 
@@ -9854,6 +10204,7 @@ if(queryTest3.equalsIgnoreCase("000")){process_status="";}else {process_status="
              result[1] = rs.getString("reclassify_reason");
              result[2] = Double.toString(rs.getDouble("old_depr_rate"));
              result[3] = rs.getString("recalc_depr");
+             result[4] = rs.getString("Asset_id");
              //result[3] = rs.getString("asset_user");
 
          }
@@ -10438,7 +10789,7 @@ return i;
 
     }
 
- public void processImprovement(String assetId, double CalcCost,double CalcNBV, double Calcvatable, double CalcVatAmt, double CalcWhtAmt, int usefullife, double cost, double vatableCost, String nbvresidual, int tranIdInt)
+ public void processImprovement(String assetId, double CalcCost,double CalcNBV, double Calcvatable, double CalcVatAmt, double CalcWhtAmt, int usefullife, double cost, double vatableCost, String nbvresidual, Long tranIdInt)
  {
 	        String query1= "update am_asset set Cost_Price = "+CalcCost+", Monthly_Dep = 0.00, NBV = "+CalcNBV+", TOTAL_NBV = "+CalcNBV+", Vatable_Cost = "+Calcvatable+", VAT = "+CalcVatAmt+", Wh_Tax_Amount = "+CalcWhtAmt+" where asset_id ='"+assetId+"'";
 

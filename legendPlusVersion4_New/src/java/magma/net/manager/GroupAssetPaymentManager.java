@@ -385,7 +385,7 @@ public class GroupAssetPaymentManager extends MagmaDBConnection {
 
 		String UPDATE_QUERY2 = "UPDATE  AM_GROUP_ASSET_MAIN "
 				+ " SET QUANTITY = QUANTITY-1, Cost_Price=(Cost_Price-Cost_Price/QUANTITY)," +
-						"Vatable_Cost=(Vatable_Cost-Vatable_Cost/QUANTITY) WHERE GROUP_ID=? ";
+						"Vatable_Cost=(Vatable_Cost-Vatable_Cost/QUANTITY) WHERE CONVERT(VARCHAR,GROUP_ID)=? ";
 
 		String UPDATE_QUERY3 = "DELETE FROM AM_ASSET "
 			+ "  WHERE ASSET_ID=? ";
@@ -1201,7 +1201,8 @@ public ArrayList<GroupAssets> findGroupMainAssetByQueryBranch(String queryFilter
 
 		String UPDATE_QUERY = "DELETE FROM AM_GROUP_IMPROVEMENT "
 				+ "  WHERE ASSET_ID=? AND REVALUE_ID=? ";
-		String DELETE_LOG_QUERY = "DELETE FROM am_uploadCheckErrorLog ";
+//		String DELETE_LOG_QUERY = "DELETE FROM am_uploadCheckErrorLog ";
+		String UPDATE_QUERY4 = "DELETE FROM AM_INVOICE_NO WHERE ASSET_ID=?";
 		Connection con = null;
 		PreparedStatement ps = null;
 		PreparedStatement ps1 = null;
@@ -1214,14 +1215,18 @@ public ArrayList<GroupAssets> findGroupMainAssetByQueryBranch(String queryFilter
 			ps.setString(2, groupid);
 			done = (ps.executeUpdate() != -1);
 			
-			ps1 = con.prepareStatement(DELETE_LOG_QUERY);
-			done = (ps1.executeUpdate() != -1);
+//			ps1 = con.prepareStatement(DELETE_LOG_QUERY);
+//			done = (ps1.executeUpdate() != -1);
+			
+			ps1 = con.prepareStatement(UPDATE_QUERY4);
+			ps1.setString(1, groupid);
+			done = (ps1.executeUpdate() != -1);			
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
 			closeConnection(con, ps);
-			closeConnection(con, ps1);
+//			closeConnection(con, ps1);
 		}
 		return done;
 	}

@@ -42,8 +42,8 @@ import audit.*;
  * @author not attributable
  * @version 1.0
  */
-public class CategoryAuditApprovalServlet extends HttpServlet {
-	public CategoryAuditApprovalServlet() {
+public class CategoryAuditApprovalServlet_17_11_2025 extends HttpServlet {
+	public CategoryAuditApprovalServlet_17_11_2025() {
 	}
 
 	/**
@@ -179,9 +179,13 @@ public class CategoryAuditApprovalServlet extends HttpServlet {
         String astatus = request.getParameter("astatus");
 		String rr = request.getParameter("reject_reason");
 		String recId = request.getParameter("recId");
+		
+		 int noOfImprovementMnths = Integer.parseInt(request.getParameter("noOfImprvMnth")); 
+		 System.out.println("---------noOfImprovementMnths-----------> "+noOfImprovementMnths);
 		int tranId = Integer.parseInt(request.getParameter("tranId"));
 		 int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(request.getParameter("assetCode"));
-		String initiatorId = aprecords.getCodeName("select userId from am_gb_UserTmp where TMPID=?",recId);
+		String initiatorId = aprecords.getCodeName("select TMPID from am_ad_categoryTmp where TMPID=?",recId);
+		System.out.println("---------initiatorId-----------> "+initiatorId);
 		recaldep = aprecords.getCodeName("select recaldep from am_ad_categoryTmp where TMPID=?",recId);
 		upexassets = aprecords.getCodeName("select upexassets from am_ad_categoryTmp where TMPID=?",recId);
 		System.out.println("---------recaldep-----------> "+recaldep+"   -----upexassets----> "+upexassets);
@@ -211,6 +215,7 @@ public class CategoryAuditApprovalServlet extends HttpServlet {
 		cat.setCurrencyId(currencyId);
                 cat.setEnforceBarcode(enforceBarcode);
                 cat.setCategoryType(categoryType);
+                cat.setNoOfImproveMnth(noOfImprovementMnths);
 
                 String computerName = null;
                 String remoteAddress = request.getRemoteAddr();
@@ -265,7 +270,7 @@ public class CategoryAuditApprovalServlet extends HttpServlet {
 	              System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
 	              if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
 	              if (singleApproval.equalsIgnoreCase("N")) {
-	              arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(Long.parseLong(recId),tableName),"75",Integer.parseInt(assetId),assetCode,userid); 
+	              arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(Long.parseLong(recId),tableName),"75",Long.parseLong(assetId),assetCode,userid); 
 //	              aprecords.updateRaiseEntry(assetId);
 	              }
 	              String oldRate=arb.getCodeName("select dep_rate from am_ad_category WHERE Category_Id = '"+categoryId+"'");
@@ -278,7 +283,7 @@ public class CategoryAuditApprovalServlet extends HttpServlet {
 										+ "'").size() <= 0) {
 							if (admin.createCategory(cat)) {
 //								System.out.println("====createCategory=====");
-		   	   					 String q = "update am_asset_approval set process_status='A', asset_status='User Creation', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
+		   	   					 String q = "update am_asset_approval set process_status='A', asset_status='Category Creation', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
 		   	   					 String r = "update am_ad_categoryTmp set RECORD_TYPE='A', Approval_status='APPROVED' where TMPID=" + recId;
 		   	   					 arb.updateAssetStatusChange(q);
 		   	   					 arb.updateAssetStatusChange(r);
@@ -312,13 +317,15 @@ public class CategoryAuditApprovalServlet extends HttpServlet {
 									+ categoryId + "'");
 					System.out.println("====YES 1=====");
 					boolean isupdt = admin.updateCategory(cat);
-					System.out.println("====updateCategory=====");
+					System.out.println("====updateCategory====="+isupdt);
 					audit.select(2,
 							"SELECT * FROM  AM_AD_CATEGORY  WHERE category_Id = '"
 									+ categoryId + "'");
 					System.out.println("====YES 2=====");
+					System.out.println("====Integer.parseInt(initiatorId)=====" + Integer.parseInt(initiatorId));
 					updtst = audit.logAuditTrail("AM_AD_CATEGORYTMP", branchcode,
 							Integer.parseInt(initiatorId), categoryId,hostName,ipAddress,macAddress);
+					System.out.println("====updtst=====" + updtst);
 					System.out.println("====YES 3=====");
 					System.out.println("====recaldep: "+recaldep+"    upexassets: "+upexassets);
 					recal.updateAsset(categoryId, oldRate, depRate, userId,
@@ -327,7 +334,7 @@ public class CategoryAuditApprovalServlet extends HttpServlet {
 					if (updtst == true) {
 						
 						
-  	   					 String q = "update am_asset_approval set process_status='A', asset_status='User Creation', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
+  	   					 String q = "update am_asset_approval set process_status='A', asset_status='Catgeory Creation', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
   	   					 String r = "update am_ad_categoryTmp set RECORD_TYPE='A', Approval_status='APPROVED' where TMPID=" + recId;
   	   					 arb.updateAssetStatusChange(q);
   	   					 arb.updateAssetStatusChange(r);
@@ -346,7 +353,7 @@ public class CategoryAuditApprovalServlet extends HttpServlet {
 			}
 			System.out.println("====>astatus: "+astatus);
 			if (astatus.equalsIgnoreCase("R")) {
-				 String q = "update am_asset_approval set process_status='R', asset_status='User Creation', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
+				 String q = "update am_asset_approval set process_status='R', asset_status='Catgeory Creation', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
 				 String r = "update am_ad_categoryTmp set RECORD_TYPE='R', Approval_status='REJECTED' where TMPID=" + recId;
 				 arb.updateAssetStatusChange(q);
 				 arb.updateAssetStatusChange(r);

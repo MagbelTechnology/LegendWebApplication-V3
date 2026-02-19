@@ -82,6 +82,13 @@ public class DepreciationBulkPosting extends HttpServlet
 		mail= new EmailSmsServiceBus();
         records = new ApprovalRecords();  
 		Properties prop = new Properties();
+		AssetRecordsBean ad;
+		try {
+			ad = new AssetRecordsBean();
+		} catch (Exception e) {
+			
+			e.getMessage();
+		}
 		File file = new File("C:\\Property\\LegendPlus.properties");
 		FileInputStream input = new FileInputStream(file);
 		prop.load(input);
@@ -575,12 +582,14 @@ public class DepreciationBulkPosting extends HttpServlet
 		      System.out.println("<<<<uploadResponse: " + uploadResponse);
 		     
 		      if(uploadResponse == true) {
-		    	  records.getCodeName("update AM_GB_BATCH_POSTING set Legacy_status='Y' where GROUP_ID = '"+processingDate+"'");
+		    	  ad.updateAssetStatusChange("update AM_GB_BATCH_POSTING set Legacy_status='Y' where GROUP_ID =?",processingDate);
+		    	 // records.getCodeName("update AM_GB_BATCH_POSTING set Legacy_status='Y' where GROUP_ID = '"+processingDate+"'");
 		    	  out.println("<script type='text/javascript'>alert('Successfully dropped for execution');</script>");
 		          out.println((new StringBuilder("<script> window.location ='DocumentHelp.jsp?np=legacyExporter&s=n'</script>"))); 
 		          
 		      }else {
-		    	  records.getCodeName("delete from AM_GB_BATCH_POSTING where GROUP_ID = '"+processingDate+"'");
+		    	  ad.updateAssetStatusChange("delete from AM_GB_BATCH_POSTING where GROUP_ID=?",processingDate);
+		    	  //records.getCodeName("delete from AM_GB_BATCH_POSTING where GROUP_ID = '"+processingDate+"'");
 		    	  out.println("<script type='text/javascript'>alert('File could not be dropped for execution')</script>");
 		          out.println((new StringBuilder("<script> window.location ='DocumentHelp.jsp?np=legacyExporter&s=n'</script>"))); 
 		      }

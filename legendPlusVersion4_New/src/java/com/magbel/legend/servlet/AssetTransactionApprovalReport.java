@@ -38,7 +38,8 @@ public class AssetTransactionApprovalReport extends HttpServlet
 	mail= new EmailSmsServiceBus();
 	records = new ApprovalRecords();
 //    String branch_Code = request.getParameter("initiatorSOLID");
-    String branch_Id = request.getParameter("branch");
+   
+	String branch_Id = request.getParameter("branch");
     String FromDate = request.getParameter("FromDate");
     String ToDate = request.getParameter("ToDate");
     if(!FromDate.equals("")){
@@ -74,6 +75,7 @@ public class AssetTransactionApprovalReport extends HttpServlet
 //    String userName = request.getParameter("userName");
     String fileName = "";
     if(report.equalsIgnoreCase("rptMenuATAR")){fileName = branchCode+"By"+userName+"AssetTransactionApprovalReport.xlsx";}
+    
 //    System.out.println("<<<<<<fileName: "+fileName);
     String filePath = System.getProperty("user.home")+"\\Downloads";
 //    System.out.println("<<<<<<filePath: "+filePath);

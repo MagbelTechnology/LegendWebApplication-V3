@@ -206,7 +206,7 @@ public class AssetExcelUploadManager extends MagmaDBConnection
         
         String currentdate = approve.getCodeName("SELECT GETDATE()");
         currentdate = currentdate.substring(0, 10);
-        System.out.println("<<<<<<<currentdate: "+currentdate);
+//        System.out.println("<<<<<<<currentdate: "+currentdate);
 //        String deleterecord = approve.getCodeName("DELETE FROM am_uploadCheckErrorLog WHERE TRANSACTION_TYPE = 'Asset Creation'");
         try
         {
@@ -220,37 +220,38 @@ public class AssetExcelUploadManager extends MagmaDBConnection
             sub_category_code = cell[5].getContents();
             sbu_code = cell[6].getContents();
             description = cell[7].getContents();
-            vatable_cost = cell[8].getContents();      
-            other_cost = cell[9].getContents();  
-            date_of_purchase = cell[10].getContents();        
-            depreciation_start_date = cell[11].getContents();  
-            wh_tax = cell[12].getContents();    
-            wh_taxPercent = cell[13].getContents();  
-            subject_to_vat = cell[14].getContents();  
-            vatPercent = cell[15].getContents();  
-            require_depreciation = cell[16].getContents();         
-            registration_no = cell[17].getContents();    
-            serial_no = cell[18].getContents();      
-            lpo_no = cell[19].getContents();         
-            bar_code = cell[20].getContents();
-            invoice_No = cell[21].getContents();
-            Vendor_Account = cell[22].getContents();
-            asset_user = cell[23].getContents();
-            spare1 = cell[24].getContents();
-            spare2 = cell[25].getContents();
-            spare3 = cell[26].getContents();
-            spare4 = cell[27].getContents();
-            spare5 = cell[28].getContents();
-            spare6 = cell[29].getContents();
-            model = cell[30].getContents();
-            make = cell[31].getContents();
-            vendor = cell[32].getContents();
-            assetMaintainBy = cell[33].getContents();
-            purchaseReason = cell[34].getContents();
-            location = cell[35].getContents();
-            projectCode = cell[36].getContents();
-            regionCode = cell[37].getContents();
-            zoneCode = cell[38].getContents();
+            vatable_cost = cell[8].getContents();  
+            transport_cost = cell[9].getContents();
+            other_cost = cell[10].getContents();  
+            date_of_purchase = cell[11].getContents();        
+            depreciation_start_date = cell[12].getContents();  
+            wh_tax = cell[13].getContents();    
+            wh_taxPercent = cell[14].getContents();  
+            subject_to_vat = cell[15].getContents();  
+            vatPercent = cell[16].getContents();  
+            require_depreciation = cell[17].getContents();         
+            registration_no = cell[18].getContents();    
+            serial_no = cell[19].getContents();      
+            lpo_no = cell[20].getContents();         
+            bar_code = cell[21].getContents();
+            invoice_No = cell[22].getContents();
+            Vendor_Account = cell[23].getContents();
+            asset_user = cell[24].getContents();
+            spare1 = cell[25].getContents();
+            spare2 = cell[26].getContents();
+            spare3 = cell[27].getContents();
+            spare4 = cell[28].getContents();
+            spare5 = cell[29].getContents();
+            spare6 = cell[30].getContents();
+            model = cell[31].getContents();
+            make = cell[32].getContents();
+            vendor = cell[33].getContents();
+            assetMaintainBy = cell[34].getContents();
+            purchaseReason = cell[35].getContents();
+            location = cell[36].getContents();
+            projectCode = cell[37].getContents();
+            regionCode = cell[38].getContents();
+            zoneCode = cell[39].getContents();
             String CompField = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             char[] chars = Vendor_Account.toCharArray();
             char[] compchars = CompField.toCharArray();
@@ -288,7 +289,7 @@ public class AssetExcelUploadManager extends MagmaDBConnection
                 purchaseReason = cell[18].getContents();
                 location = cell[19].getContents();
                 vendorName = cell[20].getContents();
-                System.out.println("<<<<<<<vendorName: "+vendorName);
+//                System.out.println("<<<<<<<vendorName: "+vendorName);
                 sheetno = sheetno + 1;
             	}        	
         }
@@ -302,7 +303,8 @@ public class AssetExcelUploadManager extends MagmaDBConnection
  //       String budgetBalance = approve.getCodeName(" SELECT BALANCE_ALLOCATION FROM AM_ACQUISITION_BUDGET WHERE CATEGORY_CODE='" +
 //        		category_code + "' AND BRANCH_ID='" + branch_code + "' AND SBU_CODE = '" + sbu_code + "'");
         vendor = approve.getCodeName("select Vendor_Id from am_ad_vendor where account_number = '"+Vendor_Account+"'");
-        System.out.println("<<<<<<<vendor: "+vendor);
+//        System.out.println("<<<<<<<date_of_purchase: "+date_of_purchase);
+//        System.out.println("<<<<<<<vendor: "+vendor);
         assetMaintainBy = vendor;
         String pDay = date_of_purchase.substring(0, 2);
         String pMonth = date_of_purchase.substring(3, 5);
@@ -310,9 +312,9 @@ public class AssetExcelUploadManager extends MagmaDBConnection
         String pDate = pYYYY+"-"+pMonth+"-"+pDay;
         String datedif = approve.getCodeName("SELECT DATEDIFF(day, '"+pDate+"', '"+currentdate+"') AS DateDiff");
        // String vendorNo = approve.getCodeName("select Vendor_ID from am_ad_section where Vendor_Name = '"+vendorName+"'");
-        System.out.println("<<<<<<<invoice_No: "+invoice_No);
+//        System.out.println("<<<<<<<invoice_No: "+invoice_No);
         String invnumb = vendor+'-'+invoice_No;
-        System.out.println("<<<<<<<invnumb: "+invnumb);
+//        System.out.println("<<<<<<<invnumb: "+invnumb);
 //		htmlUtil.insToAm_Invoice_No(group_Id,lpo_no,invnumb,"Asset Creation Upload");
 //        System.out.println("<<<<<<<pDate: "+pDate+"  <<<<<<<datedif: "+datedif);
 //        System.out.println("<<<<<<<status: "+status);
@@ -399,7 +401,7 @@ public class AssetExcelUploadManager extends MagmaDBConnection
 	        errorMessage = errorMessage+" Invoice "+error;
         
 
-   //     System.out.println("<<<<vatable_cost: "+vatable_cost+"  vatrate: "+vatrate);
+//        System.out.println("<<<<vatable_cost: "+vatable_cost+"  vatrate: "+vatrate);
         vat_amount = String.valueOf(Double.parseDouble(vatable_cost)*vatrate);
   //      System.out.println("<<<<vatable_cost====: "+vatable_cost);
         

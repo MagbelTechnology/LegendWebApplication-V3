@@ -57,7 +57,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
     String branch_Id = request.getParameter("branch");
     String report = request.getParameter("report");
     //String branchCode = request.getParameter("BRANCH_CODE");
-//    System.out.println("<<<<<<branch_Id: "+branch_Id+"  report: "+report);
+    System.out.println("<<<<<<branch_Id: "+branch_Id+"  report: "+report);
     String branchCode = "";
     if(!branch_Id.equals("0")){
     	branchCode = records.getCodeName("select BRANCH_CODE from am_ad_branch where BRANCH_ID = ? ",branch_Id);
@@ -100,7 +100,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 	     		+ "FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE "
 	     		+ "INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code "
 	     		+ "LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp "
-	     		+ "WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
+	     		+ "WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
 	     		+ "GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME "
 	     		+ "UNION ALL "
 	     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep, "
@@ -122,7 +122,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 		     		+ "FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE "
 		     		+ "INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code "
 		     		+ "LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp "
-		     		+ "WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
+		     		+ "WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold AND a.CATEGORY_CODE = ? "
 		     		+ "GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME "
 		     		+ "UNION ALL "
 		     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep, "
@@ -144,7 +144,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 		     		+ "FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE "
 		     		+ "INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code "
 		     		+ "LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp "
-		     		+ "WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? "
+		     		+ "WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold AND a.branch_id = ? "
 		     		+ "GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME "
 		     		+ "UNION ALL "
 		     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep, "
@@ -166,7 +166,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 		     		+ "FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE "
 		     		+ "INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code "
 		     		+ "LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp "
-		     		+ "WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) "
+		     		+ "WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold "
 		     		+ "GROUP BY comp.company_name,a.CATEGORY_CODE,c.category_name,a.BRANCH_CODE,b.BRANCH_NAME "
 		     		+ "UNION ALL "
 		     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep, "
@@ -191,7 +191,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 		     		+ " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
 		     		+ " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
 		     		+ " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-		     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
+		     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
 		     		+ " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name"
 		     		+ " UNION ALL "
 		     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
@@ -213,7 +213,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 		     		+ " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
 		     		+ " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
 		     		+ " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-		     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
+		     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold AND a.CATEGORY_CODE = ? "
 		     		+ " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name"
 		     		+ " UNION ALL "
 		     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
@@ -236,7 +236,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 	     		+ " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
 	     		+ " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
 	     		+ " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-	     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01)  "
+	     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold  "
 	     		+ " GROUP BY comp.company_name,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name"
 	     		+ " UNION ALL "
 	     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,'' AS DEPT_CODE,'' AS DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep,"
@@ -261,7 +261,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 		     		+ " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE "
 		     		+ " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code "
 		     		+ " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp "
-		     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
+		     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold AND a.branch_id = ? AND a.CATEGORY_CODE = ? "
 		     		+ " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name "
 		     		+ " UNION ALL "
 		     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,a.DEPT_CODE,e.DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep, "
@@ -283,7 +283,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 	     		+ " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE "
 	     		+ " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code "
 	     		+ " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp "
-	     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
+	     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold AND a.CATEGORY_CODE = ? "
 	     		+ " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name "
 	     		+ " UNION ALL "
 	     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,a.DEPT_CODE,e.DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep, "
@@ -306,7 +306,7 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 		     		+ " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE "
 		     		+ " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code "
 		     		+ " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp "
-		     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
+		     		+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > comp.old_threshhold AND a.CATEGORY_CODE = ? "
 		     		+ " GROUP BY comp.company_name,a.DEPT_CODE,e.DEPT_NAME,a.BRANCH_CODE,b.BRANCH_NAME,a.CATEGORY_CODE,c.category_name "
 		     		+ " UNION ALL "
 		     		+ " SELECT COUNT(*) AS TOTAL,a.BRANCH_CODE,b.BRANCH_NAME,a.DEPT_CODE,e.DEPT_NAME,a.CATEGORY_CODE,c.category_name,SUM(a.Accum_dep) AS Accum_dep, "
@@ -367,8 +367,8 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 			double improvAccumDepr = newassettrans.getImprovaccumDep();
 			double improvCostPrice = newassettrans.getImprovcostPrice();
 			double improvNbv = newassettrans.getImprovnbv();
-			double totalCost = newassettrans.getTotalCost();
-			double totalnbv = newassettrans.getTotalnbv();
+			double totalCost = costprice + improvCostPrice;
+			double totalnbv = nbv + improvNbv;
 			double finaltotalAccum = accumDepr+improvAccumDepr;
 			categoryCode = newassettrans.getCategoryCode();
 
@@ -449,8 +449,8 @@ public class ConsolAssetMgtSummaryCatExport extends HttpServlet
 			double improvAccumDepr = newassettrans.getImprovaccumDep();
 			double improvCostPrice = newassettrans.getImprovcostPrice();
 			double improvNbv = newassettrans.getImprovnbv();
-			double totalCost = newassettrans.getTotalCost();
-			double totalnbv = newassettrans.getTotalnbv();
+			double totalCost = costprice + improvCostPrice;
+			double totalnbv = nbv + improvNbv;
 			double finaltotalAccum = accumDepr+improvAccumDepr;
 			categoryCode = newassettrans.getCategoryCode();
 

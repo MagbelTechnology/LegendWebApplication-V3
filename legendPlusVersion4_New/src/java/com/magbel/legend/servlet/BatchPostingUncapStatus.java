@@ -411,15 +411,7 @@ public class BatchPostingUncapStatus extends HttpServlet
    		String status3 = "";
    		String posttable = "";
    		if(tableName.equals("AM_ASSET_UNCAPITALIZED")){
-   	   	tableName = "AM_ASSET_UNCAPITALIZED";   			
-   		posttable = "am_raisentry_post";
-   		columnName1 = "entryPostFlag";
-   		columnName2 = "GroupIdStatus";
-   		columnName3 = "";
-   		whereFld = "Id";
-   		status1 = "Y";
-   		status2 = "Y";
-   	   	records.updatePostAssetWithBatchId(tableName, posttable, groupid,status1,status2);
+   	   
    			
    		tableName = "AM_ASSET_UNCAPITALIZED";
    		columnName = "Asset_Status";
@@ -431,9 +423,22 @@ public class BatchPostingUncapStatus extends HttpServlet
    		 posttable = "am_asset_approval";
   		 status1 = "A";
   		 status2 = "ACTIVE";
-  		 String page = "ASSET CREATION RAISE ENTRY"; 		 
-   		records.updateAssetApprovalWithBatchId(tableName, posttable, groupid, status1, status2); 		
+  		 String page = "ASSET CREATION RAISE ENTRY"; 
+  		records.updateApprovalWithBatchId(tableName, posttable, groupid, status1, status2);
+  		tableName = "AM_ASSET_UNCAPITALIZED";   			
+   		posttable = "am_raisentry_post";
+   		columnName1 = "entryPostFlag";
+   		columnName2 = "GroupIdStatus";
+   		columnName3 = "";
+   		whereFld = "Id";
+   		status1 = "Y";
+   		status2 = "Y";
+   		String query_r ="update a SET a.entryPostFlag = 'Y',a.GroupIdStatus = 'Y' from " +posttable+ " a, "+tableName+" g where CONVERT(VARCHAR, a.id) = CONVERT(VARCHAR, g.Asset_Id) and entryPostFlag = 'N' and GroupIdStatus = 'N' and POSTING_BATCH = '"+groupid+"' " ;
+   	    ad.updateAssetStatusChange(query_r);	
+   	   	//records.updatePostAssetWithBatchId(tableName, posttable, groupid,status1,status2);
+   		//records.updateAssetApprovalWithBatchId(tableName, posttable, groupid, status1, status2); 		
         boolean done = records.insertRaiseEntryTransaction(groupid,page,userId);
+        
         }
    		if(tableName.equals("AM_GROUP_ASSET_UNCAPITALIZED")){
    	   	   	tableName = "AM_GROUP_ASSET_UNCAPITALIZED";   			
@@ -703,7 +708,13 @@ public class BatchPostingUncapStatus extends HttpServlet
       		 posttable = "am_asset_approval";
       		 status1 = "A";
       		 status2 = "ACTIVE";
-       		records.updateAssetApprovalWithBatchId(tableName, posttable, groupid, status1, status2);      		
+      		 
+      		String query_r = "update a set a.process_status = 'A',Asset_Status = 'ACTIVE' from am_asset_approval a, am_UncapitalizedDisposal g where convert(varchar, a.batch_id) = convert(varchar, g.Disposal_ID) and convert(varchar, g.POSTING_BATCH) = = '"+groupid+"' ";
+            ad.updateAssetStatusChange(query_r);
+
+      		 
+      		//records.updateApprovalWithBatchId(tableName, posttable, groupid, status1, status2);
+       		//records.updateAssetApprovalWithBatchId(tableName, posttable, groupid, status1, status2);      		
       		System.out.println("am_UncapitalizedDisposal 2");
       		tableName = "am_UncapitalizedDisposal";
       		columnName1 = "DISPOSED";
@@ -772,7 +783,8 @@ public class BatchPostingUncapStatus extends HttpServlet
           		tableName = "AM_ASSET_UNCAPITALIZED";
           		posttable = "am_Uncapitalized_improvement";
           		String page = "ASSET IMPROVEMENT RAISE ENTRY";
-          		records.updateImprovementWithBatchId(tableName, posttable, groupid);
+          		records.insertRaiseEntryTransactionforImprovement(groupid,page,userId,posttable);
+          		//records.updateImprovementWithBatchId(tableName, posttable, groupid);
           		System.out.println("am_Uncapitalized_improvement 5");
                boolean done = records.insertRaiseEntryTransactionforImprovement(groupid,page,userId,posttable);
                }               

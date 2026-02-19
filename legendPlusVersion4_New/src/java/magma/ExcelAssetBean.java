@@ -413,9 +413,9 @@ String query = "INSERT INTO AM_GROUP_ASSET(ASSET_ID,REGISTRATION_NO,BRANCH_ID,DE
 "ER_ID], PROVINCE, WAR_START_DATE, WAR_MONTH, WAR_EXPIRY_DATE,BRANCH_CODE,DEPT_CO" +
 "DE,SECTION_CODE,CATEGORY_CODE,GROUP_ID,AMOUNT_PTD,AMOUNT_REM,PART_PAY,FULLY_PAID,DEFER_PAY,LPO,BAR_CODE," +
 "PROCESS_FLAG,POST_FLAG,REQ_REDISTRIBUTION,RAISE_ENTRY,ACCUM_DEP,DEP_YTD,ASSET_STATUS,SBU_CODE,ASSET_CODE," +
-"SUB_CATEGORY_ID,SUB_CATEGORY_CODE,SPARE_3,SPARE_4,SPARE_5,SPARE_6,PROJECT_CODE,REGION_CODE,ZONE_CODE,VENDOR_NAME"+
+"SUB_CATEGORY_ID,SUB_CATEGORY_CODE,SPARE_3,SPARE_4,SPARE_5,SPARE_6,PROJECT_CODE,REGION_CODE,ZONE_CODE,VENDOR_NAME,INVOICE_NO"+
 " )VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"
-+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
++ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 try {   
 	con = getConnection();  
@@ -496,6 +496,7 @@ try {
 	ps.setString(73, regionCode);
 	ps.setString(74, zoneCode);
 	ps.setString(75, vendorName);
+	ps.setString(76, invoice_No);
 //	System.out.println("<<<<<<<createGroupUpload spare1: "+spare_1+"   spare2: "+spare_2+"   Group Id: "+gid);
 done = (ps.executeUpdate() != -1);
 //System.out.println("=====query=====> "+query);

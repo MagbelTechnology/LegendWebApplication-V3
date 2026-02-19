@@ -101,17 +101,17 @@ public class AssetConsChargesReport extends HttpServlet
 
         String categoryCode = request.getParameter("category");
      Report rep = new Report();
-   System.out.println("<<<<<<branch_Id: "+branch_Id+"    categoryCode: "+categoryCode+"  branchCode: "+branchCode);
+   System.out.println("<<<<<<bran ch_Id: "+branch_Id+"    categoryCode: "+categoryCode+"  branchCode: "+branchCode);
      String ColQuery = "";
-     if(branch_Id.equals("0")  && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")){
-    	 System.out.println("======>>>>>>>No Selection: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);	     
+     if(branch_Id.equals("0")  && categoryCode.equals("0")){
+    	 System.out.println("======>>>>>>>Branch and Category Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);	     
 	     ColQuery ="select b.Branch_ID,b.BRANCH_CODE, b.CATEGORY_CODE,a.asset_id,sum(a.monthly_dep)as charge_todate,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
 		     		+ "p.company_name,b.Date_purchased,b.effective_date,b.dep_end_date, "
 		     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No,"
 		     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
 		     		+ "from monthly_depreciation_processing a, am_asset b, am_ad_branch c,am_ad_department d,am_ad_category e,am_gb_company p "
 		     		+ "where a.asset_id = b.asset_id and c.BRANCH_CODE = b.BRANCH_CODE and a.asset_id = b.asset_id and b.CATEGORY_CODE = e.CATEGORY_CODE "
-		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.Cost_Threshold - 0.01)"
+		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.old_threshhold - 0.01) and a.dep_date between ? and ? "
 		     		+ "group by b.Branch_ID,a.asset_id,a.monthly_dep,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
 		     		+ "p.company_name,b.BRANCH_CODE,b.CATEGORY_CODE, "
 		     		+ "b.Date_purchased,b.effective_date,b.dep_end_date, "
@@ -120,35 +120,16 @@ public class AssetConsChargesReport extends HttpServlet
 		     		+ "ORDER BY"
 		     		+ "     b.BRANCH_CODE ASC,"
 		     		+ "     b.CATEGORY_CODE ASC ";       
-	} 
-     if(branch_Id.equals("0")  && categoryCode.equals("0") && !FromDate.equals("") && !ToDate.equals("")){
-    	 System.out.println("======>>>>>>>Date Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);	     
+	}      
+	 if(!branch_Id.equals("0")  && !categoryCode.equals("0")){	   
+	   System.out.println("======>>>>>>>Category Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
 	     ColQuery ="select b.Branch_ID,b.BRANCH_CODE, b.CATEGORY_CODE,a.asset_id,sum(a.monthly_dep)as charge_todate,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
 		     		+ "p.company_name,b.Date_purchased,b.effective_date,b.dep_end_date, "
 		     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No,"
 		     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
 		     		+ "from monthly_depreciation_processing a, am_asset b, am_ad_branch c,am_ad_department d,am_ad_category e,am_gb_company p "
 		     		+ "where a.asset_id = b.asset_id and c.BRANCH_CODE = b.BRANCH_CODE and a.asset_id = b.asset_id and b.CATEGORY_CODE = e.CATEGORY_CODE "
-		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.Cost_Threshold - 0.01) and a.dep_date between ? and ? "
-		     		+ "group by b.Branch_ID,a.asset_id,a.monthly_dep,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
-		     		+ "p.company_name,b.BRANCH_CODE,b.CATEGORY_CODE, "
-		     		+ "b.Date_purchased,b.effective_date,b.dep_end_date, "
-		     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No, "
-		     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
-		     		+ "ORDER BY"
-		     		+ "     b.BRANCH_CODE ASC,"
-		     		+ "     b.CATEGORY_CODE ASC ";       
-	} 
-     
-	 if(!branch_Id.equals("0")  && !categoryCode.equals("0") && !FromDate.equals("") && !ToDate.equals("")){	   
-	   System.out.println("======>>>>>>>Branch and Category and Date Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
-	     ColQuery ="select b.Branch_ID,b.BRANCH_CODE, b.CATEGORY_CODE,a.asset_id,sum(a.monthly_dep)as charge_todate,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
-		     		+ "p.company_name,b.Date_purchased,b.effective_date,b.dep_end_date, "
-		     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No,"
-		     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
-		     		+ "from monthly_depreciation_processing a, am_asset b, am_ad_branch c,am_ad_department d,am_ad_category e,am_gb_company p "
-		     		+ "where a.asset_id = b.asset_id and c.BRANCH_CODE = b.BRANCH_CODE and a.asset_id = b.asset_id and b.CATEGORY_CODE = e.CATEGORY_CODE "
-		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.Cost_Threshold - 0.01) and b.Branch_Id = ? and b.Category_Id = ? and a.dep_date between ? and ? "
+		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.old_threshhold - 0.01) and b.Branch_Id = ? and b.Category_Id = ? and a.dep_date between ? and ? "
 		     		+ "group by b.Branch_ID,a.asset_id,a.monthly_dep,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
 		     		+ "p.company_name,b.BRANCH_CODE,b.CATEGORY_CODE, "
 		     		+ "b.Date_purchased,b.effective_date,b.dep_end_date, "
@@ -158,15 +139,15 @@ public class AssetConsChargesReport extends HttpServlet
 		     		+ "     b.BRANCH_CODE ASC,"
 		     		+ "     b.CATEGORY_CODE ASC ";  
 		}      
-	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && !FromDate.equals("") && !ToDate.equals("")){	   
-	   System.out.println("======>>>>>>>Branch and Date Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
+	 if(!branch_Id.equals("0")  && categoryCode.equals("0")){	   
+	   System.out.println("======>>>>>>>Branch Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
 	     ColQuery ="select b.Branch_ID,b.BRANCH_CODE, b.CATEGORY_CODE,a.asset_id,sum(a.monthly_dep)as charge_todate,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
 		     		+ "p.company_name,b.Date_purchased,b.effective_date,b.dep_end_date, "
 		     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No,"
 		     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
 		     		+ "from monthly_depreciation_processing a, am_asset b, am_ad_branch c,am_ad_department d,am_ad_category e,am_gb_company p "
 		     		+ "where a.asset_id = b.asset_id and c.BRANCH_CODE = b.BRANCH_CODE and a.asset_id = b.asset_id and b.CATEGORY_CODE = e.CATEGORY_CODE "
-		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.Cost_Threshold - 0.01) and b.Branch_Id = ? and a.dep_date between ? and ? "
+		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.old_threshhold - 0.01) and b.Branch_Id = ? and a.dep_date between ? and ? "
 		     		+ "group by b.Branch_ID,a.asset_id,a.monthly_dep,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
 		     		+ "p.company_name,b.BRANCH_CODE,b.CATEGORY_CODE, "
 		     		+ "b.Date_purchased,b.effective_date,b.dep_end_date, "
@@ -175,34 +156,16 @@ public class AssetConsChargesReport extends HttpServlet
 		     		+ "ORDER BY"
 		     		+ "     b.BRANCH_CODE ASC,"
 		     		+ "     b.CATEGORY_CODE ASC ";    
-	     } 
-	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")){	   
-		   System.out.println("======>>>>>>>Branch Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
-		     ColQuery ="select b.Branch_ID,b.BRANCH_CODE, b.CATEGORY_CODE,a.asset_id,sum(a.monthly_dep)as charge_todate,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
-			     		+ "p.company_name,b.Date_purchased,b.effective_date,b.dep_end_date, "
-			     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No,"
-			     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
-			     		+ "from monthly_depreciation_processing a, am_asset b, am_ad_branch c,am_ad_department d,am_ad_category e,am_gb_company p "
-			     		+ "where a.asset_id = b.asset_id and c.BRANCH_CODE = b.BRANCH_CODE and a.asset_id = b.asset_id and b.CATEGORY_CODE = e.CATEGORY_CODE "
-			     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.Cost_Threshold - 0.01) and b.Branch_Id = ? "
-			     		+ "group by b.Branch_ID,a.asset_id,a.monthly_dep,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
-			     		+ "p.company_name,b.BRANCH_CODE,b.CATEGORY_CODE, "
-			     		+ "b.Date_purchased,b.effective_date,b.dep_end_date, "
-			     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No, "
-			     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
-			     		+ "ORDER BY"
-			     		+ "     b.BRANCH_CODE ASC,"
-			     		+ "     b.CATEGORY_CODE ASC ";    
-		     }      
-   if(branch_Id.equals("0")  && !categoryCode.equals("0") && !FromDate.equals("") && !ToDate.equals("")){
-	   System.out.println("======>>>>>>>Category and Date Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
+	     }      
+   if(branch_Id.equals("0")  && !categoryCode.equals("0")){
+	   System.out.println("======>>>>>>>No Selection: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
 	     ColQuery ="select b.Branch_ID,b.BRANCH_CODE, b.CATEGORY_CODE,a.asset_id,sum(a.monthly_dep)as charge_todate,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
 		     		+ "p.company_name,b.Date_purchased,b.effective_date,b.dep_end_date, "
 		     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No,"
 		     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
 		     		+ "from monthly_depreciation_processing a, am_asset b, am_ad_branch c,am_ad_department d,am_ad_category e,am_gb_company p "
 		     		+ "where a.asset_id = b.asset_id and c.BRANCH_CODE = b.BRANCH_CODE and a.asset_id = b.asset_id and b.CATEGORY_CODE = e.CATEGORY_CODE "
-		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.Cost_Threshold - 0.01) and b.Category_Id = ? and a.dep_date between ? and ? "
+		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.old_threshhold - 0.01) and b.Category_Id = ? and a.dep_date between ? and ? "
 		     		+ "group by b.Branch_ID,a.asset_id,a.monthly_dep,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
 		     		+ "p.company_name,b.BRANCH_CODE,b.CATEGORY_CODE, "
 		     		+ "b.Date_purchased,b.effective_date,b.dep_end_date, "
@@ -211,25 +174,7 @@ public class AssetConsChargesReport extends HttpServlet
 		     		+ "ORDER BY"
 		     		+ "     b.BRANCH_CODE ASC,"
 		     		+ "     b.CATEGORY_CODE ASC ";     
-		} 
-   if(branch_Id.equals("0")  && !categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")){
-	   System.out.println("======>>>>>>>Category Selected: "+branch_Id+"   categoryCode: "+categoryCode+"    FromDate: "+FromDate+"   ToDate: "+ToDate+"  dept_Code: "+dept_Code+"   asset_Id: "+asset_Id);
-	     ColQuery ="select b.Branch_ID,b.BRANCH_CODE, b.CATEGORY_CODE,a.asset_id,sum(a.monthly_dep)as charge_todate,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
-		     		+ "p.company_name,b.Date_purchased,b.effective_date,b.dep_end_date, "
-		     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No,"
-		     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
-		     		+ "from monthly_depreciation_processing a, am_asset b, am_ad_branch c,am_ad_department d,am_ad_category e,am_gb_company p "
-		     		+ "where a.asset_id = b.asset_id and c.BRANCH_CODE = b.BRANCH_CODE and a.asset_id = b.asset_id and b.CATEGORY_CODE = e.CATEGORY_CODE "
-		     		+ "and b.Dept_code = d.Dept_code and b.Asset_Status = 'ACTIVE' and b.Req_Depreciation = 'Y' and b.Cost_Price >  (p.Cost_Threshold - 0.01) and b.Category_Id = ? "
-		     		+ "group by b.Branch_ID,a.asset_id,a.monthly_dep,b.description,c.BRANCH_NAME,e.category_name,d.Dept_name,"
-		     		+ "p.company_name,b.BRANCH_CODE,b.CATEGORY_CODE, "
-		     		+ "b.Date_purchased,b.effective_date,b.dep_end_date, "
-		     		+ "b.Posting_Date,b.Cost_Price,e.Dep_rate,b.monthly_dep,b.Accum_dep,b.NBV,b.Asset_User,b.Asset_Engine_No, "
-		     		+ "b.BAR_CODE,b.Asset_Serial_No,b.Asset_Model,b.LPO,b.Spare_1,b.Spare_2,b.Registration_No,b.Vendor_AC,b.OLD_ASSET_ID,b.Purchase_Reason,b.Asset_id "
-		     		+ "ORDER BY"
-		     		+ "     b.BRANCH_CODE ASC,"
-		     		+ "     b.CATEGORY_CODE ASC ";     
-		} 
+		}      
  //  System.out.println("======>>>>>>>ColQuery: "+ColQuery);
      java.util.ArrayList list =rep.getAssetConsolidatedChargesRecords(ColQuery,branch_Id,categoryCode,FromDate,ToDate);
      System.out.println("======>>>>>>>list size: "+list.size()+"        =====report: "+report);

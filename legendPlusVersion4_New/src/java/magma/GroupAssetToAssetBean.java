@@ -1184,7 +1184,7 @@ private String memoValue="";
             ps.setInt(18, 0);
             ps.setInt(19, 0);
             ps.setDouble(20, asset_costPrice);
-            ps.setDouble(21, (asset_costPrice - 10.00));
+            ps.setDouble(21, (asset_costPrice - Double.parseDouble(residual_value)));
             ps.setDate(22, dbConnection.dateConvert(depreciation_end_date));
             ps.setDouble(23, Double.parseDouble(residual_value));
             ps.setString(24, authorized_by);
@@ -1271,7 +1271,7 @@ private String memoValue="";
             ps.setInt(18, 0);
             ps.setInt(19, 0);
             ps.setDouble(20, asset_costPrice);
-            ps.setDouble(21, (asset_costPrice-10.00));
+            ps.setDouble(21, (asset_costPrice-Double.parseDouble(residual_value)));
             ps.setDate(22, dbConnection.dateConvert(depreciation_end_date));
             ps.setDouble(23, Double.parseDouble(residual_value));
             ps.setString(24, authorized_by);
@@ -3323,7 +3323,7 @@ private String memoValue="";
             ps.setInt(18, 0);
             ps.setInt(19, 0);
             ps.setDouble(20, asset_costPrice);
-            ps.setDouble(21, asset_costPrice);
+            ps.setDouble(21, asset_costPrice-Double.parseDouble(residual_value));
             ps.setDate(22, dbConnection.dateConvert(depreciation_end_date));
             ps.setDouble(23, Double.parseDouble(residual_value));
             ps.setString(24, authorized_by);
@@ -3411,7 +3411,7 @@ private String memoValue="";
             ps.setInt(18, 0);
             ps.setInt(19, 0);
             ps.setDouble(20, asset_costPrice);
-            ps.setDouble(21, asset_costPrice);
+            ps.setDouble(21, asset_costPrice-Double.parseDouble(residual_value));
             ps.setDate(22, dbConnection.dateConvert(depreciation_end_date));
             ps.setDouble(23, Double.parseDouble(residual_value));
             ps.setString(24, authorized_by);
@@ -4729,7 +4729,8 @@ private String memoValue="";
         System.out.println("Category Code " + code.getCategoryCode(category_id));*/
         asset_id_new = new legend.AutoIDSetup().getIdentity(branch_id,
                 department_id, section_id, category_id);
-  assetCode = Integer.parseInt(new ApplicationHelper().getGeneratedId("AM_ASSET"));
+  assetCode = Integer.parseInt
+		  (new ApplicationHelper().getGeneratedId("AM_ASSET"));
         //System.out.println("New Asset_ID ::::::::: " + asset_id_new);
         Connection con = null;
         PreparedStatement ps = null;
@@ -5164,13 +5165,14 @@ private String memoValue="";
 				"Dep_Ytd,Section,'PENDING','"+state+"',Driver,Spare_1,Spare_2,User_ID,PROVINCE,WAR_START_DATE," +
 				"WAR_MONTH,WAR_EXPIRY_DATE,BRANCH_CODE,SECTION_CODE,DEPT_CODE,CATEGORY_CODE,AMOUNT_PTD,AMOUNT_REM," +
 				"PART_PAY,FULLY_PAID,GROUP_ID,BAR_CODE,SBU_CODE,LPO,supervisor,defer_pay," +
-				"mac_address, Asset_code,Cost_Price-Residual_Value,(select (100/Dep_rate)*12 from am_ad_category where category_ID = AM_GROUP_ASSET.Category_ID),'"+memo+"'," +
-				"(select (100/Dep_rate)*12 from am_ad_category where category_ID = AM_GROUP_ASSET.Category_ID),SUB_CATEGORY_ID,SUB_CATEGORY_CODE, SPARE_3, SPARE_4, SPARE_5, SPARE_6, " +
-				"ZONE_CODE, REGION_CODE,PROJECT_CODE,INTEGRIFY,VENDOR_NAME  FROM AM_GROUP_ASSET where process_flag='N' and group_id = '"+GroupId+"' Dep_rate = 0 "; 
+				"mac_address, Asset_code,Cost_Price-Residual_Value,(select Dep_rate from am_ad_category where category_ID = AM_GROUP_ASSET.Category_ID),'"+memo+"'," +
+				"(select Dep_rate from am_ad_category where category_ID = AM_GROUP_ASSET.Category_ID),SUB_CATEGORY_ID,SUB_CATEGORY_CODE, SPARE_3, SPARE_4, SPARE_5, SPARE_6, " +
+				"ZONE_CODE, REGION_CODE,PROJECT_CODE,INTEGRIFY,VENDOR_NAME  FROM AM_GROUP_ASSET where process_flag='N' and group_id = '"+GroupId+"' and Dep_rate = 0 "; 
            
            
            //          System.out.println("RecordProcess GroupId === "+GroupId); 
- //          System.out.println("RecordProcess FINDER_QUERY === "+FINDER_QUERY);   
+//           System.out.println("RecordProcess FINDER_QUERY === "+FINDER_QUERY);
+//           System.out.println("RecordProcess FINDER_QUERY === "+FINDER_QUERY_DEPRATE_ZERO);
            try {
                con = dbConnection.getConnection("legendPlus");
                ps = con.prepareStatement(FINDER_QUERY);

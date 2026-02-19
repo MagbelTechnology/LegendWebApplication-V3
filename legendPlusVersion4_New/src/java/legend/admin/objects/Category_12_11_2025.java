@@ -1,6 +1,6 @@
 package legend.admin.objects;
 
-public class Category {
+public class Category_12_11_2025 {
 	private String categoryId;
 
 	private String categoryCode;
@@ -60,13 +60,15 @@ public class Category {
     private String upexassets;
     
     private String residualchange;
+    
+    private int noOfImproveMnth;
         
-	public Category() {
+	public Category_12_11_2025() {
 
 	}
         
 
-	public Category(String categoryId, String categoryCode,
+	public Category_12_11_2025(String categoryId, String categoryCode,
 			String categoryName, String categoryAcronym,
 			String requiredforFleet, String categoryClass,
 			String pmCyclePeriod, String mileage, String notifyMaintdays,
@@ -105,7 +107,7 @@ public class Category {
 
 	}
 
-    public Category(String categoryId, String categoryCode, String categoryName, String categoryAcronym,
+    public Category_12_11_2025(String categoryId, String categoryCode, String categoryName, String categoryAcronym,
             String requiredforFleet, String categoryClass, String pmCyclePeriod, String mileage,
             String notifyMaintdays, String notifyEveryDays, String residualValue, String depRate,
             String assetLedger, String depLedger, String accumDepLedger, String glAccount,
@@ -141,7 +143,7 @@ public class Category {
 		this.currencyId = currencyId;
                 this.enforceBarcode=enforceBarcode;
     }
-public Category(String categoryId, String categoryCode,
+public Category_12_11_2025(String categoryId, String categoryCode,
 			String categoryName, String categoryAcronym,
 			String requiredforFleet, String categoryClass,
 			String pmCyclePeriod, String mileage, String notifyMaintdays,
@@ -598,4 +600,16 @@ public Category(String categoryId, String categoryCode,
 		return currencyId;
 	}
 
+
+	public int getNoOfImproveMnth() {
+		return noOfImproveMnth;
+	}
+
+
+	public void setNoOfImproveMnth(int noOfImproveMnth) {
+		this.noOfImproveMnth = noOfImproveMnth;
+	}
+
+	
+	
 }

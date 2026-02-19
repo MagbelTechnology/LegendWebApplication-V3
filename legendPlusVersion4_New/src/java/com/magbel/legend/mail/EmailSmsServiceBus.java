@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.security.Security;
 
@@ -80,10 +81,12 @@ public class EmailSmsServiceBus  {
 	    boolean sent = false;
 
 	    try {
+	        // Load properties
 	        Properties prop = new Properties();
 	        File file = new File("C:\\Property\\LegendPlus.properties");
-	        FileInputStream in = new FileInputStream(file);
-	        prop.load(in);
+	        try (FileInputStream in = new FileInputStream(file)) {
+	            prop.load(in);
+	        }
 
 	        String host = prop.getProperty("mail.smtp.host");
 	        String from = prop.getProperty("mail-user");
@@ -91,102 +94,109 @@ public class EmailSmsServiceBus  {
 	        String templatePath = prop.getProperty("mailTemplate");
 	        String logoPath = prop.getProperty("mailLogo");
 	        String legendlgoPath = prop.getProperty("legendLogo");
-	        String htmlBody = null;
-	        
-	        
-	        Date date = new Date();  
-	        sdf = new java.text.SimpleDateFormat("dd MMMM yyyy");
-	        String currentDate = sdf.format(date);
-	       
-	        
-	        String str = usermails;
-//          System.out.println("======str: " + str); 
-          String[] arrOfStr = str.split("@");
-          String full_Name = arrOfStr[0].replaceAll("[0-9.]", " ").toUpperCase();
 
-	        
+	        InternetAddress[] toAddresses = Arrays.stream(usermails.split(","))
+	                .map(String::trim)
+	                .filter(s -> !s.isEmpty())
+	                .map(addr -> {
+	                    try {
+	                        return new InternetAddress(addr, true);
+	                    } catch (Exception e) {
+	                       // System.err.println("⚠️ Invalid email skipped: " + addr);
+	                        return null;
+	                    }
+	                })
+	                .filter(Objects::nonNull)
+	                .toArray(InternetAddress[]::new);
 
-	        // Prepare recipient list
-	        String[] usermaillist = usermails.split(",");
-
-	        // Prepare HTML template
-	        Map<String, String> placeholders = new HashMap<>();
-	        placeholders.put("recipientName", full_Name); 
-	        placeholders.put("subject", subject); 
-	        //placeholders.put("time",currentDate);
-	        placeholders.put("bodyText", msgText1);
-	        
-	        try {
-	         htmlBody = EmailTemplateUtil.loadTemplate(templatePath, placeholders);
-	        }catch(Exception e) {
-	        	e.getMessage();
+	        if (toAddresses.length == 0) {
+	            //System.err.println("⚠️ No valid recipient emails found. Skipping send.");
+	            return false; 
 	        }
 
+
+	        // ✅ Extract recipient name safely
+	        String primaryEmail = toAddresses[0].getAddress();
+	        int atIndex = primaryEmail.indexOf('@');
+	        String full_Name;
+	        if (atIndex > 0) {
+	            full_Name = primaryEmail.substring(0, atIndex)
+	                                    .replaceAll("[0-9.]", " ")
+	                                    .trim()
+	                                    .toUpperCase();
+	        } else {
+	            full_Name = "USER";
+	        }
+
+	        // Prepare placeholders for email template
+	        Map<String, String> placeholders = new HashMap<>();
+	        placeholders.put("recipientName", full_Name);
+	        placeholders.put("subject", subject);
+	        placeholders.put("bodyText", msgText1);
+
+	        String htmlBody;
+	        try {
+	            htmlBody = EmailTemplateUtil.loadTemplate(templatePath, placeholders);
+	        } catch (Exception e) {
+	            System.err.println("⚠️ Error loading email template: " + e.getMessage());
+	            htmlBody = msgText1; // fallback plain text
+	        }
+
+	        // Build session
 	        Session session;
-	       
-
-	        Message msg = new MimeMessage(Session.getDefaultInstance(prop));
-
-	        if (mailAuthenticator.equalsIgnoreCase("Y")) {
+	        if ("Y".equalsIgnoreCase(mailAuthenticator)) {
 	            final String user = prop.getProperty("mail-user");
 	            final String password = prop.getProperty("mail-password");
 	            String port = prop.getProperty("mail.smtp.port");
 	            String protocol = prop.getProperty("mail.smtp.ssl.protocols");
 
-	            Properties authProps = System.getProperties();
+	            Properties authProps = new Properties();
 	            authProps.put("mail.smtp.host", host);
 	            authProps.put("mail.smtp.port", port);
 	            authProps.put("mail.smtp.auth", "true");
 	            authProps.put("mail.smtp.starttls.enable", "true");
 	            authProps.put("mail.smtp.ssl.protocols", protocol);
-	            authProps.put("mail.smtp.ssl.trust", host); 
+	            authProps.put("mail.smtp.ssl.trust", host);
 
-	            
-	             session = Session.getInstance(authProps, 
-					    new jakarta.mail.Authenticator(){
-					        protected PasswordAuthentication getPasswordAuthentication() {
-					            return new PasswordAuthentication(
-					            user, password);
-					        }
-					});
-
+	            session = Session.getInstance(authProps, new jakarta.mail.Authenticator() {
+	                @Override
+	                protected PasswordAuthentication getPasswordAuthentication() {
+	                    return new PasswordAuthentication(user, password);
+	                }
+	            });
 	        } else {
-	        	boolean sessionDebug = true;
 	            String port = prop.getProperty("mail.smtp.port");
-	            Properties noAuthProps = System.getProperties();
+	            Properties noAuthProps = new Properties();
 	            noAuthProps.put("mail.smtp.host", host);
 	            noAuthProps.put("mail.smtp.port", port);
 	            noAuthProps.put("mail.smtp.auth", "false");
 	            session = Session.getInstance(noAuthProps);
-				
 	        }
 
-	        msg = new MimeMessage(session);
+	        // Build message
+	        Message msg = new MimeMessage(session);
 	        msg.setFrom(new InternetAddress(from));
-
-	        // TO recipients
-	        InternetAddress[] toAddresses = new InternetAddress[usermaillist.length];
-	        for (int i = 0; i < usermaillist.length; i++) {
-	            toAddresses[i] = new InternetAddress(usermaillist[i].trim());
-	        }
 	        msg.setRecipients(Message.RecipientType.TO, toAddresses);
-	        msg.setSubject("Legend  - " + subject.trim());
+	        msg.setSubject("Legend - " + subject.trim());
 	        msg.setSentDate(new Date());
 
-	        
+	        // Build multipart body
 	        MimeMultipart multipart = new MimeMultipart("related");
 
 	        MimeBodyPart htmlPart = new MimeBodyPart();
-	        htmlPart.setContent(htmlBody, "text/html");
+	        htmlPart.setContent(htmlBody, "text/html; charset=UTF-8");
 	        multipart.addBodyPart(htmlPart);
 
-	        
-	        MimeBodyPart imagePart = new MimeBodyPart();
-	        DataSource fds = new FileDataSource(logoPath);
-	        imagePart.setDataHandler(new DataHandler(fds));
-	        imagePart.setHeader("Content-ID", "<logo>");
-	        multipart.addBodyPart(imagePart);
-	        
+	        // ✅ Add inline logos if provided
+	        if (logoPath != null && !logoPath.isEmpty()) {
+	            MimeBodyPart imagePart = new MimeBodyPart();
+	            DataSource fds = new FileDataSource(logoPath);
+	            imagePart.setDataHandler(new DataHandler(fds));
+	            imagePart.setHeader("Content-ID", "<logo>");
+	            imagePart.setDisposition(MimeBodyPart.INLINE);
+	            multipart.addBodyPart(imagePart);
+	        }
+
 	        if (legendlgoPath != null && !legendlgoPath.isEmpty()) {
 	            MimeBodyPart legendImagePart = new MimeBodyPart();
 	            DataSource legendDataSource = new FileDataSource(legendlgoPath);
@@ -198,37 +208,35 @@ public class EmailSmsServiceBus  {
 
 	        msg.setContent(multipart);
 
-	        // Send the message
-	        if (mailAuthenticator.equalsIgnoreCase("Y")) {
+	        // Send
+	        if ("Y".equalsIgnoreCase(mailAuthenticator)) {
 	            Transport.send(msg);
 	        } else {
-	            Transport transport = session.getTransport("smtp");
-	            transport.connect();
-	            transport.sendMessage(msg, msg.getAllRecipients());
-	            transport.close();
+	            try (Transport transport = session.getTransport("smtp")) {
+	                transport.connect();
+	                transport.sendMessage(msg, msg.getAllRecipients());
+	            }
 	        }
 
-	        System.out.println("Email sent in service..");
+	        System.out.println("✅ Email sent successfully to: " + Arrays.toString(toAddresses));
 	        sent = true;
 
 	    } catch (Exception ex) {
-	        System.out.println("point 15 in sendRecordMail");
+	        System.err.println("❌ Error sending email: " + ex.getMessage());
 	        ex.printStackTrace();
 	    }
 
 	    return sent;
 	}
-	
-	
-	
-	
 
+
+	
+	
 	
 	public void sendMail(String email, String subject, String msgText1) {
 	    try {
 	        Properties prop = new Properties();
-	        File file = new File("C:\\Property\\LegendPlus.properties");
-	        FileInputStream in = new FileInputStream(file);
+	        FileInputStream in = new FileInputStream("C:\\Property\\LegendPlus.properties");
 	        prop.load(in);
 
 	        String host = prop.getProperty("mail.smtp.host");
@@ -237,27 +245,49 @@ public class EmailSmsServiceBus  {
 	        String templatePath = prop.getProperty("mailTemplate");
 	        String logoPath = prop.getProperty("mailLogo");
 	        String legendlgoPath = prop.getProperty("legendLogo");
-	        String htmlBody = null;
 
 	        String[] recipients = email.split(",");
 	        String to = recipients[0];
-	        System.out.println("Mail To: "+to+"     Mail from: "+from);
+	        System.out.println("Mail To: " + to + "     Mail from: " + from);
 
-	        // Prepare personalized HTML content
-	        Map<String, String> placeholders = new HashMap<>();
-	        placeholders.put("recipientName", "Supervisor");
-	        placeholders.put("bodyText", msgText1);
-	        
-	        try {
-	        htmlBody = EmailTemplateUtil.loadTemplate(templatePath, placeholders);
-	        }catch(Exception e) {
-	        	e.getMessage();
-	        }
+	        // Load template
+	        String htmlBody = EmailTemplateUtil.loadTemplate(
+	                templatePath, Map.of("recipientName", "Supervisor", "bodyText", msgText1));
 
 	        Session session;
-	        Message msg = new MimeMessage(Session.getDefaultInstance(prop));
+	        if ("Y".equalsIgnoreCase(mailAuthenticator)) {
+	            final String user = prop.getProperty("mail-user");
+	            final String password = prop.getProperty("mail-password");
+	            String port = prop.getProperty("mail.smtp.port");
+	            String protocol = prop.getProperty("mail.smtp.ssl.protocols");
+
+	            Properties authProps = new Properties();
+	            authProps.put("mail.smtp.host", host);
+	            authProps.put("mail.smtp.port", port);
+	            authProps.put("mail.smtp.auth", "true");
+	            authProps.put("mail.smtp.starttls.enable", "true");
+	            authProps.put("mail.smtp.ssl.protocols", protocol);
+	            authProps.put("mail.smtp.ssl.trust", host);
+
+	            session = Session.getInstance(authProps, new jakarta.mail.Authenticator() {
+	                protected PasswordAuthentication getPasswordAuthentication() {
+	                    return new PasswordAuthentication(user, password);
+	                }
+	            }); 
+
+	        } else {
+	            String port = prop.getProperty("mail.smtp.port");
+	            Properties noAuthProps = new Properties();
+	            noAuthProps.put("mail.smtp.host", host);
+	            noAuthProps.put("mail.smtp.port", port);
+	            noAuthProps.put("mail.smtp.auth", "false");
+	            session = Session.getInstance(noAuthProps, null);
+	        }
+
+	        
+	        Message msg = new MimeMessage(session);
 	        msg.setFrom(new InternetAddress(from));
-	        msg.setRecipients(Message.RecipientType.TO, new InternetAddress[] { new InternetAddress(to) });
+	        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 	        msg.setSubject("Legend " + subject);
 	        msg.setSentDate(new Date());
 
@@ -266,17 +296,14 @@ public class EmailSmsServiceBus  {
 	        htmlPart.setContent(htmlBody, "text/html");
 	        multipart.addBodyPart(htmlPart);
 
-	        
 	        MimeBodyPart imagePart = new MimeBodyPart();
-	        DataSource fds = new FileDataSource(logoPath);
-	        imagePart.setDataHandler(new DataHandler(fds));
+	        imagePart.setDataHandler(new DataHandler(new FileDataSource(logoPath)));
 	        imagePart.setHeader("Content-ID", "<logo>");
 	        multipart.addBodyPart(imagePart);
-	        
+
 	        if (legendlgoPath != null && !legendlgoPath.isEmpty()) {
 	            MimeBodyPart legendImagePart = new MimeBodyPart();
-	            DataSource legendDataSource = new FileDataSource(legendlgoPath);
-	            legendImagePart.setDataHandler(new DataHandler(legendDataSource));
+	            legendImagePart.setDataHandler(new DataHandler(new FileDataSource(legendlgoPath)));
 	            legendImagePart.setHeader("Content-ID", "<legendLogo>");
 	            legendImagePart.setDisposition(MimeBodyPart.INLINE);
 	            multipart.addBodyPart(legendImagePart);
@@ -284,57 +311,20 @@ public class EmailSmsServiceBus  {
 
 	        msg.setContent(multipart);
 
-	        // Set CC for remaining recipients
+	        // Add CCs
 	        for (int i = 1; i < recipients.length; i++) {
-	            InternetAddress addressCopy = new InternetAddress(recipients[i]);
-	            msg.addRecipient(Message.RecipientType.CC, addressCopy);
+	            msg.addRecipient(Message.RecipientType.CC, new InternetAddress(recipients[i]));
 	        }
 
-	        if (mailAuthenticator.equalsIgnoreCase("Y")) {
-	            final String user = prop.getProperty("mail-user");
-	            final String password = prop.getProperty("mail-password");
-	            String port = prop.getProperty("mail.smtp.port");
-	            String protocol = prop.getProperty("mail.smtp.ssl.protocols");
-
-	            Properties authProps = System.getProperties();
-	            authProps.put("mail.smtp.host", host);
-	            authProps.put("mail.smtp.port", port);
-	            authProps.put("mail.smtp.auth", "true");
-	            authProps.put("mail.smtp.starttls.enable", "true");
-	            authProps.put("mail.smtp.ssl.protocols", protocol);
-	            authProps.put("mail.smtp.ssl.trust", host);
-
-	            
-	            session = Session.getInstance(authProps, 
-					    new jakarta.mail.Authenticator(){
-					        protected PasswordAuthentication getPasswordAuthentication() {
-					            return new PasswordAuthentication(
-					            user, password);
-					        }
-					});
-
-	            Transport.send(msg);
-	            System.out.println("Email Sent (authenticated).");
-
-	        } else {
-	            String port = prop.getProperty("mail.smtp.port");
-	            Properties noAuthProps = System.getProperties();
-	            noAuthProps.put("mail.smtp.host", host);
-	            noAuthProps.put("mail.smtp.port", port);
-	            noAuthProps.put("mail.smtp.auth", "false");
-
-	             session = Session.getDefaultInstance(noAuthProps,null);
-	            Transport transport = session.getTransport("smtp");
-	            transport.connect();
-	            transport.sendMessage(msg, msg.getAllRecipients());
-	            transport.close();
-	            System.out.println("Email Sent (no authentication).");
-	        }
+	        // Send
+	        Transport.send(msg);
+	        System.out.println("Email Sent.");
 
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
 	    }
 	}
+
 
 	
 		public void sendMailOld(String email, String subject,String msgText1)
@@ -1700,6 +1690,130 @@ public void sendEmail(String email, String accountName)
 
 
 public void sendMailTransactionInitiator(int tran_id, String subject, String msgText1) {
+    System.out.println("Just called sendMailTransactionInitiator API");
+    FileInputStream in = null;
+
+    try {
+        Properties prop = new Properties();
+        File file = new File("C:\\Property\\LegendPlus.properties");
+        in = new FileInputStream(file);
+        prop.load(in);
+
+        String host = prop.getProperty("mail.smtp.host");
+        String from = prop.getProperty("mail-user");
+        String mailAuthenticator = prop.getProperty("mailAuthenticator");
+        String templatePath = prop.getProperty("mailTemplate");
+        String logoPath = prop.getProperty("mailLogo");
+        String legendlgoPath = prop.getProperty("legendLogo");
+        String protocol = prop.getProperty("mail.smtp.ssl.protocols");
+        String port = prop.getProperty("mail.smtp.port");
+
+        // Get recipient email and extract full name
+        String toEmail = app.userEmail(app.userToEmailTransInitiator(tran_id));
+        String fullName = toEmail.split("@")[0].replaceAll("[0-9.]", " ").toUpperCase();
+
+        // Format date
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy");
+        String currentDate = sdf.format(new Date());
+
+        // Prepare placeholders
+        Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("recipientName", fullName);
+        placeholders.put("subject", subject);
+        placeholders.put("bodyText", msgText1);
+        placeholders.put("date", currentDate); 
+
+        // Load HTML content from template
+        String htmlBody = EmailTemplateUtil.loadTemplate(templatePath, placeholders);
+
+        // Prepare session
+        Session session;
+        Properties mailProps = new Properties();
+        mailProps.put("mail.smtp.host", host);
+        mailProps.put("mail.smtp.port", port);
+
+        if ("Y".equalsIgnoreCase(mailAuthenticator)) {
+            final String user = prop.getProperty("mail-user");
+            final String password = prop.getProperty("mail-password");
+
+            mailProps.put("mail.smtp.auth", "true");
+            mailProps.put("mail.smtp.starttls.enable", "true");
+            mailProps.put("mail.smtp.ssl.protocols", protocol);
+            mailProps.put("mail.smtp.ssl.trust", host);
+
+            session = Session.getInstance(mailProps, 
+				    new jakarta.mail.Authenticator(){
+				        protected PasswordAuthentication getPasswordAuthentication() {
+				            return new PasswordAuthentication(
+				            user, password);
+				        }
+				});
+        } else {
+            mailProps.put("mail.smtp.auth", "false");
+            session = Session.getInstance(mailProps);
+        }
+
+        session.setDebug(true);
+
+        // Compose message
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(from));
+        message.setRecipients(Message.RecipientType.TO, new InternetAddress[]{new InternetAddress(toEmail)});
+        message.setSubject("Legend - " + subject.trim());
+        message.setSentDate(new Date());
+
+        // Multipart with HTML and optional images
+        MimeMultipart multipart = new MimeMultipart("related");
+
+        MimeBodyPart htmlPart = new MimeBodyPart();
+        htmlPart.setContent(htmlBody, "text/html");
+        multipart.addBodyPart(htmlPart);
+
+        // Add mail logo
+        if (logoPath != null && !logoPath.isEmpty()) {
+            MimeBodyPart logoPart = new MimeBodyPart();
+            logoPart.setDataHandler(new DataHandler(new FileDataSource(logoPath)));
+            logoPart.setHeader("Content-ID", "<logo>");
+            logoPart.setDisposition(MimeBodyPart.INLINE);
+            multipart.addBodyPart(logoPart);
+        }
+
+        // Add legend logo if available
+        if (legendlgoPath != null && !legendlgoPath.isEmpty()) {
+            MimeBodyPart legendPart = new MimeBodyPart();
+            legendPart.setDataHandler(new DataHandler(new FileDataSource(legendlgoPath)));
+            legendPart.setHeader("Content-ID", "<legendLogo>");
+            legendPart.setDisposition(MimeBodyPart.INLINE);
+            multipart.addBodyPart(legendPart);
+        }
+
+        message.setContent(multipart);
+
+        // Send message
+        if ("Y".equalsIgnoreCase(mailAuthenticator)) {
+            Transport.send(message);
+        } else {
+            Transport transport = session.getTransport("smtp");
+            transport.connect();
+            transport.sendMessage(message, message.getAllRecipients());
+            transport.close();
+        }
+
+        System.out.println("HTML email sent to transaction initiator: " + toEmail);
+
+    } catch (Exception ex) {
+        System.out.println("Error in sendMailTransactionInitiator:");
+        ex.printStackTrace();
+    } finally {
+        try {
+            if (in != null) in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public void sendMailTransactionInitiator(Long tran_id, String subject, String msgText1) {
     System.out.println("Just called sendMailTransactionInitiator API");
     FileInputStream in = null;
 

@@ -3,20 +3,33 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
    
+import java.io.PrintWriter;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-   
+
 import magma.AssetRecordsBean;
 
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.magbel.legend.bus.ApprovalRecords;
 import com.magbel.legend.bus.Report;
 import com.magbel.legend.mail.EmailSmsServiceBus;
+
+import jxl.Workbook; 
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
    
 public class AssetManagementExport extends HttpServlet
 {
@@ -72,50 +85,50 @@ public class AssetManagementExport extends HttpServlet
      String ColQuery = "";
      if(!branch_Id.equals("0")  && !categoryCode.equals("0")){
     	 System.out.println("======>>>>>>>Branch and Category Selected: ");
-	     ColQuery ="SELECT comp.company_name,a.Old_Asset_Id,a.Asset_id,a.Description,b.BRANCH_NAME,c.category_name,e.Dept_name,a.SBU_CODE,a.Accum_dep,"
+	     ColQuery ="SELECT comp.company_name,a.Asset_id,a.Description,b.BRANCH_NAME,c.category_name,e.Dept_name,a.SBU_CODE,a.Accum_dep,"
 	 + "a.monthly_dep,a.Cost_Price,d.DEPCHARGETODATE,a.NBV,a.IMPROV_COST,a.IMPROV_ACCUMDEP,a.IMPROV_MONTHLYDEP,a.IMPROV_NBV,a.Cost_Price + a.IMPROV_COST AS Total_Cost_Price,"
 	 + "a.TOTAL_NBV,a.Date_purchased,c.Dep_rate,c.Accum_Dep_ledger,c.Dep_ledger,c.Asset_Ledger,c.gl_account,a.Branch_ID,b.BRANCH_CODE,c.category_code,a.Effective_Date" 
      + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ?"
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ?"
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
 	}      
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0")){	   
 	   System.out.println("======>>>>>>>Category Selected: ");
-     ColQuery ="SELECT comp.company_name,a.Old_Asset_Id,a.Asset_id,a.Description,b.BRANCH_NAME,c.category_name,e.Dept_name,a.SBU_CODE,a.Accum_dep,"
+     ColQuery ="SELECT comp.company_name,a.Asset_id,a.Description,b.BRANCH_NAME,c.category_name,e.Dept_name,a.SBU_CODE,a.Accum_dep,"
 	 + "a.monthly_dep,a.Cost_Price,d.DEPCHARGETODATE,a.NBV,a.IMPROV_COST,a.IMPROV_ACCUMDEP,a.IMPROV_MONTHLYDEP,a.IMPROV_NBV,a.Cost_Price + a.IMPROV_COST AS Total_Cost_Price,"
 	 + "a.TOTAL_NBV,a.Date_purchased,c.Dep_rate,c.Accum_Dep_ledger,c.Dep_ledger,c.Asset_Ledger,c.gl_account,a.Branch_ID,b.BRANCH_CODE,c.category_code,a.Effective_Date" 
      + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.CATEGORY_CODE = ? "
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
    }
 	 if(!branch_Id.equals("0")  && categoryCode.equals("0")){	   
 	   System.out.println("======>>>>>>>Branch Selected: ");
-	     ColQuery ="SELECT comp.company_name,a.Old_Asset_Id,a.Asset_id,a.Description,b.BRANCH_NAME,c.category_name,e.Dept_name,a.SBU_CODE,a.Accum_dep,"
+	     ColQuery ="SELECT comp.company_name,a.Asset_id,a.Description,b.BRANCH_NAME,c.category_name,e.Dept_name,a.SBU_CODE,a.Accum_dep,"
 	 + "a.monthly_dep,a.Cost_Price,d.DEPCHARGETODATE,a.NBV,a.IMPROV_COST,a.IMPROV_ACCUMDEP,a.IMPROV_MONTHLYDEP,a.IMPROV_NBV,a.Cost_Price + a.IMPROV_COST AS Total_Cost_Price,"
 	 + "a.TOTAL_NBV,a.Date_purchased,c.Dep_rate,c.Accum_Dep_ledger,c.Dep_ledger,c.Asset_Ledger,c.gl_account,a.Branch_ID,b.BRANCH_CODE,c.category_code,a.Effective_Date" 
      + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? "
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? "
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
 	}
    if(branch_Id.equals("0")  && categoryCode.equals("0")){
 	   System.out.println("======>>>>>>>No Selection: ");
-	     ColQuery ="SELECT comp.company_name,a.Old_Asset_Id,a.Asset_id,a.Description,b.BRANCH_NAME,c.category_name,e.Dept_name,a.SBU_CODE,a.Accum_dep,"
+	     ColQuery ="SELECT comp.company_name,a.Asset_id,a.Description,b.BRANCH_NAME,c.category_name,e.Dept_name,a.SBU_CODE,a.Accum_dep,"
 	 + "a.monthly_dep,a.Cost_Price,d.DEPCHARGETODATE,a.NBV,a.IMPROV_COST,a.IMPROV_ACCUMDEP,a.IMPROV_MONTHLYDEP,a.IMPROV_NBV,a.Cost_Price + a.IMPROV_COST AS Total_Cost_Price,"
 	 + "a.TOTAL_NBV,a.Date_purchased,c.Dep_rate,c.Accum_Dep_ledger,c.Dep_ledger,c.Asset_Ledger,c.gl_account,a.Branch_ID,b.BRANCH_CODE,c.category_code,a.Effective_Date" 
      + " FROM am_ad_branch b INNER JOIN am_Asset a ON b.BRANCH_CODE = a.BRANCH_CODE"
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01)  "
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01)  "
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
 	}   
 //   System.out.println("======>>>>>>>ColQuery: "+ColQuery);
@@ -126,8 +139,8 @@ public class AssetManagementExport extends HttpServlet
          Sheet sheet = workbook.createSheet("Demo");
          Row rowhead = sheet.createRow((int) 0);
          
-         rowhead.createCell((short) 0).setCellValue("OLD ASSET ID");
-         rowhead.createCell((short) 1).setCellValue("ASSET ID");
+         rowhead.createCell((short) 0).setCellValue("ASSET ID");
+         rowhead.createCell((short) 1).setCellValue("CATEGORY NAME");
          rowhead.createCell((short) 2).setCellValue("ASSET DESCRIPTION");
          rowhead.createCell((short) 3).setCellValue("DEPARTMENT NAME");
          rowhead.createCell((short) 4).setCellValue("SBU CODE");
@@ -145,9 +158,6 @@ public class AssetManagementExport extends HttpServlet
 		 rowhead.createCell((short) 16).setCellValue("TOTAL NBV");
 		 rowhead.createCell((short) 17).setCellValue("DEPREC.START DATE ");
 		 rowhead.createCell((short) 18).setCellValue("BRANCH CODE");
-		 rowhead.createCell((short) 19).setCellValue("BRANCH NAME");
-		 rowhead.createCell((short) 20).setCellValue("CATEGORY CODE");
-		 rowhead.createCell((short) 21).setCellValue("CATEGORY NAME");
 
 /*
      s.addCell(new Label(0, 0, "ASSET ID"));
@@ -177,13 +187,11 @@ public class AssetManagementExport extends HttpServlet
 			String oldassetId =  newassettrans.getOldassetId();
 			String barcode =  newassettrans.getBarCode();
 			String deptName =  newassettrans.getDeptCode();
+			String categoryName = newassettrans.getCategoryName();
 			String Description = newassettrans.getDescription();   
 			String assetuser = newassettrans.getAssetUser();
 			String assetcode = newassettrans.getAssetCode();
-			String category_code = newassettrans.getCategoryCode();
-			String category_name = newassettrans.getCategoryName();
 			branchCode = newassettrans.getBranchCode();
-			String branchName = newassettrans.getBranchName();
 //			String branchName = records.getCodeName("select BRANCH_NAME from am_ad_branch where BRANCH_ID = "+branchId+"");
 			double costprice = newassettrans.getCostPrice();
 			double monthlyDepr = newassettrans.getMonthlyDep();
@@ -218,6 +226,12 @@ public class AssetManagementExport extends HttpServlet
 //			System.out.println("======>mm: "+mm);
 			String dd = depr_startDate.substring(8, 10);
 			depr_startDate = dd+"/"+mm+"/"+yyyy;
+			
+			String pyyyy = purchaseDate.substring(0, 4);
+			String pmm = purchaseDate.substring(5, 7);
+			String pdd = purchaseDate.substring(8, 10);
+			purchaseDate = pdd+"/"+pmm+"/"+pyyyy;
+			
 //			System.out.println("======>depr_startDate: "+depr_startDate);
 			String deprciationDate = newassettrans.getPostingDate();
 			
@@ -228,8 +242,8 @@ public class AssetManagementExport extends HttpServlet
 
 			Row row = sheet.createRow((int) i);
 
-            row.createCell((short) 0).setCellValue(oldassetId);
-            row.createCell((short) 1).setCellValue(assetId);
+            row.createCell((short) 0).setCellValue(assetId);
+            row.createCell((short) 1).setCellValue(categoryName);
             row.createCell((short) 2).setCellValue(Description);
             row.createCell((short) 3).setCellValue(deptName);
             row.createCell((short) 4).setCellValue(sbucode);
@@ -247,11 +261,28 @@ public class AssetManagementExport extends HttpServlet
 			row.createCell((short) 16).setCellValue(totalnbv);
 			row.createCell((short) 17).setCellValue(depr_startDate);
 			row.createCell((short) 18).setCellValue(branchCode);
-			row.createCell((short) 19).setCellValue(branchName);
-			row.createCell((short) 20).setCellValue(category_code);
-			row.createCell((short) 21).setCellValue(category_name);
 
-	
+		/*				 
+           s.addCell(new Label(0, i,  assetId));
+           s.addCell(new Label(1, i, Description));
+           s.addCell(new Label(2, i, deptName));
+           s.addCell(new Label(3, i, sbucode));
+           s.addCell(new Label(4, i, purchaseDate));
+           s.addCell(new Label(5, i, String.valueOf(accumDepr))); 
+           s.addCell(new Label(6, i, String.valueOf(monthlyDepr)));
+           s.addCell(new Label(7, i, String.valueOf(costprice)));
+           s.addCell(new Label(8, i, String.valueOf(nbv)));
+           s.addCell(new Label(9, i, String.valueOf(depchargetoDate)));
+           s.addCell(new Label(10, i, String.valueOf(improvAccumDepr)));
+           s.addCell(new Label(11, i, String.valueOf(improvmonthldepr)));
+           s.addCell(new Label(12, i, String.valueOf(improvCostPrice)));
+           s.addCell(new Label(13, i, String.valueOf(improvNbv)));
+           s.addCell(new Label(14, i, String.valueOf(totalCost)));
+           s.addCell(new Label(15, i, String.valueOf(totalnbv)));
+           s.addCell(new Label(16, i, depr_startDate));
+           s.addCell(new Label(17, i, branchCode));
+      */     
+
             i++;
      }
 	   OutputStream stream = response.getOutputStream();

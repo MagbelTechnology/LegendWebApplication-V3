@@ -87,6 +87,14 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
 		FileInputStream input = new FileInputStream(file);
 		prop.load(input);
 
+		AssetRecordsBean arb = null;
+		try {
+			arb = new AssetRecordsBean();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		String ThirdPartyLabel = prop.getProperty("ThirdPartyLabel");
 //		System.out.println("ThirdPartyLabel: " + ThirdPartyLabel);
 		String singleApproval = prop.getProperty("singleApproval");
@@ -150,6 +158,24 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
 //	   if(batchNo.equals("")){batchNo ="123456";} 
 //        String branchId = request.getParameter("branch_id");  
 	  
+	   String qp = "update a set a.BRANCH_CODE = b.BRANCH_CODE from am_asset a, am_ad_branch b where a.Branch_ID = b.BRANCH_ID and a.BRANCH_CODE = '0'";
+       arb.updateAssetStatusChange(qp);
+       String qa = "update a set a.BRANCH_CODE = b.BRANCH_CODE from am_group_asset a, am_ad_branch b where a.Branch_ID = b.BRANCH_ID and a.BRANCH_CODE = '0'";
+       arb.updateAssetStatusChange(qa);
+       String qd = "update a set a.BRANCH_CODE = b.BRANCH_CODE from AM_ASSETADDITIONS a, am_ad_branch b where a.Branch_ID = b.BRANCH_ID and a.BRANCH_CODE = '0'";
+       arb.updateAssetStatusChange(qd);
+       String aa = "update a set a.CATEGORY_CODE = b.CATEGORY_CODE from am_asset a, am_ad_category b where a.Category_ID = b.Category_ID and a.CATEGORY_CODE = '0'";
+       arb.updateAssetStatusChange(aa);
+       String ab = "update a set a.DEPT_CODE = b.DEPT_CODE from am_asset a, am_ad_department b where a.Dept_ID = b.Dept_ID and a.DEPT_CODE = '0'";
+       arb.updateAssetStatusChange(ab);
+       String ac = "update a set a.CATEGORY_CODE = b.CATEGORY_CODE from AM_ASSETADDITIONS a, am_ad_category b where a.Category_ID = b.Category_ID and a.CATEGORY_CODE = '0'";
+       arb.updateAssetStatusChange(ac);
+       String ad = "update a set a.DEPT_CODE = b.DEPT_CODE from AM_ASSETADDITIONS a, am_ad_department b where a.Dept_ID = b.Dept_ID and a.DEPT_CODE = '0'";
+       arb.updateAssetStatusChange(ad);
+       String ae = "update a set a.CATEGORY_CODE = b.CATEGORY_CODE from am_group_asset a, am_ad_category b where a.Category_ID = b.Category_ID and a.CATEGORY_CODE = '0'";
+       arb.updateAssetStatusChange(ae);
+       String af = "update a set a.DEPT_CODE = b.DEPT_CODE from am_group_asset a, am_ad_department b where a.Dept_ID = b.Dept_ID and a.DEPT_CODE = '0'";
+       arb.updateAssetStatusChange(af);
        
        
         String deptCode = records.getCodeName("select dept_code from am_gb_User where USER_ID = "+userId+" ");
@@ -225,8 +251,9 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
        
         try
         {
+        	// ad = new AssetRecordsBean();
         if (!userClass.equals("NULL") || userClass!=null){
-            ad = new AssetRecordsBean();
+           
 
 //    if(exists==false){
 

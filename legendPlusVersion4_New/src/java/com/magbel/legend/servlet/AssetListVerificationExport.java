@@ -44,7 +44,7 @@ public class AssetListVerificationExport extends HttpServlet
     }
     System.out.println("<<<<<<branch_Code: "+branch_Code);
     String userName = request.getParameter("userName");
-    String fileName = branch_Code+"By"+userName+"AssetListVerificationReport.xls";    	
+    String fileName = branch_Code+"By"+userName+"AssetListVerificationReport.xlsx";    	
     String filePath = System.getProperty("user.home")+"\\Downloads";
 	File tmpDir = new File(filePath);
 	boolean exists = tmpDir.exists();	
@@ -78,7 +78,7 @@ public class AssetListVerificationExport extends HttpServlet
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ?"
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? AND a.CATEGORY_CODE = ?"
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
 	}      
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0")){	   
@@ -90,7 +90,7 @@ public class AssetListVerificationExport extends HttpServlet
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.CATEGORY_CODE = ? "
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.CATEGORY_CODE = ? "
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
    }
 	 if(!branch_Id.equals("0")  && categoryCode.equals("0")){	   
@@ -102,7 +102,7 @@ public class AssetListVerificationExport extends HttpServlet
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01) AND a.branch_id = ? "
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01) AND a.branch_id = ? "
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
 	}
    if(branch_Id.equals("0")  && categoryCode.equals("0")){
@@ -114,7 +114,7 @@ public class AssetListVerificationExport extends HttpServlet
      + " INNER JOIN am_ad_category c ON a.CATEGORY_CODE = c.category_code"
      + " LEFT OUTER JOIN DepreciationChargeToDate d ON a.Asset_id = d.Asset_id"
      + " LEFT OUTER JOIN am_ad_department e ON a.DEPT_CODE = e.DEPT_CODE,am_gb_company comp"
-+ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.Cost_Threshold-0.01)  "
++ " WHERE a.Asset_Status = 'ACTIVE' and a.Cost_Price > (comp.old_threshhold-0.01)  "
 + " ORDER BY a.BRANCH_CODE ASC,a.CATEGORY_CODE ASC ";
 	}   
 //   System.out.println("======>>>>>>>ColQuery: "+ColQuery);

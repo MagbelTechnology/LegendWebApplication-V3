@@ -35,7 +35,7 @@ import com.magbel.util.DatetimeFormat;
 		  maxFileSize = 0xa00000,    
 		  maxRequestSize = 0x3200000
 		)
-public class UploadAssetDetailServlet extends HttpServlet
+public class UploadAssetDetailServlet_09_09_2025 extends HttpServlet
 {
 	private EmailSmsServiceBus mail ;
 	

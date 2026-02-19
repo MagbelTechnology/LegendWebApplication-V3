@@ -40,6 +40,7 @@ public class RejectProcess extends HttpServlet {
     private ApprovalManager approvalManager;
     private AssetRecordsBean assetRecordBeans;
     private CompanyHandler comp;
+    java.text.SimpleDateFormat sdf;
     public RejectProcess() {
     }
 
@@ -54,6 +55,7 @@ public class RejectProcess extends HttpServlet {
             approvalManager = new ApprovalManager();
             assetRecordBeans = new AssetRecordsBean();
             comp = new CompanyHandler();
+            sdf = new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             // mail = new BulkMail();
         } catch (Exception et) {
             et.printStackTrace();
@@ -77,8 +79,9 @@ public class RejectProcess extends HttpServlet {
         String thirdPartyLabel = request.getParameter("ThirdPartyLabel"); 
         String reject_reason = request.getParameter("reject_reason");
 //        System.out.println("VVVVVVVVVVVVVVVV tranId " + request.getParameter("tranId"));
-        int tranIdRepost = Integer.parseInt(request.getParameter("tranId"));
+        long tranIdRepost = Long.parseLong(request.getParameter("tranId"));
         String systemIp= request.getRemoteAddr();
+        String dateApproved = sdf.format(new java.util.Date());
         //--reject_reason = "Posting Level: " + reject_reason;
         int userId = request.getParameter("userid")==null?Integer.parseInt(userID):Integer.parseInt(request.getParameter("userid"));
 //       System.out.println("JJJJJJJJJJJ the asset id is JJJJJJ "+ id);
@@ -139,7 +142,7 @@ public class RejectProcess extends HttpServlet {
             if (service.deleteRaiseEntry(id, page1,tranId)) {
 
                 service.updateRaiseEntry(id, "N");
-                service.updateAssetStatus3(tranId, "RP", "Rejected",reject_reason);
+                service.updateAssetStatus3(tranId, "R", "Rejected",reject_reason);
                 //service.updateAssetStatus2(tranIdRepost, "RP", "Rejected");
                 
                 if (page1 != null && page1.equalsIgnoreCase("ASSET RECLASSIFICATION RAISE ENTRY")){
@@ -148,13 +151,13 @@ public class RejectProcess extends HttpServlet {
                 
                 service.reverseAssetReclassification(oldAssetId,id);
                    // System.out.println("the transaction id in reject servlet is <<<<<<<<<< " +tranIdRepost);
-                assetRecordBeans.updateAssetStatusChange("update AM_ASSETRECLASSIFICATION set status ='RR' where Reclassify_ID =" +tranId);
+                assetRecordBeans.updateAssetStatusChange("update AM_ASSETRECLASSIFICATION set status ='REJECTED' where Reclassify_ID =" +tranIdRepost);
                 }
 
                 if (page1 != null && page1.equalsIgnoreCase("ASSET PART PAYMENT ENTRY")){
                   assetRecordBeans.updateAssetStatusChange("update AM_ASSET set asset_status ='ACTIVE' where asset_ID ='"+id +"'");
-                  assetRecordBeans.updateAssetStatusChange("update AM_ASSET_PAYMENT  set status ='RR', Reject_reason='"+reject_reason +"' where tranId =" +tranIdRepost);
-                  service.updateAssetStatus2(tranIdRepost, "RP", "Rejected");
+                  assetRecordBeans.updateAssetStatusChange("update AM_ASSET_PAYMENT  set status ='R', Reject_reason='"+reject_reason +"' where tranId =" +tranIdRepost);
+                  service.updateAssetStatus2(tranIdRepost, "R", "Rejected");
                 double lastDeduction = Double.parseDouble(service.getCodeName("select payment from AM_ASSET_PAYMENT where tranId=" +tranId));
                   //  System.out.println(" in reject >>>>> part payement >>> " + lastDeduction);
                     String reverseQuery ="update AM_ASSET set amount_ptd=amount_ptd -"+lastDeduction+",amount_rem = amount_rem + "+lastDeduction+" where asset_id= '" +id+"'";
@@ -177,6 +180,7 @@ public class RejectProcess extends HttpServlet {
                         msgText1=  "Asset with Asset Id '" + id + "' has been rejected during posting due to " + reject_reason + ".  Please re-initiate the Asset Reclassification.";
                          subject = "Asset Reclassification Rejection";
                         String mailId=  service.getCodeName("select asset_id from am_asset where asset_code='"+assetCode+"'");
+                        assetRecordBeans.updateAssetStatusChange("update am_asset_approval  set process_status='R',asset_status ='REJECTED' where transaction_id =" +tranIdRepost);
  //                       email.sendMailUser(mailId, subject, msgText1);
                  	   String createdby = service.userEmail(service.userToEmail(mailId));
                        comp.insertMailRecords(createdby,subject,msgText1);
@@ -192,7 +196,7 @@ public class RejectProcess extends HttpServlet {
                  }
                 if(page1 != null && page1.equalsIgnoreCase("ASSET CREATION RAISE ENTRY")){
                 	System.out.println("the message body >>>>> "+page1+"   Asset Id: "+id);
-                	assetRecordBeans.updateAssetStatusChange("update am_asset_approval  set process_status='R',asset_status ='R' where transaction_id =" +tranIdRepost);
+                	assetRecordBeans.updateAssetStatusChange("update am_asset_approval  set process_status='R',asset_status ='REJECTED' where transaction_id =" +tranIdRepost);
                 	assetRecordBeans.updateAssetStatusChange("update am_asset set Asset_Status='REJECTED' where Asset_Id ='" + id + "' ");
                     subject = "Asset Creation Rejection";
                 msgText1=  "Asset with Asset Id '" + id + "' has been rejected during posting due to " + reject_reason + ". Please re-create the asset.";
@@ -222,7 +226,8 @@ public class RejectProcess extends HttpServlet {
                 }
 
                    if(page1 != null && page1.equalsIgnoreCase("ASSET TRANSFER RAISE ENTRY")){
-                	   assetRecordBeans.updateAssetStatusChange("update am_asset_approval  set process_status='R',asset_status ='R' where transaction_id =" +tranIdRepost);
+                	   assetRecordBeans.updateAssetStatusChange("update am_asset_approval  set process_status='R',asset_status ='Rejected',DATE_APPROVED = '"+dateApproved+"' where transaction_id =" +tranIdRepost);
+                	   assetRecordBeans.updateAssetStatusChange("update am_assetTransfer  set approval_status ='Rejected' where TRANSFER_ID =" +tranIdRepost);
                        subject = "Asset Transfer Rejection";
               msgText1=  "Asset with Asset Id '" + id + "' has been rejected during posting due to " + reject_reason + ". Please re-initiate the Asset Transfer.";
                      //  msgText1= "Rejection of asset transfer with Asset Id '" + id + "' due to '" + reject_reason + "'. Please re-initiate the asset transfer.";
@@ -231,13 +236,18 @@ public class RejectProcess extends HttpServlet {
 
                 
                 //send mail
-                System.out.println("the message body >>>>> "+msgText1);
+//                System.out.println("the message body >>>>> "+msgText1);
                if(page1 != null && !page1.equalsIgnoreCase("ASSET CREATION RAISE ENTRY")){
                if (!setRejectReason(id, reject_reason,tranId,thirdPartyLabel)) {
   //              email.sendMailUser(id, subject, msgText1);   
             	   String createdby = service.userEmail(service.userToEmail(id));
                 comp.insertMailRecords(createdby,subject,msgText1);
                }
+               }
+               if(page1 != null && page1.equalsIgnoreCase("ASSET DISPOSAL RAISE ENTRY")){
+              	 assetRecordBeans.updateAssetStatusChange("update AM_ASSET set asset_status ='ACTIVE' where asset_ID ='"+id +"'");
+              	assetRecordBeans.updateAssetStatusChange("update am_asset_approval  set process_status='R',asset_status ='Rejected',DATE_APPROVED = '"+dateApproved+"' where transaction_id =" +tranIdRepost);
+//              	 System.out.println("update AM_ASSET set asset_status ='ACTIVE' where asset_ID ='"+id +"'");
                }
                 out.println("<script>alert('Entry Asset successfully Rejected  !')</script>");
                 out.println("<script>");
@@ -268,8 +278,17 @@ public class RejectProcess extends HttpServlet {
         String query = "update am_asset set asset_status='Rejected', post_reject_reason='" + rejectReason + "' where asset_id='" + asset_id + "'";
 //        String query = "update am_asset set asset_status='REJECTED', post_reject_reason='' where asset_id='" + asset_id + "'";
         String trantype =  service.getCodeName("select TRAN_TYPE from am_asset_approval where batch_id='"+tranId+"'");
-        if(trantype.equalsIgnoreCase("Asset Improvement")){lpo = service.getCodeName("select lpoNum from am_asset_improvement where REVALUE_ID='"+tranId+"'");}
-        if(trantype.equalsIgnoreCase("Asset Creation")){lpo = service.getCodeName("select LPO from am_asset where ASSET_ID='"+asset_id+"'");}
+        if(trantype.equalsIgnoreCase("Asset Improvement")){lpo = service.getCodeName("select lpoNum from am_asset_improvement where REVALUE_ID='"+tranId+"'");
+        query = "update am_asset set asset_status='ACTIVE', post_reject_reason=' ' where asset_id='" + asset_id + "'";
+        assetRecordBeans.updateAssetStatusChange("update am_asset_improvement set STATUS = 'REJECTED' where REVALUE_ID='"+tranId+"'");
+        }
+        if(trantype.equalsIgnoreCase("Asset Reclassification")){lpo = service.getCodeName("select lpoNum from am_asset_improvement where REVALUE_ID='"+tranId+"'");
+//        System.out.println("=====trantype: "+trantype);
+//        String Test = "update am_assetReclassification set STATUS = 'REJECTED' where Reclassify_ID='"+tranId+"'";
+//        System.out.println("=====Test: "+Test);;
+        if(trantype.equalsIgnoreCase("Asset Reclassification")){
+        	assetRecordBeans.updateAssetStatusChange("update am_assetReclassification set STATUS = 'REJECTED' where Reclassify_ID='"+tranId+"'");}
+        }
  //       System.out.println("<<<<<lpo======: "+lpo+"     trantype======: "+trantype+"     thirdPartyLabel======: "+thirdPartyLabel);
         if(lpo!="" && thirdPartyLabel.equalsIgnoreCase("Y")){boolean querydel = service.deleteQuery("DELETE FROM  AM_INVOICE_NO WHERE LPO = '"+lpo+"' AND TRANS_TYPE = '"+trantype+"'");}
 //        System.out.println("<<<<<lpo: "+lpo+"     trantype: "+trantype);

@@ -17,6 +17,7 @@ import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,69 +30,74 @@ public class UserDisableParamExecServlet extends HttpServlet {
 	private DatetimeFormat df;
 	private static final long serialVersionUID = 1L;
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		Connection con = null ;
-//        PreparedStatement ps = null;
-        PrintWriter out = response.getWriter();
-        int userID;
-//        String userClass = (String) request.getSession().getAttribute("UserClass");
-//        String branchId = request.getParameter("branchId");
-//		 String userId = (String) request.getSession().getAttribute("CurrentUser");
-//		 String processingDate = request.getParameter("bankProcessingDate");
-//		 String [] status = request.getParameterValues("status");
-//		 String class_id="";
-//		 String class_desc="";
-//		 String report_type="";
-//		 String Status="";
-        sdf = new java.text.SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-        df = new DatetimeFormat();
-		 String procDate = sdf.format(new java.util.Date());
-	 
-		//	System.out.println("<<<<<<=====userId: "+userId+"    userClass: "+userClass + " branchId: " + branchId);
-			
-		    Connection con;
-		    ResultSet rs;
-		    PreparedStatement ps;
-		    PreparedStatement ps1;
-		    PreparedStatement ps2;
-		    String query;
-		    String insertquery;
-		    String deletequery;
-		    con = null;
-		    rs = null; 
-		    ps = null;  
-		    ps1 = null;  
-		    ps2 = null;  
-//		    System.out.println("FirstDayProcessDate in procdate: "+procdate);
-		    deletequery = "delete from am_gb_classEnable ";
-		    query = "UPDATE b SET b.class = a.DefaultClass_Id FROM am_gb_classDisable a,am_gb_user b " +
-		            "WHERE a.Class_Id = b.Class AND a.class_status = 'Y'";
-		    insertquery = "insert into am_gb_classEnable(class_id,class_desc,class_name,User_Id,class_status,create_date) " +
-		            "select a.class_id,a.class_desc,a.class_name,b.User_Id,'N',? from am_gb_classDisable a " +
-		    		"INNER JOIN am_gb_user b ON b.Class = a.class_id " +
-		    		"where a.class_status = 'Y'";    
-//		    System.out.println("query in OldAssetDepreciation: "+query+"      procdate: "+procdate);
-		    try {
-		    con = getConnection();
-		    ps = con.prepareStatement(deletequery);
-		    ps.execute();
-		    ps1 = con.prepareStatement(insertquery);
-		    ps1.setDate(1, df.dateConvert(procDate));
-		    ps1.execute();
-		    ps2 = con.prepareStatement(query);
-		    ps2.execute();
-		    
-		    out.println("<script type='text/javascript'>alert('Successfully Disabled Selected Users.');</script>");
-            out.println((new StringBuilder("<script> window.location ='DocumentHelp.jsp'</script>"))); 
+	    response.setContentType("text/html");
+	    PrintWriter out = response.getWriter();
 
-		} catch (Exception ex) {  
-		    System.out.println("WARN: Disable User ->" +
-		            ex.getMessage());
-		} finally {
-		    closeConnection(con, ps, rs);
-		    closeConnection(con, ps1, rs);
-		    closeConnection(con, ps2, rs);
-		}        
-		}
+	    Connection con = null;
+	    PreparedStatement ps = null;
+	    PreparedStatement ps1 = null;
+	    PreparedStatement ps2 = null;
+
+	    try {
+	        con = getConnection();
+	        con.setAutoCommit(false); 
+
+	        String deleteQuery = "DELETE FROM am_gb_classEnable";
+	        ps = con.prepareStatement(deleteQuery);
+	        ps.executeUpdate();
+
+	        System.out.println("Entering Insertion Script");
+	        String insertQuery = "INSERT INTO am_gb_classEnable (class_id, class_desc, class_name, User_Id, class_status, create_date) " +
+	                             "SELECT a.class_id, a.class_desc, a.class_name, b.User_Id, 'N', ? " +
+	                             "FROM am_gb_classDisable a " +
+	                             "INNER JOIN am_gb_user b ON b.Class = a.class_id " +  
+	                             "WHERE a.class_status = 'Y'";
+
+	        ps1 = con.prepareStatement(insertQuery);
+	        java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+	        ps1.setDate(1, sqlDate);
+	        int i = ps1.executeUpdate();
+	       // System.out.println("Insertion Script Done");
+	        
+	        if (i > 0) {
+	        	System.out.println("Entering Update Script");
+	            String updateQuery = "UPDATE b SET b.class = a.DefaultClass_Id " +
+	                                 "FROM am_gb_classDisable a, am_gb_user b " +
+	                                 "WHERE a.Class_Id = b.Class AND a.class_status = 'Y'";
+	            ps2 = con.prepareStatement(updateQuery);
+	            int x = ps2.executeUpdate();
+	            if(x > 0) {
+	            	// System.out.println("Update Script Done");
+	            	 con.commit(); 
+	     	       out.println("<script type=\"text/javascript\">");
+		            out.println("alert('Successfully Disabled Selected Users.');");
+		            out.println("location='DocumentHelp.jsp?np=userDisableParam';");
+		            out.println("</script>");
+	            }
+	           
+	        }
+
+	       
+
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        if (con != null) {
+	            try {
+	                con.rollback(); 
+	            } catch (SQLException rollbackEx) {
+	                rollbackEx.printStackTrace();
+	            }
+	        }
+	        
+	        String errorMsg = ex.getMessage().replace("'", "\\'");
+	        out.println("<script type='text/javascript'>alert('Error occurred: " + errorMsg + "');</script>");
+	    } finally {
+	        closeConnection(null, ps2, null);
+	        closeConnection(null, ps1, null);
+	        closeConnection(con, ps, null); 
+	    }
+	}
+
 	
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	 doPost(request, response);
@@ -101,7 +107,7 @@ public class UserDisableParamExecServlet extends HttpServlet {
     {
         for(int i = 0; i < list.size(); i++)
         {
-//            System.out.println();
+        	
             UserDisableClass dc = (UserDisableClass)list.get(i);
             updateDisableClass(dc, userid, branchCode, loginId, eff_date);
         }

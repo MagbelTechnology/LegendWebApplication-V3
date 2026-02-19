@@ -2297,7 +2297,7 @@ public class SecurityHandler
         ps.setString(5, cp.getRole_uuid());
         compareAuditValues(cp.getRole_view(), cp.getRole_addn(), cp.getRole_edit(), cp.getClss_uuid(), cp.getRole_uuid(), String.valueOf(userid), branchCode, loginId, eff_date);
 
-        System.out.println("\n\n >>>>>>>>>>>>>>>>>> ps.execute() " + ps.executeUpdate());
+//        System.out.println("\n\n >>>>>>>>>>>>>>>>>> ps.execute() " + ps.executeUpdate());
 //        closeConnection(con, ps);
         }
         catch (Exception ex) {
@@ -3194,7 +3194,7 @@ public class SecurityHandler
         return password;
     }
 
-    public boolean createManageUser2(User user, String limit,String  supervisorId)
+    public boolean createManageUser2(User user, String limit,String  supervisorId) throws IOException
     {
         Connection con;
         PreparedStatement ps;
@@ -3203,6 +3203,13 @@ public class SecurityHandler
         ps = null;
         done = false;
         String query = "";
+        Properties prop = new Properties();
+		File file = new File("C:\\Property\\LegendPlus.properties");
+		FileInputStream input = new FileInputStream(file);
+		prop.load(input);
+
+		String bank = prop.getProperty("bank");
+		System.out.println("bank: " + bank);
         try {
         String userId = (new ApplicationHelper()).getGeneratedId("AM_GB_USER");
         if(user.getExpiryDate() == "" || user.getExpiryDate().equalsIgnoreCase("null") || user.getExpiryDate() == null || user.getExpiryDate().equalsIgnoreCase(""))
@@ -3229,7 +3236,14 @@ public class SecurityHandler
             ps.setString(11, user.getUserStatus());
             ps.setString(12, user.getCreatedBy());
             ps.setDate(13, df.dateConvert(new Date()));
-            ps.setDate(14, df.dateConvert(df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry()))));
+            if ("ZENITH".equals(bank)) {
+                ps.setNull(14, java.sql.Types.DATE);
+            } else {
+                java.sql.Date expiryDate = df.dateConvert(
+                    df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry()))
+                );
+                ps.setDate(14, expiryDate);
+            }
             ps.setString(15, user.getFleetAdmin());
             ps.setString(16, user.getEmail());
             ps.setString(17, userId);
@@ -3271,7 +3285,14 @@ public class SecurityHandler
             ps.setString(11, user.getUserStatus());
             ps.setString(12, user.getCreatedBy());
             ps.setDate(13, df.dateConvert(new Date()));
-            ps.setDate(14, df.dateConvert(df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry()))));
+            if ("ZENITH".equals(bank)) {
+                ps.setNull(14, java.sql.Types.DATE);
+            } else {
+                java.sql.Date expiryDate = df.dateConvert(
+                    df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry()))
+                );
+                ps.setDate(14, expiryDate);
+            }
             ps.setString(15, user.getFleetAdmin());
             ps.setString(16, user.getEmail());
             ps.setString(17, userId);
@@ -3843,42 +3864,70 @@ public class SecurityHandler
         return compName;
     }
 
+//    public String getCurrentDate_Month() throws SQLException {
+//        Connection con = null;
+//        //PreparedStatement ps = null;
+//         Statement stmt = null;
+//        ResultSet rs = null;
+//        String dateMonth = "";
+//        String logindate = "";
+//        String month = "";
+//        CallableStatement cstmt = null;
+//        try {
+//        	 con = getConnection();
+//             stmt = con.createStatement();
+//         cstmt = con.prepareCall(
+//                 "{call getCurrentDate_Month()}");
+//         cstmt.execute();
+//         rs = cstmt.getResultSet();
+//         if (rs.next()) {
+//             logindate = rs.getString(1);
+//             month = rs.getString(2);
+//             dateMonth = logindate+"#"+month;
+//          //   System.out.println("======logindate:  "+logindate+"   month: "+month+"   dateMonth: "+dateMonth);
+//         }      
+//
+//        } catch (Exception ex) {
+//
+//            System.out.println("Error occurred in getCurrentDate_Month() of SecurityHandler  >>" +ex);
+//        } finally {
+//        //closeConnection(con,stmt,rs);
+//        	rs.close();
+//        	cstmt.close();
+//        	con.close();
+//        	
+//        }
+//
+//        return dateMonth;
+//    }
+    
+    
     public String getCurrentDate_Month() throws SQLException {
-        Connection con = null;
-        //PreparedStatement ps = null;
-         Statement stmt = null;
-        ResultSet rs = null;
+
         String dateMonth = "";
-        String logindate = "";
-        String month = "";
-        CallableStatement cstmt = null;
-        try {
-        	 con = getConnection();
-             stmt = con.createStatement();
-         cstmt = con.prepareCall(
-                 "{call getCurrentDate_Month()}");
-         cstmt.execute();
-         rs = cstmt.getResultSet();
-         if (rs.next()) {
-             logindate = rs.getString(1);
-             month = rs.getString(2);
-             dateMonth = logindate+"#"+month;
-          //   System.out.println("======logindate:  "+logindate+"   month: "+month+"   dateMonth: "+dateMonth);
-         }      
+
+        try (
+            Connection con = getConnection();
+            CallableStatement cstmt = con.prepareCall("{call getCurrentDate_Month()}");
+            ResultSet rs = executeAndGetResultSet(cstmt)
+        ) {
+
+            if (rs.next()) {
+                dateMonth = rs.getString(1) + "#" + rs.getString(2);
+            }
 
         } catch (Exception ex) {
-
-            System.out.println("Error occurred in getCurrentDate_Month() of SecurityHandler  >>" +ex);
-        } finally {
-        //closeConnection(con,stmt,rs);
-        	rs.close();
-        	cstmt.close();
-        	con.close();
-        	
+            throw new SQLException("Error in getCurrentDate_Month()", ex);
         }
 
         return dateMonth;
     }
+
+    private ResultSet executeAndGetResultSet(CallableStatement cstmt) throws SQLException {
+        cstmt.execute();
+        return cstmt.getResultSet();
+    }
+
 
 //    public java.util.ArrayList getUserByQueryProc(String userNameFilter, String passwordfilter, String Name,String tokenfilter, String pass) throws SQLException
 //    {
@@ -4377,40 +4426,68 @@ public class SecurityHandler
     }
 
 
+//    public String getLoginStatus(String  userName) throws SQLException {
+//        Connection con = null;
+//        //PreparedStatement ps = null;
+//         Statement stmt = null;
+//        ResultSet rs = null;
+// //       System.out.println("======userName Name:  "+userName);
+//        String loginstatus = "";
+//        CallableStatement cstmt = null;
+//        try {
+//        	 con = getConnection();
+//             stmt = con.createStatement();
+////         cstmt = con.prepareCall(
+////                 "{call getLoginStatus(" + userName + ")}");
+//         cstmt = con.prepareCall("{CALL getLoginStatus(?)}");
+//         cstmt.setString(1, userName);
+//         //cstmt.execute();
+//         rs = cstmt.executeQuery();
+//         if (rs.next()) {
+//             loginstatus = rs.getString(1);
+// //            System.out.println("======Company Name:  "+compName);
+//         }      
+//
+//        } catch (Exception ex) {
+//
+//            System.out.println("Error occurred in getLoginStatus() of SecurityHandler  >>" +ex);
+//        } finally {
+//        //closeConnection(con,stmt,rs);
+//        	rs.close();
+//        	cstmt.close();
+//        	con.close();
+//        }
+//
+//        return loginstatus;
+//    }
+    
     public String getLoginStatus(String  userName) throws SQLException {
-        Connection con = null;
-        //PreparedStatement ps = null;
-         Statement stmt = null;
-        ResultSet rs = null;
- //       System.out.println("======userName Name:  "+userName);
+
         String loginstatus = "";
-        CallableStatement cstmt = null;
-        try {
-        	 con = getConnection();
-             stmt = con.createStatement();
-//         cstmt = con.prepareCall(
-//                 "{call getLoginStatus(" + userName + ")}");
-         cstmt = con.prepareCall("{CALL getLoginStatus(?)}");
-         cstmt.setString(1, userName);
-         //cstmt.execute();
-         rs = cstmt.executeQuery();
-         if (rs.next()) {
-             loginstatus = rs.getString(1);
- //            System.out.println("======Company Name:  "+compName);
-         }      
 
-        } catch (Exception ex) {
+        try (
+                Connection con = getConnection();
+                CallableStatement cstmt = con.prepareCall("{CALL getLoginStatus(?)}")
+            ) {
 
-            System.out.println("Error occurred in getLoginStatus() of SecurityHandler  >>" +ex);
-        } finally {
-        //closeConnection(con,stmt,rs);
-        	rs.close();
-        	cstmt.close();
-        	con.close();
-        }
+                cstmt.setString(1, userName);
+
+                try (ResultSet rs = cstmt.executeQuery()) {
+                    if (rs.next()) {
+                        loginstatus = rs.getString(1);
+                    }
+                }
+
+            } catch (Exception ex) {
+                throw new SQLException("Error in getLoginStatus()", ex);
+            }
 
         return loginstatus;
     }
+
+   
+
+    
 
     public String getclassName(String userClass,String param) throws SQLException {
         Connection con = null;
@@ -5309,31 +5386,36 @@ public class SecurityHandler
         
         try {
         
-        if(filter.equals("")) {
-        	query= "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff \r\n" + 
-        			extraQuery +
-        			"union select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff"
-        			+extraQuery;
-        	 c = getConnection();
-           //  System.out.println("query: " + query);
-             s = c.prepareStatement(query);
-             s.setString(1, status);
-             s.setString(2, status);
-        }
+//        if(filter.equals("")) {
+//        	query= "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff \r\n" + 
+//        			extraQuery +
+//        			"union select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff"
+//        			+extraQuery;
+//        	 c = getConnection();
+//           //  System.out.println("query: " + query);
+//             s = c.prepareStatement(query);
+//             s.setString(1, status);
+//             s.setString(2, status);
+//        }
+        	
+        	if(filter.equals("")) {
+            	query= "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff \r\n" + 
+            			"union select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff";
+            	 c = getConnection();
+                 System.out.println("query: " + query);
+                 s = c.prepareStatement(query);
+            }
         
         if(!filter.equals("")) {
-         query = "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff "+extraQuery+ " and StaffId like ? \r\n" + 
-        		"union\r\n" + 
-        		"select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff "+extraQuery+ " and Full_Name like ? ";
-         c = getConnection();
-       // System.out.println("query: " + query);
-         s = c.prepareStatement(query);
-         s.setString(1, status);
-         s.setString(2, "%"+filter+"%");
-         s.setString(3, status);
-         s.setString(4,  "%"+filter+"%");
-
-        }
+            query = "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff where StaffId like ? \r\n" + 
+           		"union\r\n" + 
+           		"select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff where Full_Name like ? ";
+            c = getConnection();
+           System.out.println("query: " + query);
+            s = c.prepareStatement(query);
+            s.setString(1, "%"+filter+"%");
+            s.setString(2,  "%"+filter+"%");
+           }
 
             rs = s.executeQuery();
         while(rs.next()){

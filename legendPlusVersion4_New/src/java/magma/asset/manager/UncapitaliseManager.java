@@ -12,6 +12,7 @@ import magma.util.Codes;
 
 import com.magbel.util.ApplicationHelper;
 import com.magbel.legend.bus.ApprovalRecords;
+import com.magbel.legend.vao.newAssetTransaction;
 public class UncapitaliseManager extends MagmaDBConnection {
     private Codes code;
 
@@ -8061,7 +8062,7 @@ public void processUncapImprovementReversal(String assetId, double oldCost,doubl
 //
 //}
 
-public ArrayList getUncapAssetByQuery(String query,String branch_Id,String dept_Id,String category,String asset_Id,String regNumber,String fromDate,String toDate, String status) {
+public ArrayList getUncapAssetByQueryOld(String query,String branch_Id,String dept_Id,String category,String asset_Id,String regNumber,String fromDate,String toDate, String status) {
 //  String selectQuery = "SELECT * FROM AM_ASSET WHERE " + query;
   String selectQuery = "SELECT * FROM AM_ASSET_UNCAPITALIZED WHERE ASSET_ID IS NOT NULL " +query;
 
@@ -8168,88 +8169,7 @@ public ArrayList getUncapAssetByQuery(String query,String branch_Id,String dept_
 			 ps.setString(2, asset_Id);
 			 ps.setString(3, status);
 		 }
-//		 if(!branch_Id.equals("ALL") && category.equals("ALL") && dept_Id.equals("ALL") && fromDate.equals("") && toDate.equals("") && !asset_Id.equals("")) {
-//			 System.out.println("Asset Id Selection in getUncapAssetByQuery: ");
-//			 ps.setString(1, asset_Id);
-//			 ps.setString(2, status);
-//     }
-		 
-	
-     
-//    if(query.contains("ASSET_ID") && query.contains("ASSET_STATUS")){
-//  	  System.out.println("<========getAssetByQuery=======>0 asset_Id: "+asset_Id);
-//  	  ps.setString(1, asset_Id);
-//	  ps.setString(2, status);
-//    }     
-//    if(query.contains("BRANCH_ID") && query.contains("ASSET_STATUS")){
-//  	  System.out.println("<========getAssetByQuery=======>1 With STatus branch_Id: "+branch_Id + "status: " + status);
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, branch_Id);
-//  	  ps.setString(3, status);
-//    }  
-//    if(query.contains("BRANCH_ID") && query.contains("DEPT_ID") && query.contains("ASSET_STATUS")){
-//  	  System.out.println("<========getAssetByQuery=======>2");
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, branch_Id);
-//  	  ps.setString(3, dept_Id);
-//  	  ps.setString(4, status);
-//    }   
-//    if(query.contains("BRANCH_ID") && query.contains("ASSET_ID") && query.contains("ASSET_STATUS")){
-//  	  System.out.println("<========getAssetByQuery=======>3");
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, branch_Id);
-//  	  ps.setString(3, asset_Id);
-//  	  ps.setString(4, status);
-//    }   
-//    if(query.contains("BRANCH_ID") && query.contains("CATEGORY_ID") && query.contains("ASSET_STATUS")){
-//  	  System.out.println("<========getAssetByQuery=======>4");
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, category);
-//  	  ps.setString(3, branch_Id);
-//  	  ps.setString(4, status);
-//    }  
-//    if(query.contains("BRANCH_ID") && query.contains("CATEGORY_ID") && query.contains("DEPT_ID") && query.contains("DATE_PURCHASED") && !query.contains("ASSET_ID")){
-//  	  System.out.println("<========getAssetByQuery=======>5");
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, category);
-//  	  ps.setString(3, branch_Id);
-//  	  ps.setString(4, dept_Id);
-//  	  ps.setString(5, fromDate);
-//  	  ps.setString(6, toDate);
-//    }  
-//    if(query.contains("BRANCH_ID") && query.contains("DEPT_ID") && query.contains("DATE_PURCHASED") && !query.contains("CATEGORY_ID")){
-//  	  System.out.println("<========getAssetByQuery=======>6");
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, branch_Id);
-//  	  ps.setString(3, dept_Id);
-//  	  ps.setString(4, fromDate);
-//  	  ps.setString(5, toDate);
-//    }          
-//    if(query.contains("BRANCH_ID") && query.contains("CATEGORY_ID") && !query.contains("ASSET_STATUS") && !query.contains("DEPT_ID")){
-//  	  System.out.println("<========getAssetByQuery=======>7");
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, category);
-//  	  ps.setString(3, branch_Id);
-//  	  ps.setString(4, status);
-//    }   
-//    if(query.contains("BRANCH_ID") && query.contains("CATEGORY_ID") && query.contains("DEPT_ID") && query.contains("ASSET_STATUS")){
-//  	  System.out.println("<========getAssetByQuery=======>8");
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, category);
-//  	  ps.setString(3, branch_Id);
-//  	  ps.setString(4, dept_Id);
-//  	  ps.setString(5, status);
-//  	  
-//    } 
-//    if(query.contains("BRANCH_ID") && query.contains("CATEGORY_ID") && query.contains("DEPT_ID") && query.contains("ASSET_ID") && query.contains("ASSET_STATUS")){
-//  	  System.out.println("<========getAssetByQuery=======>9");
-//  	  ps.setString(1, branch_Id);
-//  	  ps.setString(2, category);
-//  	  ps.setString(3, branch_Id);
-//  	  ps.setString(4, dept_Id);
-//  	  ps.setString(5, asset_Id);
-//  	  ps.setString(6, status);
-//    } 
+
       rs = ps.executeQuery();
 
       while (rs.next()) {
@@ -8349,5 +8269,179 @@ public ArrayList getUncapAssetByQuery(String query,String branch_Id,String dept_
   return list;
 
 }
+
+
+public ArrayList getUncapAssetByQuery(String query,String branch_Id,String dept_Id,String category,String asset_Id,String regNumber,String fromDate,String toDate, String status) {
+//  String selectQuery = "SELECT * FROM AM_ASSET WHERE " + query;
+  String selectQuery = "SELECT * FROM AM_ASSET_UNCAPITALIZED WHERE ASSET_ID IS NOT NULL ";
+
+  Connection con = null;
+  PreparedStatement ps = null;
+  ResultSet rs = null;
+  ArrayList<Uncapitalized> list = new ArrayList<>();
+  List<String> params = new ArrayList<>();
+  Uncapitalized _obj = null;
+
+  try {
+      con = getConnection("legendPlus");     
+      
+    
+
+          StringBuilder sqlQuery = new StringBuilder(selectQuery);
+
+
+          if (!asset_Id.isEmpty()) {
+        	    sqlQuery = new StringBuilder("SELECT * FROM AM_ASSET_UNCAPITALIZED WHERE ASSET_ID = ?");
+        	    params.clear();
+        	    params.add(asset_Id);
+        	    System.out.println("Only Asset ID selected, skipping other filters");
+        	} else {
+        	    if (!branch_Id.equals("ALL")) {
+        	        sqlQuery.append(" AND BRANCH_ID = ?");
+        	        params.add(branch_Id);
+        	        System.out.println("Branch selected");
+        	    }
+
+        	    if (!category.equals("ALL")) {
+        	        sqlQuery.append(" AND category_id =?");
+        	        params.add(category);
+        	        System.out.println("Category selected");
+        	    }
+
+        	    if (!dept_Id.equals("ALL")) {
+        	        sqlQuery.append(" AND Dept_id =?");
+        	        params.add(dept_Id);
+        	        System.out.println("Department selected");
+        	    }
+
+        	    if (!fromDate.isEmpty() && !toDate.isEmpty()) {
+        	        sqlQuery.append(" AND DATE_PURCHASED BETWEEN ? AND ?");
+        	        params.add(fromDate);
+        	        params.add(toDate);
+        	        System.out.println("Date selected");
+        	    }
+
+        	    if (!status.isEmpty()) {
+        	        sqlQuery.append(" AND ASSET_STATUS =?");
+        	        params.add(status);
+        	        System.out.println("Status selected");
+        	    }
+
+        	    if (!regNumber.isEmpty()) {
+        	        sqlQuery.append(" AND REGISTRATION_NO =?");
+        	        params.add(regNumber);
+        	        System.out.println("Reg Number selected");
+        	    }
+        	}
+
+
+          ps = con.prepareStatement(sqlQuery.toString());
+          for (int i = 0; i < params.size(); i++) {
+              ps.setString(i + 1, params.get(i));
+          }
+
+          rs = ps.executeQuery();
+    
+     
+
+      while (rs.next()) {
+          String assetId = rs.getString("ASSET_ID");
+          String regNo = rs.getString("REGISTRATION_NO");
+          int branchId = rs.getInt("BRANCH_ID");
+//          String branchName = rs.getString("BRANCH_NAME");
+//          System.out.println("We are here");
+          int deptId = rs.getInt("DEPT_ID");
+//          String deptName = rs.getString("DEPT_NAME");
+//          System.out.println("We are here 2");
+          int sectionId = rs.getInt("SECTION_ID");
+//          String sectionName = rs.getString("SECTION_NAME");
+          int categoryId = rs.getInt("CATEGORY_ID");
+//          String categoryName = rs.getString("CATEGORY_NAME");
+          String description = rs.getString("DESCRIPTION");
+          String datePurchased = formatDate(rs.getDate("DATE_PURCHASED"));
+          double depRate = rs.getDouble("DEP_RATE");
+          String make = rs.getString("ASSET_MAKE");
+          String assetUser = rs.getString("ASSET_USER");
+          double accumDep = rs.getDouble("ACCUM_DEP");
+          double monthDep = rs.getDouble("MONTHLY_DEP");
+          double costPrice = rs.getDouble("COST_PRICE");
+          String depEndDate = formatDate(rs.getDate("DEP_END_DATE"));
+          double residualValue = rs.getDouble("RESIDUAL_VALUE");
+          String effDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+          String raiseEntry = rs.getString("RAISE_ENTRY");
+          double NBV = rs.getDouble("NBV");
+          //String effDate = rs.getString("EFFECTIVE_DATE");
+          String vendorAcct = rs.getString("VENDOR_AC");
+          String model = rs.getString("ASSET_MODEL");
+          String engineNo = rs.getString("ASSET_ENGINE_NO");
+          String email1 = rs.getString("EMAIL1");
+          String email2 = rs.getString("EMAIL2");
+          //String vendorName = rs.getString("VENDOR_NAME");
+//          int regionId = rs.getInt("REGION_ID");
+//          String regionName = rs.getString("REGION_NAME");
+          String whoToRem1 = rs.getString("WHO_TO_REM");
+          String whoToRem2 = rs.getString("WHO_TO_REM_2");
+          String reqRedistbtn = rs.getString("REQ_REDISTRIBUTION");
+          double vatAmt = rs.getDouble("VAT");
+          double whtAmt = rs.getDouble("WH_TAX_AMOUNT");
+          String subj2Vat = rs.getString("SUBJECT_TO_VAT");
+          String subj2Wht = rs.getString("WH_TAX");
+          double vatableCost = rs.getDouble("VATABLE_COST");
+          int assetCode = rs.getInt("asset_code");
+//          double impraccumDep = rs.getDouble("IMPROV_ACCUMDEP");
+//          double imprmonthDep = rs.getDouble("IMPROV_MONTHLYDEP");
+//          double imprcostPrice = rs.getDouble("IMPROV_COST");
+//          double imprNBV = rs.getDouble("IMPROV_NBV");
+         // int wht_percent = rs.getInt("WHT_PERCENT");
+        //  String integrify = rs.getString("INTEGRIFY");
+//          _obj = new Uncapitalized(assetId, regNo, branchId, branchName, deptId,
+//                           deptName, sectionId, sectionName,
+//                           categoryId, categoryName, regionId, regionName,
+//                           description, datePurchased, depRate, make,
+//                           assetUser,
+//                           accumDep, monthDep, costPrice, depEndDate,
+//                           residualValue, raiseEntry, NBV, effDate,
+//                           vendorAcct, model,
+//                           engineNo, email1, email2, whoToRem1, whoToRem2,
+//                           reqRedistbtn, vatAmt, whtAmt, subj2Vat,
+//                           subj2Wht, vatableCost);
+//          _obj.setImpraccumDep(impraccumDep);
+//          _obj.setImprcost(imprcostPrice);
+//          _obj.setImprmonthDep(imprmonthDep);
+//          _obj.setImprnbv(imprNBV);
+//          _obj.setAssetCode(assetCode);
+
+        //  _obj.setWht_percent(wht_percent);
+          _obj = new Uncapitalized(assetId, regNo, branchId, "", deptId,
+                  "", sectionId, "",
+                  categoryId, "", 0, "",
+                  description, datePurchased, depRate, make,
+                  assetUser,
+                  accumDep, monthDep, costPrice, depEndDate,
+                  residualValue, raiseEntry, NBV, effDate,
+                  vendorAcct, model,
+                  engineNo, email1, email2, whoToRem1, whoToRem2,
+                  reqRedistbtn, vatAmt, whtAmt, subj2Vat,
+                  subj2Wht, vatableCost);
+                  _obj.setAssetCode(assetCode);
+//                  _obj.setImpraccumDep(impraccumDep);
+//                  _obj.setImprcost(imprcostPrice);
+//                  _obj.setImprmonthDep(imprmonthDep);
+//                  _obj.setImprnbv(imprNBV);  
+                  list.add(_obj);   	
+      }
+
+  } catch (Exception e) {
+      System.out.println("INFO:Error fetching Asset by Query ->" +
+                         e.getMessage());
+  } finally {
+      closeConnection(con, ps, rs);
+  }
+
+  return list;
+
+}
+
+
 
 }

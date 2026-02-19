@@ -1,5 +1,6 @@
 package ng.com.magbel.token;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,7 +11,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Properties;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -41,10 +48,10 @@ public class ParallexTokenClass {
    	
         	String uri = prop.getProperty("ParallexApiUrl");
         	
-        	System.out.println("<<<<< We are here ");
+        	//System.out.println("<<<<< We are here ");
 		
 		try { 
-			System.out.println("<<<<< We are here 2 ");
+			//System.out.println("<<<<< We are here 2 ");
 			 	obj.put("UserId", userId);
 			 	obj.put("TokenResponse", token);
 	          
@@ -109,7 +116,91 @@ public class ParallexTokenClass {
 		return status;
 	}
 	
-	
+	public static String postTransaction(String requestPayload)
+	        throws IOException {
+	    String result = "";
+	    Properties prop = new Properties();
+	    File file = new File("C:\\Property\\LegendPlus.properties");
+	    FileInputStream input = new FileInputStream(file);
+	    prop.load(input);
+
+	    String uri = prop.getProperty("ParallexPostingApiUrl");
+	    String clientId = prop.getProperty("clientId");
+	    String clientKey = prop.getProperty("clientKey");
+	    System.out.println("clientId to URI: " + clientId);
+	    System.out.println("clientKey to URI: " + clientKey);
+	    
+	    try {
+
+//	    	 // Create a trust manager that does not validate certificate chains
+//	        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+//	                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+//	                    return null;
+//	                }
+//					@Override
+//					public void checkClientTrusted(
+//							java.security.cert.X509Certificate[] arg0,
+//							String authType) throws CertificateException {
+//						// TODO Auto-generated method stub
+//						
+//					}
+//					@Override
+//					public void checkServerTrusted(
+//							java.security.cert.X509Certificate[] arg0,
+//							String authType) throws CertificateException {
+//						// TODO Auto-generated method stub
+//						
+//					}
+//	            }
+//	        };
+//
+//	        SSLContext sc = SSLContext.getInstance("SSL");
+//	        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+//	        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+//	        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+
+
+	        URL url = new URL(uri);
+	        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+	        con.setRequestMethod("POST");
+	        con.setRequestProperty("Content-Type", "application/json");
+	        con.setRequestProperty("Accept", "application/json");
+	        if (clientId != null && !clientId.isBlank()) {
+	            con.setRequestProperty("client-id", clientId);
+	        }
+
+	        if (clientKey != null && !clientKey.isBlank()) {
+	            con.setRequestProperty("client-key", clientKey);
+	        }
+	        con.setDoOutput(true);
+
+	        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+	            wr.writeBytes(requestPayload);
+	            wr.flush();
+	        }
+
+	        int responseCode = con.getResponseCode();
+	        InputStream response = (responseCode >= 200 && responseCode < 300)
+	                ? con.getInputStream()
+	                : con.getErrorStream();
+
+	        StringBuilder sb = new StringBuilder();
+	        try (BufferedReader br = new BufferedReader(new InputStreamReader(response))) {
+	            String line;
+	            while ((line = br.readLine()) != null) {
+	                sb.append(line);
+	            }
+	        }
+
+	        result = sb.toString();
+	        System.out.println("Response Code: " + responseCode);
+	        System.out.println("Response Body: " + result);
+
+	    } catch (Exception e) {
+	        System.out.println("Error posting transaction: " + e.getMessage());
+	    }
+	    return result;
+	}
 	
 	
 	

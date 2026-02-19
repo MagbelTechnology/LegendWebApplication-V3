@@ -19,7 +19,7 @@ import com.magbel.util.HtmlUtility;
 // Referenced classes of package magma:
 //            DateManipulations
 
-public class ExcelAssetImproveBean extends ConnectionClass
+public class ExcelAssetImproveBean_09_09_2025 extends ConnectionClass
 {
 	public ApprovalRecords approve;
 	public HtmlUtility htmlUtil;	
@@ -113,7 +113,7 @@ public class ExcelAssetImproveBean extends ConnectionClass
     private String newvat_amount;
     private String newnbv;
     private String newwht_amount;
-    public ExcelAssetImproveBean()
+    public ExcelAssetImproveBean_09_09_2025()
         throws Exception
     {
         branch_id = "0";
@@ -348,6 +348,7 @@ throws Exception
 {
 	Connection con = null;
 	PreparedStatement ps = null;
+	PreparedStatement ps2 = null;
 	boolean done = false;
 	String id = "";
 	
@@ -390,6 +391,15 @@ double  costPrice = Double.parseDouble(cost_price)+vatAmount;
 //System.out.println("=====createGroupUpload asset_id=====> "+asset_id);
 //System.out.println("=====createGroupUpload description=====> "+description);
 String query = "INSERT INTO AM_GROUP_IMPROVEMENT(Revalue_ID,asset_id,cost_increase,revalue_reason,revalue_Date," +
+"User_ID,raise_entry,r_vendor_ac,cost_price,vatable_cost," +
+"vat_amount,wht_amount,nbv,accum_dep,old_cost_price,old_vatable_cost,old_vat_amount,old_wht_amount,old_nbv,old_accum_dep," +
+"effDate,approval_status,WHT_PERCENT,WH_tax,Subject_to_vat,new_cost_price,new_vatable_cost,new_nbv,new_vat_amount," +
+"new_wht_amount,R_VENDOR_ID,branch_code,category_code,description,lpoNum,invoice_no," +
+"asset_code,IMPROV_USEFULLIFE,OLD_IMPROV_NBV,OLDIMPROV_ACCUMDEP,OLD_IMPROV_COST,OLD_IMPROV_VATABLECOST," +
+"IMPROVED,PROJECT_CODE,LOCATION"+
+" )VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+String query2 = "INSERT INTO am_asset_improvement_Upload(Revalue_ID,asset_id,cost_increase,revalue_reason,revalue_Date," +
 "User_ID,raise_entry,r_vendor_ac,cost_price,vatable_cost," +
 "vat_amount,wht_amount,nbv,accum_dep,old_cost_price,old_vatable_cost,old_vat_amount,old_wht_amount,old_nbv,old_accum_dep," +
 "effDate,approval_status,WHT_PERCENT,WH_tax,Subject_to_vat,new_cost_price,new_vatable_cost,new_nbv,new_vat_amount," +
@@ -449,9 +459,60 @@ try {
 	
 //	System.out.println("<<<<<<<createGroupUpload spare1: "+spare_1+"   spare2: "+spare_2+"   Group Id: "+gid);
 done = (ps.executeUpdate() != -1);
+
+ps2 = con.prepareStatement(query2);
+ps2.setString(1, gid);
+ps2.setString(2, Assetid);
+ps2.setDouble(3, costPrice);
+ps2.setString(4, improveReason);
+ps2.setString(5, DateManipulations.CalendarToDb(date_of_purchase));
+ps2.setInt(6, Integer.parseInt(user_id));
+ps2.setString(7, "N");
+ps2.setString(8, vendor_account);
+ps2.setDouble(9, costPrice);
+ps2.setDouble(10, Double.parseDouble(vatable_cost)); 
+ps2.setDouble(11, vatAmount); 
+ps2.setDouble(12, whtaxamount);
+ps2.setDouble(13, 0); 
+ps2.setDouble(14, 0); 
+ps2.setDouble(15, Double.parseDouble(oldcost_price)); 
+ps2.setDouble(16, Double.parseDouble(oldvatable_cost)); 
+ps2.setDouble(17, Double.parseDouble(oldvat_amount)); 
+ps2.setDouble(18, Double.parseDouble(oldwht_amount)); 
+ps2.setDouble(19, Double.parseDouble(oldnbv)); 
+ps2.setDouble(20, Double.parseDouble(oldaccum_dep)); 
+ps2.setString(21, DateManipulations.CalendarToDb(posting_date));
+ps2.setString(22, approvalStatus);
+ps2.setDouble(23, Double.parseDouble(wh_tax_amount)); 
+ps2.setString(24, wh_tax);
+ps2.setString(25, subject_to_vat);
+ps2.setDouble(26, Double.parseDouble(oldcost_price)+costPrice);
+ps2.setDouble(27, Double.parseDouble(oldvatable_cost)+Double.parseDouble(cost_price));
+ps2.setDouble(28, Double.parseDouble(oldnbv)+costPrice);
+ps2.setDouble(29, Double.parseDouble(oldvat_amount)+vatAmount);
+ps2.setDouble(30, Double.parseDouble(oldwht_amount)+whtaxamount);
+ps2.setString(31, supplied_by);
+ps2.setString(32, branch_code);
+ps2.setString(33, category_code);
+ps2.setString(34, description);
+ps2.setString(35, lpo_no);
+ps2.setString(36, invoice_No);
+ps2.setString(37, asset_code);
+ps2.setInt(38, Integer.parseInt(usefullife));
+ps2.setDouble(39, Double.parseDouble(oldIMPROV_NBV));
+ps2.setDouble(40, Double.parseDouble(oldIMPROV_ACCUMDEP));
+ps2.setDouble(41, Double.parseDouble(oldIMPROV_COST));
+ps2.setDouble(42, Double.parseDouble(oldIMPROV_VATABLECOST));
+ps2.setString(43, improved);
+ps2.setString(44, projectCode);
+ps2.setString(45, location);
+
+//System.out.println("<<<<<<<createGroupUpload spare1: "+spare_1+"   spare2: "+spare_2+"   Group Id: "+gid);
+done = (ps2.executeUpdate() != -1);
 //System.out.println("=====query=====> "+query);
 if(done==true){
 	id ="SUCCESS";
+	htmlUtil.insToAm_Invoice_No(gid,lpo_no,invoice_No,"Asset Improve Upload");
 }else{
 	id ="FAILED";
 }
@@ -464,6 +525,7 @@ System.out.println(this.getClass().getName()
 		+ e.getMessage());
 } finally {
 	dbConnection.closeConnection(con, ps);
+	dbConnection.closeConnection(con, ps2);
 }
 
 }

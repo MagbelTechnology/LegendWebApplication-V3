@@ -19,7 +19,7 @@ import com.magbel.legend.bus.ApprovalRecords;
 import com.magbel.legend.mail.EmailSmsServiceBus;
 import com.magbel.util.Cryptomanager; 
 
-import legend.admin.handlers.SecurityHandler_07_11_2024; 
+import legend.admin.handlers.SecurityHandler; 
 import magma.AssetRecordsBean;
 import magma.net.dao.MagmaDBConnection;
 /**
@@ -293,7 +293,7 @@ public class UserAuditApprovalServlet extends HttpServlet {
               System.out.println("Value of transAvailable is >>>>>> " + transAvailable);
               if (transAvailable == "0") {alertmessage = "Someone already attending to the Transaction";}
               if (singleApproval.equalsIgnoreCase("N")) {
-              arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(Long.parseLong(recId),tableName),"75",Integer.parseInt(assetId),assetCode,userid); 
+              arb.setPendingMultiApprTransArchive(arb.setApprovalDataUploadGroup(Long.parseLong(recId),tableName),"75",Long.parseLong(assetId),assetCode,userid); 
               aprecords.updateRaiseEntry(assetId);
               }
               

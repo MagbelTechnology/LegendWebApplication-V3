@@ -13,14 +13,19 @@ import java.sql.*;
  *
  * @author Jejelowo.B.Festus
  * @version 1.0
+ * 
  */
 public interface eConnection {
     /**
      * getConnection
      *
      * @return Connection
+     * @throws SQLException 
      */
-    public Connection getConnection(String jndi);
+	
+	// public Connection getConnection(String jndi);
+	
+    public Connection getConnection(String jndi) throws SQLException;
 
     /**
      * closeConnection

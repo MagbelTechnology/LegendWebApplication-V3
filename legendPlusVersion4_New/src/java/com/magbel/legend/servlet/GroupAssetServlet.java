@@ -469,7 +469,9 @@ public class GroupAssetServlet extends HttpServlet
 			System.out.println("sup_name_qry >>>>> " + sup_name_qry);
 	 		Supervisor_name = aprecords.getCodeName((sup_name_qry).toUpperCase(),groupID);	 
 	 		
-	 		
+	 		String invnumb = vendorNo+'-'+invoiceNo;
+	 		System.out.println("invnumb >>>>> " + invnumb);
+	 		htmlUtil.insToAm_Invoice_No(groupID,lpo,invnumb,"Group Asset Creation");
 		  
 		//	ad.setPendingTrans(ad.setApprovalDataGroup(groupid));
 		if(groupAssetByAsset.equalsIgnoreCase("Y")){
@@ -489,9 +491,7 @@ public class GroupAssetServlet extends HttpServlet
 		 	out.print("window.location='"+destination+"&id="+statux[1] +"&tran_status="+tran_status+"&tran_type="+tran_type+"&assetId="+id+"&reason=&pPage="+currentPage+"';");
 		 	out.print("</script>");
 	 	}
-	String invnumb = vendorNo+'-'+invoiceNo;
-	System.out.println("invnumb >>>>> " + invnumb);
-	htmlUtil.insToAm_Invoice_No(groupID,lpo,invnumb,"Group Asset Creation");	
+		
 		   }//else for if(numOfTransactionLevel == 0) 
 				 
 				 out.print(newURL);
