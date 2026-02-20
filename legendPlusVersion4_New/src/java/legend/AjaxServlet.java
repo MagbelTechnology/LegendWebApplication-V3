@@ -191,7 +191,7 @@ else {}
 
     }
 */
-    public void getSectionInDept(HttpServletRequest request,
+    public void getSectionInDeptOld(HttpServletRequest request,
                                  HttpServletResponse response) throws
             ServletException, IOException {
         // legend.objects.BranchDept dept = null;
@@ -260,8 +260,69 @@ else {}
         }
 
     }
+    
+    public void getSectionInDept(HttpServletRequest request,
+            HttpServletResponse response)
+throws ServletException, IOException {
 
-    public void getBranchRegion(HttpServletRequest request,
+response.setContentType("text/xml;charset=UTF-8");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String bidValue = request.getParameter("bid");
+
+if (bidValue == null || !bidValue.contains("_")) {
+out.write("</message>");
+return;
+}
+
+String[] bidSplit = bidValue.split("_");
+String branchId = bidSplit[0];
+String deptId = bidSplit[1];
+
+String query =
+"SELECT s.sectionId, a.Section_Name + '-' + a.Section_Code AS SectionFullName " +
+"FROM sbu_dept_section s " +
+"JOIN am_ad_section a ON s.sectionId = a.Section_ID " +
+"WHERE s.branchid = ? AND s.deptid = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, branchId);
+ps.setString(2, deptId);
+
+try (ResultSet rs = ps.executeQuery()) {
+
+while (rs.next()) {
+
+String sectionId = rs.getString("sectionId");
+String sectionName = rs.getString("SectionFullName");
+
+if (sectionName != null) {
+   sectionName = sectionName
+           .replace("&", "&amp;")
+           .replace("<", "&lt;")
+           .replace(">", "&gt;");
+}
+
+out.write("<section>");
+out.write("<id>" + sectionId + "</id>");
+out.write("<name>" + sectionName + "</name>");
+out.write("</section>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error Fetching sections in dept -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+}
+
+    public void getBranchRegionOld(HttpServletRequest request,
                                HttpServletResponse response) throws
             ServletException, IOException {
         // legend.objects.BranchDept dept = null;
@@ -312,7 +373,63 @@ else {}
         }
 
     }
-    public void getBranchState(HttpServletRequest request,
+    
+    public void getBranchRegion(HttpServletRequest request,
+            HttpServletResponse response)
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchId = request.getParameter("bid");
+
+if (branchId == null || branchId.trim().isEmpty()) {
+out.write("</message>");
+return;
+}
+
+String query =
+"SELECT a.REGION_CODE, b.REGION_NAME + '-' + a.REGION_CODE AS REGION_FULL " +
+"FROM am_ad_branch a " +
+"JOIN am_ad_region b ON a.REGION_CODE = b.REGION_CODE " +
+"WHERE a.branch_id = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, branchId);
+
+try (ResultSet rs = ps.executeQuery()) {
+
+while (rs.next()) {
+
+String regionCode = rs.getString("REGION_CODE");
+String regionName = rs.getString("REGION_FULL");
+
+if (regionName != null) {
+    regionName = regionName
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;");
+}
+
+out.write("<region>");
+out.write("<id>" + regionCode + "</id>");
+out.write("<name>" + regionName + "</name>");
+out.write("</region>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error Fetching Region -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+}
+    
+    public void getBranchStateOld(HttpServletRequest request,
                                   HttpServletResponse response) throws
                ServletException, IOException {
            // legend.objects.BranchDept dept = null;
@@ -373,7 +490,127 @@ else {}
            }
 
     }
-    public void getBranchProvince(HttpServletRequest request,
+    
+    public void getBranchState2Old(HttpServletRequest request,
+            HttpServletResponse response)
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchId = request.getParameter("bid");
+
+if (branchId == null || branchId.trim().isEmpty()) {
+out.write("</message>");
+return;
+}
+
+String query =
+"SELECT b.STATE, s.state_name " +
+"FROM am_ad_branch b " +
+"JOIN am_gb_states s ON b.STATE = s.state_ID " +
+"WHERE b.branch_id = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, branchId);
+
+try (ResultSet rs = ps.executeQuery()) {
+
+while (rs.next()) {
+
+ String stateId = rs.getString("STATE");
+ String stateName = rs.getString("state_name");
+
+ if (stateName != null) {
+     stateName = stateName
+             .replace("&", "&amp;")
+             .replace("<", "&lt;")
+             .replace(">", "&gt;");
+ }
+
+ out.write("<state>");
+ out.write("<id>" + stateId + "</id>");
+ out.write("<name>" + stateName + "</name>");
+ out.write("</state>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error Fetching state -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+}
+    
+    public void getBranchState(HttpServletRequest request,
+            HttpServletResponse response)
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchId = request.getParameter("bid");
+
+if (branchId == null || branchId.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query =
+"SELECT b.STATE, s.state_name " +
+"FROM am_ad_branch b " +
+"JOIN am_gb_states s ON b.STATE = s.state_ID " +
+"WHERE b.branch_id = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, branchId);
+
+try (ResultSet rs = ps.executeQuery()) {
+
+while (rs.next()) {
+ String stateId = rs.getString("STATE");
+ String stateName = escapeXml(rs.getString("state_name"));
+
+ out.write("<state>");
+ out.write("<id>" + stateId + "</id>");
+ out.write("<name>" + stateName + "</name>");
+ out.write("</state>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error Fetching state -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+    
+    private String escapeXml(String value) {
+        if (value == null) return "";
+        return value.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&apos;");
+    }
+    
+    public void getBranchProvinceOld(HttpServletRequest request,
                               HttpServletResponse response) throws
            ServletException, IOException {
        // legend.objects.BranchDept dept = null;
@@ -431,9 +668,63 @@ else {}
        }
 
 }
+    
+    public void getBranchProvince(HttpServletRequest request,
+            HttpServletResponse response)
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchId = request.getParameter("bid");
+
+if (branchId == null || branchId.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query =
+"SELECT b.PROVINCE, p.Province " +
+"FROM am_ad_branch b " +
+"JOIN am_gb_Province p ON b.PROVINCE = p.Province_ID " +
+"WHERE b.BRANCH_ID = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, branchId);
+
+try (ResultSet rs = ps.executeQuery()) {
+
+while (rs.next()) {
+
+String provinceId = rs.getString("PROVINCE");
+String provinceName = escapeXml(rs.getString("Province"));
+
+out.write("<province>");
+out.write("<id>" + provinceId + "</id>");
+out.write("<name>" + provinceName + "</name>");
+out.write("</province>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error Fetching Province -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
 
 
-      public void getDeptInBranch(HttpServletRequest request,
+      public void getDeptInBranchOld(HttpServletRequest request,
                                 HttpServletResponse response) throws
             ServletException, IOException {
         // legend.objects.BranchDept dept = null;
@@ -489,8 +780,72 @@ else {}
 
     }
 
+      public void getDeptInBranch(HttpServletRequest request,
+              HttpServletResponse response)
+throws ServletException, IOException {
 
-      public void getDeptFromBranch(HttpServletRequest request,
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchIdParam = request.getParameter("bid");
+
+if (branchIdParam == null) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+int branchId;
+try {
+branchId = Integer.parseInt(branchIdParam);
+} catch (NumberFormatException e) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query =
+"SELECT d.dept_id, d.Dept_name + '-' + d.dept_Code AS DeptFullName " +
+"FROM sbu_branch_dept s " +
+"JOIN am_ad_department d ON s.deptId = d.Dept_ID " +
+"WHERE s.branchId = ? " +
+"ORDER BY d.Dept_name";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setInt(1, branchId);
+
+try (ResultSet rs = ps.executeQuery()) {
+
+while (rs.next()) {
+
+  String deptId = rs.getString("dept_id");
+  String deptName = escapeXml(rs.getString("DeptFullName"));
+
+  out.write("<department>");
+  out.write("<id>" + deptId + "</id>");
+  out.write("<name>" + deptName + "</name>");
+  out.write("</department>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching departments in Branch -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+      public void getDeptFromBranchOld(HttpServletRequest request,
                                 HttpServletResponse response) throws
             ServletException, IOException {
         // legend.objects.BranchDept dept = null;
@@ -541,9 +896,60 @@ else {}
         }
 
     }
+      public void getDeptFromBranch(HttpServletRequest request,
+              HttpServletResponse response) 
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchCode = request.getParameter("bid");
+if (branchCode == null || branchCode.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query =
+"SELECT d.Dept_code, d.Dept_name + '-' + d.Dept_code AS DeptFullName " +
+"FROM sbu_branch_dept s " +
+"JOIN am_ad_department d ON s.deptId = d.Dept_ID " +
+"WHERE s.branchCode = ? " +
+"ORDER BY d.Dept_name";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, branchCode);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String deptId = rs.getString("Dept_code");
+String deptName = escapeXml(rs.getString("DeptFullName"));
+
+out.write("<department>");
+out.write("<id>" + deptId + "</id>");
+out.write("<name>" + deptName + "</name>");
+out.write("</department>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching departments in Branch -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
 
 
-    public void getDeptInBranch2(HttpServletRequest request,
+    public void getDeptInBranch2Old(HttpServletRequest request,
                                 HttpServletResponse response) throws
             ServletException, IOException {
         // legend.objects.BranchDept dept = null;
@@ -597,8 +1003,72 @@ else {}
         }
 
     }
+    
+    public void getDeptInBranch2(HttpServletRequest request,
+            HttpServletResponse response) 
+throws ServletException, IOException {
 
-    public void getSbuInBranch(HttpServletRequest request,
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchIdStr = request.getParameter("bid");
+if (branchIdStr == null || branchIdStr.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+int branchId = 0;
+try {
+branchId = Integer.parseInt(branchIdStr);
+} catch (NumberFormatException e) {
+System.out.println("WARNING: Invalid branch ID -> " + branchIdStr);
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query =
+"SELECT d.dept_code, d.Dept_name + '-' + d.dept_code AS DeptFullName " +
+"FROM sbu_branch_dept s " +
+"JOIN am_ad_department d ON s.deptId = d.Dept_ID " +
+"WHERE s.branchId = ? " +
+"ORDER BY d.Dept_name";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setInt(1, branchId);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String deptCode = rs.getString("dept_code");
+String deptName = escapeXml(rs.getString("DeptFullName"));
+
+out.write("<department>");
+out.write("<id>" + deptCode + "</id>");
+out.write("<name>" + deptName + "</name>");
+out.write("</department>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching departments in Branch -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+    public void getSbuInBranchOld(HttpServletRequest request,
                               HttpServletResponse response) throws
           ServletException, IOException {
       // legend.objects.BranchDept dept = null;
@@ -653,8 +1123,71 @@ else {}
       }
 
   }
+    
+    public void getSbuInBranch(HttpServletRequest request,
+            HttpServletResponse response) 
+throws ServletException, IOException {
 
-    public void getUsrDeptInBranch(HttpServletRequest request,
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchIdStr = request.getParameter("bid");
+if (branchIdStr == null || branchIdStr.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+int branchId = 0;
+try {
+branchId = Integer.parseInt(branchIdStr);
+} catch (NumberFormatException e) {
+System.out.println("WARNING: Invalid branch ID -> " + branchIdStr);
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT sbu_code, sbu_name " +
+   "FROM am_sbu_attachement " +
+   "WHERE attach_id = ? " +
+   "ORDER BY sbu_name";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setInt(1, branchId);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String sbuCode = rs.getString("sbu_code");
+String sbuName = escapeXml(rs.getString("sbu_name"));
+
+out.write("<newsbu_code>");
+out.write("<id>" + sbuCode + "</id>");
+out.write("<name>" + sbuName + "</name>");
+out.write("</newsbu_code>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching SBU in Branch -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+    public void getUsrDeptInBranchOld(HttpServletRequest request,
                               HttpServletResponse response) throws
           ServletException, IOException {
       // legend.objects.BranchDept dept = null;
@@ -708,9 +1241,72 @@ else {}
       }
 
   }
+    
+    
+    public void getUsrDeptInBranch(HttpServletRequest request,
+            HttpServletResponse response) 
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchIdStr = request.getParameter("bid");
+if (branchIdStr == null || branchIdStr.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+int branchId = 0;
+try {
+branchId = Integer.parseInt(branchIdStr);
+} catch (NumberFormatException e) {
+System.out.println("WARNING: Invalid branch ID -> " + branchIdStr);
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT a.DEPT_CODE, a.DEPT_NAME " +
+"FROM am_ad_department a " +
+"JOIN sbu_branch_dept b ON a.DEPT_ID = b.DEPTID " +
+"WHERE a.DEPT_STATUS = 'ACTIVE' AND b.BRANCHID = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setInt(1, branchId);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String deptCode = rs.getString("DEPT_CODE");
+String deptName = escapeXml(rs.getString("DEPT_NAME"));
+
+out.write("<department>");
+out.write("<id>" + deptCode + "</id>");
+out.write("<name>" + deptName + "</name>");
+out.write("</department>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching user departments in branch -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
 
 
-    public void getSupervisor(HttpServletRequest request,
+
+    public void getSupervisorOld(HttpServletRequest request,
                                 HttpServletResponse response) throws
             ServletException, IOException {
         // legend.objects.BranchDept dept = null;
@@ -772,8 +1368,78 @@ else {}
         }
 
     }
+    
+    
+    public void getSupervisor(HttpServletRequest request,
+            HttpServletResponse response) 
+throws ServletException, IOException {
 
-public void getItemType(HttpServletRequest request,
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+// Parse request branch ID safely
+int reqnBranchId = 0;
+String branchid = request.getParameter("bid");
+if (branchid != null) {
+try {
+reqnBranchId = Integer.parseInt(branchid);
+} catch (NumberFormatException ignored) {}
+}
+
+// Get session attributes safely
+HttpSession session = request.getSession();
+int userBranchId = 0;
+int currentUserId = 0;
+try {
+String userbrnchid = (String) session.getAttribute("UserCenter");
+userBranchId = userbrnchid != null ? Integer.parseInt(userbrnchid) : 0;
+String userID = (String) session.getAttribute("CurrentUser");
+currentUserId = userID != null ? Integer.parseInt(userID) : 0;
+} catch (NumberFormatException ignored) {}
+
+String query = "SELECT user_id, full_name " +
+     "FROM am_gb_user " +
+     "WHERE (branch = ? OR branch = ?) " +
+     "AND user_status = 'Active' " +
+     "AND is_supervisor = 'Y' " +
+     "AND user_ID != ? " +
+     "ORDER BY full_name";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setInt(1, reqnBranchId);
+ps.setInt(2, userBranchId);
+ps.setInt(3, currentUserId);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+  String supervisorId = rs.getString("user_id");
+  String supervisorName = escapeXml(rs.getString("full_name"));
+
+  out.write("<supervisor>");
+  out.write("<id>" + supervisorId + "</id>");
+  out.write("<name>" + supervisorName + "</name>");
+  out.write("</supervisor>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching supervisors -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getItemTypeOld(HttpServletRequest request,
             HttpServletResponse response) throws
 ServletException, IOException {
 // legend.objects.BranchDept dept = null;
@@ -829,7 +1495,59 @@ out.println(DOC_TYPE);
 
 }
 
-public void getSTCategory(HttpServletRequest request,
+public void getItemType(HttpServletRequest request,
+        HttpServletResponse response) 
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String itemTypeCode = request.getParameter("bid");
+int itemTypeId = 0;
+if (itemTypeCode != null) {
+try {
+itemTypeId = Integer.parseInt(itemTypeCode);
+} catch (NumberFormatException ignored) {}
+}
+
+String query = "SELECT ITEM_CODE, DESCRIPTION + '-' + ITEM_CODE " +
+   "FROM ST_INVENTORY_ITEMS " +
+   "WHERE ITEMTYPE_CODE = ? " +
+   "ORDER BY DESCRIPTION";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setInt(1, itemTypeId);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String id = rs.getString(1);
+String name = escapeXml(rs.getString(2));
+
+out.write("<description>");
+out.write("<id>" + id + "</id>");
+out.write("<name>" + name + "</name>");
+out.write("</description>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching item types -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getSTCategoryOld(HttpServletRequest request,
         HttpServletResponse response) throws
 ServletException, IOException {
 //legend.objects.BranchDept dept = null;
@@ -881,7 +1599,58 @@ out.println(DOC_TYPE);
 
 }
 
-public void getSubCategory(HttpServletRequest request,
+
+public void getSTCategory(HttpServletRequest request,
+        HttpServletResponse response) 
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String categoryCode = request.getParameter("bid");
+if (categoryCode == null || categoryCode.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT ITEMTYPE_CODE, NAME " +
+ "FROM ST_ITEMTYPE " +
+ "WHERE STATUS = 'A' AND CATEGORY_CODE = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, categoryCode);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String id = rs.getString("ITEMTYPE_CODE");
+String name = escapeXml(rs.getString("NAME"));
+
+out.write("<itemName>");
+out.write("<id>" + id + "</id>");
+out.write("<name>" + name + "</name>");
+out.write("</itemName>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching category items -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+public void getSubCategoryOld(HttpServletRequest request,
         HttpServletResponse response) throws
 ServletException, IOException {
 String subcategoryId = request.getParameter("bid");
@@ -931,7 +1700,60 @@ out.println(DOC_TYPE);
 
 }
 
-public void getAssetDesc(HttpServletRequest request,
+
+public void getSubCategory(HttpServletRequest request,
+        HttpServletResponse response) 
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String subcategoryId = request.getParameter("bid");
+if (subcategoryId == null || subcategoryId.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT DESCRIPTION, DESCRIPTION + '-' + SUB_CATEGORY_CODE AS NARRATION " +
+"FROM AM_ASSET_DESCRIPTION " +
+"WHERE SUB_CATEGORY_CODE IN (SELECT SUB_CATEGORY_CODE FROM am_ad_sub_category WHERE SUB_CATEGORY_ID = ?) " +
+"ORDER BY DESCRIPTION";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, subcategoryId);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String id = escapeXml(rs.getString("DESCRIPTION"));
+String name = escapeXml(rs.getString("NARRATION"));
+
+out.write("<description>");
+out.write("<id>" + id + "</id>");
+out.write("<name>" + name + "</name>");
+out.write("</description>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching subcategory -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getAssetDescOld(HttpServletRequest request,
         HttpServletResponse response) throws
 ServletException, IOException {
 String assetId = request.getParameter("bid");
@@ -980,7 +1802,57 @@ out.println(DOC_TYPE);
 
 }
 
-public void getAssetBarCode(HttpServletRequest request,
+public void getAssetDesc(HttpServletRequest request,
+        HttpServletResponse response)
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String assetId = request.getParameter("bid");
+if (assetId == null || assetId.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT DESCRIPTION, DESCRIPTION AS NARRATION " +
+  "FROM AM_ASSET WHERE ASSET_ID = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, assetId);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String id = escapeXml(rs.getString("DESCRIPTION"));
+String name = escapeXml(rs.getString("NARRATION"));
+
+out.write("<description>");
+out.write("<id>" + id + "</id>");
+out.write("<name>" + name + "</name>");
+out.write("</description>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching Asset Description -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getAssetBarCodeOld(HttpServletRequest request,
         HttpServletResponse response) throws
 ServletException, IOException {
 String assetId = request.getParameter("bid");
@@ -1029,7 +1901,56 @@ out.println(DOC_TYPE);
 
 }
 
-public void getDeptCodeInBranch(HttpServletRequest request,
+public void getAssetBarCode(HttpServletRequest request,
+        HttpServletResponse response)
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String assetId = request.getParameter("bid");
+if (assetId == null || assetId.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT BAR_CODE, BAR_CODE AS NARRATION FROM AM_ASSET WHERE ASSET_ID = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, assetId);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String id = escapeXml(rs.getString("BAR_CODE"));
+String name = escapeXml(rs.getString("NARRATION"));
+
+out.write("<description>");
+out.write("<id>" + id + "</id>");
+out.write("<name>" + name + "</name>");
+out.write("</description>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching Asset BarCode -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getDeptCodeInBranchOld(HttpServletRequest request,
                           HttpServletResponse response) throws
       ServletException, IOException {
   // legend.objects.BranchDept dept = null;
@@ -1080,7 +2001,60 @@ public void getDeptCodeInBranch(HttpServletRequest request,
 
 }
 
-public void getDeptInBranchByCode(HttpServletRequest request,
+public void getDeptCodeInBranch(HttpServletRequest request,
+        HttpServletResponse response)
+throws ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchCode = request.getParameter("bid");
+if (branchCode == null || branchCode.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT d.Dept_code, d.Dept_name + '-' + d.Dept_code AS DEPT_NARRATION " +
+"FROM sbu_branch_dept s " +
+"JOIN am_ad_department d ON s.deptId = d.Dept_ID " +
+"WHERE s.branchCode = ? " +
+"ORDER BY d.Dept_name";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, branchCode);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String id = escapeXml(rs.getString("Dept_code"));
+String name = escapeXml(rs.getString("DEPT_NARRATION"));
+
+out.write("<department>");
+out.write("<id>" + id + "</id>");
+out.write("<name>" + name + "</name>");
+out.write("</department>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching departments in Branch -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getDeptInBranchByCodeOld(HttpServletRequest request,
                           HttpServletResponse response) throws
       ServletException, IOException {
 	String branchDeptSplit[] = new String[2];
@@ -1137,8 +2111,65 @@ public void getDeptInBranchByCode(HttpServletRequest request,
 }
 
 
+public void getDeptInBranchByCode(HttpServletRequest request,
+        HttpServletResponse response)
+throws ServletException, IOException {
 
-public void getCodeOnly(HttpServletRequest request,
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String branchDepValue = request.getParameter("bid");
+if (branchDepValue == null || !branchDepValue.contains("_")) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String[] branchDeptSplit = branchDepValue.split("_");
+String branchCode = branchDeptSplit[0];
+String deptCode = branchDeptSplit[1];
+
+String query = "SELECT d.dept_Code, d.Dept_name + '-' + d.dept_Code AS DEPT_NARRATION " +
+"FROM sbu_branch_dept s " +
+"JOIN am_ad_department d ON s.deptCode = d.Dept_Code " +
+"WHERE s.branchCode = ? AND s.deptCode = ? " +
+"ORDER BY d.Dept_name";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, branchCode);
+ps.setString(2, deptCode);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String id = escapeXml(rs.getString("dept_Code"));
+String name = escapeXml(rs.getString("DEPT_NARRATION"));
+
+out.write("<department>");
+out.write("<id>" + id + "</id>");
+out.write("<name>" + name + "</name>");
+out.write("</department>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching department by code -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getCodeOnlyOld(HttpServletRequest request,
                           HttpServletResponse response) throws
       ServletException, IOException {
   // legend.objects.BranchDept dept = null;
@@ -1191,7 +2222,56 @@ public void getCodeOnly(HttpServletRequest request,
 
 }
 
-public void getCAT(HttpServletRequest request,
+public void getCodeOnly(HttpServletRequest request,
+        HttpServletResponse response) throws
+ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String code = request.getParameter("bid");
+if (code == null || code.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT CODE, DESCRIPTION FROM ST_GL_PROJECT WHERE CODE = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, code);
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+String id = escapeXml(rs.getString("CODE"));
+String name = escapeXml(rs.getString("DESCRIPTION"));
+
+out.write("<codeDescription>");
+out.write("<id>" + id + "</id>");
+out.write("<name>" + name + "</name>");
+out.write("</codeDescription>");
+}
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching Project Code in getCodeOnly -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getCATOld(HttpServletRequest request,
         HttpServletResponse response) throws
 ServletException, IOException {
 	
@@ -1252,7 +2332,58 @@ ServletException, IOException {
 	
 }
 
-public void getTEC(HttpServletRequest request,
+public void getCAT(HttpServletRequest request,
+        HttpServletResponse response) throws
+ServletException, IOException {
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String categoryCode = request.getParameter("bid");
+if (categoryCode == null || categoryCode.trim().isEmpty()) {
+out.write("</message>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT sub_category_desc, sub_category_desc " +
+        "FROM HD_COMPLAIN_SUBCATEGORY " +
+        "WHERE category_code = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, categoryCode);
+
+try (ResultSet rs = ps.executeQuery()) {
+ while (rs.next()) {
+     String id = escapeXml(rs.getString(1));
+     String name = escapeXml(rs.getString(2));
+
+     out.write("<subcategory>");
+     out.write("<id>" + id + "</id>");
+     out.write("<name>" + name + "</name>");
+     out.write("</subcategory>");
+ }
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching Category -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+
+
+public void getTECOld(HttpServletRequest request,
         HttpServletResponse response) throws
 ServletException, IOException {
 	
@@ -1301,6 +2432,59 @@ ServletException, IOException {
 	}
 
 }
+
+
+public void getTEC(HttpServletRequest request,
+        HttpServletResponse response) throws
+ServletException, IOException {
+
+String categoryCode = request.getParameter("bid");
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<technician>");
+
+if (categoryCode == null || categoryCode.trim().isEmpty()) {
+out.write("<name></name>");
+out.write("<head></head>");
+out.write("</technician>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT Dept_name, UnitHead FROM AM_AD_DEPARTMENT WHERE Dept_code = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, categoryCode);
+
+try (ResultSet rs = ps.executeQuery()) {
+ String name = "";
+ String head = "";
+ if (rs.next()) {
+     name = escapeXml(rs.getString("Dept_name"));
+     head = escapeXml(rs.getString("UnitHead"));
+ }
+ out.write("<name>" + name + "</name>");
+ out.write("<head>" + head + "</head>");
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching technician -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</technician>");
+out.flush();
+out.close();
+}
+
+
+
 public void getTechMail(HttpServletRequest request,
         HttpServletResponse response) throws
 ServletException, IOException {
@@ -1351,7 +2535,7 @@ ServletException, IOException {
 
 }
    
-public void getUSERID(HttpServletRequest request,
+public void getUSERIDOld(HttpServletRequest request,
         HttpServletResponse response) throws
 ServletException, IOException {
 	
@@ -1394,7 +2578,59 @@ ServletException, IOException {
 	out.println(DOC_TYPE);
 	}
 
-}    
+}   
+
+
+public void getUSERID(HttpServletRequest request,
+        HttpServletResponse response) throws
+ServletException, IOException {
+
+String userName = request.getParameter("bid");
+
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<returnmail>");
+
+if (userName == null || userName.trim().isEmpty()) {
+out.write("<name></name>");
+out.write("<head></head>");
+out.write("</returnmail>");
+out.flush();
+out.close();
+return;
+}
+
+String query = "SELECT User_Id, email FROM AM_GB_USER WHERE User_Name = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, userName);
+
+try (ResultSet rs = ps.executeQuery()) {
+String userId = "";
+String email = "";
+if (rs.next()) {
+  userId = escapeXml(rs.getString("User_Id").trim());
+  email = escapeXml(rs.getString("email").trim());
+}
+
+out.write("<name>" + userId + "</name>");
+out.write("<head>" + email + "</head>");
+}
+
+} catch (Exception e) {
+System.out.println("WARNING: Error fetching UserID -> " + e.getMessage());
+e.printStackTrace();
+}
+
+out.write("</returnmail>");
+out.flush();
+out.close();
+}
+
 
 public void getBank(HttpServletRequest request,
         HttpServletResponse response) throws

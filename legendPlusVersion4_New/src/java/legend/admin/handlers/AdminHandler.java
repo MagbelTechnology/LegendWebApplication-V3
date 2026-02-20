@@ -6,6 +6,7 @@ package legend.admin.handlers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
@@ -5211,7 +5212,7 @@ int  branch=0;
 		return (d.length > 0);
 	}
 
- public void SaveLoginAudit(String userid, String branchcode, String workstname, String ip, String sessionid)
+ public void SaveLoginAuditOld(String userid, String branchcode, String workstname, String ip, String sessionid)
 	{
 
 					 boolean done = false;
@@ -5253,6 +5254,49 @@ int  branch=0;
 							closeConnection(con, ps);
 						}					//return done
 
+	}
+ 
+ public void SaveLoginAudit(String userId, String branchCode, String workstationName, String ip, String sessionId) {
+
+	    String query = " INSERT INTO gb_user_login (\r\n"
+	    		+ "	            create_date, user_id, branch_code, mtid, time_in,\r\n"
+	    		+ "	            workstation_name, System_ip, session_id, session_time\r\n"
+	    		+ "	        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ApplicationHelper apph = new ApplicationHelper();
+	        String generatedIdStr = apph.getGeneratedId("gb_user_login");
+	        long mtid = 0;
+	        try {
+	            mtid = Long.parseLong(generatedIdStr);
+	        } catch (NumberFormatException e) {
+	            System.out.println("Invalid generated ID for login audit: " + generatedIdStr);
+	        }
+
+	        String createDate = htmlUtil.getCodeName("SELECT GETDATE() ");
+
+	        ps.setString(1, createDate);            
+	        ps.setString(2, userId);            
+	        ps.setString(3, branchCode);        
+	        ps.setLong(4, mtid);               
+	        ps.setString(5, df.getDateTime().substring(10));            
+	        ps.setString(6, workstationName);   
+	        ps.setString(7, ip);                
+	        ps.setString(8, sessionId);        
+	        ps.setString(9, df.getDateTime().substring(10));            
+
+	        int updatedRows = ps.executeUpdate();
+	        if (updatedRows > 0) {
+	            System.out.println("Login audit saved for user: " + userId);
+	        } else {
+	            System.out.println("Login audit NOT saved for user: " + userId);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
 
 
@@ -7574,7 +7618,7 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 
 	}
 	
-	public java.util.List getZoneByQuery(String filter) {
+	public java.util.List getZoneByQueryOld(String filter) {
 		java.util.List _list = new java.util.ArrayList();
 		Zone zone = null;
 		String query = "SELECT Zone_Id, Zone_Code, Zone_Name,Zone_Acronym, Zone_Address,"
@@ -7617,7 +7661,31 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 		return _list;
 
 	}
-    private legend.admin.objects.Zone getAZone(String filter) {
+	
+	public java.util.List getZoneByQuery(String filter) {
+		java.util.List list = new java.util.ArrayList();
+
+	    // Use WHERE 1=1 for easier concatenation of filter clauses
+	    String query = "SELECT Zone_Id, Zone_Code, Zone_Name, Zone_Acronym, Zone_Address, " +
+	                   "Zone_Phone, Zone_Fax, Zone_Status, User_Id, Create_Date " +
+	                   "FROM AM_AD_ZONE WHERE 1=1 " + filter;
+
+	    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        while (rs.next()) {
+	            list.add(mapZoneFromResultSet(rs));
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return list;
+	}
+	
+    private legend.admin.objects.Zone getAZoneOld(String filter) {
 		legend.admin.objects.Zone zone = null;
 		String query = "SELECT Zone_Id, Zone_Code, Zone_Name"
 				+ ", Zone_Acronym, Zone_Address"
@@ -7670,8 +7738,47 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 		return zone;
 
 	}
+    
+    private legend.admin.objects.Zone getAZone(String filter) {
+        legend.admin.objects.Zone zone = null;
 
-	public boolean createZone(legend.admin.objects.Zone zone) {
+        String query = "SELECT Zone_Id, Zone_Code, Zone_Name, Zone_Acronym, Zone_Address, " +
+                       "Zone_Phone, Zone_Fax, Zone_Status, User_Id, Create_Date " +
+                       "FROM AM_AD_ZONE WHERE 1=1 " + filter; 
+
+        try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                zone = mapZoneFromResultSet(rs);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return zone;
+    }
+    
+    private legend.admin.objects.Zone mapZoneFromResultSet(ResultSet rs) throws SQLException {
+        legend.admin.objects.Zone zone = new legend.admin.objects.Zone();
+
+        zone.setZoneId(rs.getString("Zone_Id"));
+        zone.setZoneCode(rs.getString("Zone_Code"));
+        zone.setZoneName(rs.getString("Zone_Name"));
+        zone.setZoneAcronym(rs.getString("Zone_Acronym"));
+        zone.setZoneAddress(rs.getString("Zone_Address"));
+        zone.setZonePhone(rs.getString("Zone_Phone"));
+        zone.setZoneFax(rs.getString("Zone_Fax"));
+        zone.setZoneStatus(rs.getString("Zone_Status"));
+        zone.setUserId(rs.getString("User_Id"));
+        zone.setCreateDate(rs.getString("Create_Date"));
+
+        return zone;
+    }
+
+	public boolean createZoneOld(legend.admin.objects.Zone zone) {
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -7706,9 +7813,52 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 		return done;
 
 	}
+	
+	public boolean createZone(legend.admin.objects.Zone zone) {
+
+	    String query = " INSERT INTO AM_AD_ZONE(\r\n"
+	    		+ "	            Zone_Code, Zone_Name, Zone_Acronym, Zone_Address,\r\n"
+	    		+ "	            Zone_Phone, Zone_Fax, Zone_Status, User_Id, Create_Date, Zone_iD\r\n"
+	    		+ "	        ) VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+	    boolean done = false;
+
+	    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, zone.getZoneCode());
+	        ps.setString(2, zone.getZoneName());
+	        ps.setString(3, zone.getZoneAcronym());
+	        ps.setString(4, zone.getZoneAddress());
+	        ps.setString(5, zone.getZonePhone());
+	        ps.setString(6, zone.getZoneFax());
+	        ps.setString(7, zone.getZoneStatus());
+	        ps.setString(8, zone.getUserId());
 
 
-public void updateLoginSession(String userName) {
+	        ps.setDate(9, new java.sql.Date(System.currentTimeMillis()));
+
+
+	        String generatedIdStr = new ApplicationHelper().getGeneratedId("AM_AD_ZONE");
+	        long generatedId = 0;
+	        try {
+	            generatedId = Long.parseLong(generatedIdStr);
+	        } catch (NumberFormatException e) {
+	            System.out.println("WARNING: Invalid generated ID -> " + generatedIdStr);
+	        }
+	        ps.setLong(10, generatedId);
+
+	        done = ps.executeUpdate() > 0;
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	    }
+
+	    return done;
+	}
+
+
+public void updateLoginSessionOld(String userName) {
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -7734,7 +7884,45 @@ public void updateLoginSession(String userName) {
 		}
 }
 
-public void updateTimeOutSession(String userName) {
+public void updateLoginSession(String userName) {
+
+    String querySelect = "SELECT u.USER_ID, MAX(l.MTID) AS MTID\r\n"
+    		+ "        FROM am_gb_user u\r\n"
+    		+ "        JOIN gb_user_login l ON u.USER_ID = l.USER_ID\r\n"
+    		+ "        WHERE u.USER_NAME = ?\r\n"
+    		+ "        GROUP BY u.USER_ID";
+
+    String queryUpdate = "UPDATE gb_user_login SET session_time = ? WHERE USER_ID = ? AND MTID = ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement psSelect = con.prepareStatement(querySelect)) {
+
+        psSelect.setString(1, userName);
+
+        try (ResultSet rs = psSelect.executeQuery()) {
+            if (rs.next()) {
+                String userid = rs.getString("USER_ID");
+                String mtid = rs.getString("MTID");
+
+                try (PreparedStatement psUpdate = con.prepareStatement(queryUpdate)) {
+                    psUpdate.setString(1, df.getDateTime());
+                    psUpdate.setString(2, userid);
+                    psUpdate.setString(3, mtid);
+
+                    int updatedRows = psUpdate.executeUpdate();
+                    System.out.println("Updated rows: " + updatedRows);
+                }
+            } else {
+                System.out.println("No login record found for user: " + userName);
+            }
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+public void updateTimeOutSessionOld(String userName) {
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -7760,6 +7948,46 @@ public void updateTimeOutSession(String userName) {
 		}
 }
 
+public void updateTimeOutSession(String userName) {
+
+    String userid = htmlUtil.getCodeName(
+            "SELECT USER_ID FROM am_gb_user WHERE USER_NAME = ?", userName);
+
+    if (userid == null) {
+        System.out.println("User not found: " + userName);
+        return;
+    }
+
+    String mtid = htmlUtil.getCodeName(
+            "SELECT MAX(MTID) FROM gb_user_login WHERE USER_ID = ?", userid);
+
+    if (mtid == null) {
+        System.out.println("No login record found for user: " + userName);
+        return;
+    }
+
+    String query = "UPDATE gb_user_login SET time_out = ? WHERE USER_ID = ? AND MTID = ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+      
+        String timeOutValue = df.getDateTime(); 
+        ps.setString(1, timeOutValue);
+        ps.setString(2, userid);
+        ps.setInt(3, Integer.parseInt(mtid));
+
+        int updatedRows = ps.executeUpdate();
+        if (updatedRows > 0) {
+            System.out.println("Time-out updated successfully for user: " + userName);
+        } else {
+            System.out.println("No records updated for user: " + userName);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace(); 
+    }
+}
 
 
 }

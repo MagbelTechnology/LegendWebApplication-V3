@@ -42,6 +42,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.json.JSONException;
@@ -765,7 +766,7 @@ public class SecurityHandler
         return _list;
 
     } 
-    public java.util.ArrayList getUserByQuery(String filter)
+    public java.util.ArrayList getUserByQueryOld(String filter)
     {
         ArrayList _list;
         String query;
@@ -883,7 +884,87 @@ public class SecurityHandler
 
     }
     
-    public java.util.ArrayList getUserByQuery(String filter,String status)
+    public java.util.ArrayList getUserByQuery(String filter) {
+
+    	java.util.ArrayList list = new ArrayList<>();
+
+    	String query = "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, " +
+                "Phone_No, is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, " +
+                "Create_Date, Password_Expiry, Login_Date, Login_System, Fleet_Admin, email, " +
+                "Branch, password_changed, Expiry_Date, branch_restriction, approval_limit, " +
+                "approval_level, token_required, dept_restriction, UnderTaker, region_code, " +
+                "zone_code, region_restriction, zone_restriction, Facility_Admin, Store_Admin " +
+                "FROM AM_GB_USER WHERE User_Id IS NOT NULL ";
+
+ query += filter; 
+
+ Connection c = null;
+ PreparedStatement s = null;
+ ResultSet rs = null;
+
+ try {
+     c = getConnection();
+     s = c.prepareStatement(query);
+     rs = s.executeQuery();
+
+     while (rs.next()) {
+         list.add(mapGetUserByQuery1FromResultSet(rs));
+     }
+
+ } catch (Exception e) {
+     e.printStackTrace();
+ } finally {
+     closeConnection(c, s, rs);
+ }
+
+ return list;
+
+    }
+    
+    private User mapGetUserByQuery1FromResultSet(ResultSet rs) throws SQLException {
+        User user = new User();
+
+        user.setUserId(rs.getString("User_Id"));
+        user.setUserName(rs.getString("User_Name"));
+        user.setUserFullName(rs.getString("Full_Name"));
+        user.setLegacySystemId(rs.getString("Legacy_Sys_Id"));
+        user.setUserClass(rs.getString("Class"));
+        user.setBranch(rs.getString("Branch"));
+        user.setPassword(rs.getString("Password"));
+        user.setPhoneNo(rs.getString("Phone_No"));
+        user.setIsSupervisor(rs.getString("Is_Supervisor"));
+        user.setMustChangePwd(rs.getString("Must_Change_Pwd"));
+        user.setLoginStatus(rs.getString("Login_Status"));
+        user.setUserStatus(rs.getString("User_Status"));
+        user.setCreatedBy(rs.getString("UserId"));
+        user.setCreateDate(rs.getString("Create_Date"));
+        user.setPwdExpiry(rs.getString("Password_Expiry"));
+        user.setLastLogindate(rs.getString("Login_Date"));
+        user.setLoginSystem(rs.getString("Login_System"));
+        user.setFleetAdmin(rs.getString("Fleet_Admin"));
+        user.setEmail(rs.getString("email"));
+        user.setPwdChanged(rs.getString("password_changed"));
+        user.setUnderTaker(rs.getString("UnderTaker"));
+        user.setRegionCode(rs.getString("region_code"));
+        user.setZoneCode(rs.getString("zone_code"));
+        user.setRegionRestrict(rs.getString("region_restriction"));
+        user.setZoneRestrict(rs.getString("zone_restriction"));
+        user.setIsFacilityAdministrator(rs.getString("Facility_Admin"));
+        user.setIsStoreAdministrator(rs.getString("Store_Admin"));
+
+        // Token logic
+        user.setTokenRequired("Y".equalsIgnoreCase(rs.getString("token_required")));
+
+        user.setApprvLimit(rs.getString("approval_limit"));
+        user.setApprvLevel(rs.getString("approval_level"));
+        user.setBranchRestrict(rs.getString("branch_restriction"));
+        user.setDeptRestrict(rs.getString("dept_restriction"));
+        user.setExpDate(rs.getDate("Expiry_Date"));
+
+        return user;
+    }
+    
+    public java.util.ArrayList getUserByQueryOld(String filter,String status)
     {
         ArrayList _list;
         String query;
@@ -1002,6 +1083,90 @@ public class SecurityHandler
         return _list;
 
     }
+    
+    public java.util.ArrayList getUserByQuery(String filter, String status) {
+
+    	java.util.ArrayList users = new ArrayList<>();
+
+        String baseQuery =
+            "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, " +
+            "Phone_No, Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, " +
+            "UserId, Create_Date, Password_Expiry, Login_Date, Login_System, " +
+            "Fleet_Admin, Email, password_changed, Expiry_Date, branch_restriction, " +
+            "approval_limit, approval_level, token_required, dept_restriction, " +
+            "UnderTaker, region_code, zone_code, region_restriction, zone_restriction, " +
+            "Facility_Admin, Store_Admin " +
+            "FROM AM_GB_USER WHERE USER_STATUS = ? ";
+
+        String query = baseQuery + (filter != null ? filter : "");
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, status);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    users.add(mapGetUserByQueryFromResultSet(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR in getUserByQuery -> " + e.getMessage());
+        }
+
+        return users;
+    }
+    
+    private User mapGetUserByQueryFromResultSet(ResultSet rs) throws SQLException {
+
+        User user = new User();
+
+        user.setUserId(rs.getString("User_Id"));
+        user.setUserName(rs.getString("User_Name"));
+        user.setUserFullName(rs.getString("Full_Name"));
+        user.setLegacySystemId(rs.getString("Legacy_Sys_Id"));
+        user.setUserClass(rs.getString("Class"));
+        user.setBranch(rs.getString("Branch"));
+        user.setPassword(rs.getString("Password"));
+        user.setPhoneNo(rs.getString("Phone_No"));
+        user.setIsSupervisor(rs.getString("Is_Supervisor"));
+        user.setMustChangePwd(rs.getString("Must_Change_Pwd"));
+        user.setLoginStatus(rs.getString("Login_Status"));
+        user.setUserStatus(rs.getString("User_Status"));
+        user.setCreatedBy(rs.getString("UserId"));
+        user.setCreateDate(rs.getString("Create_Date"));
+        user.setPwdExpiry(rs.getString("Password_Expiry"));
+        user.setLastLogindate(rs.getString("Login_Date"));
+        user.setLoginSystem(rs.getString("Login_System"));
+        user.setFleetAdmin(rs.getString("Fleet_Admin"));
+        user.setEmail(rs.getString("email"));
+        user.setPwdChanged(rs.getString("password_changed"));
+        user.setUnderTaker(rs.getString("UnderTaker"));
+        user.setRegionCode(rs.getString("region_code"));
+        user.setZoneCode(rs.getString("zone_code"));
+        user.setRegionRestrict(rs.getString("region_restriction"));
+        user.setZoneRestrict(rs.getString("zone_restriction"));
+        user.setIsFacilityAdministrator(rs.getString("Facility_Admin"));
+        user.setIsStoreAdministrator(rs.getString("Store_Admin"));
+
+        String tokenRequired = rs.getString("token_required");
+        user.setTokenRequired(
+            tokenRequired != null && tokenRequired.trim().equalsIgnoreCase("Y")
+        );
+
+        user.setApprvLimit(rs.getString("approval_limit"));
+        user.setBranchRestrict(rs.getString("branch_restriction"));
+        user.setApprvLevel(rs.getString("approval_level"));
+        user.setDeptRestrict(rs.getString("dept_restriction"));
+
+        // Expiry Date
+        user.setExpDate(rs.getDate("Expiry_Date"));
+
+        return user;
+    }
+
+
 
 
     public legend.admin.objects.User getUserByUserIDOld(String UserID)
@@ -1980,28 +2145,36 @@ public class SecurityHandler
         return done;
     }
     
-    public boolean queryPexpiry(String userId) {
+
+    public boolean queryPexpiry(String userid) {
         String query = "SELECT password_expiry FROM AM_GB_USER WHERE USER_ID = ?";
-        boolean expired = false;
+        boolean done = false;
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
 
-            ps.setString(1, userId);
-
+            ps.setString(1, userid);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
                     String exDate = rs.getString("password_expiry");
-                    int diff = df.getDayDifferenceNoABS(exDate, sdf.format(new Date()));
-                    expired = diff <= 0; 
+
+                    if (exDate != null && !exDate.trim().isEmpty()) {
+                        int diff = df.getDayDifferenceNoABS(exDate, sdf.format(new Date()));
+                        if (diff <= 0) {
+                            done = true;
+                        }
+                    } else {
+                      
+                        System.out.println("WARNING: password_expiry is null or empty for user " + userid);
+                    }
                 }
             }
-
-        } catch (SQLException e) {
-            System.err.println("WARNING: Error executing queryPexpiry -> " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("WARNING: Error executing query in queryPexpiry -> " + e.getMessage());
+            e.printStackTrace();
         }
 
-        return expired;
+        return done;
     }
 
 
@@ -2020,7 +2193,7 @@ public class SecurityHandler
 //        return con;
 //    }
 //    
-	private Connection getConnection() {
+	private Connection getConnectionOld() {
 		Connection con = null;
 		try {
 //        	if(con==null){
@@ -2038,6 +2211,17 @@ public class SecurityHandler
 //			closeConnection(con);
 //		}
 		return con;
+	}
+	
+	private Connection getConnection() throws SQLException {
+	    try {
+	        Context initContext = new InitialContext();
+	        String dsJndi = "java:/legendPlus"; // your JNDI DataSource
+	        DataSource ds = (DataSource) initContext.lookup(dsJndi);
+	        return ds.getConnection();
+	    } catch (NamingException e) {
+	        throw new SQLException("Error looking up DataSource '" + "java:/legendPlus" + "'", e);
+	    }
 	}
 
 
@@ -5098,7 +5282,7 @@ public class SecurityHandler
         return className;
     }
     
-    public String getClassName(String userClass, String param) throws SQLException {
+    public String getclassName(String userClass, String param) throws SQLException {
         String className = "";
 
         String sql = "{CALL getclassName(?, ?)}";
@@ -5227,7 +5411,7 @@ public class SecurityHandler
         return validPage;
     }
     
-    public String getExitClass(String pageName, String classId) throws SQLException {
+    public String getExitclass(String pageName, String classId) throws SQLException {
         String validPage = "";
 
         String sql = "{CALL getExitclass(?, ?)}";

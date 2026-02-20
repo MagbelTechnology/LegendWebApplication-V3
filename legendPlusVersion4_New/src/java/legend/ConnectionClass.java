@@ -1055,7 +1055,7 @@ public class ConnectionClass {
     }
 
 
-    public String[][] getSectionsForCombo() throws Exception {
+    public String[][] getSectionsForComboOld() throws Exception {
     	Connection conn = null;
     	ResultSet rs = null;
     	ResultSet rsc = null;
@@ -1098,8 +1098,53 @@ public class ConnectionClass {
         }
         return null;
     }
+    
+    public String[][] getSectionsForCombo() {
+        String query = "SELECT * " +
+                       "FROM AM_AD_SECTION " +
+                       "WHERE SECTION_STATUS = 'ACTIVE' " +
+                       "ORDER BY SECTION_NAME ASC";
+        
+        String countQuery = "SELECT COUNT(*) FROM AM_AD_SECTION " +
+                            "WHERE SECTION_STATUS = 'ACTIVE'";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement countPs = conn.prepareStatement(countQuery);
+             ResultSet countRs = countPs.executeQuery()) {
+            
+            if (!countRs.next()) {
+                return new String[0][0]; // no sections
+            }
 
-    public String[][] getSectionsForComboExcluding(String s) throws Exception {
+            int count = countRs.getInt(1);
+            if (count == 0) {
+                return new String[0][0];
+            }
+
+            String[][] sections = new String[count][3];
+
+            try (PreparedStatement ps = conn.prepareStatement(query);
+                 ResultSet rs = ps.executeQuery()) {
+
+                int i = 0;
+                while (rs.next()) {
+                    sections[i][0] = rs.getString(1);
+                    sections[i][1] = rs.getString(2);
+                    sections[i][2] = rs.getString(3);
+                    i++;
+                }
+            }
+
+            return sections;
+
+        } catch (Exception e) {
+            System.out.println("WARN: Error fetching sections -> " + e.getMessage());
+            e.printStackTrace();
+            return new String[0][0]; // safe fallback
+        }
+    }
+
+    public String[][] getSectionsForComboExcludingOld(String s) throws Exception {
     	Connection conn = null;
     	ResultSet rs = null;
     	ResultSet rsc = null;
@@ -1141,6 +1186,49 @@ public class ConnectionClass {
         return null;
 
     }
+    
+    public String[][] getSectionsForComboExcluding(String excludeName) {
+        String query = "SELECT SECTION_ID, SECTION_CODE, SECTION_NAME " +
+                       "FROM AM_AD_SECTION " +
+                       "WHERE LOWER(SECTION_NAME) != LOWER(?) " +
+                       "ORDER BY SECTION_NAME ASC";
+
+        String countQuery = "SELECT COUNT(*) FROM AM_AD_SECTION " +
+                            "WHERE LOWER(SECTION_NAME) != LOWER(?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement countPs = conn.prepareStatement(countQuery)) {
+
+            countPs.setString(1, excludeName);
+            try (ResultSet countRs = countPs.executeQuery()) {
+                if (!countRs.next() || countRs.getInt(1) == 0) {
+                    return new String[0][0]; // no sections
+                }
+
+                int count = countRs.getInt(1);
+                String[][] sections = new String[count][3];
+
+                try (PreparedStatement ps = conn.prepareStatement(query)) {
+                    ps.setString(1, excludeName);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        int i = 0;
+                        while (rs.next()) {
+                            sections[i][0] = rs.getString(1);
+                            sections[i][1] = rs.getString(2);
+                            sections[i][2] = rs.getString(3);
+                            i++;
+                        }
+                    }
+                }
+                return sections;
+            }
+
+        } catch (Exception e) {
+            System.out.println("WARN: Error fetching sections excluding '" + excludeName + "' -> " + e.getMessage());
+            e.printStackTrace();
+            return new String[0][0]; // safe fallback
+        }
+    }
 
     public String[][] getStatusForCombo() throws Exception {
         String[][] a = new String[4][3];
@@ -1164,7 +1252,7 @@ public class ConnectionClass {
         return a;
     }
 
-    public String getVatRate() throws Exception {
+    public String getVatRateOld() throws Exception {
     	Connection conn = null;
     	ResultSet rs = null;
     	
@@ -1183,9 +1271,29 @@ public class ConnectionClass {
         return vat;
     }
 
+    public String getVatRate() {
+        String vat = "0";
+
+        String query = "SELECT VAT_RATE FROM AM_GB_COMPANY";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                vat = rs.getString(1) != null ? rs.getString(1) : "0";
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error fetching VAT rate -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return vat;
+    }
 
 
-     public String getWhRate() throws Exception {
+     public String getWhRateOld() throws Exception {
     	 Connection conn = null;
      	ResultSet rs = null;
      	
@@ -1201,9 +1309,29 @@ public class ConnectionClass {
         //freeResource();
         return vat;
     }
+     
+     public String getWhRate() {
+    	    String rate = "0";
+    	    String query = "SELECT WHT_RATE FROM AM_GB_COMPANY";
+
+    	    try (Connection conn = getConnection();
+    	         PreparedStatement ps = conn.prepareStatement(query);
+    	         ResultSet rs = ps.executeQuery()) {
+
+    	        if (rs.next()) {
+    	            rate = rs.getString(1) != null ? rs.getString(1) : "0";
+    	        }
+
+    	    } catch (Exception e) {
+    	        System.out.println("WARN: Error fetching WHT_RATE -> " + e.getMessage());
+    	        e.printStackTrace();
+    	    }
+
+    	    return rate;
+    	}
 
 
-   public String getFedWhRate() throws Exception {
+   public String getFedWhRateOld() throws Exception {
 	   Connection conn = null;
     	ResultSet rs = null;
     	
@@ -1221,9 +1349,28 @@ public class ConnectionClass {
         return vat;
     }
 
+   public String getFedWhRate() {
+	    String rate = "0";
+	    String query = "SELECT FED_WHT_RATE FROM AM_GB_COMPANY";
+
+	    try (Connection conn = getConnection();
+	         PreparedStatement ps = conn.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            rate = rs.getString(1) != null ? rs.getString(1) : "0";
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("WARN: Error fetching FED_WHT_RATE -> " + e.getMessage());
+	        e.printStackTrace();
+	    }
+
+	    return rate;
+	}
 
 
-   public String getProcessingStatus() throws Exception {
+   public String getProcessingStatusOld() throws Exception {
 	   Connection conn = null;
    	ResultSet rs = null;
    	
@@ -1240,8 +1387,28 @@ public class ConnectionClass {
         //freeResource();
         return ps;
     }
+   
+   public String getProcessingStatus() {
+	    String status = "0"; 
+	    String query = "SELECT PROCESSING_STATUS FROM AM_GB_COMPANY";
 
-   public String getLegacyExportStatus() throws Exception {
+	    try (Connection conn = getConnection();
+	         PreparedStatement ps = conn.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            status = rs.getString("PROCESSING_STATUS") != null ? rs.getString("PROCESSING_STATUS") : "0";
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("WARN: Error fetching processing status -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    }
+
+	    return status;
+	}
+
+   public String getLegacyExportStatusOld() throws Exception {
 	   Connection conn = null;
    	ResultSet rs = null;
    	
@@ -1258,6 +1425,27 @@ public class ConnectionClass {
         //freeResource();
         return ps;
     }
+   
+   public String getLegacyExportStatus() {
+	    String status = "0"; // default value
+	    String query = "SELECT COUNT(*) AS LEGACYEXPORTSTATUS FROM FINACLE_EXT";
+
+	    try (Connection conn = getConnection();
+	         PreparedStatement ps = conn.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            status = rs.getString("LEGACYEXPORTSTATUS") != null ? rs.getString("LEGACYEXPORTSTATUS") : "0";
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("WARN: Error fetching legacy export status -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    }
+
+	    return status;
+	}
+   
 public boolean populateFinacleTemp(int ps_status,String ThirdPartyLabel)throws Exception{
 
     boolean suc = false;
@@ -1530,7 +1718,7 @@ return a;
 
 }
 
-    public String[][] getBranchesForCombo(String code,String branchRestrict) throws Exception {
+    public String[][] getBranchesForComboOld(String code,String branchRestrict) throws Exception {
     	Connection conn = null;
     	ResultSet rs = null;
     	ResultSet rsc = null;
@@ -1575,5 +1763,44 @@ return a;
     	}
         //freeResource();
         return null;
+    }
+    
+    public String[][] getBranchesForCombo(String code, String branchRestrict) throws Exception {
+        String[][] result = null;
+
+        String queryAll = "SELECT * FROM AM_AD_BRANCH WHERE BRANCH_STATUS = 'ACTIVE' ORDER BY BRANCH_NAME ASC";
+        String queryRestricted = "SELECT * FROM AM_AD_BRANCH WHERE BRANCH_STATUS = 'ACTIVE' AND BRANCH_ID = ? ORDER BY BRANCH_NAME ASC";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(branchRestrict.equalsIgnoreCase("N") ? queryAll : queryRestricted)) {
+
+            if (!branchRestrict.equalsIgnoreCase("N")) {
+                ps.setString(1, code);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+               
+                rs.last();
+                int rowCount = rs.getRow();
+                rs.beforeFirst(); 
+
+                if (rowCount > 0) {
+                    int columnCount = rs.getMetaData().getColumnCount();
+                    result = new String[rowCount][columnCount];
+                    int i = 0;
+                    while (rs.next()) {
+                        for (int j = 0; j < columnCount; j++) {
+                            result[i][j] = rs.getString(j + 1);
+                        }
+                        i++;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("WARN: Error fetching branches -> " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }

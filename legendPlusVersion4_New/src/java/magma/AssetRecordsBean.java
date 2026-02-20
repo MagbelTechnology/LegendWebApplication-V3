@@ -2182,7 +2182,7 @@ AssetPaymentManager payment = null;
      * @param category_id String
      * @return boolean
      */
-    public boolean isMultipleComponent(String category_id) {
+    public boolean isMultipleComponentOld(String category_id) {
 
         Connection con = null;
         PreparedStatement ps = null;
@@ -2213,6 +2213,28 @@ AssetPaymentManager payment = null;
         return multipleComponent;
     }
 
+    public boolean isMultipleComponent(String categoryId) {
+        boolean multipleComponent = false;
+        String query = "SELECT COUNT(AM_ID) FROM AM_CT_COMPONENT WHERE CATEGORY = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, categoryId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    multipleComponent = rs.getInt(1) > 0;
+                }
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error determining multiple components -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return multipleComponent;
+    }
     /**
      * isDepreciationReCalculatable
      *
@@ -2290,7 +2312,7 @@ AssetPaymentManager payment = null;
      *
      * @return String
      */
-    public String findResidualValue() {
+    public String findResidualValueOld() {
 
         Connection con = null;
         PreparedStatement ps = null;
@@ -2315,6 +2337,26 @@ AssetPaymentManager payment = null;
         return residual;
     }
 
+    
+    public String findResidualValue() {
+        String residual = "0.0";
+        String query = "SELECT RESIDUAL_VALUE FROM AM_GB_COMPANY";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                residual = rs.getString(1) != null ? rs.getString(1) : "0.0";
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error fetching residual value -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return residual;
+    }
 
     public static String getDepreciationEndDate(String vals) {
         String endDate = "ERROR";
@@ -3252,7 +3294,7 @@ public String checkBranchCode()
 		this.memo = memo;
 	}
         
-    public String[] setUpInfo(){
+    public String[] setUpInfoOld(){
 
         String[] result= new String[4];
     Connection con = null;
@@ -3284,6 +3326,32 @@ public String checkBranchCode()
         return result;
 
 
+    }
+    
+    
+    public String[] setUpInfo() {
+        String[] result = new String[4];
+        String query = "SELECT LPO_Required, Barcode_Fld, Trans_Threshold, Cost_Threshold FROM am_gb_company";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                result[0] = rs.getString("LPO_Required");
+                result[1] = rs.getString("Barcode_Fld");
+                result[2] = rs.getString("Trans_Threshold");
+                result[3] = rs.getString("Cost_Threshold");
+            } else {
+                System.out.println("WARN: setUpInfo() query returned no rows");
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error fetching company setup info -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return result;
     }
 
     /**
@@ -5135,7 +5203,7 @@ public String getAssetTransInfo(int tran_id){
 
    } //getTransactionDetails()
 
-public int getNumOfTransactionLevel(String levelCode){
+public int getNumOfTransactionLevelOld(String levelCode){
    String query = "select level from approval_level_setup where code = '"+levelCode+"'";
    int result=100;
     Connection con = null;
@@ -5159,9 +5227,32 @@ public int getNumOfTransactionLevel(String levelCode){
         return result;
    } //getNumOfTransactionLevel()
 
+public int getNumOfTransactionLevel(String levelCode) {
+    int result = 100; 
+    String query = "SELECT level FROM approval_level_setup WHERE code = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, levelCode);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getInt(1);
+            }
+        }
+
+    } catch (SQLException ex) {
+        System.out.println("AssetRecordsBean: getNumOfTransactionLevel WARN: Error fetching level -> " + ex.getMessage());
+        ex.printStackTrace();
+    }
+
+    return result;
+}
 
 
-public boolean updateNewAssetStatus(String assetId) throws Exception {
+
+public boolean updateNewAssetStatusOld(String assetId) throws Exception {
 
         String query = "update am_asset SET  asset_status = 'ACTIVE' ,Finacle_Posted_Date= ? where asset_id ='" +assetId+"'";
          boolean done = true;
@@ -5187,7 +5278,30 @@ public boolean updateNewAssetStatus(String assetId) throws Exception {
 
     }
 
+public boolean updateNewAssetStatus(String assetId) throws Exception {
+    String query = "UPDATE am_asset SET asset_status = 'ACTIVE', Finacle_Posted_Date = ? WHERE asset_id = ?";
+    boolean done = true;
 
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setTimestamp(1, dbConnection.getDateTime(new java.util.Date()));
+        ps.setString(2, assetId);
+
+        int updatedRows = ps.executeUpdate();
+        if (updatedRows == 0) {
+            done = false; 
+            System.out.println("AssetRecordsBean: updateNewAssetStatus: WARN: No asset found with ID " + assetId);
+        }
+
+    } catch (Exception ex) {
+        done = false;
+        System.out.println("AssetRecordsBean: updateNewAssetStatus: WARN: Error updating asset -> " + ex.getMessage());
+        ex.printStackTrace();
+    }
+
+    return done;
+}
 
 
 

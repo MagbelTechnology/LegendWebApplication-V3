@@ -1,6 +1,7 @@
 package com.magbel.util;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 
@@ -107,7 +108,7 @@ public static boolean isFieldMandated(ArrayList records,String formField){
 
 
 
-public  String getGeneratedId(String tableName) {
+public  String getGeneratedIdOld(String tableName) {
 
 	dateFormat = new DatetimeFormat();
     sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -160,8 +161,57 @@ public  String getGeneratedId(String tableName) {
 	return id;
 
    }
+
+public String getGeneratedId(String tableName) {
+    int counter = 0;
+    String id = "";
+
+    String FINDER_QUERY = "SELECT MT_ID FROM IA_MTID_TABLE WHERE MT_TABLENAME = ?";
+    String UPDATE_QUERY = "UPDATE IA_MTID_TABLE SET MT_ID = MT_ID + 1 WHERE MT_TABLENAME = ?";
+
+    try (Connection con = getConnection()) {
+
+        // Start a transaction for concurrency safety
+        con.setAutoCommit(false);
+
+        // Get current MT_ID
+        try (PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+            ps.setString(1, tableName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    counter = rs.getInt(1);
+                } else {
+                    counter = 1;
+                    String insertQuery = "INSERT INTO IA_MTID_TABLE(MT_TABLENAME, MT_ID) VALUES (?, ?)";
+                    try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+                        psInsert.setString(1, tableName);
+                        psInsert.setInt(2, counter);
+                        psInsert.executeUpdate();
+                    }
+                }
+            }
+        }
+
+        // Increment MT_ID
+        try (PreparedStatement psUpdate = con.prepareStatement(UPDATE_QUERY)) {
+            psUpdate.setString(1, tableName);
+            psUpdate.executeUpdate();
+        }
+
+        con.commit(); // commit the transaction
+
+        //Format ID (zero-padded to 5 digits, e.g., 00001)
+        id = String.format("%05d", counter);
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        id = null; 
+    }
+
+    return id;
+}
    
-   public  String getGeneratedId2(String tableName) {
+   public  String getGeneratedId2Old(String tableName) {
 
 	dateFormat = new DatetimeFormat();
     sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -214,8 +264,54 @@ public  String getGeneratedId(String tableName) {
 
    }
 
+   public String getGeneratedId2(String tableName) {
+	    int counter = 0;
+	    String id = "";
 
-public  String getSelectId(String tableName) {
+	    String FINDER_QUERY = "SELECT MT_ID FROM IA_MTID_TABLE WHERE MT_TABLENAME = ?";
+	    String UPDATE_QUERY = "UPDATE IA_MTID_TABLE SET MT_ID = MT_ID + 1 WHERE MT_TABLENAME = ?";
+
+	    try (Connection con = getConnection()) {
+	        con.setAutoCommit(false); // start transaction
+
+	        // Get current MT_ID
+	        try (PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+	            ps.setString(1, tableName);
+	            try (ResultSet rs = ps.executeQuery()) {
+	                if (rs.next()) {
+	                    counter = rs.getInt(1) + 1; // MT_ID + 1
+	                } else {
+	                    counter = 1; // initialize if missing
+	                    String insertQuery = "INSERT INTO IA_MTID_TABLE(MT_TABLENAME, MT_ID) VALUES (?, ?)";
+	                    try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+	                        psInsert.setString(1, tableName);
+	                        psInsert.setInt(2, counter);
+	                        psInsert.executeUpdate();
+	                    }
+	                }
+	            }
+	        }
+
+	        // Increment MT_ID
+	        try (PreparedStatement psUpdate = con.prepareStatement(UPDATE_QUERY)) {
+	            psUpdate.setString(1, tableName);
+	            psUpdate.executeUpdate();
+	        }
+
+	        con.commit(); 
+
+	        // Format ID (zero-padded to 5 digits, e.g., 00001)
+	        id = String.format("%05d", counter);
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        id = null;
+	    }
+
+	    return id;
+	}
+
+public  String getSelectIdOld(String tableName) {
 
 	dateFormat = new DatetimeFormat();
     sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -263,5 +359,34 @@ public  String getSelectId(String tableName) {
 	return id;
 
    }
+
+public String getSelectId(String tableName) {
+    int counter = 0;
+    String id = "";
+
+    String FINDER_QUERY = "SELECT MT_ID + 1 FROM IA_MTID_TABLE WHERE MT_TABLENAME = ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+
+        ps.setString(1, tableName);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) { 
+                counter = rs.getInt(1);
+            } else {
+                counter = 1; 
+            }
+        }
+
+        id = String.format("%05d", counter); // e.g., 00001
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        id = null; 
+    }
+
+    return id;
+}
    
 }

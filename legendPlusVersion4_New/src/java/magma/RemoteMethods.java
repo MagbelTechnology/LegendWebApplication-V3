@@ -24,7 +24,7 @@ public class RemoteMethods extends RemoteScripting {
         System.out.println("RemoteScripting: " + msg);
     }
 
-    public static String getDepRate(String Category) {
+    public static String getDepRateOld(String Category) {
     	dbConnection = new MagmaDBConnection();
     	Connection con = null;
     	PreparedStatement ps = null;
@@ -53,8 +53,36 @@ public class RemoteMethods extends RemoteScripting {
         }
         return "";
     }
+    
+    public static String getDepRate(String categoryId) {
+        dbConnection = new MagmaDBConnection();
+        String depRate = "";
 
-    public static String getResidualValue(String Category)
+        String query = "SELECT dep_rate FROM am_ad_category WHERE category_id = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, categoryId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    depRate = rs.getString(1) != null ? rs.getString(1) : "";
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("WARN: Error fetching depRate -> " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            System.out.println("WARN: Unexpected error in getDepRate -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return depRate;
+    }
+
+    public static String getResidualValueOld(String Category)
     {
 
     	dbConnection = new MagmaDBConnection();
@@ -84,8 +112,37 @@ public class RemoteMethods extends RemoteScripting {
         }
         return "";
     }
+    
+    public static String getResidualValue(String categoryId) {
 
-    public static String getVendorAC(String vendor) {
+        dbConnection = new MagmaDBConnection();
+        String residualValue = "";
+
+        String query = "SELECT residual_value FROM am_ad_category WHERE category_id = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, categoryId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    residualValue = rs.getString(1) != null ? rs.getString(1) : "";
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("WARN: SQL error getting residual value -> " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            System.out.println("WARN: Unexpected error in getResidualValue -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return residualValue;
+    }
+
+    public static String getVendorACOld(String vendor) {
 
     	dbConnection = new MagmaDBConnection();
     	Connection con = null;
@@ -115,6 +172,35 @@ public class RemoteMethods extends RemoteScripting {
         }
         return "";
 
+    }
+    
+    public static String getVendorAC(String vendorId) {
+
+        dbConnection = new MagmaDBConnection();
+        String accountNumber = "";
+
+        String query = "SELECT ACCOUNT_NUMBER FROM AM_AD_VENDOR WHERE VENDOR_ID = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, vendorId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    accountNumber = rs.getString(1) != null ? rs.getString(1) : "";
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("WARN: SQL error getting Vendor Account -> " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            System.out.println("WARN: Unexpected error getting Vendor Account -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return accountNumber;
     }
 
 
@@ -218,7 +304,7 @@ public class RemoteMethods extends RemoteScripting {
         }
         return "";
     }
- public static String getEnforceBarCode(String Category)
+ public static String getEnforceBarCodeOld(String Category)
     {
 
 	 	dbConnection = new MagmaDBConnection();
@@ -248,7 +334,36 @@ public class RemoteMethods extends RemoteScripting {
         return "";
     }
  
- public static String getsubcategory(String Category)
+ public static String getEnforceBarCode(String categoryId) {
+
+	    dbConnection = new MagmaDBConnection();
+	    String enforceBarcode = "";
+
+	    String query = "SELECT enforceBarcode FROM am_ad_category WHERE category_id = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, categoryId);   // Use setInt if category_id is numeric
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                enforceBarcode = rs.getString(1) != null ? rs.getString(1) : "";
+	            }
+	        }
+
+	    } catch (SQLException ex) {
+	        System.out.println("WARN: SQL error in getEnforceBarCode -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    } catch (Exception ex) {
+	        System.out.println("WARN: Unexpected error in getEnforceBarCode -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    }
+
+	    return enforceBarcode;
+	}
+ 
+ public static String getsubcategoryOld(String Category)
  {
 
 	 	Connection con = null;
@@ -278,6 +393,35 @@ public class RemoteMethods extends RemoteScripting {
      return "";
  }
 
+ public static String getsubcategory(String categoryId) {
+
+	    dbConnection = new MagmaDBConnection();
+	    String subCategoryCode = "";
+
+	    String query = "SELECT SUB_CATEGORY_CODE FROM am_ad_sub_category WHERE SUB_CATEGORY_ID = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, categoryId);  // Use setInt if numeric
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                subCategoryCode = rs.getString(1) != null ? rs.getString(1) : "";
+	            }
+	        }
+
+	    } catch (SQLException ex) {
+	        System.out.println("WARN: SQL error in getSubCategory -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    } catch (Exception ex) {
+	        System.out.println("WARN: Unexpected error in getSubCategory -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    }
+
+	    return subCategoryCode;
+	}
+ 
 
  public static String getAmountInWords(String amount){
 

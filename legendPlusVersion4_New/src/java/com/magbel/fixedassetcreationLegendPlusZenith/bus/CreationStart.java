@@ -59,7 +59,7 @@ public class CreationStart {
         }
 
         // ========================
-        // JOB 4 – Every 5 Minutes
+        // JOB 4 – Every 2 Minutes
         // ========================
         JobKey jobKey4 = new JobKey("Jobs4", "group4");
 
@@ -73,8 +73,7 @@ public class CreationStart {
             Trigger trigger4 = TriggerBuilder.newTrigger()
                     .withIdentity("triggerJobs4", "group4")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 0/2 * * * ?")
-                            .withMisfireHandlingInstructionDoNothing())
+                            CronScheduleBuilder.cronSchedule("0 0/2 * * * ?"))
                     .build();
 
             scheduler.scheduleJob(job4, trigger4);
@@ -95,8 +94,7 @@ public class CreationStart {
             Trigger trigger6 = TriggerBuilder.newTrigger()
                     .withIdentity("triggerJobs6", "group6")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 0/10 * * * ?")
-                            .withMisfireHandlingInstructionDoNothing())
+                            CronScheduleBuilder.cronSchedule("0 0/10 * * * ?"))
                     .build();
 
             scheduler.scheduleJob(job6, trigger6);

@@ -18,6 +18,7 @@ import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -56,7 +57,7 @@ public class ApprovalRecords extends MagmaDBConnection
         dbConnection = new MagmaDBConnection();
     }
 
-    public ArrayList findApproval(String assetId, String filter)
+    public ArrayList findApprovalOld(String assetId, String filter)
     {
         Connection con;
         PreparedStatement ps;
@@ -106,7 +107,48 @@ public class ApprovalRecords extends MagmaDBConnection
         return collection;
     }
     
-    public ArrayList findApproval(String filter)
+    public ArrayList findApproval(String assetId, String filter) {
+    	ArrayList collection = new ArrayList<>();
+
+       
+        String FINDER_QUERY = "SELECT Id, Description, Page, Flag, partPay, UserId, Branch, subjectToVat, whTax, operation1, exitPage, url "
+                            + "FROM am_raisentry_post WHERE ID = ? AND FLAG = ? " + filter;
+
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+
+            ps.setString(1, assetId);
+            ps.setString(2, "Y");
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Approval app = new Approval(
+                            rs.getString("Id"),
+                            rs.getString("Description"),
+                            rs.getString("Page"),
+                            rs.getString("Flag"),
+                            rs.getString("partPay"),
+                            rs.getString("UserId"),
+                            rs.getString("Branch"),
+                            rs.getString("subjectToTax"), 
+                            rs.getString("whTax"),
+                            rs.getString("operation1"),
+                            rs.getString("exitPage"),
+                            rs.getString("url")
+                    );
+                    collection.add(app);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("WARNING: cannot fetch [am_raisentry_post] -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return collection;
+    }
+    
+    public ArrayList findApprovalOld(String filter)
     {
         Connection con;
         PreparedStatement ps;
@@ -153,8 +195,46 @@ public class ApprovalRecords extends MagmaDBConnection
         return collection;
 
     }
+    
+    public ArrayList findApproval(String filter) {
+        ArrayList collection = new ArrayList<>();
+        String FINDER_QUERY = "SELECT Id, Description, Page, Flag, partPay, UserId, Branch, subjectToVat, whTax, operation1, exitPage, url "
+                            + "FROM am_raisentry_post WHERE FLAG = ? " + filter;
 
-    public boolean isApprovalExisting(String assetId, String page)
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+
+            ps.setString(1, "Y");
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Approval app = new Approval(
+                            rs.getString("Id"),
+                            rs.getString("Description"),
+                            rs.getString("Page"),
+                            rs.getString("Flag"),
+                            rs.getString("partPay"),
+                            rs.getString("UserId"),
+                            rs.getString("Branch"),
+                            rs.getString("subjectToVat"),
+                            rs.getString("whTax"),
+                            rs.getString("operation1"),
+                            rs.getString("exitPage"),
+                            rs.getString("url")
+                    );
+                    collection.add(app); 
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("WARNING: cannot fetch [am_raisentry_post] -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return collection;
+    }
+
+    public boolean isApprovalExistingOld(String assetId, String page)
     {
         boolean done;
         Connection con;
@@ -190,8 +270,28 @@ public class ApprovalRecords extends MagmaDBConnection
         return done;
 
     }
+    
+    public boolean isApprovalExisting(String assetId, String page) {
+        String FINDER_QUERY = "SELECT 1 FROM am_raisentry_post WHERE ID = ? AND page = ?";
 
-    public boolean isApprovalExisting(String assetId)
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+
+            ps.setString(1, assetId);
+            ps.setString(2, page);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // true if at least one record exists
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("WARNING: Cannot fetch from am_raisentry_post -> " + ex.getMessage());
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isApprovalExistingOld(String assetId)
     {
         boolean done;
         Connection con;
@@ -224,8 +324,27 @@ public class ApprovalRecords extends MagmaDBConnection
 
         return done;
     }
+    
+    public boolean isApprovalExisting(String assetId) {
+        String FINDER_QUERY = "SELECT 1 FROM am_raisentry_post WHERE ID = ?";
 
-    public void updateApproval(String assetid)
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+
+            ps.setString(1, assetId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); 
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("WARNING: Cannot fetch from am_raisentry_post -> " + ex.getMessage());
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public void updateApprovalOld(String assetid)
     {
         Connection con;
         PreparedStatement ps;
@@ -248,8 +367,27 @@ public class ApprovalRecords extends MagmaDBConnection
         }
 
     }
+    
+    public boolean updateApproval(String assetId) {
+        String UPDATE_QUERY = "UPDATE am_raisentry_post SET flag = ? WHERE ID = ?";
 
-    public void updateRaiseEntry(String assetid)
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(UPDATE_QUERY)) {
+
+            ps.setString(1, "N");
+            ps.setString(2, assetId);
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0; // true if at least one row was updated
+
+        } catch (SQLException ex) {
+            System.out.println("WARNING: Cannot update am_raisentry_post -> " + ex.getMessage());
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public void updateRaiseEntryOld(String assetid)
     {
         Connection con;
         PreparedStatement ps;
@@ -271,8 +409,27 @@ public class ApprovalRecords extends MagmaDBConnection
             closeConnection(con, ps);
         }
     }
+    
+    public boolean updateRaiseEntry(String assetId) {
+        String UPDATE_QUERY = "UPDATE am_asset SET raise_entry = ? WHERE ASSET_ID = ?";
 
-    public void updateRaiseAsseg2Entry(String assetid)
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(UPDATE_QUERY)) {
+
+            ps.setString(1, "Y");
+            ps.setString(2, assetId);
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0; // true if at least one row was updated
+
+        } catch (SQLException ex) {
+            System.out.println("WARNING: Cannot update am_asset -> " + ex.getMessage());
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public void updateRaiseAsseg2EntryOld(String assetid)
     {
         Connection con;
         PreparedStatement ps;
@@ -294,8 +451,27 @@ public class ApprovalRecords extends MagmaDBConnection
             closeConnection(con, ps);
         }
     }
+    
+    public boolean updateRaiseAsseg2Entry(String assetId) {
+        String UPDATE_QUERY = "UPDATE am_asset2 SET raise_entry = ? WHERE ASSET_ID = ?";
 
-    public boolean insertApproval(String id, String description, String page, String flag, String partPay, String UserId, String Branch, 
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(UPDATE_QUERY)) {
+
+            ps.setString(1, "Y");
+            ps.setString(2, assetId);
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0; // true if at least one row was updated
+
+        } catch (SQLException ex) {
+            System.out.println("WARNING: Cannot update am_asset2 -> " + ex.getMessage());
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean insertApprovalOld(String id, String description, String page, String flag, String partPay, String UserId, String Branch, 
             String subjectToVat, String whTax, String url)
     {
         boolean done;
@@ -335,8 +511,43 @@ public class ApprovalRecords extends MagmaDBConnection
         }
         return done;
     }
+    
+    public boolean insertApproval(String id, String description, String page, String flag,
+            String partPay, String userId, String branch, 
+            String subjectToVat, String whTax, String url) {
 
-    public String getCodeName(String query)
+
+flag = "Y";
+
+String query = "INSERT INTO am_raisentry_post " +
+ "(Id, Description, Page, Flag, partPay, UserId, Branch, subjectToVat, whTax, url) " +
+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+try (Connection con = getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, id);
+ps.setString(2, description);
+ps.setString(3, page);
+ps.setString(4, flag);
+ps.setString(5, partPay);
+ps.setString(6, userId);
+ps.setString(7, branch);
+ps.setString(8, subjectToVat);
+ps.setString(9, whTax);
+ps.setString(10, url);
+
+int rowsInserted = ps.executeUpdate();
+return rowsInserted > 0;
+
+} catch (SQLException ex) {
+System.out.println("WARNING: Cannot insert into am_raisentry_post -> " + ex.getMessage());
+ex.printStackTrace();
+return false;
+}
+}
+
+    public String getCodeNameOld(String query)
     {
         String result;
         Connection con;
@@ -367,8 +578,28 @@ public class ApprovalRecords extends MagmaDBConnection
   //      System.out.println("====getCodeName result=====  "+result);
         return result;
     }
+    
+    public String getCodeName(String query) {
+        String result = "";
 
-    public String getCodeName(String query,String param)
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) { 
+                result = rs.getString(1);
+                if (result == null) result = "";
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error in getCodeName() for query: " + query);
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public String getCodeNameOld(String query,String param)
     {
         String result;
         Connection con;
@@ -401,8 +632,32 @@ public class ApprovalRecords extends MagmaDBConnection
   //      System.out.println("====getCodeName result=====  "+result);
         return result;
     }
+    
+    public String getCodeName(String query, String param) {
+        String result = "";
 
-    public String getCodeName(String query,String param1,String param2,String param3)
+        
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, param);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    result = rs.getString(1) != null ? rs.getString(1) : "";
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error in getCodeName() -> " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+
+    public String getCodeNameOld(String query,String param1,String param2,String param3)
     {
         String result;
         Connection con;
@@ -434,8 +689,33 @@ public class ApprovalRecords extends MagmaDBConnection
   //      System.out.println("====getCodeName result=====  "+result);
         return result;
     }
+    
+    public String getCodeName(String query, String param1, String param2, String param3) {
+        String result = "";
 
-    public String getCodeName(String query,String param1,String param2)
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, param1);
+            ps.setString(2, param2);
+            ps.setString(3, param3);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    result = rs.getString(1) != null ? rs.getString(1) : "";
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error in getCodeName() -> " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+
+    public String getCodeNameOld(String query,String param1,String param2)
     {
         String result;
         Connection con;
@@ -464,6 +744,31 @@ public class ApprovalRecords extends MagmaDBConnection
             closeConnection(con, ps);
         }
   //      System.out.println("====getCodeName result=====  "+result);
+        return result;
+    }
+    
+    public String getCodeName(String query, String param1, String param2) {
+        String result = "";
+
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, param1);
+            ps.setString(2, param2);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    result = rs.getString(1);
+                    if (result == null) result = "";
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error in getCodeName() for query: " + query);
+            System.out.println("Parameters: " + param1 + ", " + param2);
+            e.printStackTrace();
+        }
+
         return result;
     }
 
@@ -598,7 +903,7 @@ public class ApprovalRecords extends MagmaDBConnection
         return imageData;
     }
 
-    public void getImageData(String assetId, String pageName)
+    public void getImageData(String assetId, String pageName) throws SQLException
     {
         Connection conn = null;
         conn = getConnection("legendPlus");

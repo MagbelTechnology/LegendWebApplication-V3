@@ -32,7 +32,7 @@ public class stateservlet extends HttpServlet {
 
     //Process the HTTP Get request
     //@Override
-    public void service(HttpServletRequest request, HttpServletResponse response)
+    public void serviceOld(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
       String branchid = request.getParameter("branch_id");
@@ -103,6 +103,70 @@ public class stateservlet extends HttpServlet {
            if (DOC_TYPE != null) {
                out.println(DOC_TYPE);
            }
+    }
+    
+    public void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String branchid = request.getParameter("branch_id");
+        int branchID = 0;
+        if (branchid != null) {
+            try {
+                branchID = Integer.parseInt(branchid);
+            } catch (NumberFormatException e) {
+                branchID = 0; 
+            }
+        }
+
+        response.setContentType("text/xml");
+        response.setHeader("Cache-Control", "no-cache");
+
+        try (PrintWriter out = response.getWriter()) {
+            out.write("<message>");
+
+            String query = "SELECT b.STATE, s.state_name + '-' + s.state_code AS state_full " +
+                           "FROM am_ad_branch b " +
+                           "LEFT JOIN am_gb_states s ON b.STATE = s.state_ID " +
+                           "WHERE b.branch_id = ?";
+
+            try (Connection con = new DataConnect("legendPlus").getConnection();
+                 PreparedStatement ps = con.prepareStatement(query)) {
+
+                ps.setInt(1, branchID);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String stateId = rs.getString("STATE");
+                        String stateName = rs.getString("state_full");
+
+                        if (stateId != null && stateName != null) {
+                            out.write("<state>");
+                            out.write("<id>" + stateId + "</id>");
+                            out.write("<name>" + escapeXml(stateName) + "</name>");
+                            out.write("</state>");
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                System.out.println("WARNING: Error Fetching state from stateservlet -> " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            out.write("</message>");
+            if (DOC_TYPE != null) {
+                out.println(DOC_TYPE);
+            }
+        }
+    }
+
+    // Helper to escape XML special characters
+    private String escapeXml(String input) {
+        return input.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&apos;");
     }
 
     public void destroy()
