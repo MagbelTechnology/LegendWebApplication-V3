@@ -5,9 +5,9 @@ import org.quartz.impl.StdSchedulerFactory;
 
 public class CreationStart {
 
-    private static Scheduler scheduler;
+    public static Scheduler scheduler;
 
-    private CreationStart() {
+    public CreationStart() {
         
     }
 
@@ -73,7 +73,7 @@ public class CreationStart {
             Trigger trigger4 = TriggerBuilder.newTrigger()
                     .withIdentity("triggerJobs4", "group4")
                     .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 0/5 * * * ?")
+                            CronScheduleBuilder.cronSchedule("0 0/2 * * * ?")
                             .withMisfireHandlingInstructionDoNothing())
                     .build();
 

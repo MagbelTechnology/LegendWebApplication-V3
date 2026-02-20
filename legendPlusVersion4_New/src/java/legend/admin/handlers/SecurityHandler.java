@@ -1004,7 +1004,7 @@ public class SecurityHandler
     }
 
 
-    public legend.admin.objects.User getUserByUserID(String UserID)
+    public legend.admin.objects.User getUserByUserIDOld(String UserID)
     {
         User user;
         String expiryDate;
@@ -1133,8 +1133,90 @@ public class SecurityHandler
         }
         return user;
     }
+    
+    public User getUserByUserID(String userID) {
 
-    public legend.admin.objects.User getUserByUserName(String UserName)
+        String query =
+            "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, " +
+            "Phone_No, Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, " +
+            "UserId, Create_Date, Password_Expiry, Login_Date, Login_System, " +
+            "Fleet_Admin, Email, password_changed, branch_restriction, Expiry_Days, " +
+            "Expiry_Date, dept_code, is_StockAdministrator, is_Storekeeper, " +
+            "Approval_Level, dept_restriction, UnderTaker, region_code, zone_code, " +
+            "region_restriction, zone_restriction, Facility_Admin, Store_Admin, token_required " +
+            "FROM AM_GB_USER WHERE User_Id = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, userID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (!rs.next()) {
+                    return null;
+                }
+
+                User user = mapUserFromResultSet(rs);
+                return user;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR in getUserByUserID -> " + e.getMessage());
+            return null;
+        }
+    }
+    
+    private User mapUserFromResultSet(ResultSet rs) throws SQLException {
+
+        User user = new User();
+
+        user.setUserId(rs.getString("User_Id"));
+        user.setUserName(rs.getString("User_Name"));
+        user.setUserFullName(rs.getString("Full_Name"));
+        user.setLegacySystemId(rs.getString("Legacy_Sys_Id"));
+        user.setUserClass(rs.getString("Class"));
+        user.setBranch(rs.getString("Branch"));
+        user.setPhoneNo(rs.getString("Phone_No"));
+        user.setIsSupervisor(rs.getString("Is_Supervisor"));
+        user.setMustChangePwd(rs.getString("Must_Change_Pwd"));
+        user.setLoginStatus(rs.getString("Login_Status"));
+        user.setUserStatus(rs.getString("User_Status"));
+        user.setCreatedBy(rs.getString("UserId"));
+        user.setCreateDate(rs.getString("Create_Date"));
+        user.setPwdExpiry(rs.getString("Password_Expiry"));
+        user.setLastLogindate(rs.getString("Login_Date"));
+        user.setLoginSystem(rs.getString("Login_System"));
+        user.setFleetAdmin(rs.getString("Fleet_Admin"));
+        user.setEmail(rs.getString("Email"));
+        user.setPwdChanged(rs.getString("password_changed"));
+        user.setBranchRestrict(rs.getString("branch_restriction"));
+        user.setExpiryDays(rs.getInt("Expiry_Days"));
+        user.setDeptCode(rs.getString("dept_code"));
+        user.setIsStockAdministrator(rs.getString("is_StockAdministrator"));
+        user.setIsStorekeeper(rs.getString("is_Storekeeper"));
+        user.setApproveLevel(rs.getString("Approval_Level"));
+        user.setDeptRestrict(rs.getString("dept_restriction"));
+        user.setUnderTaker(rs.getString("UnderTaker"));
+        user.setRegionCode(rs.getString("region_code"));
+        user.setZoneCode(rs.getString("zone_code"));
+        user.setRegionRestrict(rs.getString("region_restriction"));
+        user.setZoneRestrict(rs.getString("zone_restriction"));
+        user.setIsFacilityAdministrator(rs.getString("Facility_Admin"));
+        user.setIsStoreAdministrator(rs.getString("Store_Admin"));
+        user.setTokenRequire(rs.getString("token_required"));
+
+        Date expiry = rs.getDate("Expiry_Date");
+        if (expiry != null) {
+            user.setExpiryDate(expiry.toString());
+        }
+
+        return user;
+    }
+
+
+
+    public legend.admin.objects.User getUserByUserNameOld(String UserName)
     {
         User user;
         String query;
@@ -1220,8 +1302,67 @@ public class SecurityHandler
         }
         return user;
     }
+    
+    public User getUserByUserName(String userName) {
 
-    public boolean createUser(legend.admin.objects.User user)
+        String query =
+            "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, " +
+            "Phone_No, Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, " +
+            "UserId, Create_Date, Password_Expiry, Login_Date, Login_System, " +
+            "Fleet_Admin, Email, password_changed, region_code, zone_code, " +
+            "region_restriction, zone_restriction, Facility_Admin, Store_Admin " +
+            "FROM AM_GB_USER WHERE User_Name = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, userName);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (!rs.next()) {
+                    return null; // user not found
+                }
+
+                User user = new User();
+
+                user.setUserId(rs.getString("User_Id"));
+                user.setUserName(rs.getString("User_Name"));
+                user.setUserFullName(rs.getString("Full_Name"));
+                user.setLegacySystemId(rs.getString("Legacy_Sys_Id"));
+                user.setUserClass(rs.getString("Class"));
+                user.setBranch(rs.getString("Branch"));
+                user.setPassword(rs.getString("Password"));
+                user.setPhoneNo(rs.getString("Phone_No"));
+                user.setIsSupervisor(rs.getString("Is_Supervisor"));
+                user.setMustChangePwd(rs.getString("Must_Change_Pwd"));
+                user.setLoginStatus(rs.getString("Login_Status"));
+                user.setUserStatus(rs.getString("User_Status"));
+                user.setCreatedBy(rs.getString("UserId"));
+                user.setCreateDate(rs.getString("Create_Date"));
+                user.setPwdExpiry(rs.getString("Password_Expiry"));
+                user.setLastLogindate(rs.getString("Login_Date"));
+                user.setLoginSystem(rs.getString("Login_System"));
+                user.setFleetAdmin(rs.getString("Fleet_Admin"));
+                user.setEmail(rs.getString("Email"));
+                user.setRegionCode(rs.getString("region_code"));
+                user.setZoneCode(rs.getString("zone_code"));
+                user.setRegionRestrict(rs.getString("region_restriction"));
+                user.setZoneRestrict(rs.getString("zone_restriction"));
+                user.setIsFacilityAdministrator(rs.getString("Facility_Admin"));
+                user.setIsStoreAdministrator(rs.getString("Store_Admin"));
+
+                return user;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR in getUserByUserName -> " + e.getMessage());
+            return null;
+        }
+    }
+
+
+    public boolean createUserOld(legend.admin.objects.User user)
     {
         Connection con;
         PreparedStatement ps;
@@ -1322,8 +1463,83 @@ public class SecurityHandler
         return done;
 
     }
+    
+    public boolean createUser(legend.admin.objects.User user) {
 
-    public boolean updateUser(legend.admin.objects.User user)
+        boolean hasExpiryDate = user.getExpiryDate() != null &&
+                                !user.getExpiryDate().trim().isEmpty() &&
+                                !"null".equalsIgnoreCase(user.getExpiryDate().trim());
+
+        String query = hasExpiryDate
+                ? "INSERT INTO AM_GB_USER (" +
+                  "User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, Phone_No, " +
+                  "Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, " +
+                  "Create_Date, Password_Expiry, Fleet_Admin, Email, branch_restriction, " +
+                  "Expiry_Days, Expiry_Date, dept_restriction, dept_code, UnderTaker, " +
+                  "region_code, zone_code, region_restriction, zone_restriction, " +
+                  "Facility_Admin, Store_Admin) " +
+                  "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                : "INSERT INTO AM_GB_USER (" +
+                  "User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, Phone_No, " +
+                  "Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, " +
+                  "Create_Date, Password_Expiry, Fleet_Admin, Email, branch_restriction, " +
+                  "Expiry_Days, dept_restriction, dept_code, UnderTaker, " +
+                  "region_code, zone_code, region_restriction, zone_restriction, " +
+                  "Facility_Admin, Store_Admin) " +
+                  "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            int index = 1;
+
+            String generatedId = new ApplicationHelper().getGeneratedId("AM_GB_USER");
+
+            ps.setString(index++, user.getUserName());
+            ps.setString(index++, user.getUserFullName());
+            ps.setString(index++, user.getLegacySystemId());
+            ps.setString(index++, user.getUserClass());
+            ps.setString(index++, user.getBranch());
+            ps.setString(index++, user.getPassword());
+            ps.setString(index++, user.getPhoneNo());
+            ps.setString(index++, user.getIsSupervisor());
+            ps.setString(index++, user.getMustChangePwd());
+            ps.setString(index++, user.getLoginStatus());
+            ps.setString(index++, user.getUserStatus());
+            ps.setString(index++, generatedId);
+            ps.setDate(index++, df.dateConvert(new Date()));
+            ps.setDate(index++, df.dateConvert(
+                    df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry()))
+            ));
+            ps.setString(index++, user.getFleetAdmin());
+            ps.setString(index++, user.getEmail());
+            ps.setString(index++, user.getBranchRestrict());
+            ps.setInt(index++, user.getExpiryDays());
+
+            if (hasExpiryDate) {
+                ps.setDate(index++, df.dateConvert(user.getExpiryDate()));
+            }
+
+            ps.setString(index++, user.getDeptRestrict());
+            ps.setString(index++, user.getDeptCode());
+            ps.setString(index++, user.getUnderTaker());
+            ps.setString(index++, user.getRegionCode());
+            ps.setString(index++, user.getZoneCode());
+            ps.setString(index++, user.getRegionRestrict());
+            ps.setString(index++, user.getZoneRestrict());
+            ps.setString(index++, user.getIsFacilityAdministrator());
+            ps.setString(index++, user.getIsStoreAdministrator());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("WARNING: Error executing createUser -> " + e.getMessage());
+            return false;
+        }
+    }
+
+
+    public boolean updateUserOld(legend.admin.objects.User user)
     {
         Connection con;
         PreparedStatement ps;
@@ -1415,9 +1631,75 @@ public class SecurityHandler
         return done;
 
     }
+    
+    public boolean updateUser(legend.admin.objects.User user) {
+
+        boolean hasExpiryDate = user.getExpiryDate() != null &&
+                                !user.getExpiryDate().trim().isEmpty() &&
+                                !"null".equalsIgnoreCase(user.getExpiryDate().trim());
+
+        String query = hasExpiryDate
+                ? "UPDATE AM_GB_USER SET User_Name=?, Full_Name=?, Legacy_Sys_Id=?, Class=?, " +
+                  "Branch=?, Password=?, Phone_No=?, Is_Supervisor=?, Must_Change_Pwd=?, " +
+                  "Login_Status=?, User_Status=?, Fleet_Admin=?, Email=?, branch_restriction=?, " +
+                  "Expiry_Days=?, Expiry_Date=?, region_code=?, zone_code=?, region_restriction=?, " +
+                  "zone_restriction=?, Facility_Admin=?, Store_Admin=? WHERE User_Id=?"
+                : "UPDATE AM_GB_USER SET User_Name=?, Full_Name=?, Legacy_Sys_Id=?, Class=?, " +
+                  "Branch=?, Password=?, Phone_No=?, Is_Supervisor=?, Must_Change_Pwd=?, " +
+                  "Login_Status=?, User_Status=?, Fleet_Admin=?, Email=?, branch_restriction=?, " +
+                  "Expiry_Days=?, region_code=?, zone_code=?, region_restriction=?, " +
+                  "zone_restriction=?, Facility_Admin=?, Store_Admin=? WHERE User_Id=?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            int index = 1;
+
+            ps.setString(index++, user.getUserName());
+            ps.setString(index++, user.getUserFullName());
+            ps.setString(index++, user.getLegacySystemId());
+            ps.setString(index++, user.getUserClass());
+            ps.setString(index++, user.getBranch());
+            ps.setString(index++, user.getPassword());
+            ps.setString(index++, user.getPhoneNo());
+            ps.setString(index++, user.getIsSupervisor());
+            ps.setString(index++, user.getMustChangePwd());
+            ps.setString(index++, user.getLoginStatus());
+            ps.setString(index++, user.getUserStatus());
+            ps.setString(index++, user.getFleetAdmin());
+            ps.setString(index++, user.getEmail());
+            ps.setString(index++, user.getBranchRestrict());
+            ps.setInt(index++, user.getExpiryDays());
+
+            if (hasExpiryDate) {
+                ps.setDate(index++, df.dateConvert(user.getExpiryDate()));
+            }
+
+            ps.setString(index++, user.getRegionCode());
+            ps.setString(index++, user.getZoneCode());
+            ps.setString(index++, user.getRegionRestrict());
+            ps.setString(index++, user.getZoneRestrict());
+            ps.setString(index++, user.getIsFacilityAdministrator());
+            ps.setString(index++, user.getIsStoreAdministrator());
+            ps.setString(index++, user.getUserId());
+
+            boolean updated = ps.executeUpdate() > 0;
+
+            if (user.getExpiryDays() == 0) {
+                updateExpiryDate(Integer.parseInt(user.getUserId()));
+            }
+
+            return updated;
+
+        } catch (SQLException e) {
+            System.err.println("WARNING: Error executing updateUser -> " + e.getMessage());
+            return false;
+        }
+    }
 
 
-    public boolean confirmPassword(String iden, String pass)
+
+    public boolean confirmPasswordOld(String iden, String pass)
     {
         String query;
         Connection con;
@@ -1449,8 +1731,33 @@ public class SecurityHandler
         }
         return done;
     }
+    
+    public boolean confirmPassword(String userId, String pass) throws Exception {
+        String query = "SELECT PASSWORD FROM AM_GB_USER WHERE USER_ID = ?";
+        boolean isMatch = false;
+        cm = new CryptManager();
 
-    public boolean updateLogins(String userid, String ipaddress)
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String storedPassword = rs.getString("PASSWORD");
+                    isMatch = pass.equals(cm.decrypt(storedPassword));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("WARNING: Error executing confirmPassword -> " + e.getMessage());
+        }
+
+        return isMatch;
+    }
+
+
+    public boolean updateLoginsOld(String userid, String ipaddress)
     {
         String query;
         Connection con;
@@ -1477,8 +1784,29 @@ public class SecurityHandler
         }
         return done;
     }
+    
+    public boolean updateLogins(String userId, String ipAddress) {
+        String query = "UPDATE AM_GB_USER SET LOGIN_STATUS = 1, LOGIN_SYSTEM = ?, login_date = ? WHERE USER_ID = ?";
+        boolean done = false;
 
-    public boolean changePassword(String userid, String password, String expiry)
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, ipAddress);
+            ps.setDate(2, df.dateConvert(new Date())); 
+            ps.setString(3, userId);
+
+            done = ps.executeUpdate() > 0; 
+
+        } catch (SQLException e) {
+            System.err.println("WARNING: Error executing updateLogins -> " + e.getMessage());
+        }
+
+        return done;
+    }
+
+
+    public boolean changePasswordOld(String userid, String password, String expiry)
     {
         String query;
         Connection con;
@@ -1508,8 +1836,32 @@ public class SecurityHandler
     }
     return done;
 }
+    
+    public boolean changePassword(String userId, String password, String expiry) {
+        String query = "UPDATE AM_GB_USER SET Password = ?, password_changed = ?, password_expiry = ?, must_change_pwd = ? WHERE USER_ID = ?";
+        boolean done = false;
 
-    public boolean updateLogins(String userid, String status, String ipaddress)
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, password);
+            ps.setString(2, "Y");
+            ps.setDate(3, df.dateConvert(df.addDayToDate(new Date(), Integer.parseInt(expiry))));
+
+            ps.setString(4, "N");
+            ps.setString(5, userId);
+
+            done = ps.executeUpdate() > 0; 
+
+        } catch (SQLException e) {
+            System.err.println("WARNING: Error executing changePassword -> " + e.getMessage());
+        }
+
+        return done;
+    }
+
+
+    public boolean updateLoginsOld(String userid, String status, String ipaddress)
     {
         String query;
         Connection con;
@@ -1554,8 +1906,44 @@ public class SecurityHandler
         }
         return done;
     }
+    
+    public boolean updateLogins(String userId, String status, String ipAddress) {
+        String updateUserQuery = "UPDATE AM_GB_USER SET LOGIN_STATUS = ?, LOGIN_SYSTEM = ?, login_date = GETDATE() WHERE USER_ID = ?";
+        String querySessionOut = "UPDATE gb_user_login SET time_out = ? WHERE user_id = ? AND MTID = ?";
 
-    public boolean queryPexpiry(String userid)
+        boolean done = false;
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(updateUserQuery);
+             PreparedStatement ps1 = con.prepareStatement(querySessionOut)) {
+
+            // Update AM_GB_USER
+            ps.setString(1, status);
+            ps.setString(2, ipAddress);
+            ps.setString(3, userId);
+            int rowsUpdated = ps.executeUpdate();
+
+            // Get latest MTID for the user
+            String mtid = records.getCodeName("SELECT MAX(mtid) FROM gb_user_login WHERE USER_ID = ?", userId);
+
+            // Update GB_USER_LOGIN session
+            ps1.setString(1, df.getDateTime().substring(10));
+            ps1.setString(2, userId);
+            ps1.setString(3, mtid);
+            int sessionUpdated = ps1.executeUpdate();
+
+            
+            done = rowsUpdated > 0 && sessionUpdated > 0;
+
+        } catch (SQLException e) {
+            System.err.println("WARNING: Error executing updateLogins -> " + e.getMessage());
+        }
+
+        return done;
+    }
+
+
+    public boolean queryPexpiryOld(String userid)
     {
         String query;
         Connection con;
@@ -1591,6 +1979,31 @@ public class SecurityHandler
         }
         return done;
     }
+    
+    public boolean queryPexpiry(String userId) {
+        String query = "SELECT password_expiry FROM AM_GB_USER WHERE USER_ID = ?";
+        boolean expired = false;
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String exDate = rs.getString("password_expiry");
+                    int diff = df.getDayDifferenceNoABS(exDate, sdf.format(new Date()));
+                    expired = diff <= 0; 
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("WARNING: Error executing queryPexpiry -> " + e.getMessage());
+        }
+
+        return expired;
+    }
+
 
 //    private Connection getConnection()
 //    {
@@ -3827,7 +4240,7 @@ public class SecurityHandler
     }
  
 
-    public String getCompanyInfo(String compCode) throws SQLException {
+    public String getCompanyInfoOld(String compCode) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -3863,6 +4276,34 @@ public class SecurityHandler
 
         return compName;
     }
+    
+    public String getCompanyInfo(String compCode) throws SQLException {
+        String compName = "";
+
+ 
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall("{CALL getCompanyInfo(?)}")) {
+
+            cstmt.setString(1, compCode);
+
+            boolean hasResultSet = cstmt.execute();
+
+            if (hasResultSet) {
+                try (ResultSet rs = cstmt.getResultSet()) {
+                    if (rs.next()) {
+                        compName = rs.getString(1);
+                    }
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getCompanyInfo() >> " + ex.getMessage());
+            throw ex; // propagate exception to caller
+        }
+
+        return compName;
+    }
+
 
 //    public String getCurrentDate_Month() throws SQLException {
 //        Connection con = null;
@@ -4072,7 +4513,7 @@ public class SecurityHandler
 //
 //}
     
-    public java.util.ArrayList getUserByQueryProc(String userNameFilter, String passwordfilter, String Name,String tokenfilter, String pass) throws SQLException
+    public java.util.ArrayList getUserByQueryProcOld(String userNameFilter, String passwordfilter, String Name,String tokenfilter, String pass) throws SQLException
     {
         java.util.ArrayList _list = new java.util.ArrayList();
         legend.admin.objects.User user = null;
@@ -4216,6 +4657,89 @@ public class SecurityHandler
     return _list;
 
 }
+    
+    public java.util.ArrayList getUserByQueryProc(
+            String userNameFilter, 
+            String passwordFilter, 
+            String Name, 
+            String tokenFilter, 
+            String pass) throws SQLException {
+    	
+    	java.util.ArrayList userList = new java.util.ArrayList();
+        CryptManager cm = new CryptManager();
+
+        // Clean input filters
+        String cleanedUserName = userNameFilter != null ? userNameFilter.replaceAll("\\s", "") : "";
+        String cleanedToken = tokenFilter != null ? tokenFilter.replaceAll("\\s", "") : "";
+
+        String sql = "{CALL getUserByQueryNoPassword(?, ?)}";
+
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            // Set stored procedure parameters
+            cstmt.setString(1, cleanedUserName);
+            cstmt.setString(2, cleanedToken);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+
+                while (rs.next()) {
+                    String userName = rs.getString(2);
+                    String encryptedPassword = rs.getString(7);
+
+                    // Only add user if credentials match
+                    if (Name(userName, pass, cm.decrypt(encryptedPassword))) {
+
+                        legend.admin.objects.User user = new legend.admin.objects.User();
+                        user.setUserId(rs.getString(1));
+                        user.setUserName(userName);
+                        user.setUserFullName(rs.getString(3));
+                        user.setLegacySystemId(rs.getString(4));
+                        user.setUserClass(rs.getString(5));
+                        user.setBranch(rs.getString(6));
+                        user.setPassword(encryptedPassword);
+                        user.setPhoneNo(rs.getString(8));
+                        user.setIsSupervisor(rs.getString(9));
+                        user.setMustChangePwd(rs.getString(10));
+                        user.setLoginStatus(rs.getString(11));
+                        user.setUserStatus(rs.getString(12));
+                        user.setCreatedBy(rs.getString(13));
+                        user.setCreateDate(rs.getString(14));
+                        user.setPwdExpiry(rs.getString(15));
+                        user.setLastLogindate(rs.getString(16));
+                        user.setLoginSystem(rs.getString(17));
+                        user.setFleetAdmin(rs.getString(18));
+                        user.setEmail(rs.getString(19));
+                        user.setBranch(rs.getString(20));
+                        user.setPwdChanged(rs.getString(21));
+                        user.setExpDate(rs.getDate(22));
+                        user.setBranchRestrict(rs.getString(23));
+                        user.setApprvLimit(rs.getString(24));
+                        user.setApprvLevel(rs.getString(25));
+                        user.setTokenRequired("Y".equalsIgnoreCase(rs.getString(26)));
+                        user.setRegionCode(rs.getString(27));
+                        user.setZoneCode(rs.getString(28));
+                        user.setRegionRestrict(rs.getString(29));
+                        user.setZoneRestrict(rs.getString(30));
+                        user.setIsFacilityAdministrator(rs.getString(31));
+                        user.setIsStoreAdministrator(rs.getString(32));
+
+                        userList.add(user);
+                    }
+                }
+
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error in getUserByQueryProc(): " + e.getMessage());
+            e.printStackTrace();
+            throw new SQLException("Failed to fetch users", e);
+        }
+
+        return userList;
+    }
+
+    
 
     public java.util.ArrayList getUserByQueryNoPasswordProc(String userNameFilter, String Name,String tokenfilter) throws SQLException
     {  
@@ -4351,7 +4875,7 @@ public class SecurityHandler
 }
 
 
-    public String getTokenUserId(String userName) throws SQLException {
+    public String getTokenUserIdOld(String userName) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4387,8 +4911,32 @@ public class SecurityHandler
 
         return tokenUserId;
     }
+    
+    public String getTokenUserId(String userName) throws SQLException {
+        String tokenUserId = "";
+        String sql = "{CALL getTokenUserId(?)}";
 
-    public String getUserMail(int userId) throws SQLException {
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            cstmt.setString(1, userName);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    tokenUserId = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getTokenUserId() >> " + ex.getMessage());
+            throw ex; 
+        }
+
+        return tokenUserId;
+    }
+
+
+    public String getUserMailOld(int userId) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4424,6 +4972,31 @@ public class SecurityHandler
 
         return email;
     }
+    
+    
+    public String getUserMail(int userId) throws SQLException {
+        String email = "";
+        String sql = "{CALL getUserId(?)}";
+
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            cstmt.setInt(1, userId);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    email = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error occurred in getUserMail() of SecurityHandler >> " + ex.getMessage());
+            throw ex; // propagate exception
+        }
+
+        return email;
+    }
+
 
 
 //    public String getLoginStatus(String  userName) throws SQLException {
@@ -4489,7 +5062,7 @@ public class SecurityHandler
 
     
 
-    public String getclassName(String userClass,String param) throws SQLException {
+    public String getclassNameOld(String userClass,String param) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4524,8 +5097,36 @@ public class SecurityHandler
 
         return className;
     }
+    
+    public String getClassName(String userClass, String param) throws SQLException {
+        String className = "";
 
-    public String getBranchCode(int branchId) throws SQLException {
+        String sql = "{CALL getclassName(?, ?)}";
+
+       
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            cstmt.setString(1, userClass);
+            cstmt.setString(2, param);
+
+            
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    className = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getClassName() >> " + ex.getMessage());
+            throw ex; 
+        }
+
+        return className;
+    }
+
+
+    public String getBranchCodeOld(int branchId) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4561,8 +5162,35 @@ public class SecurityHandler
 
         return branchCode;
     }
+    
+    public String getBranchCode(int branchId) throws SQLException {
+        String branchCode = "";
 
-    public String getExitclass(String pageName, String classId) throws SQLException {
+        String sql = "{CALL getBranchCode(?)}";
+
+       
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            cstmt.setInt(1, branchId);
+
+            
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    branchCode = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getBranchCode() >> " + ex.getMessage());
+            throw ex; 
+        }
+
+        return branchCode;
+    }
+
+
+    public String getExitclassOld(String pageName, String classId) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4598,8 +5226,38 @@ public class SecurityHandler
 //        System.out.println("======valid Page======: "+validPage);
         return validPage;
     }
+    
+    public String getExitClass(String pageName, String classId) throws SQLException {
+        String validPage = "";
 
-    public String getClassId(String  userName) throws SQLException {
+        String sql = "{CALL getExitclass(?, ?)}";
+
+        
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            pageName = pageName != null ? pageName.trim() : "";
+            classId = classId != null ? classId.trim() : "";
+
+            cstmt.setString(1, pageName);
+            cstmt.setString(2, classId);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    validPage = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getExitClass() >> " + ex.getMessage());
+            throw ex; 
+        }
+
+        return validPage;
+    }
+
+
+    public String getClassIdOld(String  userName) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4628,8 +5286,33 @@ public class SecurityHandler
 
         return classId;
     }
+    
+    public String getClassId(String userName) throws SQLException {
+        String classId = "";
+        String sql = "{CALL getClassId(?)}";
 
-    public String getSubMenuExit(String pageName) throws SQLException {
+       
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            cstmt.setString(1, userName);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    classId = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getClassId() >> " + ex.getMessage());
+            throw ex; 
+        }
+
+        return classId;
+    }
+
+
+    public String getSubMenuExitOld(String pageName) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4662,8 +5345,34 @@ public class SecurityHandler
 //        System.out.println("======subClass Page======: "+subClass);
         return subClass;
     }
+    
+    public String getSubMenuExit(String pageName) throws SQLException {
+        String subClass = "";
+        String sql = "{CALL getSubMenuExit(?)}";
 
-    public String getToDate() throws SQLException {
+        
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            pageName = pageName != null ? pageName.trim() : "";
+            cstmt.setString(1, pageName);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    subClass = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getSubMenuExit() >> " + ex.getMessage());
+            throw ex; 
+        }
+
+        return subClass;
+    }
+
+
+    public String getToDateOld() throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4692,8 +5401,29 @@ public class SecurityHandler
 
         return toDate;
     }
+    
+    public String getToDate() throws SQLException {
+        String toDate = "";
+        String sql = "{CALL getToDate()}";
 
-    public String getFromDate() throws SQLException {
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql);
+             ResultSet rs = cstmt.executeQuery()) {
+
+            if (rs.next()) {
+                toDate = rs.getString(1);
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getToDate() >> " + ex.getMessage());
+            throw ex; 
+        }
+
+        return toDate;
+    }
+
+
+    public String getFromDateOld() throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4722,8 +5452,30 @@ public class SecurityHandler
 
         return fromDate;
     }
+    
+    public String getFromDate() throws SQLException {
+        String fromDate = "";
+        String sql = "{CALL getFromDate()}";
 
-    public String getOtherMails(String mailCode) throws SQLException {
+        // Use try-with-resources to automatically close Connection, CallableStatement, and ResultSet
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql);
+             ResultSet rs = cstmt.executeQuery()) {
+
+            if (rs.next()) {
+                fromDate = rs.getString(1);
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getFromDate() >> " + ex.getMessage());
+            throw ex; // propagate exception to caller
+        }
+
+        return fromDate;
+    }
+
+
+    public String getOtherMailsOld(String mailCode) throws SQLException {
         Connection con = null;
         //PreparedStatement ps = null;
          Statement stmt = null;
@@ -4753,6 +5505,30 @@ public class SecurityHandler
 
         return mailAddress;
     }
+    
+    public String getOtherMails(String mailCode) throws SQLException {
+        String mailAddress = "";
+        String sql = "{CALL getOtherMails(?)}";
+
+        try (Connection con = getConnection();
+             CallableStatement cstmt = con.prepareCall(sql)) {
+
+            cstmt.setString(1, mailCode);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    mailAddress = rs.getString(1);
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.err.println("Error in getOtherMails() >> " + ex.getMessage());
+            throw ex; 
+        }
+
+        return mailAddress;
+    }
+
 
     public String createManageUser2Tmp(User user, String limit,String userId,String menuId)
     {
