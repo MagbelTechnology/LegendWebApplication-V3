@@ -10709,24 +10709,22 @@ public java.util.ArrayList getUsernotSignOutRecordsOld(String sessionTimeOut)
  }
 
 
+
+
+
 public List<String> getUsernotSignOutRecords(String sessionTimeOut) {
 
     List<String> list = new ArrayList<>();
 
-    String notSignOutquery =
-        "SELECT user_id, session_time, create_date, " +
-        "DATEDIFF(second, session_time, CONVERT(VARCHAR, getdate(), 108)) AS difference " +
-        "FROM gb_user_login " +
-        "WHERE time_out IS NULL " +
-        "AND DATEDIFF(second, session_time, CONVERT(VARCHAR, getdate(), 108)) > 60 * ?";
+    String query = "SELECT user_id,session_time,create_date,DATEDIFF(second, session_time, (SELECT CONVERT(VARCHAR, getdate(), 108))) AS difference"
+			+ " from gb_user_login where time_out is null and DATEDIFF(second, session_time, (SELECT CONVERT(VARCHAR, getdate(), 108))) > 60 * ?";
 
     try (Connection c = getConnection();
-         PreparedStatement s = c.prepareStatement(notSignOutquery)) {
+         PreparedStatement ps = c.prepareStatement(query)) {
 
-        s.setInt(1, Integer.parseInt(sessionTimeOut));
+        ps.setString(1, sessionTimeOut);
 
-        try (ResultSet rs = s.executeQuery()) {
-
+        try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(rs.getString("user_id"));
             }
@@ -10738,6 +10736,7 @@ public List<String> getUsernotSignOutRecords(String sessionTimeOut) {
 
     return list;
 }
+
 
 
 //public boolean updateUsernotSignOutRecords( String userId,String mtid) throws SQLException

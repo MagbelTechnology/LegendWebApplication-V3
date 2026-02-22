@@ -89,7 +89,7 @@ public class Jobs6 implements Job {
             // Fetch emails to send
             java.util.List<com.magbel.legend.vao.SendMail> mailList = comp.getSendMailSqlRecords();
             if (mailList == null || mailList.isEmpty()) {
-                _log.info("No emails to send in this run.");
+                //_log.info("No emails to send in this run.");
                 return;
             }
 

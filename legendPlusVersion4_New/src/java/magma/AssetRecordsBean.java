@@ -211,8 +211,7 @@ public class AssetRecordsBean extends legend.ConnectionClass
 		}
         asset_id = new legend.AutoIDSetup().getIdentity(branch_id,
                 department_id, section_id, category_id);
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
 AssetPaymentManager payment = null;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
@@ -347,13 +346,11 @@ AssetPaymentManager payment = null;
             done = false;
             return done;
         }  
-        try {
-
+        try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(createQuery)) {
 //            double costPrice = Double.parseDouble(vat_amount) +
 //                               Double.parseDouble(vatable_cost);
             double costPrice = Double.parseDouble(cost_price);
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
             ps.setString(1, asset_id);
             ps.setString(2, registration_no);
             ps.setInt(3, Integer.parseInt(branch_id));
@@ -462,9 +459,7 @@ AssetPaymentManager payment = null;
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error creating asset in AM_ASSET Table->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
         return done;
     }
@@ -477,8 +472,7 @@ AssetPaymentManager payment = null;
     private boolean rinsertAssetTwoRecord() throws Exception, Throwable {
         asset_id = new legend.AutoIDSetup().getIdentity(branch_id,
                 department_id, section_id, category_id);
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         boolean done = true;
 AssetPaymentManager payment = null;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
@@ -608,13 +602,13 @@ AssetPaymentManager payment = null;
             done = false;
             return done;
         }  
-        try {
+        try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(createQuery)) {
 
 //            double costPrice = Double.parseDouble(vat_amount) +
 //                               Double.parseDouble(vatable_cost);
             double costPrice = Double.parseDouble(cost_price);
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+           
             ps.setString(1, asset_id);
             ps.setString(2, registration_no);
             ps.setInt(3, Integer.parseInt(branch_id));
@@ -721,10 +715,8 @@ AssetPaymentManager payment = null;
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error creating asset in AM_ASSET TWO Table->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
-
+        } 
+        
         return done;
     }
 
@@ -757,8 +749,7 @@ AssetPaymentManager payment = null;
                        "WAREHOUSE_CODE = ?,ITEMTYPE = ?,ITEM_CODE = ?,REGION_CODE = ?, TRANPORT_COST = ?,OTHER_COST = ?  "+
                        "WHERE	ASSET_ID = '" + asset_id + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         boolean done = true;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
             status = "Z";
@@ -830,13 +821,13 @@ AssetPaymentManager payment = null;
         wh_tax_amount = wh_tax_amount.replaceAll(",", "");
         residual_value = residual_value.replaceAll(",", "");
 
-        try {
+        try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
 
             double costPrice = Double.parseDouble(vat_amount) +
                                Double.parseDouble(vatable_cost);
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+           
             ps.setString(1, registration_no);
             ps.setString(2, description.toUpperCase());
             ps.setString(3, vendor_account);
@@ -912,9 +903,8 @@ AssetPaymentManager payment = null;
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error updating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
     }
@@ -947,8 +937,7 @@ AssetPaymentManager payment = null;
                        "WAREHOUSE_CODE = ?,ITEMTYPE = ?,ITEMCODE = ?,REGION_CODE = ?   "+
                        "WHERE	ASSET_ID = '" + asset_id + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
             status = "Z";
@@ -1020,13 +1009,13 @@ AssetPaymentManager payment = null;
         wh_tax_amount = wh_tax_amount.replaceAll(",", "");
         residual_value = residual_value.replaceAll(",", "");
 
-        try {
+        try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
 
             double costPrice = Double.parseDouble(vat_amount) +
                                Double.parseDouble(vatable_cost);
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+           
             ps.setString(1, registration_no);
             ps.setString(2, description.toUpperCase());
             ps.setString(3, vendor_account);
@@ -1099,9 +1088,8 @@ AssetPaymentManager payment = null;
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error updating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
     }
@@ -1132,14 +1120,13 @@ AssetPaymentManager payment = null;
                            "A.WAREHOUSE_CODE, A.ITEM_CODE,A.ITEMTYPE,A.PROJECT_CODE,REGION_CODE,OLD_ASSET_ID,VENDOR_NAME FROM AM_ASSET A " +
                            "WHERE A.ASSET_ID = '" + asset_id + "'";
 //			System.out.println("getAssetRecords query: "+query);
-            Connection con = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
+           
 
-            try {
-                con = dbConnection.getConnection("legendPlus");
-                ps = con.prepareStatement(query);
-                rs = ps.executeQuery();
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(query)) {
+            	
+               
+                try (ResultSet rs = ps.executeQuery()) {
 
                 if (rs.next()) {  
 
@@ -1241,12 +1228,11 @@ AssetPaymentManager payment = null;
                 } else {
                     System.out.print("nothing");
                 }
+                }
 
             } catch (Exception ex) {
                 System.out.println("WARN: Error fetching all asset ->" + ex);
-            } finally {
-                dbConnection.closeConnection(con, ps);
-            }
+            } 
         }
     }
 
@@ -2235,13 +2221,15 @@ AssetPaymentManager payment = null;
 
         return multipleComponent;
     }
+    
+    
     /**
      * isDepreciationReCalculatable
      *
      * @param assetid String
      * @return boolean
      */
-    public boolean isDepreciationReCalculatable(String assetid) {
+    public boolean isDepreciationReCalculatableOld(String assetid) {
 
         Connection con = null;
         PreparedStatement ps = null;
@@ -2274,6 +2262,35 @@ AssetPaymentManager payment = null;
 
         return calculatable;
     }
+    
+    public boolean isDepreciationReCalculatable(String assetid) {
+
+        boolean calculatable = false;
+        final double ZERO = 0.00d;
+        String query = "SELECT ACCUM_DEP FROM AM_ASSET WHERE ASSET_ID = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, assetid);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    double accumDep = rs.getDouble("ACCUM_DEP");
+
+                    if (accumDep > ZERO) {
+                        calculatable = true;
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error isDepreciationReCalculatable -> " + ex);
+        }
+
+        return calculatable;
+    }
 
     /**
      * getDepreciationRate
@@ -2281,7 +2298,7 @@ AssetPaymentManager payment = null;
      * @param category_id String
      * @return String
      */
-    private String getDepreciationRate(String category_id) throws Exception {
+    private String getDepreciationRateOld(String category_id) throws Exception {
 
         Connection con = null;
         PreparedStatement ps = null;
@@ -2302,6 +2319,29 @@ AssetPaymentManager payment = null;
             System.out.println("WARN: Error fetching DepreciationRate ->" + ex);
         } finally {
             dbConnection.closeConnection(con, ps);
+        }
+
+        return rate;
+    }
+    
+    public String getDepreciationRate(String category_id) {
+    	 String rate = "0.0";
+        String query = "SELECT DEP_RATE FROM AM_AD_CATEGORY WHERE CATEGORY_ID = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, category_id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                	rate = rs.getString("DEP_RATE") ;
+                }
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error fetching DepreciationRate -> " + ex.getMessage());
+            ex.printStackTrace();
         }
 
         return rate;
@@ -2428,7 +2468,7 @@ Date date = new Date();
         return endDate;
     }
 
-    public boolean chkidExists(String assetid) {
+    public boolean chkidExistsOld(String assetid) {
         boolean exists = false;
         Connection con = null;
         PreparedStatement ps = null;
@@ -2449,6 +2489,22 @@ Date date = new Date();
 
         return exists;
 
+    }
+    
+    public boolean chkidExists(String assetid) {
+
+        String sql = "SELECT 1 FROM am_asset WHERE asset_id = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, assetid);
+            return ps.executeQuery().next();
+
+        } catch (Exception e) {
+            System.out.println("WARN: chkidExists -> " + e);
+            return false;
+        }
     }
 
     public int insertAssetRecord(String branch) throws Exception, Throwable {
@@ -2508,7 +2564,7 @@ Date date = new Date();
         return 0;
     }
 
-    public String[] getBudgetInfo() {
+    public String[] getBudgetInfoOld() {
         String[] result = new String[5];
 
         String query = " SELECT financial_start_date,financial_no_ofmonths"
@@ -2541,8 +2597,39 @@ Date date = new Date();
 
         return result;
     }
+    
+    public String[] getBudgetInfo() {
 
-    public double[] getBudgetValues() {
+        String[] result = new String[5];
+
+        String query = "SELECT financial_start_date, financial_no_ofmonths, " +
+                       "financial_end_date, enforce_acq_budget, quarterly_surplus_cf " +
+                       "FROM am_gb_company";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+
+                Date startDate = rs.getDate("financial_start_date");
+                Date endDate = rs.getDate("financial_end_date");
+
+                result[0] = (startDate != null) ? sdf.format(startDate) : null;
+                result[1] = rs.getString("financial_no_ofmonths");
+                result[2] = (endDate != null) ? sdf.format(endDate) : null;
+                result[3] = rs.getString("enforce_acq_budget");
+                result[4] = rs.getString("quarterly_surplus_cf");
+            }
+
+        } catch (Exception e) {
+            System.out.println("WARNING: Error Fetching Company Details -> " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    public double[] getBudgetValuesOld() {
         double[] result = new double[12];
 	  	String qrylevel =" SELECT BRANCH_CODE FROM AM_AD_BRANCH WHERE BRANCH_ID = " + branch_id + " ";
   	    String branchCode = approvalRec.getCodeName(qrylevel);
@@ -2586,6 +2673,73 @@ Date date = new Date();
 
         return result;
     }
+    
+    public double[] getBudgetValues() {
+
+        double[] result = new double[10];
+
+        String branchSql = "SELECT BRANCH_CODE FROM AM_AD_BRANCH WHERE BRANCH_ID = ?";
+        String subCatSql = "SELECT sub_category_code FROM am_ad_sub_category WHERE sub_category_ID = ?";
+        
+        String query = "SELECT Q1_ALLOCATION, Q1_ACTUAL, Q2_ALLOCATION, Q2_ACTUAL, " +
+                       "Q3_ALLOCATION, Q3_ACTUAL, Q4_ALLOCATION, Q4_ACTUAL, " +
+                       "BALANCE_ALLOCATION, TOTAL_ACTUAL " +
+                       "FROM AM_ACQUISITION_BUDGET " +
+                       "WHERE CATEGORY_CODE = ? " +
+                       "AND BRANCH_ID = ? " +
+                       "AND SBU_CODE = ? " +
+                       "AND SUB_CATEGORY_CODE = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus")) {
+
+            String branchCode;
+            try (PreparedStatement ps1 = con.prepareStatement(branchSql)) {
+                ps1.setString(1, branch_id);
+                try (ResultSet rs1 = ps1.executeQuery()) {
+                    if (!rs1.next()) return result;
+                    branchCode = rs1.getString(1);
+                }
+            }
+
+            String subcategoryCode;
+            try (PreparedStatement ps2 = con.prepareStatement(subCatSql)) {
+                ps2.setString(1, sub_category_id);
+                try (ResultSet rs2 = ps2.executeQuery()) {
+                    if (!rs2.next()) return result;
+                    subcategoryCode = rs2.getString(1);
+                }
+            }
+
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+
+                ps.setString(1, getCatCode());
+                ps.setString(2, branchCode);
+                ps.setString(3, sbu_code);
+                ps.setString(4, subcategoryCode);
+
+                try (ResultSet rs = ps.executeQuery()) {
+
+                    if (rs.next()) {
+                        result[0] = rs.getDouble("Q1_ALLOCATION");
+                        result[1] = rs.getDouble("Q1_ACTUAL");
+                        result[2] = rs.getDouble("Q2_ALLOCATION");
+                        result[3] = rs.getDouble("Q2_ACTUAL");
+                        result[4] = rs.getDouble("Q3_ALLOCATION");
+                        result[5] = rs.getDouble("Q3_ACTUAL");
+                        result[6] = rs.getDouble("Q4_ALLOCATION");
+                        result[7] = rs.getDouble("Q4_ACTUAL");
+                        result[8] = rs.getDouble("BALANCE_ALLOCATION");
+                        result[9] = rs.getDouble("TOTAL_ACTUAL");
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("WARNING: Error Fetching Budget Details -> " + e.getMessage());
+        }
+
+        return result;
+    }
 
     public String getQuarter() {
         System.out.println("getting quarters");
@@ -2622,7 +2776,7 @@ Date date = new Date();
 
     }
 
-    public String getCatCode() {
+    public String getCatCodeOld() {
 
         String query =
                 "SELECT CATEGORY_CODE  FROM am_ad_category  " +
@@ -2652,8 +2806,31 @@ Date date = new Date();
         return catid;
 
     }
+    
+    public String getCatCode() {
 
-    public String getSubcatCode() {
+        String query = "SELECT CATEGORY_CODE FROM am_ad_category WHERE category_id = ?";
+        String catCode = null;
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, category_id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    catCode = rs.getString("CATEGORY_CODE");
+                }
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return catCode;
+    }
+
+    public String getSubcatCodeOld() {
 
         String query =
                 "SELECT SUB_CATEGORY_CODE  FROM am_ad_sub_category  " +
@@ -2682,6 +2859,29 @@ Date date = new Date();
 
         return catid;
 
+    }
+    
+    public String getSubcatCode() {
+
+        String query = "SELECT SUB_CATEGORY_CODE FROM am_ad_sub_category WHERE sub_category_id = ?";
+        String subCatCode = null;
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, sub_category_id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    subCatCode = rs.getString("SUB_CATEGORY_CODE");
+                }
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return subCatCode;
     }
 
     public boolean chkBudgetAllocation(String quarter, double values[],
@@ -2741,7 +2941,7 @@ Date date = new Date();
         return allocation;
     }
 
-    public void updateBudget(String quarter, String[] bugdetinfo) throws SQLException {
+    public void updateBudgetOld(String quarter, String[] bugdetinfo) throws SQLException {
 
         String fisdate = "";
         int finomonth = 0;
@@ -2863,6 +3063,63 @@ Date date = new Date();
         //System.out.println(
                // "Exiting update of Aquicisition Budget due to Asset Creation");
     }
+    
+    public void updateBudget(String quarter, String[] budgetInfo) throws SQLException {
+        String branchCode = approvalRec.getCodeName(
+            "SELECT BRANCH_CODE FROM AM_AD_BRANCH WHERE BRANCH_ID = " + branch_id
+        );
+        String subCategoryCode = approvalRec.getCodeName(
+            "SELECT sub_category_code FROM am_ad_sub_category WHERE sub_category_ID = " + sub_category_id
+        );
+
+        String oldCategory = getCatCode();
+        String cost = cost_price.replaceAll(",", "");
+
+        String columnToUpdate;
+        switch (quarter.toUpperCase()) {
+            case "FIRST":
+                columnToUpdate = "TOTAL_ACTUAL";
+                break;
+            case "2ND":
+                columnToUpdate = "Q2_ACTUAL";
+                break;
+            case "3RD":
+                columnToUpdate = "Q3_ACTUAL";
+                break;
+            case "4TH":
+                columnToUpdate = "Q4_ACTUAL";
+                break;
+            default:
+                columnToUpdate = "TOTAL_ACTUAL";
+                break;
+        }
+
+        String sql = "UPDATE AM_ACQUISITION_BUDGET " +
+                     "SET " + columnToUpdate + " = COALESCE(" + columnToUpdate + ",0) + ?, " +
+                     "BALANCE_ALLOCATION = BALANCE_ALLOCATION - ? " +
+                     "WHERE BRANCH_ID = ? AND CATEGORY_CODE = ? AND SBU_CODE = ? AND SUB_CATEGORY_CODE = ? " +
+                     "AND ACC_START_DATE = ? AND ACC_END_DATE = ?";
+
+        try (Connection conn = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setDouble(1, Double.parseDouble(cost));
+            ps.setDouble(2, Double.parseDouble(cost));
+            ps.setString(3, branchCode);
+            ps.setString(4, oldCategory);
+            ps.setString(5, sbu_code);
+            ps.setString(6, subCategoryCode);
+            ps.setDate(7, dateFormat.dateConvert(budgetInfo[0]));
+            ps.setDate(8, dateFormat.dateConvert(budgetInfo[2]));
+
+            int updated = ps.executeUpdate();
+            System.out.println("Budget updated for " + quarter + " quarter. Rows affected: " + updated);
+
+        } catch (Exception ex) {
+            System.out.println("ERROR in updateBudget: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
 
 	/**
 	 * @return the amountPTD
@@ -2960,7 +3217,7 @@ Date date = new Date();
 
 
 
-public String subjectToVat(String id){
+public String subjectToVatOld(String id){
 String result="";
     Connection con = null;
         PreparedStatement ps = null;
@@ -2988,7 +3245,27 @@ String result="";
         return result;
 }
 
+public String subjectToVat(String assetId) {
+    String result = "";
+    String query = "SELECT Subject_TO_Vat FROM am_asset WHERE asset_id = ?";
 
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, assetId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getString("Subject_TO_Vat");
+            }
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARN: Error fetching Subject to VAT -> " + ex);
+        ex.printStackTrace();
+    }
+
+    return result;
+}
 
  /*
 
@@ -3048,7 +3325,7 @@ String result="";
 
 
 
-public String whTax(String id){
+public String whTaxOld(String id){
 String result="";
     Connection con = null;
         PreparedStatement ps = null;
@@ -3076,8 +3353,30 @@ String result="";
         return result;
 }
 
+public String whTax(String assetId) {
+    String result = "";
+    String query = "SELECT wh_tax FROM am_asset WHERE asset_id = ?";
 
-public String checkCategoryCode()
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, assetId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getString("wh_tax");
+            }
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARN: Error fetching WHTAX -> " + ex);
+        ex.printStackTrace();
+    }
+
+    return result;
+}
+
+
+public String checkCategoryCodeOld()
     {
        String result="";
     Connection con = null;
@@ -3106,8 +3405,28 @@ public String checkCategoryCode()
         return result;
     }
 
+public String checkCategoryCode() {
+    String result = "";
+    String query = "SELECT CATEGORY_CODE FROM am_asset";
 
-public String checkBranchCode()
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
+
+        if (rs.next()) {
+            result = rs.getString("CATEGORY_CODE");
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARN: Error fetching CategoryCode -> " + ex);
+        ex.printStackTrace();
+    }
+
+    return result;
+}
+
+
+public String checkBranchCodeOld()
     {
        String result="";
     Connection con = null;
@@ -3136,9 +3455,27 @@ public String checkBranchCode()
         return result;
     }
 
+public String checkBranchCode() {
+    String result = "";
+    String query = "SELECT BRANCH_CODE FROM am_asset";
 
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
 
- public String getCodeName(String query)
+        if (rs.next()) {
+            result = rs.getString("BRANCH_CODE");
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARN: Error fetching BranchCode -> " + ex);
+        ex.printStackTrace();
+    }
+
+    return result;
+}
+
+ public String getCodeNameOld(String query)
     {
         String result;
         Connection con;
@@ -3176,9 +3513,29 @@ public String checkBranchCode()
         }
         return result;
     }
+ 
+ 
+ public String getCodeName(String query) {
+	    String result = "";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            result = rs.getString(1) != null ? rs.getString(1) : "";
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("Error in getCodeName() -> " + e);
+	        e.printStackTrace();
+	    }
+
+	    return result;
+	}
 
 
- public boolean createRequisitionForm(String itemRequest, String requestBranch, String requestDepartment, String remark, String requestTo, String approval)
+ public boolean createRequisitionFormOld(String itemRequest, String requestBranch, String requestDepartment, String remark, String requestTo, String approval)
     {
         boolean done;
         String query;
@@ -3222,6 +3579,32 @@ public String checkBranchCode()
         }
         return done;
     }
+ 
+ public boolean createRequisitionForm(String itemRequest, String requestBranch, String requestDepartment,
+         String remark, String requestTo, String approval) {
+boolean done = false;
+String query = "INSERT INTO REQUISITIONFORM VALUES(?,?,?,?,?,?)";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+ps.setString(1, itemRequest);
+ps.setString(2, requestBranch);
+ps.setString(3, requestDepartment);
+ps.setString(4, remark);
+ps.setString(5, requestTo);
+ps.setString(6, approval);
+
+
+done = ps.executeUpdate() > 0;
+
+} catch (Exception e) {
+System.out.println("Error creating requisition form -> " + e);
+e.printStackTrace();
+}
+
+return done;
+}
 
     /**
      * @return the sbu
@@ -3369,7 +3752,7 @@ public String checkBranchCode()
     }
 
 
-    public void setPendingTrans(String[] a, String code){
+    public void setPendingTransOld(String[] a, String code){
 //    	System.out.println("====code 0====> "+code);
 //    	System.out.println("TEST a[0])===> "+a[0]);
 //    	System.out.println("TEST a[1])===> "+a[1]);
@@ -3452,6 +3835,57 @@ public String checkBranchCode()
 
 
     }//staticApprovalInfo()
+    
+    
+    public void setPendingTrans(String[] a, String code) {
+        int transactionLevel = 0;
+        String pq = "INSERT INTO am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,"
+                + "effective_date,branchCode,asset_status,tran_type,process_status,tran_sent_time,transaction_id,batch_id,"
+                + "transaction_level) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        String tranLevelQuery = "SELECT level FROM approval_level_setup WHERE code = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+
+            // ===== Get transaction level =====
+            psLevel.setString(1, code);
+            try (ResultSet rs = psLevel.executeQuery()) {
+                if (rs.next()) {
+                    transactionLevel = rs.getInt(1);
+                }
+            }
+
+            // ===== Prepare insert =====
+            try (PreparedStatement ps = con.prepareStatement(pq)) {
+
+                String mtid = new ApplicationHelper().getGeneratedId("am_asset_approval");
+                SimpleDateFormat timer = new SimpleDateFormat("kk:mm:ss");
+
+                ps.setString(1, a[0] != null ? a[0] : "");  // asset_id
+                ps.setString(2, a[1] != null ? a[1] : "");  // user_id
+                ps.setString(3, a[2] != null ? a[2] : "");  // super_id
+                ps.setDouble(4, (a[3] != null && !a[3].isEmpty()) ? Double.parseDouble(a[3]) : 0);  // amount
+                ps.setTimestamp(5, dbConnection.getDateTime(new java.util.Date()));  // posting_date
+                ps.setString(6, a[5] != null ? a[5] : "");  // description
+                ps.setDate(7, a[6] != null ? dbConnection.dateConvert(a[6]) : null);  // effective_date
+                ps.setString(8, a[7] != null ? a[7] : "");  // branchCode
+                ps.setString(9, a[8] != null ? a[8] : "");  // asset_status
+                ps.setString(10, a[9] != null ? a[9] : ""); // tran_type
+                ps.setString(11, a[10] != null ? a[10] : ""); // process_status
+                ps.setString(12, timer.format(new java.util.Date())); // tran_sent_time
+                ps.setString(13, mtid);   // transaction_id
+                ps.setString(14, mtid);   // batch_id
+                ps.setInt(15, transactionLevel);
+
+                ps.executeUpdate();
+            }
+
+        } catch (Exception er) {
+            System.out.println(">>> AssetRecordBeans:setPendingTrans >>>> " + er);
+            er.printStackTrace();
+        }
+    }
 
 
 public String timeInstance() {
@@ -3463,7 +3897,7 @@ public String timeInstance() {
 
 
 
-public String[] setApprovalData(String id){
+public String[] setApprovalDataOld(String id){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
  //String currentDate  = reArrangeDate(getCurrentDate1());
@@ -3507,8 +3941,47 @@ result[10] = "P";
 
 }//setApprovalData()
 
+public String[] setApprovalData(String assetId) {
+    String[] result = new String[12]; 
 
-public String[] setApprovalDataforAsset2(String id,String code){
+    String query = "SELECT asset_id, user_ID, supervisor, Cost_Price, Posting_Date, "
+                 + "description, effective_date, BRANCH_CODE, Asset_Status "
+                 + "FROM am_asset WHERE asset_id = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, assetId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result[0] = rs.getString("asset_id");
+                result[1] = rs.getString("user_ID");
+                result[2] = rs.getString("supervisor");
+                result[3] = rs.getString("Cost_Price");
+                result[4] = rs.getString("Posting_Date");
+                result[5] = rs.getString("description");
+                result[6] = rs.getString("effective_date");
+                result[7] = rs.getString("BRANCH_CODE");
+                result[8] = rs.getString("Asset_Status");
+            }
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARN: Error fetching approval data -> " + ex);
+        ex.printStackTrace();
+    }
+
+    
+    result[9]  = "Asset Creation";  // transaction type
+    result[10] = "P";               // process status
+  //  result[11] = new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date());  
+
+    return result;
+}
+
+
+public String[] setApprovalDataforAsset2Old(String id,String code){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
  //String currentDate  = reArrangeDate(getCurrentDate1());
@@ -3562,10 +4035,60 @@ result[10] = "P";
 
 }//setApprovalData()
 
+public String[] setApprovalDataforAsset2(String assetId, String code) {
+    String[] result = new String[12];
+    String transType = "";
+
+    String assetQuery = "SELECT asset_id, user_ID, supervisor, Cost_Price, Posting_Date, "
+                      + "description, effective_date, BRANCH_CODE, Asset_Status "
+                      + "FROM am_asset2 WHERE asset_id = ?";
+
+    String tranLevelQuery = "SELECT Transaction_type FROM approval_level_setup WHERE code = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement psTran = con.prepareStatement(tranLevelQuery);
+         PreparedStatement psAsset = con.prepareStatement(assetQuery)) {
+
+        // Fetch transaction type
+        psTran.setString(1, code);
+        try (ResultSet rsTran = psTran.executeQuery()) {
+            if (rsTran.next()) {
+                transType = rsTran.getString(1);
+            }
+        }
+
+        // Fetch asset data
+        psAsset.setString(1, assetId);
+        try (ResultSet rsAsset = psAsset.executeQuery()) {
+            if (rsAsset.next()) {
+                result[0] = rsAsset.getString("asset_id");
+                result[1] = rsAsset.getString("user_ID");
+                result[2] = rsAsset.getString("supervisor");
+                result[3] = rsAsset.getString("Cost_Price");
+                result[4] = rsAsset.getString("Posting_Date");
+                result[5] = rsAsset.getString("description");
+                result[6] = rsAsset.getString("effective_date");
+                result[7] = rsAsset.getString("BRANCH_CODE");
+                result[8] = rsAsset.getString("Asset_Status");
+            }
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARN: Error fetching asset approval data -> " + ex);
+        ex.printStackTrace();
+    }
+
+    result[9]  = transType;  // transaction type
+    result[10] = "P";        // process status
+  //  result[11] = new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date());
+
+    return result;
+}
+
     /**
      * @return the processin_status
      */
-   public String getTransDetails(String asset_id){
+   public String getTransDetailsOld(String asset_id){
    String query = "select process_status from am_asset_approval where asset_id ='"+asset_id+"'";
    String result="";
     Connection con = null;
@@ -3595,8 +4118,31 @@ result[10] = "P";
 
    
    } //getTransactionDetails()
+   
+   public String getTransDetails(String assetId) {
+	    String result = "";
+	    String query = "SELECT process_status FROM am_asset_approval WHERE asset_id = ?";
 
-public void getTransFeedback(String id, String process_status, String reject_reason,long tran_id){
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, assetId);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                result = rs.getString("process_status");
+	            }
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("WARN: Error fetching transaction details -> " + ex);
+	        ex.printStackTrace();
+	    }
+
+	    return result;
+	}
+
+public void getTransFeedbackOld(String id, String process_status, String reject_reason,long tran_id){
 String query_r ="update am_asset_approval set process_status=?,reject_reason=? where asset_id = '"+id+"'and transaction_id="+tran_id;
     //System.out.println("the value of  ==============" + id);
 Connection con = null;
@@ -3627,8 +4173,35 @@ ps = con.prepareStatement(query_r);
 
 }//getTransFeedback()
 
+
+public void getTransFeedback(String assetId, String processStatus, String rejectReason, long tranId) {
+    String query = "UPDATE am_asset_approval SET process_status = ?, reject_reason = ? " +
+                   "WHERE asset_id = ? AND transaction_id = ?";
+
+    // Clear reject reason if approved or pending
+    if ("a".equalsIgnoreCase(processStatus) || "p".equalsIgnoreCase(processStatus)) {
+        rejectReason = "";
+    }
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, processStatus);
+        ps.setString(2, rejectReason);
+        ps.setString(3, assetId);
+        ps.setLong(4, tranId);
+
+        int updated = ps.executeUpdate();
+       
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: getTransFeedback() >>>>> " + ex);
+        ex.printStackTrace();
+    }
+}
+
  
-public void updateAssetStatusApproval(int transId,String supervisorId){
+public void updateAssetStatusApprovalOld(int transId,String supervisorId){
 	//Date approveddate = new java.util.Date();
 	Timestamp approveddate =  dbConnection.getDateTime(new java.util.Date());
 	//System.out.println("Approveddate in updateAssetStatusApproval: "+approveddate);
@@ -3663,7 +4236,31 @@ ps = con.prepareStatement(query_r);
 
 }//updateAssetStatusApproval()
 
-public void updateAssetStatusApproval(Long transId){
+public void updateAssetStatusApproval(int transId, String supervisorId) {
+    Timestamp approvedDate = dbConnection.getDateTime(new java.util.Date());
+
+    String query = "UPDATE am_asset_approval " +
+                   "SET asset_status = ?, date_approved = ? " +
+                   "WHERE transaction_id = ? AND super_id = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, "APPROVED");
+        ps.setTimestamp(2, approvedDate);
+        ps.setInt(3, transId);
+        ps.setString(4, supervisorId);
+
+        int updated = ps.executeUpdate();
+        
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: updateAssetStatusApproval() >>>>> " + ex);
+        ex.printStackTrace();
+    }
+}
+
+public void updateAssetStatusApprovalOld(Long transId){
 	//Date approveddate = new java.util.Date();
 	Timestamp approveddate =  dbConnection.getDateTime(new java.util.Date());
 	//System.out.println("Approveddate in updateAssetStatusApproval: "+approveddate);
@@ -3698,9 +4295,29 @@ ps = con.prepareStatement(query_r);
 
 }//updateAssetStatusApproval()
 
+public void updateAssetStatusApproval(Long transId) {
+    Timestamp approvedDate = dbConnection.getDateTime(new java.util.Date());
+    String query = "UPDATE am_asset_approval " +
+                   "SET asset_status = ?, date_approved = ? " +
+                   "WHERE transaction_id = ?";
 
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
 
-public void updateAssetStatus(String assetId,String supervisorId){
+        ps.setString(1, "APPROVED");
+        ps.setTimestamp(2, approvedDate);
+        ps.setLong(3, transId);
+
+        int updated = ps.executeUpdate();
+        
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: updateAssetStatusApproval() >>>>> " + ex);
+        ex.printStackTrace();
+    }
+}
+
+public void updateAssetStatusOld(String assetId,String supervisorId){
 String query_r ="update am_asset set asset_status=?,raise_entry=? where asset_id = '"+assetId+"' and super_id = '"+supervisorId+"' ";
 
 Connection con = null;
@@ -3731,7 +4348,28 @@ ps = con.prepareStatement(query_r);
 
 }//updateAssetStatus()
 
-public void updateAssetStatus(String assetId){
+public void updateAssetStatus(String assetId, String supervisorId) {
+    String query = "UPDATE am_asset SET asset_status = ?, raise_entry = ? " +
+                   "WHERE asset_id = ? AND super_id = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, "ACTIVE");
+        ps.setString(2, "Y");
+        ps.setString(3, assetId);
+        ps.setString(4, supervisorId);
+
+        int updated = ps.executeUpdate();
+        // Optional: System.out.println("Rows updated: " + updated);
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: updateAssetStatus() >>>>> " + ex);
+        ex.printStackTrace();
+    }
+}
+
+public void updateAssetStatusOld(String assetId){
 String query_r ="update am_asset set asset_status=?,raise_entry=? where asset_id = '"+assetId+"' ";
 
 Connection con = null;
@@ -3762,8 +4400,27 @@ ps = con.prepareStatement(query_r);
 
 }//updateAssetStatus()
 
+public void updateAssetStatus(String assetId) {
+    String query = "UPDATE am_asset SET asset_status = ?, raise_entry = ? WHERE asset_id = ?";
 
-public String getDisposalSupervisor(String id, String trans_type){
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, "ACTIVE");
+        ps.setString(2, "Y");
+        ps.setString(3, assetId);
+
+        int updated = ps.executeUpdate();
+        
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: updateAssetStatus() >>>>> " + ex);
+        ex.printStackTrace();
+    }
+}
+
+
+public String getDisposalSupervisorOld(String id, String trans_type){
   String query = "select super_id from am_asset_approval where asset_id ='"+id+"'and tran_type ='"+trans_type+"'";
    String result="";
     Connection con = null;
@@ -3797,7 +4454,31 @@ public String getDisposalSupervisor(String id, String trans_type){
 
 }//getDisposalSupervisor()
 
-public String[] setDisposalData(String id){
+public String getDisposalSupervisor(String assetId, String tranType) {
+    String result = "";
+    String query = "SELECT super_id FROM am_asset_approval WHERE asset_id = ? AND tran_type = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, assetId);
+        ps.setString(2, tranType);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getString(1);
+            }
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARN: Error fetching Disposal Supervisor -> " + ex);
+        ex.printStackTrace();
+    }
+
+    return result;
+}
+
+public String[] setDisposalDataOld(String id){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
    String[] result= new String[12];
@@ -3839,8 +4520,47 @@ result[10] = "P";
 }//setApprovalData()
 
 
+public String[] setDisposalData(String assetId) {
+    String[] result = new String[12];
+    String query = "SELECT asset_id, user_ID, supervisor, Cost_Price, Posting_Date, "
+                 + "description, effective_date, BRANCH_CODE, Asset_Status "
+                 + "FROM am_asset WHERE asset_id = ?";
 
-public void updateAssetStatusChange(String query_r){
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, assetId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result[0] = rs.getString("asset_id");
+                result[1] = rs.getString("user_ID");
+                result[2] = rs.getString("supervisor");
+                result[3] = rs.getString("Cost_Price");
+                result[4] = rs.getString("Posting_Date");
+                result[5] = rs.getString("description");
+                result[6] = rs.getString("effective_date");
+                result[7] = rs.getString("BRANCH_CODE");
+                result[8] = rs.getString("Asset_Status"); 
+            }
+        }
+
+    } catch (Exception ex) {
+        System.out.println("WARN: Error fetching disposal data -> " + ex);
+        ex.printStackTrace();
+    }
+
+
+    result[9] = "Asset Creation";
+    result[10] = "P";
+    // result[11] = timeInstance(); 
+
+    return result;
+}
+
+
+
+public void updateAssetStatusChangeOld(String query_r){
 //String query_r ="update" +tableName+ "set"+columnName+"=? where asset_id = '"+assetId+"'";
 
 Connection con = null;
@@ -3871,7 +4591,23 @@ ps = con.prepareStatement(query_r);
 }//updateAssetStatus()
 
 
-public void insertMails(String createdby,String subject, String msgText1){
+public void updateAssetStatusChange(String query) {
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        // ps.setString(1, value1);
+        // ps.setInt(2, value2);
+
+        int rowsUpdated = ps.executeUpdate();
+       // System.out.println("Rows updated: " + rowsUpdated);
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: updateAssetStatusChange() >>>>> " + ex);
+        ex.printStackTrace();
+    }
+}
+
+public void insertMailsOld(String createdby,String subject, String msgText1){
 String query_r ="INSERT INTO MAILS_TO_SEND (MAIL_ADDRESS,MAIL_HEADER,MAIL_BODY) VALUES(?,?,?) ";
 		Connection con = null;
         PreparedStatement ps = null;
@@ -3900,7 +4636,27 @@ ps = con.prepareStatement(query_r);
 
 }//updateAssetStatus()
 
-public void updateGroupAssetStatusChange(long id,String status)
+
+public void insertMails(String createdBy, String subject, String msgText) {
+    String query = "INSERT INTO MAILS_TO_SEND (MAIL_ADDRESS, MAIL_HEADER, MAIL_BODY) VALUES (?, ?, ?)";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, createdBy);
+        ps.setString(2, subject);
+        ps.setString(3, msgText);
+
+        int rowsInserted = ps.executeUpdate();
+       // System.out.println("Rows inserted: " + rowsInserted);
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: insertMails() >>>>> " + ex);
+        ex.printStackTrace();
+    }
+}
+
+public void updateGroupAssetStatusChangeOld(long id,String status)
 {
 	//String query_r ="update" +tableName+ "set"+columnName+"=? where asset_id = '"+assetId+"'";
 	Connection con = null;
@@ -3926,7 +4682,27 @@ public void updateGroupAssetStatusChange(long id,String status)
 
 }//updateAssetStatus()
 
-public void updateGroupAssetMainStatusChange(long id,String status)
+public void updateGroupAssetStatusChange(long id, String status) {
+    String query = "UPDATE am_group_asset SET asset_status = ? WHERE Group_id = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, status);
+        ps.setLong(2, id);
+
+        int rowsUpdated = ps.executeUpdate();
+      //  System.out.println("Rows updated in am_group_asset: " + rowsUpdated);
+
+        updateGroupAssetMainStatusChange(id, status);
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: Error updating am_group_asset >>> " + ex);
+        ex.printStackTrace();
+    }
+}
+
+public void updateGroupAssetMainStatusChangeOld(long id,String status)
 {
 	String query_r ="update am_group_asset_main set asset_status=? " +
 	"where Group_id = '"+id+"'";
@@ -3946,6 +4722,25 @@ catch (Exception ex)
 finally 
 	{
         dbConnection.closeConnection(con, ps);
+    }
+}
+
+
+public void updateGroupAssetMainStatusChange(long id, String status) {
+    String query = "UPDATE am_group_asset_main SET asset_status = ? WHERE Group_id = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, status);
+        ps.setLong(2, id);
+
+        int rowsUpdated = ps.executeUpdate();
+        //System.out.println("Rows updated in am_group_asset_main: " + rowsUpdated);
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: Error updating am_group_asset_main >>> " + ex);
+        ex.printStackTrace();
     }
 }
 
@@ -3989,7 +4784,7 @@ public String checkBranchCode()
 	}
 
 */
-	public String checkBranchCode(String Asset_id)
+	public String checkBranchCodeOld(String Asset_id)
 	{
 		String branch="";
 		String query="SELECT BRANCH_CODE FROM AM_ASSET where Asset_id='"+Asset_id+"'";
@@ -4025,8 +4820,31 @@ public String checkBranchCode()
 			}
 	return 	branch;
 	}
+	
+	public String checkBranchCode(String assetId) {
+	    String branch = "";
+	    String query = "SELECT BRANCH_CODE FROM AM_ASSET WHERE Asset_id = ?";
 
-	public String checkCategoryCode(String Asset_id)
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, assetId);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                branch = rs.getString("BRANCH_CODE");
+	            }
+	        }
+
+	    } catch (Exception er) {
+	        System.out.println("Error in checkBranchCode() >>> " + er);
+	        er.printStackTrace();
+	    }
+
+	    return branch;
+	}
+
+	public String checkCategoryCodeOld(String Asset_id)
 	{
 		String category="";
 		String query="SELECT CATEGORY_CODE FROM AM_ASSET  where Asset_id='"+Asset_id+"'";
@@ -4063,8 +4881,31 @@ public String checkBranchCode()
 	return 	category;
 	}
 
+	
+	public String checkCategoryCode(String assetId) {
+	    String category = "";
+	    String query = "SELECT CATEGORY_CODE FROM AM_ASSET WHERE Asset_id = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, assetId);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                category = rs.getString("CATEGORY_CODE");
+	            }
+	        }
+
+	    } catch (Exception er) {
+	        System.out.println("Error in checkCategoryCode() >>> " + er);
+	        er.printStackTrace();
+	    }
+
+	    return category;
+	}
   
-	public String checkAssetLedgerAccount(String category,String branch)
+	public String checkAssetLedgerAccountOld(String category,String branch)
 	{
 		String assetledgeraccount="";
 //		System.out.println("category "+category);
@@ -4115,8 +4956,39 @@ public String checkBranchCode()
 			}
 	return 	assetledgeraccount;
 	}
+	
+	public String checkAssetLedgerAccount(String category, String branch) {
+
+	    String assetLedgerAccount = "";
+
+	    
+	    String baseQuery = approvalRec.getCodeName(
+	            "SELECT PREFIX FROM ACCOUNT_GLPREFIX_PARAM WHERE type = 'AS'"
+	    );
+
+	    String query = baseQuery + " AND a.category_code = ? AND d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                assetLedgerAccount = rs.getString("asd");
+	            }
+	        }
+
+	    } catch (Exception er) {
+	        System.out.println("Error in checkAssetLedgerAccount() >>> " + er);
+	        er.printStackTrace();
+	    }
+
+	    return assetLedgerAccount;
+	}
 //Added by ayojava-retrieves Part Pay Account For Posting -07-08-09
-        public String checkAssetLedgerAccountPartPay(String category,String branch)
+        public String checkAssetLedgerAccountPartPayOld(String category,String branch)
 	{
 		String assetledgeraccount="";
 //		System.out.println("category "+category);
@@ -4168,8 +5040,39 @@ public String checkBranchCode()
 	return 	assetledgeraccount;
 	}
 
+        public String checkAssetLedgerAccountPartPay(String category, String branch) {
+
+            String assetLedgerAccount = "";
+
+           
+            String baseQuery = approvalRec.getCodeName(
+                    "SELECT PREFIX FROM ACCOUNT_GLPREFIX_PARAM WHERE type = 'LI2'"
+            );
+
+         
+            String query = baseQuery + " AND a.category_code = ? AND d.branch_code = ?";
+
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement ps = con.prepareStatement(query)) {
+
+                ps.setString(1, category);
+                ps.setString(2, branch);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        assetLedgerAccount = rs.getString("asd");
+                    }
+                }
+
+            } catch (Exception er) {
+                System.out.println("Error in checkAssetLedgerAccountPartPay() >>> " + er);
+                er.printStackTrace();
+            }
+
+            return assetLedgerAccount;
+        }
         
-	public String checkAccounAcqusitionSuspense (String category,String branch)
+	public String checkAccounAcqusitionSuspenseOld (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 		/*System.out.println("category "+category);
@@ -4220,8 +5123,39 @@ public String checkBranchCode()
 			}
 	return 	assetAcqusitionSuspense;
 	}
+	
+	public String checkAccounAcqusitionSuspense(String category, String branch) {
+
+	    String assetAcqusitionSuspense = "";
+
+	    String script = approvalRec.getCodeName(
+	        "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS4'"
+	    );
+
+	    String query = script + 
+	        " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                assetAcqusitionSuspense = rs.getString("asd");
+	            }
+	        }
+
+	    } catch (Exception er) {
+	        er.printStackTrace();
+	    }
+
+	    return assetAcqusitionSuspense;
+	}
+	
 //edited by ayojava .Query uses branch_code to generate account number instead of default_branch
-        public String checkAccounAcqusitionSuspense2 (String category,String branch)
+        public String checkAccounAcqusitionSuspense2Old (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 		/*System.out.println("category "+category);
@@ -4273,8 +5207,37 @@ public String checkBranchCode()
 	return 	assetAcqusitionSuspense;
 	}
 
+        public String checkAccounAcqusitionSuspense2(String category, String branch) {
 
-    	public String checkAccounAcqusitionSuspenseBranch (String category,String branch)
+            String assetAcqusitionSuspense = "";
+
+            String script = approvalRec.getCodeName(
+                "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS3'"
+            );
+
+            String query = script + 
+                " and a.category_code = ? and d.branch_code = ?";
+
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement ps = con.prepareStatement(query)) {
+
+                ps.setString(1, category);
+                ps.setString(2, branch);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        assetAcqusitionSuspense = rs.getString("asd");
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace(); 
+            }
+
+            return assetAcqusitionSuspense;
+        }
+
+    	public String checkAccounAcqusitionSuspenseBranchOld (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 //		System.out.println("category "+category);
@@ -4325,7 +5288,37 @@ public String checkBranchCode()
 	return 	assetAcqusitionSuspense;
 	}
     	
-	public String assetProcurementDr (String category,String branch)
+    	public String checkAccounAcqusitionSuspenseBranch(String category, String branch) {
+
+    	    String assetAcqusitionSuspense = "";
+
+    	    String script = approvalRec.getCodeName(
+    	        "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS3'"
+    	    );
+
+    	    String query = script +
+    	            " and a.category_code = ? and d.branch_code = ?";
+
+    	    try (Connection con = dbConnection.getConnection("legendPlus");
+    	         PreparedStatement ps = con.prepareStatement(query)) {
+
+    	        ps.setString(1, category);
+    	        ps.setString(2, branch);
+
+    	        try (ResultSet rs = ps.executeQuery()) {
+    	            if (rs.next()) {
+    	                assetAcqusitionSuspense = rs.getString("asd");
+    	            }
+    	        }
+
+    	    } catch (Exception e) {
+    	        e.printStackTrace(); 
+    	    }
+
+    	    return assetAcqusitionSuspense;
+    	}
+    	
+	public String assetProcurementDrOld(String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 		/*System.out.println("category "+category);
@@ -4376,7 +5369,38 @@ public String checkBranchCode()
 			}
 	return 	assetAcqusitionSuspense;
 	}
-	public String assetProcurementCr (String category,String branch)
+	
+	public String assetProcurementDr(String category, String branch) {
+
+	    String assetAcqusitionSuspense = "";
+
+	    String script = approvalRec.getCodeName(
+	        "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS3'"
+	    );
+
+	    String query = script +
+	            " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                assetAcqusitionSuspense = rs.getString("asd");
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	    }
+
+	    return assetAcqusitionSuspense;
+	}
+	
+	public String assetProcurementCrOld (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 		/*System.out.println("category "+category);
@@ -4426,7 +5450,38 @@ public String checkBranchCode()
 			}
 	return 	assetAcqusitionSuspense;
 	}
-	public String assetVatDr (String category,String branch)
+	
+	public String assetProcurementCr(String category, String branch) {
+
+	    String assetAcqusitionSuspense = "";
+
+	    String script = approvalRec.getCodeName(
+	        "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS3'"
+	    );
+
+	    String query = script +
+	            " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                assetAcqusitionSuspense = rs.getString("asd");
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	    }
+
+	    return assetAcqusitionSuspense;
+	}
+	
+	public String assetVatDrOld (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 //		System.out.println("category "+category);
@@ -4476,8 +5531,38 @@ public String checkBranchCode()
 			}
 	return 	assetAcqusitionSuspense;
 	}
+	
+	public String assetVatDr(String category, String branch) {
 
-	public String witholdingFedTaxCr (String category,String branch)
+	    String assetAcqusitionSuspense = "";
+
+	    String script = approvalRec.getCodeName(
+	        "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS3'"
+	    );
+
+	    String query = script +
+	            " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                assetAcqusitionSuspense = rs.getString("asd");
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	    }
+
+	    return assetAcqusitionSuspense;
+	}
+
+	public String witholdingFedTaxCrOld (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 		/*System.out.println("category "+category);
@@ -4527,8 +5612,39 @@ public String checkBranchCode()
 			}
 	return 	assetAcqusitionSuspense;
 	}
+	
+	public String witholdingFedTaxCr(String category, String branch) {
 
-	public String witholdingFedTaxCr (String category,String branch,String whtax)
+	    String assetAcqusitionSuspense = "";
+
+	    String script = approvalRec.getCodeName(
+	        "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'LI'"
+	    );
+
+	    String query = script +
+	            " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                assetAcqusitionSuspense = rs.getString("asd");
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	    }
+
+	    return assetAcqusitionSuspense;
+	}
+	
+
+	public String witholdingFedTaxCrOld (String category,String branch,String whtax)
 	{
 		String assetAcqusitionSuspense="";
 		String query = "";
@@ -4603,10 +5719,45 @@ public String checkBranchCode()
 	return 	assetAcqusitionSuspense;
 	}	
 	
+	public String witholdingFedTaxCr(String category, String branch, String whtax) {
+
+	    String result = "";
+
+	    if (!"S".equalsIgnoreCase(whtax) &&
+	        !"F".equalsIgnoreCase(whtax)) {
+	        return "";
+	    }
+
+	    String script = AccountPrefixCache.get("LI"); 
+
+	    if (script == null) {
+	        return "";
+	    }
+
+	    String query = script +
+	            " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                result = rs.getString("asd");
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	    }
+
+	    return result;
+	}
 	
 	
-	
-	public String stateWHTaxCr (String category,String branch)
+	public String stateWHTaxCrOld (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 		/*System.out.println("category "+category);
@@ -4659,11 +5810,39 @@ public String checkBranchCode()
 	}
 
 
-	
+	public String stateWHTaxCr(String category, String branch) {
+	    String result = "";
+
+	    String script = AccountPrefixCache.get("LI"); 
+
+	    if (script == null || script.isEmpty()) {
+	        return ""; 
+	    }
+
+	    String query = script + " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                result = rs.getString("asd"); 
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return result;
+	}
 
 
 
-	public String statePLDisposalAccount (String category,String branch)
+	public String statePLDisposalAccountOld (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 //		System.out.println("category "+category);
@@ -4724,7 +5903,39 @@ public String checkBranchCode()
 			}
 	return 	assetAcqusitionSuspense;
 	}
-	public String stateAccumDepLedger (String category,String branch)
+	
+	public String statePLDisposalAccount(String category, String branch) {
+	    String result = "";
+
+	    String script = AccountPrefixCache.get("IN"); 
+
+	    if (script == null || script.isEmpty()) {
+	        return "";
+	    }
+
+	    String query = script + " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                result = rs.getString("asd"); 
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	    }
+
+	    return result;
+	}
+	
+	
+	public String stateAccumDepLedgerOld (String category,String branch)
 	{
 		String assetAcqusitionSuspense="";
 //		System.out.println("category "+category);
@@ -4774,8 +5985,38 @@ public String checkBranchCode()
 	return 	assetAcqusitionSuspense;
 	}
 
+	
+	public String stateAccumDepLedger(String category, String branch) {
+	    String result = "";
 
-        public String checkAccumDepLedger (String category,String branch)
+	    String script = AccountPrefixCache.get("AS"); 
+
+	    if (script == null || script.isEmpty()) {
+	        return ""; 
+	    }
+	    
+	    String query = script + " and a.category_code = ? and d.branch_code = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, category);
+	        ps.setString(2, branch);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                result = rs.getString("asd"); 
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return result;
+	}
+
+        public String checkAccumDepLedgerOld (String category,String branch)
 	{
 		String assetAccumDepLedger="";
 //		System.out.println("category "+category);
@@ -4824,8 +6065,38 @@ public String checkBranchCode()
 			}
 	return 	assetAccumDepLedger;
 	}
+        
+    	public String checkAccumDepLedger (String category,String branch) {
+    	    String result = "";
 
-        public String checkDepLedgerAccount (String category,String branch)
+    	    String script = AccountPrefixCache.get("AS2"); 
+
+    	    if (script == null || script.isEmpty()) {
+    	        return ""; 
+    	    }
+    	    
+    	    String query = script + " and a.category_code = ? and d.branch_code = ?";
+
+    	    try (Connection con = dbConnection.getConnection("legendPlus");
+    	         PreparedStatement ps = con.prepareStatement(query)) {
+
+    	        ps.setString(1, category);
+    	        ps.setString(2, branch);
+
+    	        try (ResultSet rs = ps.executeQuery()) {
+    	            if (rs.next()) {
+    	                result = rs.getString("asd"); 
+    	            }
+    	        }
+
+    	    } catch (Exception e) {
+    	        e.printStackTrace();
+    	    }
+
+    	    return result;
+    	}
+
+        public String checkDepLedgerAccountOld (String category,String branch)
 	{
 		String assetAccumDepLedger="";
 //		System.out.println("category "+category);
@@ -4874,6 +6145,36 @@ public String checkBranchCode()
 			}
 	return 	assetAccumDepLedger;
 	}
+        
+        public String checkDepLedgerAccount (String category,String branch) {
+    	    String result = "";
+
+    	    String script = AccountPrefixCache.get("EX"); 
+
+    	    if (script == null || script.isEmpty()) {
+    	        return ""; 
+    	    }
+    	    
+    	    String query = script + " and a.category_code = ? and d.branch_code = ?";
+
+    	    try (Connection con = dbConnection.getConnection("legendPlus");
+    	         PreparedStatement ps = con.prepareStatement(query)) {
+
+    	        ps.setString(1, category);
+    	        ps.setString(2, branch);
+
+    	        try (ResultSet rs = ps.executeQuery()) {
+    	            if (rs.next()) {
+    	                result = rs.getString("asd"); 
+    	            }
+    	        }
+
+    	    } catch (Exception e) {
+    	        e.printStackTrace();
+    	    }
+
+    	    return result;
+    	}
 
 	/*
     public String getCodeName(String query)
@@ -4906,7 +6207,7 @@ public String checkBranchCode()
       return result;
      }
 */
-    	public boolean checkApprovalStatus(String id)
+    	public boolean checkApprovalStatusOld(String id)
 	{
             boolean status = false;
 
@@ -4949,8 +6250,30 @@ public String checkBranchCode()
 	return 	status;
 	}
 
+    	public boolean checkApprovalStatus(String assetId) {
+    	    boolean status = false;
+    	    String query = "SELECT asset_status FROM AM_ASSET WHERE asset_id = ?";
 
-        public void setPendingTranValues(String query){
+    	    try (Connection con = dbConnection.getConnection("legendPlus");
+    	         PreparedStatement ps = con.prepareStatement(query)) {
+
+    	        ps.setString(1, assetId); 
+
+    	        try (ResultSet rs = ps.executeQuery()) {
+    	            if (rs.next()) {
+    	                String assetStatus = rs.getString("asset_status");
+    	                status = "active".equalsIgnoreCase(assetStatus);
+    	            }
+    	        }
+
+    	    } catch (Exception e) {
+    	        e.printStackTrace(); 
+    	    }
+
+    	    return status;
+    	}
+
+        public void setPendingTranValuesOld(String query){
 //            System.out.println("in method setPendingTranValues with queryJJJJJJJJJJJJJJJJ" +query);
         Connection con;
         PreparedStatement ps;
@@ -4983,11 +6306,20 @@ public String checkBranchCode()
         }//setPendingTranValues
         
         
+        public void setPendingTranValues(String query) {
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement ps = con.prepareStatement(query)) {
+
+                ps.execute();
+
+            } catch (Exception e) {
+                e.printStackTrace(); 
+            }
+        }
 
 
 
-
-public void incrementApprovalCount(long tran_id,int count,int nextSupervisor){
+public void incrementApprovalCountOld(long tran_id,int count,int nextSupervisor){
 String query_r ="update am_asset_approval set approval_level_count=?,super_id=? where transaction_id =?";
 String query_Archive ="update am_asset_approval_archive set approval_level_count=?,super_id=? where transaction_id =?";
 
@@ -5020,6 +6352,30 @@ ps.setLong(3,tran_id);           //ps.execute();
 
 }//incrementApprovalCount()
 
+
+public void incrementApprovalCount(long tran_id, int count, int nextSupervisor) {
+    String queryActive = "UPDATE am_asset_approval SET approval_level_count=?, super_id=? WHERE transaction_id=?";
+    String queryArchive = "UPDATE am_asset_approval_archive SET approval_level_count=?, super_id=? WHERE transaction_id=?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement psActive = con.prepareStatement(queryActive);
+         PreparedStatement psArchive = con.prepareStatement(queryArchive)) {
+
+        psActive.setInt(1, count);
+        psActive.setInt(2, nextSupervisor);
+        psActive.setLong(3, tran_id);
+        psActive.executeUpdate();
+
+        psArchive.setInt(1, count);
+        psArchive.setInt(2, nextSupervisor);
+        psArchive.setLong(3, tran_id);
+        psArchive.executeUpdate();
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordBean: incrementApprovalCount() >>>>> " + ex);
+    }
+}
+
     /**
      * @return the deferPay
      */
@@ -5039,7 +6395,7 @@ ps.setLong(3,tran_id);           //ps.execute();
 
 
 
-public ArrayList selectComponent(String  comp_Id)
+public ArrayList selectComponentOld(String  comp_Id)
     {
 
         Connection con = null;
@@ -5170,9 +6526,115 @@ public ArrayList selectComponent(String  comp_Id)
     }
 
 
+public ArrayList selectComponent(String  comp_Id) throws SQLException
+{
+	ArrayList collection = new ArrayList();
+	String FINDER_QUERY = "SELECT  * from AM_AD_COMPONENT WHERE comp_Id = ? ";
+	
+	try(Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(FINDER_QUERY)){
+		
+		  ps.setString(1, comp_Id); 
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	        	while (rs.next()) {
+	            	   ComponentViewDetail app = new ComponentViewDetail(
+	                           rs.getString("COMP_ID"),
+	                           rs.getString("PARENT_ASSET_ID"),
+	                           rs.getString("PARENT_COMP_ID"),
+	                           rs.getString("ASSET_ID"),
+	                           rs.getString("CATEGORY"),
+	                           rs.getString("DESCRIPTION"),
+	                           rs.getString("SERIAL_NO"),
+	                           rs.getString("MAKE"),
+	                           rs.getString("MODEL"),
+	                           rs.getString("ADDITIONAL_FIELD"),
+	                           rs.getString("STATUS"),
+	                           rs.getString("COMPONENT"),
+	                           rs.getDouble("COST"),
+	                           rs.getDouble("ASSIGNED"),
+	                           rs.getDouble("DEPRECIATION"),
+	                           rs.getString("Registration_No"),
+	                           rs.getInt("Branch_ID"),
+	                           rs.getInt("Dept_ID"),
+	                           rs.getInt("Section_id"),
+	                           rs.getString("Vendor_AC"),
+	                           rs.getDate("Date_purchased"),
+	                           rs.getDouble("Dep_Rate"),
+	                           rs.getString("Asset_Engine_No"),
+	                           rs.getInt("Supplier_Name"),
+	                           rs.getString("Asset_User"),
+	                           rs.getInt("Asset_Maintenance"),
+	                           rs.getDouble("Accum_Dep"),
+	                           rs.getDouble("Monthly_Dep"),
+	                           rs.getDouble("Cost_Price"),
+	                           rs.getDouble("NBV"),
+	                           rs.getDate("Dep_End_Date"),
+	                           rs.getDouble("Residual_Value"),
+	                           rs.getString("Authorized_By"),
+	                           rs.getString("Wh_Tax"),
+	                           rs.getDouble("Wh_Tax_Amount"),
+	                           rs.getString("Req_Redistribution"),
+	                           rs.getDate("Posting_Date"),
+	                           rs.getDate("Effective_Date"),
+	                           rs.getString("Purchase_Reason"),
+	                           rs.getInt("Useful_Life"),
+	                           rs.getInt("Total_Life"),
+	                           rs.getInt("Location"),
+	                           rs.getInt("Remaining_Life"),
+	                           rs.getDouble("Vatable_Cost"),
+	                           rs.getDouble("Vat"),
+	                           rs.getString("Req_Depreciation"),
+	                           rs.getString("Subject_TO_Vat"),
+	                           rs.getString("Who_TO_Rem"),
+	                           rs.getString("Email1"),
+	                           rs.getString("Who_To_Rem_2"),
+	                           rs.getString("Email2"),
+	                           rs.getString("Raise_Entry"),
+	                           rs.getDouble("Dep_Ytd"),
+	                           rs.getString("Section"),
+	                           rs.getInt("State"),
+	                           rs.getInt("Driver"),
+	                           rs.getString("Spare_2"),
+	                           rs.getInt("User_ID"),
+	                           rs.getDate("Date_Disposed"),
+	                           rs.getInt("PROVINCE"),
+	                           rs.getString("Multiple"),
+	                           rs.getDate("WAR_START_DATE"),
+	                           rs.getInt("WAR_MONTH"),
+	                           rs.getDate("WAR_EXPIRY_DATE"),
+	                           rs.getDate("Last_Dep_Date"),
+	                           rs.getString("BRANCH_CODE"),
+	                           rs.getString("SECTION_CODE"),
+	                           rs.getString("DEPT_CODE"),
+	                           rs.getString("CATEGORY_CODE"),
+	                           rs.getDouble("AMOUNT_PTD"),
+	                           rs.getDouble("AMOUNT_REM"),
+	                           rs.getString("PART_PAY"),
+	                           rs.getString("FULLY_PAID"),
+	                           rs.getInt("GROUP_ID"),
+	                           rs.getString("BAR_CODE"),
+	                           rs.getString("SBU_CODE"),
+	                           rs.getString("LPO"),
+	                           rs.getString("supervisor")
+	                       );
+	                       collection.add(app);
+	            }
+	        }
+		
+	}catch (Exception ex) {
+        System.out.println("WARNING: cannot fetch AM_AD_COMPONENT -> " + ex.getMessage());
+    }
+
+	
+	
+	return collection;
+}
 
 
-public String getAssetTransInfo(int tran_id){
+
+
+public String getAssetTransInfoOld(int tran_id){
    String query = "select process_status from am_asset_approval where transaction_id = "+tran_id;
    String result="";
     Connection con = null;
@@ -5202,6 +6664,26 @@ public String getAssetTransInfo(int tran_id){
 
 
    } //getTransactionDetails()
+
+public String getAssetTransInfo(int tran_id){
+	   String query = "select process_status from am_asset_approval where transaction_id = ? ";
+	   String result="";
+	   
+	   try(Connection con = dbConnection.getConnection("legendPlus");
+	            PreparedStatement ps = con.prepareStatement(query)){
+		   ps.setInt(1, tran_id); 
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	        	result = rs.getString("process_status");
+	        }
+		   
+	   }catch(Exception e) {
+		   System.out.println("AssetRecordsBean WARN: Error fetching getAssetTransInfo(int tran_id) ->" + e); 
+	   }
+	   
+	        return result;
+
+	   } 
 
 public int getNumOfTransactionLevelOld(String levelCode){
    String query = "select level from approval_level_setup where code = '"+levelCode+"'";
@@ -5321,8 +6803,7 @@ public boolean insertComponent(String parentAssetId, String parentCompId,
             String partPAY,String fullyPAID,String  group_id,String  bar_code,String sbu_code,String lpo,String getSupervisor ) throws Exception, Throwable
     {
     	String assetId = comp.createComponentAssetIdDelimiter(parentAssetId,description);
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
 
 
@@ -5419,12 +6900,11 @@ public boolean insertComponent(String parentAssetId, String parentCompId,
                              " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,  " +
                              " ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
         assetCode = Integer.parseInt(new ApplicationHelper().getGeneratedId("AM_ASSET"));
-        try {
+        try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(createQuery)) {
             double costPrice = Double.parseDouble(vat_amount) + Double.parseDouble(vatable_cost);
             int Accum_Dep = 0;//Integer.parseInt(String.valueOf(assigned));
             int Monthly_Dep=0;
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
             ps.setString(1, parentAssetId);
             ps.setInt(2, new Integer(parentCompId).intValue());
             ps.setString(3, assetId);
@@ -5513,55 +6993,79 @@ public boolean insertComponent(String parentAssetId, String parentCompId,
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error creating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
         return done;
     }
 
 
+
+ 
+ public void updateComponentStatusOld(String parentAssetId,String description2,double cost)
+ {
+ 	String query_r ="update AM_COMPONENT_DIST set created = ? where ASSET_ID=? AND COMPONENT_EXP_ACCT=? AND COST_VALUE=?  ";
+
+ 	        Connection con = null;
+ 	        PreparedStatement ps = null;
+ 	        //ResultSet rs = null;
+
+ 	try {
+ 	    con = dbConnection.getConnection("legendPlus");
+
+
+ 	ps = con.prepareStatement(query_r);
+
+
+
+ 	            ps.setString(1,"Y");
+ 	            ps.setString(2, parentAssetId);
+ 	            ps.setString(3,description2);
+ 	            ps.setDouble(4,cost);
+
+
+// 	            System.out.println("parentAssetId "+parentAssetId);
+// 	            System.out.println("description2 "+description2);
+// 	            System.out.println("cost "+cost);
+
+
+ 	            int i =ps.executeUpdate();
+
+
+ 	        } catch (Exception ex) {
+
+ 	            System.out.println("update not successful" + ex);
+ 	        } finally {
+ 	            dbConnection.closeConnection(con, ps);
+ 	        }
+
+
+ 	}
+ 
+ 
  public void updateComponentStatus(String parentAssetId,String description2,double cost)
-    {
-    	String query_r ="update AM_COMPONENT_DIST set created = ? where ASSET_ID=? AND COMPONENT_EXP_ACCT=? AND COST_VALUE=?  ";
+ {
+ 	String query_r ="update AM_COMPONENT_DIST set created = ? where ASSET_ID=? AND COMPONENT_EXP_ACCT=? AND COST_VALUE=?  ";      
 
-    	        Connection con = null;
-    	        PreparedStatement ps = null;
-    	        //ResultSet rs = null;
-
-    	try {
-    	    con = dbConnection.getConnection("legendPlus");
+ 	try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query_r)) {
 
 
-    	ps = con.prepareStatement(query_r);
+ 	            ps.setString(1,"Y");
+ 	            ps.setString(2, parentAssetId);
+ 	            ps.setString(3,description2);
+ 	            ps.setDouble(4,cost);
+
+ 	            int i =ps.executeUpdate();
+
+ 	        } catch (Exception ex) {
+
+ 	            System.out.println("update not successful" + ex);
+ 	        } 
 
 
+ 	}
 
-    	            ps.setString(1,"Y");
-    	            ps.setString(2, parentAssetId);
-    	            ps.setString(3,description2);
-    	            ps.setDouble(4,cost);
-
-
-//    	            System.out.println("parentAssetId "+parentAssetId);
-//    	            System.out.println("description2 "+description2);
-//    	            System.out.println("cost "+cost);
-
-
-    	            int i =ps.executeUpdate();
-
-
-    	        } catch (Exception ex) {
-
-    	            System.out.println("update not successful" + ex);
-    	        } finally {
-    	            dbConnection.closeConnection(con, ps);
-    	        }
-
-
-    	}
-
-public String[] setApprovalDataUpdate(String id){
+public String[] setApprovalDataUpdateOld(String id){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
    String[] result= new String[12];
@@ -5604,8 +7108,48 @@ result[10] = "P";
 
 }//setApprovalData()
 
+public String[] setApprovalDataUpdate(String id){
 
-public String[] setApprovalDataUpdate2(String id){
+		   String[] result= new String[12];
+
+	         String query ="select asset_id,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE,Asset_Status from am_assetUpdate where asset_id = ? "; ;
+
+
+
+	         try (Connection con = dbConnection.getConnection("legendPlus");
+	                 PreparedStatement ps = con.prepareStatement(query)) {
+	        	 
+	        	 ps.setString(1, id);
+	           
+	            try(ResultSet rs = ps.executeQuery();){
+	            while (rs.next()) {
+	                result[0] = rs.getString("asset_id");
+	                result[1]= rs.getString("user_ID");
+	                result[2] = rs.getString("supervisor");
+	               result[3] = rs.getString("Cost_Price");
+	               result[4] = rs.getString("Posting_Date");
+	               result[5] = rs.getString("description");
+	               result[6] = rs.getString("effective_date");
+	               result[7] = rs.getString("BRANCH_CODE");
+	               result[8] = rs.getString("Asset_Status");
+
+	            }
+	            }
+
+	        } catch (Exception ex) {
+	            System.out.println("WARN: Error fetching CategoryCode ->" + ex);
+	        } 
+	result[9] = "Asset Update";
+	result[10] = "P";
+
+//	    System.out.println("the value of supervisor is *************setApprovalDataUpdate************************" + result[2]);
+	//result[11] = timeInstance();
+	        return result;
+
+	}//setApprovalData()
+
+
+public String[] setApprovalDataUpdate2Old(String id){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
    String[] result= new String[12];
@@ -5649,6 +7193,45 @@ result[10] = "P";
 
 }
 
+public String[] setApprovalDataUpdate2(String id){
+
+	   String[] result= new String[12];
+
+	   String query ="select asset_id,user_ID,supervisor,Cost_Price,Posting_Date,description," +
+               "effective_date,BRANCH_CODE,Asset_Status from am_asset where asset_id = ? " ;
+
+      try (Connection con = dbConnection.getConnection("legendPlus");
+              PreparedStatement ps = con.prepareStatement(query)) {
+     	 
+     	 ps.setString(1, id);
+        
+         try(ResultSet rs = ps.executeQuery();){
+         while (rs.next()) {
+             result[0] = rs.getString("asset_id");
+             result[1]= rs.getString("user_ID");
+             result[2] = rs.getString("supervisor");
+            result[3] = rs.getString("Cost_Price");
+            result[4] = rs.getString("Posting_Date");
+            result[5] = rs.getString("description");
+            result[6] = rs.getString("effective_date");
+            result[7] = rs.getString("BRANCH_CODE");
+            result[8] = rs.getString("Asset_Status");
+
+         }
+         }
+
+     } catch (Exception ex) {
+    	 System.out.println("WARN: Error fetching CategoryCode ->" + ex);
+     } 
+result[9] = "Asset Update";
+result[10] = "P";
+
+// System.out.println("the value of supervisor is *************setApprovalDataUpdate************************" + result[2]);
+//result[11] = timeInstance();
+     return result;
+
+}
+
 
 public boolean insertInToAssetRecordTemp(String assetId,String userId) throws Exception {
 
@@ -5670,8 +7253,7 @@ public boolean insertInToAssetRecordTemp(String assetId,String userId) throws Ex
                        "SPARE_3 ,SPARE_4 ,SPARE_5 ,SPARE_6,sub_category_id,SUB_CATEGORY_CODE) "+
                        "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+      
         boolean done = true;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
             status = "Z";
@@ -5743,13 +7325,13 @@ public boolean insertInToAssetRecordTemp(String assetId,String userId) throws Ex
         wh_tax_amount = wh_tax_amount.replaceAll(",", "");
         residual_value = residual_value.replaceAll(",", "");
 
-        try {
+        try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
 
             double costPrice = Double.parseDouble(vat_amount) +
                                Double.parseDouble(vatable_cost);
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+           
             ps.setString(1, registration_no);
             ps.setString(2, description.toUpperCase());
             ps.setString(3, vendor_account);
@@ -5819,26 +7401,25 @@ public boolean insertInToAssetRecordTemp(String assetId,String userId) throws Ex
         } catch (Exception ex) {
             done = false;
             System.out.println("AssetRecordsBean: insertInToAssetRecordTemp():WARN:Error inserting to am_assetUpdate table->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
     }
 
-public boolean insertInToAssetRecordTemp(String assetId,String userId,String sup_id,String status) throws Exception {
+public boolean insertInToAssetRecordTempOld(String assetId,String userId,String sup_id,String status) throws Exception {
 
         String query = "insert into am_assetUpdate " +
                        "(ASSET_ID,USER_ID,SUPERVISOR,ASSET_STATUS,BRANCH_CODE,CATEGORY_CODE)"+
                        "values(?,?,?,?,?,?)";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
          
-        try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
+        	
+           
             ps.setString(1, assetId);
             ps.setString(2, userId);
             ps.setString(3, sup_id);
@@ -5850,16 +7431,42 @@ public boolean insertInToAssetRecordTemp(String assetId,String userId,String sup
         } catch (Exception ex) {
             done = false;
             System.out.println("AssetRecordsBean: insertInToAssetRecordTemp():WARN:Error inserting to am_assetUpdate table->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
     }
 
 
+public boolean insertInToAssetRecordTemp(String assetId, String userId, String sup_id, String status) {
+    String query = "INSERT INTO am_assetUpdate " +
+                   "(ASSET_ID, USER_ID, SUPERVISOR, ASSET_STATUS, BRANCH_CODE, CATEGORY_CODE) " +
+                   "VALUES (?, ?, ?, ?, ?, ?)";
 
-public void updateComponentStatus(String parentAssetId,String description2,double cost,String DepSeqValue)
+    boolean done = true;
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, assetId != null ? assetId.trim() : "");
+        ps.setString(2, userId != null ? userId.trim() : "");
+        ps.setString(3, sup_id != null ? sup_id.trim() : "");
+        ps.setString(4, status != null ? status.trim() : "");
+        ps.setString(5, "");  
+        ps.setString(6, ""); 
+
+        ps.executeUpdate();
+
+    } catch (Exception ex) {
+        done = false;
+        System.out.println("AssetRecordsBean: insertInToAssetRecordTemp(): WARN: Error inserting assetId " + assetId + " -> " + ex);
+    }
+
+    return done;
+}
+
+
+public void updateComponentStatusOld(String parentAssetId,String description2,double cost,String DepSeqValue)
     {
     	String query_r ="update AM_COMPONENT_DIST set created = ? where ASSET_ID=? AND COMPONENT_EXP_ACCT=? AND COST_VALUE=? AND SEQUENCE_NO=? ";
 
@@ -5900,7 +7507,36 @@ public void updateComponentStatus(String parentAssetId,String description2,doubl
 
     	}
 
-public int changeAssetID(String oldAssetId,String newAssetId)
+public void updateComponentStatus(String parentAssetId,String description2,double cost,String DepSeqValue)
+{
+	String query_r ="update AM_COMPONENT_DIST set created = ? where ASSET_ID=? AND COMPONENT_EXP_ACCT=? AND COST_VALUE=? AND SEQUENCE_NO=? ";
+
+	      
+
+	 try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query_r)) {
+
+
+
+	            ps.setString(1,"Y");
+	            ps.setString(2, parentAssetId);
+	            ps.setString(3,description2);
+	            ps.setDouble(4,cost);
+	            ps.setString(5, DepSeqValue);
+
+
+	            int i =ps.executeUpdate();
+
+
+	        } catch (Exception ex) {
+
+	            System.out.println("update not successful" + ex);
+	        } 
+
+
+	}
+
+public int changeAssetIDOld(String oldAssetId,String newAssetId)
     {
     int value =0;
 
@@ -5935,8 +7571,31 @@ return value;
     	}
 
 
+public int changeAssetID(String oldAssetId,String newAssetId)
+{
+int value =0;
 
-public String setPendingTrans2(String[] a, String code){
+String query_r ="update am_asset set asset_id = ? where ASSET_ID=? ";
+
+	        try (Connection con = dbConnection.getConnection("legendPlus");
+	   	         PreparedStatement ps = con.prepareStatement(query_r)) {
+
+	            ps.setString(1,newAssetId);
+	            ps.setString(2, oldAssetId);
+
+	            value =ps.executeUpdate();
+
+
+	        } catch (Exception ex) {
+
+	            System.out.println("AssetRecordsBean: changeAssetID(): asset id update not successful" + ex);
+	        } 
+
+return value;
+	}
+
+
+public String setPendingTrans2Old(String[] a, String code){
 //	System.out.println("====code 1====> "+code);
     String mtid_id ="";
         int transaction_level=0;
@@ -6015,6 +7674,62 @@ return mtid_id;
     }//setPendingTrans2()
 
 
+public String setPendingTrans2(String[] a, String code) {
+    String mtid_id = "";
+    int transaction_level = 0;
+
+    String pq = "INSERT INTO am_asset_approval(" +
+            "asset_id, user_id, super_id, amount, posting_date, description, " +
+            "effective_date, branchCode, asset_status, tran_type, process_status, tran_sent_time, " +
+            "transaction_id, batch_id, transaction_level) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    String tranLevelQuery = "SELECT level FROM approval_level_setup WHERE code = ?";
+
+    try (Connection con = dbConnection.getConnection("legendPlus")) {
+
+
+        try (PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+            psLevel.setString(1, code);
+            try (ResultSet rs = psLevel.executeQuery()) {
+                if (rs.next()) {
+                    transaction_level = rs.getInt(1);
+                }
+            }
+        }
+
+        SimpleDateFormat timer = new SimpleDateFormat("kk:mm:ss");
+        mtid_id = new ApplicationHelper().getGeneratedId("am_asset_approval");
+
+
+        try (PreparedStatement ps = con.prepareStatement(pq)) {
+            ps.setString(1, a[0] != null ? a[0] : "");
+            ps.setString(2, a[1] != null ? a[1] : "");
+            ps.setString(3, a[2] != null ? a[2] : "");
+            ps.setDouble(4, a[3] != null ? Double.parseDouble(a[3]) : 0);
+            ps.setTimestamp(5, dbConnection.getDateTime(new java.util.Date())); // posting_date
+            ps.setString(6, a[5] != null ? a[5] : "");
+            ps.setDate(7, a[6] != null ? dbConnection.dateConvert(a[6]) : null); // effective_date
+            ps.setString(8, a[7] != null ? a[7] : "");
+            ps.setString(9, a[8] != null ? a[8] : "");
+            ps.setString(10, a[9] != null ? a[9] : "");
+            ps.setString(11, a[10] != null ? a[10] : "");
+            ps.setString(12, timer.format(new java.util.Date())); // tran_sent_time
+            ps.setString(13, mtid_id); // transaction_id
+            ps.setString(14, mtid_id); // batch_id
+            ps.setInt(15, transaction_level);
+
+            ps.executeUpdate();
+        }
+
+    } catch (Exception er) {
+        System.out.println("AssetRecordBeans:setPendingTrans2() >>>>> " + er);
+        er.printStackTrace();
+    }
+
+    return mtid_id;
+}
+
 
 
 //this method is to update am_group_asset_main
@@ -6039,8 +7754,7 @@ public boolean updateAsset(String assetId,String userId) throws Exception {
                    "WAR_MONTH=?,WAR_EXPIRY_DATE=?, BAR_CODE=? ,SBU_CODE=? , LPO=? , supervisor=?, defer_pay=? ,category_id=?,"+
                    "dep_rate=?,wht_percent=?,SPARE_3=? ,SPARE_4=? ,SPARE_5=? ,SPARE_6=?,sub_category_id=?,SUB_CATEGORY_CODE=?,TRANPORT_COST = ?,OTHER_COST = ?  where asset_id=? and user_id=? " ;
 
-    Connection con = null;
-    PreparedStatement ps = null;
+   
     boolean done = true;
     /*if (require_redistribution.equalsIgnoreCase("Y")) {
         status = "Z";
@@ -6110,13 +7824,13 @@ public boolean updateAsset(String assetId,String userId) throws Exception {
     wh_tax_amount = wh_tax_amount.replaceAll(",", "");
     residual_value = residual_value.replaceAll(",", "");
 
-    try {
+    try (Connection con = dbConnection.getConnection("legendPlus");
+  	         PreparedStatement ps = con.prepareStatement(query)) {
 
         double costPrice = Double.parseDouble(vat_amount) +
                            Double.parseDouble(vatable_cost);
 //System.out.println("vatable_cost "+vatable_cost);
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+       
         ps.setString(1, registration_no);
         ps.setString(2, description.toUpperCase());
         ps.setString(3, vendor_account);
@@ -6191,9 +7905,8 @@ public boolean updateAsset(String assetId,String userId) throws Exception {
     } catch (Exception ex) {
         done = false;
         System.out.println("AssetRecordsBean: updateasset():WARN:Error updating to am_asset table->" + ex);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
+    
     return done;
 
 }
@@ -6202,21 +7915,7 @@ public boolean updateAsset(String assetId,String userId) throws Exception {
      * *Bulk asset update
      */
     public boolean bulkAssetUpdate(java.util.ArrayList list) {
-	/*String query = "UPDATE AM_ASSET SET DESCRIPTION=? "
-		+",DATE_PURCHASED= ?, COST_PRICE = ?"
-			+ " WHERE ASSET_ID=?";*/
-
-    /*String query = "update am_asset SET  " +
-                       "REGISTRATION_NO=?,VENDOR_AC=?," +
-                       "ASSET_MODEL=?,ASSET_SERIAL_NO=?," +
-                       "ASSET_ENGINE_NO=?,SUPPLIER_NAME=?," +
-                       "ASSET_USER=?,ASSET_MAINTENANCE=?," +
-                       "AUTHORIZED_BY=?," +
-                       "PURCHASE_REASON=?," +
-                       "SPARE_1 = ?,SPARE_2 = ?," +
-                       "BAR_CODE =?,LPO =? " +
-                       "WHERE ASSET_ID =? ";*/
-
+	
      String query = "update am_asset SET  " +
                        "REGISTRATION_NO=?,Description=?,VENDOR_AC=?," +
                        "ASSET_MODEL=?,ASSET_SERIAL_NO=?," +
@@ -6229,14 +7928,10 @@ public boolean updateAsset(String assetId,String userId) throws Exception {
                        "WHERE ASSET_ID=? ";
 
 
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
 	magma.AssetRecordsBean bd = null;
 	int[] d = null;
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	 try (Connection con = dbConnection.getConnection("legendPlus");
+   	         PreparedStatement ps = con.prepareStatement(query)) {
 
 		for (int i = 0; i < list.size(); i++) {
 			bd = (magma.AssetRecordsBean) list.get(i);
@@ -6371,9 +8066,8 @@ public boolean updateAsset(String assetId,String userId) throws Exception {
 
 	} catch (Exception ex) {
 		System.out.println("Error Updating all asset ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
+	 
 
 	return (d.length > 0);
 
@@ -6415,7 +8109,7 @@ public boolean updateAsset(String assetId,String userId) throws Exception {
 		}
 	}
     
-public boolean updateStatus(String status,String batchId) throws Exception {
+public boolean updateStatusOld(String status,String batchId) throws Exception {
 
     String query = "update am_asset_approval set PROCESS_STATUS=? where BATCH_ID=? " ;
 
@@ -6440,6 +8134,27 @@ public boolean updateStatus(String status,String batchId) throws Exception {
 }
 
 
+public boolean updateStatus(String status,String batchId) throws Exception {
+
+    String query = "update am_asset_approval set PROCESS_STATUS=? where BATCH_ID=? " ;
+
+    boolean done = true;
+    try (Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query)) {
+    	
+        ps.setString(1, status);
+        ps.setString(2, batchId);
+
+        ps.execute();
+
+    } catch (Exception ex) {
+        done = false;
+        System.out.println("am_asset_approval: update am_asset_approval():WARN:Error updating to am_asset_approval table->" + ex);
+    } 
+    return done;
+}
+
+
 
 private String getCurrentDate1(){
    String output = null;
@@ -6459,7 +8174,7 @@ return output;
 
 
 //lanre new modification 25-5-09
-public String checkAccounPartPayment (String category,String branch)
+public String checkAccounPartPaymentOld (String category,String branch)
 {
 	String assetAcqusitionSuspense="";
 //	System.out.println("category "+category);
@@ -6507,8 +8222,41 @@ public String checkAccounPartPayment (String category,String branch)
 return 	assetAcqusitionSuspense;
 }
 
+public String checkAccounPartPayment(String category, String branch) {
+    String assetAcqusitionSuspense = "";
+    
+    String query=" select c.iso_code,"
+			+" (select accronym from am_ad_ledger_type where series = substring(b.part_pay_acct,1,1)),"
+			+" d.branch_code,"
+			+" a.Asset_Ledger,"
+			+" c.iso_code +(select accronym from am_ad_ledger_type where series = substring(a.Asset_Ledger,1,1))+"
+			+" b.default_branch + b.part_pay_acct asd"
+			+" from am_ad_category a,am_ad_branch d, AM_GB_CURRENCY_CODE c, am_gb_company b"
+			+" where a.currency_id = c.currency_id"
+			+" and a.category_code = ? "
+			+" and d.branch_code = ? ";
 
-public String checkAccounDeferPayment (String category,String branch)
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, category);
+        ps.setString(2, branch);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                assetAcqusitionSuspense = rs.getString("asd");
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return assetAcqusitionSuspense;
+}
+
+
+public String checkAccounDeferPaymentOld (String category,String branch)
 {
 	String assetAcqusitionSuspense="";
 //	System.out.println("category "+category);
@@ -6556,7 +8304,48 @@ public String checkAccounDeferPayment (String category,String branch)
 return 	assetAcqusitionSuspense;
 }
 
-public boolean insertRaiseEntryTransaction(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId ) {
+public String checkAccounDeferPayment (String category,String branch)
+{
+	String assetAcqusitionSuspense="";
+//	System.out.println("category "+category);
+//	System.out.println("branch "+branch);
+	String query=" select c.iso_code,"
+				+" (select accronym from am_ad_ledger_type where series = substring(b.defer_account,1,1)),"
+				+" d.branch_code,"
+				+" a.Asset_Ledger,"
+				+" c.iso_code +(select accronym from am_ad_ledger_type where series = substring(a.Asset_Ledger,1,1))+"
+				+" b.default_branch + b.defer_account asd"
+				+" from am_ad_category a,am_ad_branch d, AM_GB_CURRENCY_CODE c, am_gb_company b"
+				+" where a.currency_id = c.currency_id"
+				+" and a.category_code = ? "
+				+" and d.branch_code = ? ";
+
+
+	try (Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query)) {
+		
+		 ps.setString(1, category);
+	        ps.setString(2, branch);
+
+		try(ResultSet rs = ps.executeQuery();){
+
+		if (rs.next())
+		 {
+			assetAcqusitionSuspense  = rs.getString("asd");
+
+		 }
+	   }
+	}
+		catch (Exception er)
+		{
+		 er.printStackTrace();
+
+		}
+		
+return 	assetAcqusitionSuspense;
+}
+
+public boolean insertRaiseEntryTransactionOld(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId ) {
     boolean done=true;
 
 	   Connection con = null;
@@ -6592,7 +8381,42 @@ public boolean insertRaiseEntryTransaction(String id,String Description,String d
     return done;
 }
 
-public boolean insertRaiseEntryTransactionTranId(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String tranId )
+
+public boolean insertRaiseEntryTransaction(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId ) {
+    boolean done=true;
+
+    String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount," +
+            "creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date)" +
+                   " VALUES(?,?,?,?,?,?,?,?,?,?)";
+    try (Connection con = dbConnection.getConnection("legendPlus");
+    	    PreparedStatement ps = con.prepareStatement(query)) {
+    	
+       
+        ps.setString(1,id);
+        ps.setString(2,Description);
+        ps.setString(3, debitAccount);
+        ps.setString(4,creditAccount);
+        ps.setDouble(5,amount);
+        ps.setString(6,iso);
+        ps.setString(7,asset_id);
+        ps.setString(8, page1);
+        ps.setString(9, transactionId);
+        ps.setTimestamp(10, dbConnection.getDateTime(new java.util.Date()));
+
+        ps.execute();
+
+    }
+    catch (Exception ex)
+    {
+ 	   done = false;
+        System.out.println("WARNING:cannot insert am_raisentry_transaction->" );
+        ex.printStackTrace();
+    } 
+    
+    return done;
+}
+
+public boolean insertRaiseEntryTransactionTranIdOld(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String tranId )
 {
     boolean done=true;
 
@@ -6631,7 +8455,43 @@ public boolean insertRaiseEntryTransactionTranId(String id,String Description,St
 }
 
 
-public ArrayList findRaisedTransaction(String filter) {
+public boolean insertRaiseEntryTransactionTranId(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String tranId )
+{
+    boolean done=true;
+
+    String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount," +
+            "creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,Trans_id)" +
+                   " VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+    try (Connection con = dbConnection.getConnection("legendPlus");
+    	    PreparedStatement ps = con.prepareStatement(query)) {
+    	
+        
+        ps.setString(1,id);
+        ps.setString(2,Description);
+        ps.setString(3, debitAccount);
+        ps.setString(4,creditAccount);
+        ps.setDouble(5,amount);
+        ps.setString(6,iso);
+        ps.setString(7,asset_id);
+        ps.setString(8, page1);
+        ps.setString(9, transactionId);
+        ps.setTimestamp(10, dbConnection.getDateTime(new java.util.Date()));
+        ps.setInt(11,Integer.parseInt(tranId));
+
+        ps.execute();
+
+    }
+    catch (Exception ex)
+    {
+ 	   done = false;
+        System.out.println("WARNING:cannot insert am_raisentry_transaction->" );
+        ex.printStackTrace();
+    } 
+    
+    return done;
+}
+
+public ArrayList findRaisedTransactionOld(String filter) {
 
     Connection con = null;
     PreparedStatement ps = null;
@@ -6673,6 +8533,45 @@ public ArrayList findRaisedTransaction(String filter) {
     return collection;
 
 }
+
+public ArrayList findRaisedTransaction(String filter) {
+
+   
+    RaisedTransaction app = null;
+    ArrayList collection = new ArrayList();
+    String FINDER_QUERY = "SELECT User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transaction_date from am_raisentry_transaction  " + filter;
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+    	    PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+
+       try( ResultSet rs = ps.executeQuery();){
+
+        while (rs.next()) {
+
+            String id = rs.getString("User_id");
+            String Description = rs.getString("Description");
+            String debitAccount = rs.getString("debitAccount");
+            String creditAccount = rs.getString("creditAccount");
+            double amount = rs.getDouble("amount");
+           String iso =rs.getString("iso");
+           String assetId = rs.getString("ASSET_ID");
+           String page1 = rs.getString("page1");
+           String transaction_date= rs.getString("transaction_date");
+
+
+            app = new RaisedTransaction(id,Description,debitAccount,creditAccount,amount,iso,assetId,page1,transaction_date);
+            collection.add(app);
+        }
+       }
+
+    } catch (Exception ex) {
+        System.out.println("WARNING: cannot fetch [am_raisentry_transaction]->" +
+                ex.getMessage());
+    } 
+    
+    return collection;
+
+}
     /**
      * @return the selectTax
      */
@@ -6702,7 +8601,7 @@ public ArrayList findRaisedTransaction(String filter) {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }    
- public String isoCheck(  String asset_id,String page1,String transactionId) 
+ public String isoCheckOld(  String asset_id,String page1,String transactionId) 
 	   {
 		 	
 	        Connection con = null;
@@ -6740,49 +8639,42 @@ public ArrayList findRaisedTransaction(String filter) {
 	        return iso;
 
 	    }
+ 
 
-  public String isoCheck(  String asset_id,String page1,String transactionId,String tranId)
-	   {
+ public String isoCheck(String assetId, String page1, String transactionId, String tranId) {
 
-	        Connection con = null;
-	        PreparedStatement ps = null;
-	        ResultSet rs = null;
-	        String iso = "1414";
-//	        System.out.println("Magbel asset_id: "+asset_id+" page1: "+page1+" transactionId: "+transactionId+" tranId: "+tranId);
-	        String QUERY_TEST = "SELECT iso from am_raisentry_transaction WHERE transactionId='"+transactionId+"' and ASSET_ID='"+asset_id+"' and page1='"+page1+"' and Trans_id = '"+tranId+"' ";
-//	        System.out.println("====QUERY_TEST: "+QUERY_TEST);
-	        String FINDER_QUERY = "SELECT iso from am_raisentry_transaction WHERE transactionId=?   and ASSET_ID=?  and page1=? and Trans_id = ? ";
-//	        System.out.print("isoCheck FINDER_QUERY: "+FINDER_QUERY);
-	        try {
-	        	con = dbConnection.getConnection("legendPlus");
-	            ps = con.prepareStatement(FINDER_QUERY);
-	            ps.setString(1, transactionId);
-	            ps.setString(2, asset_id);
-	            ps.setString(3, page1);
-                ps.setString(4,tranId);
-	            rs = ps.executeQuery();
+	    String iso = "1414"; 
 
-	            while (rs.next())
-	            {
-	            	iso = rs.getString("iso");
+	    String query = "SELECT iso " +
+	                   "FROM am_raisentry_transaction " +
+	                   "WHERE transactionId = ? " +
+	                   "AND ASSET_ID = ? " +
+	                   "AND page1 = ? " +
+	                   "AND Trans_id = ?";
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, transactionId);
+	        ps.setString(2, assetId);
+	        ps.setString(3, page1);
+	        ps.setString(4, tranId);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                iso = rs.getString("iso");
 	            }
-
-	        }
-	        catch (Exception ex)
-	        {
-	            System.out.println("WARNING: cannot fetch am_raisentry_transaction->" +ex.getMessage());
-	            ex.printStackTrace();
-	        }
-	        finally
-	        {
-	        	closeConnection(con, ps);
 	        }
 
-	        return iso;
-
+	    } catch (Exception ex) {
+	        System.out.println("WARNING: cannot fetch am_raisentry_transaction -> " + ex.getMessage());
+	        ex.printStackTrace();
 	    }
 
-	 public boolean isoChecking (  String asset_id,String page1,String transactionId) 
+	    return iso;
+	}
+ 
+	 public boolean isoCheckingOld (  String asset_id,String page1,String transactionId) 
 	   {
 		 	
 	        Connection con = null;
@@ -6823,8 +8715,46 @@ public ArrayList findRaisedTransaction(String filter) {
 	        return done;
 
 	    }
+	 
+	 public boolean isoChecking (  String asset_id,String page1,String transactionId) 
+	   {
+		 	
+	       
+	        boolean done = false;
+	       
+	        String FINDER_QUERY = "SELECT * from am_raisentry_transaction WHERE transactionId=?  " +
+                      " and ASSET_ID=?  and page1=? ";
 
-         public boolean isoChecking (  String asset_id,String page1,String transactionId,String tranId)
+	        try (Connection con = dbConnection.getConnection("legendPlus");
+	   	         PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+	        	
+	            ps.setString(1, transactionId);
+	            ps.setString(2, asset_id);
+	            ps.setString(3, page1);
+	            
+	            
+	            
+	          try(ResultSet  rs = ps.executeQuery();){
+
+	            while (rs.next()) 
+	            {
+	            	done = true;
+	            }
+
+	        } 
+	        }
+	        catch (Exception ex) 
+	        {
+	            System.out.println("WARNING: cannot fetch am_raisentry_transaction->" +ex.getMessage());
+	            ex.printStackTrace();
+	        } 
+	        
+
+	        return done;
+
+	    }
+
+         public boolean isoCheckingOld (  String asset_id,String page1,String transactionId,String tranId)
 	   {
 
 	        Connection con = null;
@@ -6865,8 +8795,46 @@ public ArrayList findRaisedTransaction(String filter) {
 	        return done;
 
 	    }
+         
+         public boolean isoChecking (  String asset_id,String page1,String transactionId,String tranId)
+  	   {
 
-	 public boolean updateRaiseEntryTransaction( String asset_id,String page1,String transactionId ,String iso) {
+  	       
+  	        boolean done = false;
+
+  	        String FINDER_QUERY = "SELECT * from am_raisentry_transaction WHERE transactionId=?  " +
+                          " and ASSET_ID=?  and page1=?  and Trans_id = ? ";
+
+
+	        try (Connection con = dbConnection.getConnection("legendPlus");
+	   	         PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+  	            ps.setString(1, transactionId.trim());
+  	            ps.setString(2, asset_id.trim());
+  	            ps.setString(3, page1.trim());
+  	             ps.setString(4,tranId);
+
+
+  	           try(ResultSet  rs = ps.executeQuery();){
+
+  	            while (rs.next())
+  	            {
+  	            	done = true;
+  	            }
+  	           }
+
+  	        }
+  	        catch (Exception ex)
+  	        {
+  	            System.out.println("WARNING: cannot fetch am_raisentry_transaction->" +ex.getMessage());
+  	            ex.printStackTrace();
+  	        }
+  	        
+
+  	        return done;
+
+  	    }
+
+	 public boolean updateRaiseEntryTransactionOld( String asset_id,String page1,String transactionId ,String iso) {
 		    boolean done=true;
 			  
 			   Connection con = null;
@@ -6897,8 +8865,38 @@ public ArrayList findRaisedTransaction(String filter) {
 		    }
 		    return done;
 		}
+	 
+	 public boolean updateRaiseEntryTransaction( String asset_id,String page1,String transactionId ,String iso) {
+		    boolean done=true;
+			  
+			
+		    String query = "update am_raisentry_transaction set iso=?,transaction_date=? where transactionId=?    and ASSET_ID=? and page1=? " ;
+		                  
+		    try (Connection con = dbConnection.getConnection("legendPlus");
+		   	         PreparedStatement ps = con.prepareStatement(query)) {
+		    	
+		        ps.setString(1,iso);
+		        ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
+		        ps.setString(3,transactionId);
+		       
+		        ps.setString(4,asset_id);
+		        ps.setString(5, page1);
+		        
+		        
+		        ps.execute();
+		        
+		    } 
+		    catch (Exception ex) 
+		    {
+		 	   done = false;
+		        System.out.println("WARNING:cannot update am_raisentry_transaction->" );
+		        ex.printStackTrace();
+		    } 
+		    
+		    return done;
+		}
 
-          public boolean updateRaiseEntryTransaction2( String asset_id,String page1,String transactionId ,String iso,String tranId) {
+          public boolean updateRaiseEntryTransaction2_Old( String asset_id,String page1,String transactionId ,String iso,String tranId) {
 		    boolean done=true;
 
 			   Connection con = null;
@@ -6929,8 +8927,36 @@ public ArrayList findRaisedTransaction(String filter) {
 		    }
 		    return done;
 		}
+          
+          public boolean updateRaiseEntryTransaction2( String asset_id,String page1,String transactionId ,String iso,String tranId) {
+  		    boolean done=true;
 
-		public String lossDisposalAccount (String category,String branch)
+  			  
+  		    String query = "update am_raisentry_transaction set iso=?,transaction_date=? where transactionId=?    and ASSET_ID=? and page1=?   and Trans_id = ? " ;
+
+  		  try (Connection con = dbConnection.getConnection("legendPlus");
+		   	         PreparedStatement ps = con.prepareStatement(query)) {
+  		        ps.setString(1,iso);
+  		        ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
+  		        ps.setString(3,transactionId);
+
+  		        ps.setString(4,asset_id);
+  		        ps.setString(5, page1);
+  		        ps.setString(6,tranId);
+
+  		        ps.execute();
+
+  		    }
+  		    catch (Exception ex)
+  		    {
+  		 	   done = false;
+  		        System.out.println("WARNING:cannot update am_raisentry_transaction->" );
+  		        ex.printStackTrace();
+  		    } 
+  		    return done;
+  		}
+
+		public String lossDisposalAccountOld (String category,String branch)
 		{
 			String lossDisposalAccount="";
 //			System.out.println("category "+category);
@@ -6991,8 +9017,44 @@ public ArrayList findRaisedTransaction(String filter) {
 				}
 		return 	lossDisposalAccount;
 		}
+		
+	
+		public String lossDisposalAccount(String category, String branch) {
 
-		public String stateSuspenseAcct (String category,String branch)
+		    String lossDisposalAccount = "";
+
+		    String baseQuery = approvalRec.getCodeName(
+		            "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'EX2'"
+		    );
+
+		   
+		    String query = baseQuery + 
+		                   " AND a.category_code = ? " +
+		                   " AND d.branch_code = ?";
+
+		    try (Connection con = dbConnection.getConnection("legendPlus");
+		         PreparedStatement ps = con.prepareStatement(query)) {
+
+		        ps.setString(1, category);
+		        ps.setString(2, branch);
+
+		        try (ResultSet rs = ps.executeQuery()) {
+		            if (rs.next()) {
+		                lossDisposalAccount = rs.getString("asd");
+		            }
+		        }
+
+		    } catch (Exception e) {
+		        System.out.println("Error in lossDisposalAccount(): " + e.getMessage());
+		        e.printStackTrace();
+		    }
+
+		    return lossDisposalAccount;
+		}
+		
+
+
+		public String stateSuspenseAcctOld (String category,String branch)
 		{
 			String assetAcqusitionSuspense="";
 //			System.out.println("category "+category);
@@ -7042,6 +9104,40 @@ public ArrayList findRaisedTransaction(String filter) {
 				}
 		return 	assetAcqusitionSuspense;
 		}
+		
+		
+		public String stateSuspenseAcct(String category, String branch) {
+
+		    String assetAcqusitionSuspense = "";
+
+		    String baseQuery = approvalRec.getCodeName(
+		            "select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'LI3'"
+		    );
+
+		   
+		    String query = baseQuery + 
+		                   " AND a.category_code = ? " +
+		                   " AND d.branch_code = ?";
+
+		    try (Connection con = dbConnection.getConnection("legendPlus");
+		         PreparedStatement ps = con.prepareStatement(query)) {
+
+		        ps.setString(1, category);
+		        ps.setString(2, branch);
+
+		        try (ResultSet rs = ps.executeQuery()) {
+		            if (rs.next()) {
+		            	assetAcqusitionSuspense = rs.getString("asd");
+		            }
+		        }
+
+		    } catch (Exception e) {
+		        System.out.println("Error in lossDisposalAccount(): " + e.getMessage());
+		        e.printStackTrace();
+		    }
+
+		    return assetAcqusitionSuspense;
+		}
 
 
 public void updateGroupAssetStatus(String group_Id)
@@ -7075,7 +9171,7 @@ catch (Exception ex) {
 
 }//updateAssetStatus()
 
-public void updateGroupAssetStatusMain(String group_Id)
+public void updateGroupAssetStatusMainOld(String group_Id)
 {
 	String query_r ="update am_group_asset_main set asset_status=?,raise_entry=? " +
 	"where Group_id = '"+group_Id+"'";
@@ -7100,6 +9196,26 @@ catch (Exception ex) {
     dbConnection.closeConnection(con, ps);
 }}
 
+public void updateGroupAssetStatusMain(String group_Id)
+{
+	String query_r ="update am_group_asset_main set asset_status=?,raise_entry=? " +
+	"where Group_id = ? ";
+
+
+	 try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query_r)) {
+ps.setString(1,"ACTIVE");
+ps.setString(2,"Y");
+ps.setString(3,group_Id);
+
+int i =ps.executeUpdate();
+}
+catch (Exception ex) {
+
+    System.out.println("AssetRecordBean: updateGroupAssetStatusMain()>>>>>" + ex);
+} 
+}
+
 
 public String reArrangeDate(String date){
        String re="";
@@ -7118,7 +9234,7 @@ public String reArrangeDate(String date){
        }//reArrangeDate()
 
 
-public String[] setApprovalDataGroup(long id){
+public String[] setApprovalDataGroupOld(long id){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
    String[] result= new String[12];
@@ -7166,40 +9282,118 @@ public String[] setApprovalDataGroup(long id){
 }//setApprovalData()
 
 
-public boolean updateNewApprovalAssetStatus(String groupID, int supervise) throws Exception {
+public String[] setApprovalDataGroup(long id) {
 
-        /*String query = "update am_asset_approval set  asset_status = ?, process_status=?, " +
-        		"super_id =?, approval1 =? where asset_id =?";*/
-        String query = "update am_asset_approval set  asset_status = ?, process_status=?, " +
-		"super_id =?, approval1 =? where asset_id =?";
-         boolean done = true;
-        Connection con = null;
-        PreparedStatement ps = null;
+    String[] result = new String[12];
 
-        try {
+    String query = "SELECT group_id, user_ID, supervisor, Cost_Price, Posting_Date, " +
+                   "       description, effective_date, BRANCH_CODE, Asset_Status " +
+                   "FROM am_group_asset_main " +
+                   "WHERE group_id = ?";
 
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
 
+        ps.setLong(1, id);
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            ps.setString(1, "ACTIVE");
-            ps.setString(2, "A");
-            ps.setInt(3, supervise);
-            ps.setInt(4, supervise);
-            ps.setString(5,groupID);
-            ps.execute();
+        try (ResultSet rs = ps.executeQuery()) {
 
-        } catch (Exception ex) {
-            done = false;
-            System.out.println("AssetRecordsBean: updateNewApprovalAssetStatus: WARN:Error updating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
+            if (rs.next()) {
+
+                result[0] = String.valueOf(id);
+                result[1] = rs.getString("user_ID");
+                result[2] = rs.getString("supervisor");
+                result[3] = rs.getString("Cost_Price");
+
+                result[4] = rs.getDate("Posting_Date") != null
+                        ? dbConnection.formatDate(rs.getDate("Posting_Date"))
+                        : "";
+
+                result[5] = rs.getString("description");
+
+                result[6] = rs.getDate("effective_date") != null
+                        ? dbConnection.formatDate(rs.getDate("effective_date"))
+                        : "";
+
+                result[7] = rs.getString("BRANCH_CODE");
+                result[8] = rs.getString("Asset_Status");
+            }
         }
-        return done;
 
+    } catch (Exception ex) {
+        System.out.println("AssetRecordsBean: setApprovalDataGroup() WARN -> " + ex.getMessage());
+        ex.printStackTrace();
     }
 
-public void updateAssetStatux(String assetId){
+    result[9] = "Group Asset Creation";
+    result[10] = "P";
+
+    return result;
+}
+
+
+
+
+public boolean updateNewApprovalAssetStatusOld(String groupID, int supervise) throws Exception {
+
+    /*String query = "update am_asset_approval set  asset_status = ?, process_status=?, " +
+    		"super_id =?, approval1 =? where asset_id =?";*/
+    String query = "update am_asset_approval set  asset_status = ?, process_status=?, " +
+	"super_id =?, approval1 =? where asset_id =?";
+     boolean done = true;
+    Connection con = null;
+    PreparedStatement ps = null;
+
+    try {
+
+
+
+        con = dbConnection.getConnection("legendPlus");
+        ps = con.prepareStatement(query);
+        ps.setString(1, "ACTIVE");
+        ps.setString(2, "A");
+        ps.setInt(3, supervise);
+        ps.setInt(4, supervise);
+        ps.setString(5,groupID);
+        ps.execute();
+
+    } catch (Exception ex) {
+        done = false;
+        System.out.println("AssetRecordsBean: updateNewApprovalAssetStatus: WARN:Error updating asset->" + ex);
+    } finally {
+        dbConnection.closeConnection(con, ps);
+    }
+    return done;
+
+}
+
+public boolean updateNewApprovalAssetStatus(String groupID, int supervise) throws Exception {
+
+
+    String query = "update am_asset_approval set  asset_status = ?, process_status=?, " +
+	"super_id =?, approval1 =? where asset_id =?";
+     boolean done = true;
+   
+
+     try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+        ps.setString(1, "ACTIVE");
+        ps.setString(2, "A");
+        ps.setInt(3, supervise);
+        ps.setInt(4, supervise);
+        ps.setString(5,groupID);
+        ps.execute();
+
+    } catch (Exception ex) {
+        done = false;
+        System.out.println("AssetRecordsBean: updateNewApprovalAssetStatus: WARN:Error updating asset->" + ex);
+    } 
+     
+    return done;
+
+}
+
+public void updateAssetStatuxOld(String assetId){
 String query_r ="update am_asset set asset_status=?,raise_entry=? where asset_id = '"+assetId+"'";
 
 Connection con = null;
@@ -7230,7 +9424,29 @@ ps = con.prepareStatement(query_r);
 
 }//updateAssetStatus()
 
-public boolean updateNewAssetStatux(String assetId) throws Exception {
+public void updateAssetStatux(String assetId){
+String query_r ="update am_asset set asset_status=?,raise_entry=? where asset_id = '"+assetId+"'";
+
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query_r)) {
+
+
+            ps.setString(1,"APPROVED");
+            ps.setString(2,"Y");
+            //ps.setString(2,reject_reason);
+           int i =ps.executeUpdate();
+            //ps.execute();
+
+        } catch (Exception ex) {
+
+            System.out.println("AssetRecordBean: updateAssetStatux()>>>>>" + ex);
+        } 
+
+
+}//updateAssetStatus()
+
+public boolean updateNewAssetStatuxOld(String assetId) throws Exception {
 
         String query = "update am_asset SET  asset_status = 'APPROVED' where asset_id ='" +assetId+"'";
          boolean done = true;
@@ -7255,7 +9471,25 @@ public boolean updateNewAssetStatux(String assetId) throws Exception {
         return done;
     }
 
-    public String vendorName (String assetId)
+public boolean updateNewAssetStatux(String assetId) throws Exception {
+
+    String query = "update am_asset SET  asset_status = 'APPROVED' where asset_id ='" +assetId+"'";
+     boolean done = true;
+    
+     try (Connection con = dbConnection.getConnection("legendPlus");
+    	        PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.execute();
+
+    } catch (Exception ex) {
+        done = false;
+        System.out.println("AssetRecordsBean: updateNewAssetStatux(): WARN:Error updating asset->" + ex);
+    } 
+     
+    return done;
+}
+
+    public String vendorNameOld(String assetId)
 		{
 
 
@@ -7294,6 +9528,34 @@ public boolean updateNewAssetStatux(String assetId) throws Exception {
 				}
 		return 	vendor;
 		}
+    
+    public String vendorName(String assetId) {
+
+        String vendor = "";
+
+        String query = "SELECT v.vendor_name " +
+                       "FROM am_ad_vendor v " +
+                       "JOIN am_asset a ON v.vendor_id = a.supplier_name " +
+                       "WHERE a.asset_id = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, assetId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    vendor = rs.getString("vendor_name");
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error in vendorNameOld(): " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return vendor;
+    }
 
     /**
      * @return the systemIp
@@ -7314,8 +9576,7 @@ public boolean updateNewAssetStatux(String assetId) throws Exception {
         private void rinsertAssetRecord(String assetId) throws Exception, Throwable {
        // asset_id = new legend.AutoIDSetup().getIdentity(branch_id,
               //  department_id, section_id, category_id);
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
     AssetPaymentManager payment = null;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
@@ -7442,13 +9703,13 @@ if (lpo == null || lpo.equals("")) {
          * should be made available for fleet.
          */
 
-        try {
+        try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(createQuery)) {
 
             double costPrice = Double.parseDouble(vat_amount) +
                                Double.parseDouble(vatable_cost);
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+           
             ps.setString(1, assetId);
             ps.setString(2, registration_no);
             ps.setInt(3, Integer.parseInt(branch_id));
@@ -7537,14 +9798,12 @@ if (lpo == null || lpo.equals("")) {
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error inserting into  asset creation archive->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
        // return done;
     }
 
-public boolean insertRaiseEntryTransactionArchive(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String systemIp,String mac_Address ) {
+public boolean insertRaiseEntryTransactionArchiveOld(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String systemIp,String mac_Address ) {
     boolean done=true;
 
 	   Connection con = null;
@@ -7580,7 +9839,52 @@ public boolean insertRaiseEntryTransactionArchive(String id,String Description,S
     return done;
 }
 
-public boolean updateRaiseEntryTransactionArchive( String asset_id,String page1,String transactionId ,String iso,String systemIp,String mac_Address) {
+public boolean insertRaiseEntryTransactionArchive(
+        String userId,
+        String description,
+        String debitAccount,
+        String creditAccount,
+        double amount,
+        String iso,
+        String assetId,
+        String page1,
+        String transactionId,
+        String systemIp,
+        String macAddress) {
+
+    String query = "INSERT INTO am_raisentry_transaction_archive " +
+            "(User_id, Description, debitAccount, creditAccount, amount, iso, " +
+            "ASSET_ID, page1, transactionId, transaction_date, system_ip, mac_address) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, userId);
+        ps.setString(2, description);
+        ps.setString(3, debitAccount);
+        ps.setString(4, creditAccount);
+        ps.setDouble(5, amount);
+        ps.setString(6, iso);
+        ps.setString(7, assetId);
+        ps.setString(8, page1);
+        ps.setString(9, transactionId);
+        ps.setTimestamp(10, dbConnection.getDateTime(new java.util.Date()));
+        ps.setString(11, systemIp);
+        ps.setString(12, macAddress);
+
+        int rows = ps.executeUpdate();
+
+        return rows > 0;  
+
+    } catch (Exception ex) {
+        System.out.println("WARNING: cannot insert am_raisentry_transaction_archive -> " + ex.getMessage());
+        ex.printStackTrace();
+        return false;
+    }
+}
+
+public boolean updateRaiseEntryTransactionArchiveOld( String asset_id,String page1,String transactionId ,String iso,String systemIp,String mac_Address) {
 		    boolean done=true;
 
 			   Connection con = null;
@@ -7613,6 +9917,35 @@ public boolean updateRaiseEntryTransactionArchive( String asset_id,String page1,
 		    return done;
 		}
 
+public boolean updateRaiseEntryTransactionArchive( String asset_id,String page1,String transactionId ,String iso,String systemIp,String mac_Address) {
+    boolean done=true;
+    
+    String query = "update am_raisentry_transaction_archive set iso=?,transaction_date=? ,system_ip=?,mac_address=? where transactionId=?    and ASSET_ID=? and page1=? " ;
+
+    try (Connection con = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = con.prepareStatement(query)) {
+    	
+        ps.setString(1,iso);
+        ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
+        ps.setString(3, systemIp);
+                ps.setString(4, mac_Address);
+                ps.setString(5,transactionId);
+        ps.setString(6,asset_id);
+        ps.setString(7, page1);
+
+
+        ps.execute();
+
+    }
+    catch (Exception ex)
+    {
+ 	   done = false;
+        System.out.println("WARNING:cannot update am_raisentry_transaction_archive->" );
+        ex.printStackTrace();
+    } 
+    
+    return done;
+}
     /**
      * @return the macAddress
      */
@@ -7627,7 +9960,7 @@ public boolean updateRaiseEntryTransactionArchive( String asset_id,String page1,
         this.macAddress = macAddress;
     }
 
-public void setPendingTransArchive(String[] a, String code,long mtid){
+public void setPendingTransArchiveOld(String[] a, String code,long mtid){
 //System.out.println("====code 2====> "+code);
         int transaction_level=0;
         Connection con;
@@ -7696,7 +10029,60 @@ public void setPendingTransArchive(String[] a, String code,long mtid){
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
     }//staticApprovalInfo()
 
-public void getTransFeedbackArchive(String id, String process_status, String reject_reason,long tran_id){
+public void setPendingTransArchive(String[] a, String code, long mtid) {
+
+    String insertQuery = "INSERT INTO am_asset_approval_archive " +
+            "(asset_id, user_id, super_id, amount, posting_date, description, " +
+            "effective_date, branchCode, asset_status, tran_type, process_status, " +
+            "tran_sent_time, transaction_id, batch_id, transaction_level) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    String levelQuery = "SELECT level FROM approval_level_setup WHERE code = ?";
+
+    int transactionLevel = 0;
+
+    try (Connection con = dbConnection.getConnection("legendPlus")) {
+
+        // -------- Get Transaction Level --------
+        try (PreparedStatement psLevel = con.prepareStatement(levelQuery)) {
+
+            psLevel.setString(1, code);
+
+            try (ResultSet rs = psLevel.executeQuery()) {
+                if (rs.next()) {
+                    transactionLevel = rs.getInt("level");
+                }
+            }
+        }
+
+        try (PreparedStatement ps = con.prepareStatement(insertQuery)) {
+
+            ps.setString(1,  a[0] != null ? a[0] : "");
+            ps.setString(2,  a[1] != null ? a[1] : "");
+            ps.setString(3,  a[2] != null ? a[2] : "");
+            ps.setDouble(4,  a[3] != null ? Double.parseDouble(a[3]) : 0.0);
+            ps.setTimestamp(5, dbConnection.getDateTime(new java.util.Date()));
+            ps.setString(6,  a[5] != null ? a[5] : "");
+            ps.setDate(7,    a[6] != null ? dbConnection.dateConvert(a[6]) : null);
+            ps.setString(8,  a[7] != null ? a[7] : "");
+            ps.setString(9,  a[8] != null ? a[8] : "");
+            ps.setString(10, a[9] != null ? a[9] : "");
+            ps.setString(11, a[10] != null ? a[10] : "");
+            ps.setString(12, new SimpleDateFormat("kk:mm:ss").format(new java.util.Date()));
+            ps.setLong(13,   mtid);
+            ps.setString(14, String.valueOf(mtid));
+            ps.setInt(15,    transactionLevel);
+
+            ps.executeUpdate();
+        }
+
+    } catch (Exception e) {
+        System.out.println("AssetRecordBeans:setPendingTransArchive() ERROR -> " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+public void getTransFeedbackArchiveOld(String id, String process_status, String reject_reason,long tran_id){
 String query_r ="update am_asset_approval_archive set process_status=?,reject_reason=? where asset_id = '"+id+"'and transaction_id="+tran_id;
     //System.out.println("the value of  ==============" + id);
 Connection con = null;
@@ -7727,7 +10113,37 @@ ps = con.prepareStatement(query_r);
 
 }//getTransFeedback()
 
-public void updateAssetStatusApprovalArchive(long transId){
+public void getTransFeedbackArchive(String id,
+        String processStatus,
+        String rejectReason,
+        long tranId) {
+
+String query = "UPDATE am_asset_approval_archive " +
+"SET process_status = ?, reject_reason = ? " +
+"WHERE asset_id = ? AND transaction_id = ?";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(query)) {
+
+if ("a".equalsIgnoreCase(processStatus) ||
+"p".equalsIgnoreCase(processStatus)) {
+rejectReason = "";
+}
+
+ps.setString(1, processStatus);
+ps.setString(2, rejectReason);
+ps.setString(3, id);
+ps.setLong(4, tranId);
+
+ps.executeUpdate();
+
+} catch (Exception ex) {
+System.out.println("AssetRecordBean: getTransFeedbackArchiveOld() ERROR -> " + ex.getMessage());
+ex.printStackTrace();
+}
+}
+
+public void updateAssetStatusApprovalArchiveOld(long transId){
 //String query_r ="update am_asset_approval set asset_status=? where asset_id = '"+assetId+"'";
 String query_r ="update am_asset_approval_archive set asset_status=? where transaction_id = ?";
 Connection con = null;
@@ -7758,8 +10174,26 @@ ps = con.prepareStatement(query_r);
 
 }//updateAssetStatusApproval()
 
+public void updateAssetStatusApprovalArchive(long transId){
+	//String query_r ="update am_asset_approval set asset_status=? where asset_id = '"+assetId+"'";
+	String query_r ="update am_asset_approval_archive set asset_status=? where transaction_id = ?";
+	try (Connection con = dbConnection.getConnection("legendPlus");
+			PreparedStatement ps = con.prepareStatement(query_r)) {
 
-public void updateAssetStatusArchive(String assetId){
+	            ps.setString(1,"ACTIVE");
+	            ps.setLong(2, transId);
+	           int i =ps.executeUpdate();
+
+	        } catch (Exception ex) {
+
+	            System.out.println("AssetRecordBean: updateAssetStatusApprovalArchive()>>>>>" + ex);
+	        } 
+
+
+	}//updateAssetStatusApproval()
+
+
+public void updateAssetStatusArchiveOld(String assetId){
 String query_r ="update am_asset_archive set asset_status=?,raise_entry=? where asset_id = '"+assetId+"'";
 
 Connection con = null;
@@ -7788,7 +10222,27 @@ ps = con.prepareStatement(query_r);
         }
 }//updateAssetStatus()
 
-public void updateAssetStatuxArchive(String assetId){
+public void updateAssetStatusArchive(String assetId){
+String query_r ="update am_asset_archive set asset_status=?,raise_entry=? where asset_id = '"+assetId+"'";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+		PreparedStatement ps = con.prepareStatement(query_r)) {
+
+
+
+            ps.setString(1,"ACTIVE");
+            ps.setString(2,"Y");
+            //ps.setString(2,reject_reason);
+           int i =ps.executeUpdate();
+            //ps.execute();
+
+        } catch (Exception ex) {
+
+            System.out.println("AssetRecordBean: updateAssetStatusArchive()>>>>>" + ex);
+        } 
+}//updateAssetStatus()
+
+public void updateAssetStatuxArchiveOld(String assetId){
 String query_r ="update am_asset_archive set asset_status=?,raise_entry=? where asset_id = '"+assetId+"'";
 
 Connection con = null;
@@ -7815,6 +10269,26 @@ ps = con.prepareStatement(query_r);
         } finally {
             dbConnection.closeConnection(con, ps);
         }
+}//updateAssetStatus()
+
+public void updateAssetStatuxArchive(String assetId){
+String query_r ="update am_asset_archive set asset_status=?,raise_entry=? where asset_id = '"+assetId+"'";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+		PreparedStatement ps = con.prepareStatement(query_r)) {
+
+
+
+            ps.setString(1,"APPROVED");
+            ps.setString(2,"Y");
+            //ps.setString(2,reject_reason);
+           int i =ps.executeUpdate();
+            //ps.execute();
+
+        } catch (Exception ex) {
+
+            System.out.println("AssetRecordBean: updateAssetStatuxArchive()>>>>>" + ex);
+        } 
 }//updateAssetStatus()
 /*
 public void incrementApprovalCountArchive(int tran_id,int count,int nextSupervisor){
@@ -7884,13 +10358,12 @@ ps = con.prepareStatement(query_r);
    public boolean insertRaiseEntryTransaction(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String ip_address, String costdebitAcctName,String costcreditAcctName) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
+
     String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	 Connection  con = dbConnection.getConnection("legendPlus");
+    	 PreparedStatement  ps = con.prepareStatement(query);
         ps.setString(1,id);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -7911,9 +10384,7 @@ ps = con.prepareStatement(query_r);
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
@@ -7921,13 +10392,12 @@ ps = con.prepareStatement(query_r);
      public boolean updateRaiseEntryTransaction( String asset_id,String page1,String transactionId ,String iso,String ip_address) {
 		    boolean done=true;
 
-			   Connection con = null;
-		    PreparedStatement ps = null;
+			 
 		    String query = "update am_raisentry_transaction set iso=?,transaction_date=?,system_ip=? where transactionId=?    and ASSET_ID=? and page1=? " ;
 
 		    try {
-		    	con = dbConnection.getConnection("legendPlus");
-		        ps = con.prepareStatement(query);
+		    	Connection	con = dbConnection.getConnection("legendPlus");
+		    	PreparedStatement ps = con.prepareStatement(query);
 		        ps.setString(1,iso);
 		        ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
 		        ps.setString(3, ip_address);
@@ -7945,9 +10415,7 @@ ps = con.prepareStatement(query_r);
 		 	   done = false;
 		        System.out.println("WARNING:cannot update am_raisentry_transaction->" );
 		        ex.printStackTrace();
-		    } finally {
-		    	closeConnection(con, ps);
-		    }
+		    } 
 		    return done;
 		}
 
@@ -7955,15 +10423,10 @@ ps = con.prepareStatement(query_r);
  public void incrementApprovalCount2(int tran_id,int count,int nextSupervisor){
 String query_r ="update am_asset_approval set approval_level_count=?,super_id=?,posting_date=? where transaction_id =?";
 
-Connection con = null;
-        PreparedStatement ps = null;
-        //ResultSet rs = null;
 
 try {
-    con = dbConnection.getConnection("legendPlus");
-
-
-ps = con.prepareStatement(query_r);
+	Connection con = dbConnection.getConnection("legendPlus");
+	PreparedStatement ps = con.prepareStatement(query_r);
 
 
 
@@ -7978,9 +10441,7 @@ ps = con.prepareStatement(query_r);
         } catch (Exception ex) {
 
             System.out.println("AssetRecordBean: incrementApprovalCount()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 
 }//incrementApprovalCount()
@@ -7988,15 +10449,9 @@ ps = con.prepareStatement(query_r);
  public void incrementApprovalCount2(long tran_id,int count,int nextSupervisor){
 String query_r ="update am_asset_approval set approval_level_count=?,super_id=?,posting_date=? where transaction_id =?";
 
-Connection con = null;
-        PreparedStatement ps = null;
-        //ResultSet rs = null;
-
 try {
-    con = dbConnection.getConnection("legendPlus");
-
-
-ps = con.prepareStatement(query_r);
+	Connection con = dbConnection.getConnection("legendPlus");
+	PreparedStatement ps = con.prepareStatement(query_r);
 
 
 
@@ -8011,9 +10466,7 @@ ps = con.prepareStatement(query_r);
         } catch (Exception ex) {
 
             System.out.println("AssetRecordBean: incrementApprovalCount()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 
 }//incrementApprovalCount()
@@ -8021,15 +10474,9 @@ ps = con.prepareStatement(query_r);
  public void incrementApprovalCountArchive(int tran_id,int count,int nextSupervisor){
 String query_r ="update am_asset_approval_archive set approval_level_count=?,super_id=?,posting_date=? where transaction_id =?";
 
-Connection con = null;
-        PreparedStatement ps = null;
-        //ResultSet rs = null;
-
 try {
-    con = dbConnection.getConnection("legendPlus");
-
-
-ps = con.prepareStatement(query_r);
+	Connection con = dbConnection.getConnection("legendPlus");
+	PreparedStatement ps = con.prepareStatement(query_r);
 
 
 
@@ -8044,9 +10491,7 @@ ps = con.prepareStatement(query_r);
         } catch (Exception ex) {
 
             System.out.println("AssetRecordBean: incrementApprovalCountArchive()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 
 }//incrementApprovalCount()
@@ -8069,16 +10514,15 @@ ps = con.prepareStatement(query_r);
                            "A.[USER_ID], A.WHO_TO_REM_2,A.MULTIPLE,A.WAR_START_DATE,WAR_MONTH,WAR_EXPIRY_DATE," +
                            "AMOUNT_PTD,AMOUNT_REM,PART_PAY,FULLY_PAID, GROUP_ID,A.BAR_CODE,A.SBU_CODE,A.LPO,A.SUPERVISOR,A.defer_pay,A.wht_percent " +
                            "FROM AM_ASSETUPDATE A " +
-                           "WHERE A.ASSET_ID = '" + assetId + "'";
+                           "WHERE A.ASSET_ID = ? ";
 
-            Connection con = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
+ 
 
             try {
-                con = dbConnection.getConnection("legendPlus");
-                ps = con.prepareStatement(query);
-                rs = ps.executeQuery();
+            	Connection con = dbConnection.getConnection("legendPlus");
+            	PreparedStatement ps = con.prepareStatement(query);
+            	ps.setString(1, assetId);
+                ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
 
@@ -8173,38 +10617,38 @@ ps = con.prepareStatement(query_r);
           "WHO_TO_REM_2 = ?, DRIVER = ? , ASSET_ENGINE_NO = ?, WAR_MONTH = ?,"+
           "BAR_CODE = ?, LPO = ?, wht_percent=?,SPARE_3 = ?, SPARE_4 = ?,SPARE_5 = ?, SPARE_6 = ? WHERE ASSET_ID = ? ";
 
-                    ps = con.prepareStatement(updateQuery);
-                    ps.setString(1, registration_no);
-                    ps.setString(2, maintained_by);
-                    ps.setString(3, authorized_by);
-                    ps.setString(4, supplied_by);
-                    ps.setString(5, reason);
-                    ps.setString(6, description.toUpperCase());
-                    ps.setString(7, vendor_account);
-                    ps.setString(8, serial_number);
-                    ps.setString(9, model);
-                    ps.setString(10, user);
-                    ps.setString(11, subject_to_vat);
-                    ps.setString(12, who_to_remind);
-                    ps.setString(13, email_1);
-                    ps.setString(14, email2);
-                    ps.setString(15, wh_tax_cb);
-                    ps.setString(16, spare_1);
-                    ps.setString(17, spare_2);
-                    ps.setString(18, who_to_remind_2);
-                    ps.setString(19, driver);
-                    ps.setString(20, engine_number);
-                    ps.setString(21, noOfMonths);
-                    ps.setString(22, bar_code);
-                    ps.setString(23, lpo);
-                    ps.setDouble(24,Double.parseDouble(selectTax));
-                    ps.setString(25, spare_3);
-                    ps.setString(26, spare_4);
-                    ps.setString(27, spare_5);
-                    ps.setString(28, spare_6);
-                    ps.setString(29, asset_id);
+                    PreparedStatement ps2 = con.prepareStatement(updateQuery);
+                    ps2.setString(1, registration_no);
+                    ps2.setString(2, maintained_by);
+                    ps2.setString(3, authorized_by);
+                    ps2.setString(4, supplied_by);
+                    ps2.setString(5, reason);
+                    ps2.setString(6, description.toUpperCase());
+                    ps2.setString(7, vendor_account);
+                    ps2.setString(8, serial_number);
+                    ps2.setString(9, model);
+                    ps2.setString(10, user);
+                    ps2.setString(11, subject_to_vat);
+                    ps2.setString(12, who_to_remind);
+                    ps2.setString(13, email_1);
+                    ps2.setString(14, email2);
+                    ps2.setString(15, wh_tax_cb);
+                    ps2.setString(16, spare_1);
+                    ps2.setString(17, spare_2);
+                    ps2.setString(18, who_to_remind_2);
+                    ps2.setString(19, driver);
+                    ps2.setString(20, engine_number);
+                    ps2.setString(21, noOfMonths);
+                    ps2.setString(22, bar_code);
+                    ps2.setString(23, lpo);
+                    ps2.setDouble(24,Double.parseDouble(selectTax));
+                    ps2.setString(25, spare_3);
+                    ps2.setString(26, spare_4);
+                    ps2.setString(27, spare_5);
+                    ps2.setString(28, spare_6);
+                    ps2.setString(29, asset_id);
 
-                int i =ps.executeUpdate();
+                int i =ps2.executeUpdate();
 
 
                 }//if(update_changes.equalsIgnoreCase("YES"))
@@ -8212,9 +10656,7 @@ ps = con.prepareStatement(query_r);
 
             } catch (Exception ex) {
                 System.out.println("AssetRecordsBean: getAssetRecordsForApprovalArchive()WARN: Error fetching all asset/ updating am_assetUpdate table ->" + ex);
-            } finally {
-                dbConnection.closeConnection(con, ps,rs);
-            }
+            } 
         }
     }
 
@@ -8236,16 +10678,15 @@ ps = con.prepareStatement(query_r);
                            "A.[USER_ID], A.WHO_TO_REM_2,A.MULTIPLE,A.WAR_START_DATE,WAR_MONTH,WAR_EXPIRY_DATE," +
                            "AMOUNT_PTD,AMOUNT_REM,PART_PAY,FULLY_PAID, GROUP_ID,A.BAR_CODE,A.SBU_CODE,A.LPO,A.SUPERVISOR,A.defer_pay,A.wht_percent " +
                            "FROM AM_ASSETUPDATE A " +
-                           "WHERE A.ASSET_ID = '" + assetId + "'";
+                           "WHERE A.ASSET_ID = ? ";
 
-            Connection con = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
+           
 
             try {
-                con = dbConnection.getConnection("legendPlus");
-                ps = con.prepareStatement(query);
-                rs = ps.executeQuery();
+            	Connection con = dbConnection.getConnection("legendPlus");
+            	PreparedStatement ps = con.prepareStatement(query);
+            	ps.setString(1, assetId);
+            	ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
 
@@ -8338,38 +10779,38 @@ ps = con.prepareStatement(query_r);
           "WHO_TO_REM_2 = ?, DRIVER = ? , ASSET_ENGINE_NO = ?, WAR_MONTH = ?,"+
           "BAR_CODE = ?, LPO = ?, wht_percent=?,SPARE_3 = ?, SPARE_4 = ?,SPARE_5 = ?, SPARE_6 = ? WHERE ASSET_ID = ? ";
 
-          ps = con.prepareStatement(updateQuery);
-                    ps.setString(1, registration_no);
-                    ps.setString(2, maintained_by);
-                    ps.setString(3, authorized_by);
-                    ps.setString(4, supplied_by);
-                    ps.setString(5, reason);
-                    ps.setString(6, description.toUpperCase());
-                    ps.setString(7, vendor_account);
-                    ps.setString(8, serial_number);
-                    ps.setString(9, model);
-                    ps.setString(10, user);
-                    ps.setString(11, subject_to_vat);
-                    ps.setString(12, who_to_remind);
-                    ps.setString(13, email_1);
-                    ps.setString(14, email2);
-                    ps.setString(15, wh_tax_cb);
-                    ps.setString(16, spare_1);
-                    ps.setString(17, spare_2);
-                    ps.setString(18, who_to_remind_2);
-                    ps.setString(19, driver);
-                    ps.setString(20, engine_number);
-                    ps.setString(21, noOfMonths);
-                    ps.setString(22, bar_code);
-                    ps.setString(23, lpo);
-                    ps.setDouble(24,Double.parseDouble(selectTax));
-                    ps.setString(25, spare_3);
-                    ps.setString(26, spare_4);
-                    ps.setString(27, spare_5);
-                    ps.setString(28, spare_6);
-                    ps.setString(29, asset_id);
+                    PreparedStatement ps2 = con.prepareStatement(updateQuery);
+                    ps2.setString(1, registration_no);
+                    ps2.setString(2, maintained_by);
+                    ps2.setString(3, authorized_by);
+                    ps2.setString(4, supplied_by);
+                    ps2.setString(5, reason);
+                    ps2.setString(6, description.toUpperCase());
+                    ps2.setString(7, vendor_account);
+                    ps2.setString(8, serial_number);
+                    ps2.setString(9, model);
+                    ps2.setString(10, user);
+                    ps2.setString(11, subject_to_vat);
+                    ps2.setString(12, who_to_remind);
+                    ps2.setString(13, email_1);
+                    ps2.setString(14, email2);
+                    ps2.setString(15, wh_tax_cb);
+                    ps2.setString(16, spare_1);
+                    ps2.setString(17, spare_2);
+                    ps2.setString(18, who_to_remind_2);
+                    ps2.setString(19, driver);
+                    ps2.setString(20, engine_number);
+                    ps2.setString(21, noOfMonths);
+                    ps2.setString(22, bar_code);
+                    ps2.setString(23, lpo);
+                    ps2.setDouble(24,Double.parseDouble(selectTax));
+                    ps2.setString(25, spare_3);
+                    ps2.setString(26, spare_4);
+                    ps2.setString(27, spare_5);
+                    ps2.setString(28, spare_6);
+                    ps2.setString(29, asset_id);
 
-                int i =ps.executeUpdate();
+                int i =ps2.executeUpdate();
 
 
                 }//if(update_changes.equalsIgnoreCase("YES"))
@@ -8377,9 +10818,7 @@ ps = con.prepareStatement(query_r);
 
             } catch (Exception ex) {
                 System.out.println("AssetRecordsBean: getAssetRecordsForApprovalArchive()WARN: Error fetching all asset/ updating am_assetUpdate table ->" + ex);
-            } finally {
-                dbConnection.closeConnection(con, ps,rs);
-            }
+            } 
         }
     }
 
@@ -8401,16 +10840,15 @@ public void getAssetRecordsForApproval(String assetId, String update_changes) th
                            "A.[USER_ID], A.WHO_TO_REM_2,A.MULTIPLE,A.WAR_START_DATE,WAR_MONTH,WAR_EXPIRY_DATE," +
                            "AMOUNT_PTD,AMOUNT_REM,PART_PAY,FULLY_PAID, GROUP_ID,A.BAR_CODE,A.SBU_CODE,A.LPO,A.SUPERVISOR,A.defer_pay,A.wht_percent " +
                            "FROM AM_ASSETUPDATE A " +
-                           "WHERE A.ASSET_ID = '" + assetId + "'";
+                           "WHERE A.ASSET_ID = '? ";
 
-            Connection con = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
+           
 
             try {
-                con = dbConnection.getConnection("legendPlus");
-                ps = con.prepareStatement(query);
-                rs = ps.executeQuery();
+            	Connection con = dbConnection.getConnection("legendPlus");
+            	PreparedStatement ps = con.prepareStatement(query);
+            	ps.setString(1, assetId);
+            	ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
 
@@ -8503,39 +10941,39 @@ public void getAssetRecordsForApproval(String assetId, String update_changes) th
           "WHO_TO_REM_2 = ?, DRIVER = ? , ASSET_ENGINE_NO = ?, WAR_MONTH = ?,"+
           "BAR_CODE = ?, LPO = ?, wht_percent=?, SPARE_3 = ?, SPARE_4 = ?, SPARE_5 = ?, SPARE_6 = ?  WHERE ASSET_ID = ?";
 
-          ps = con.prepareStatement(updateQuery);
-                    ps.setString(1, registration_no);
-                    ps.setString(2, maintained_by);
-                    ps.setString(3, authorized_by);
-                    ps.setString(4, supplied_by);
-                    ps.setString(5, reason);
-                    ps.setString(6, description.toUpperCase());
-                    ps.setString(7, vendor_account);
-                    ps.setString(8, serial_number);
-                    ps.setString(9, model);
-                    ps.setString(10, user);
-                    ps.setString(11, subject_to_vat);
-                    ps.setString(12, who_to_remind);
-                    ps.setString(13, email_1);
-                    ps.setString(14, email2);
-                    ps.setString(15, wh_tax_cb);
-                    ps.setString(16, spare_1);
-                    ps.setString(17, spare_2);
-                    ps.setString(18, who_to_remind_2);
-                    ps.setString(19, driver);
-                    ps.setString(20, engine_number);
-                    ps.setString(21, noOfMonths);
-                    ps.setString(22, bar_code);
-                    ps.setString(23, lpo);
-                    ps.setDouble(24,Double.parseDouble(selectTax));
-                    ps.setString(25, spare_3);
-                    ps.setString(26, spare_4);
-                    ps.setString(27, spare_5);
-                    ps.setString(28, spare_6);
-                    ps.setString(29, asset_id);
+                    PreparedStatement ps2  = con.prepareStatement(updateQuery);
+                    ps2.setString(1, registration_no);
+                    ps2.setString(2, maintained_by);
+                    ps2.setString(3, authorized_by);
+                    ps2.setString(4, supplied_by);
+                    ps2.setString(5, reason);
+                    ps2.setString(6, description.toUpperCase());
+                    ps2.setString(7, vendor_account);
+                    ps2.setString(8, serial_number);
+                    ps2.setString(9, model);
+                    ps2.setString(10, user);
+                    ps2.setString(11, subject_to_vat);
+                    ps2.setString(12, who_to_remind);
+                    ps2.setString(13, email_1);
+                    ps2.setString(14, email2);
+                    ps2.setString(15, wh_tax_cb);
+                    ps2.setString(16, spare_1);
+                    ps2.setString(17, spare_2);
+                    ps2.setString(18, who_to_remind_2);
+                    ps2.setString(19, driver);
+                    ps2.setString(20, engine_number);
+                    ps2.setString(21, noOfMonths);
+                    ps2.setString(22, bar_code);
+                    ps2.setString(23, lpo);
+                    ps2.setDouble(24,Double.parseDouble(selectTax));
+                    ps2.setString(25, spare_3);
+                    ps2.setString(26, spare_4);
+                    ps2.setString(27, spare_5);
+                    ps2.setString(28, spare_6);
+                    ps2.setString(29, asset_id);
 
 
-                int i =ps.executeUpdate();
+                int i =ps2.executeUpdate();
 
 
                 }//if(update_changes.equalsIgnoreCase("YES"))
@@ -8543,11 +10981,11 @@ public void getAssetRecordsForApproval(String assetId, String update_changes) th
 
             } catch (Exception ex) {
                 System.out.println("AssetRecordsBean: getAssetRecordsForApproval()WARN: Error fetching all asset/ updating am_assetUpdate table ->" + ex);
-            } finally {
-                dbConnection.closeConnection(con, ps,rs);
+            } 
             }
         }
-    }
+
+
 
 public void getAsset2RecordsForApproval(String assetId, String update_changes) throws Exception {
 
@@ -8567,16 +11005,15 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
                            "A.[USER_ID], A.WHO_TO_REM_2,A.MULTIPLE,A.WAR_START_DATE,WAR_MONTH,WAR_EXPIRY_DATE," +
                            "AMOUNT_PTD,AMOUNT_REM,PART_PAY,FULLY_PAID, GROUP_ID,A.BAR_CODE,A.SBU_CODE,A.LPO,A.SUPERVISOR,A.defer_pay,A.wht_percent " +
                            "FROM AM_ASSETUPDATE A " +
-                           "WHERE A.ASSET_ID = '" + assetId + "'";
+                           "WHERE A.ASSET_ID = ? ";
 
-            Connection con = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
+           
 
             try {
-                con = dbConnection.getConnection("legendPlus");
-                ps = con.prepareStatement(query);
-                rs = ps.executeQuery();
+            	Connection con = dbConnection.getConnection("legendPlus");
+            	PreparedStatement ps = con.prepareStatement(query);
+            	ps.setString(1, assetId);
+            	ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
 
@@ -8669,36 +11106,38 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
           "WHO_TO_REM_2 = ?, DRIVER = ? , ASSET_ENGINE_NO = ?, WAR_MONTH = ?,"+
           "BAR_CODE = ?, LPO = ?, wht_percent=?, SPARE_3 = ?, SPARE_4 = ?, SPARE_5 = ?, SPARE_6 = ?  WHERE ASSET_ID = ?";
 
-          ps = con.prepareStatement(updateQuery);
-                    ps.setString(1, registration_no);
-                    ps.setString(2, maintained_by);
-                    ps.setString(3, authorized_by);
-                    ps.setString(4, supplied_by);
-                    ps.setString(5, reason);
-                    ps.setString(6, description.toUpperCase());
-                    ps.setString(7, vendor_account);
-                    ps.setString(8, serial_number);
-                    ps.setString(9, model);
-                    ps.setString(10, user);
-                    ps.setString(11, subject_to_vat);
-                    ps.setString(12, who_to_remind);
-                    ps.setString(13, email_1);
-                    ps.setString(14, email2);
-                    ps.setString(15, wh_tax_cb);
-                    ps.setString(16, spare_1);
-                    ps.setString(17, spare_2);
-                    ps.setString(18, who_to_remind_2);
-                    ps.setString(19, driver);
-                    ps.setString(20, engine_number);
-                    ps.setString(21, noOfMonths);
-                    ps.setString(22, bar_code);
-                    ps.setString(23, lpo);
-                    ps.setDouble(24,Double.parseDouble(selectTax));
-                    ps.setString(25, spare_3);
-                    ps.setString(26, spare_4);
-                    ps.setString(27, spare_5);
-                    ps.setString(28, spare_6);
-                    ps.setString(29, asset_id);
+                    PreparedStatement updatePs = con.prepareStatement(updateQuery);
+                    
+                    updatePs.setString(1, registration_no);
+                    updatePs.setString(2, maintained_by);
+                    updatePs.setString(3, authorized_by);
+                    updatePs.setString(4, supplied_by);
+                    updatePs.setString(5, reason);
+                    updatePs.setString(6, description != null ? description.toUpperCase() : null);
+                    updatePs.setString(7, vendor_account);
+                    updatePs.setString(8, serial_number);
+                    updatePs.setString(9, model);
+                    updatePs.setString(10, user);
+                    updatePs.setString(11, subject_to_vat);
+                    updatePs.setString(12, who_to_remind);
+                    updatePs.setString(13, email_1);
+                    updatePs.setString(14, email2);
+                    updatePs.setString(15, wh_tax_cb);
+                    updatePs.setString(16, spare_1);
+                    updatePs.setString(17, spare_2);
+                    updatePs.setString(18, who_to_remind_2);
+                    updatePs.setString(19, driver);
+                    updatePs.setString(20, engine_number);
+                    updatePs.setString(21, noOfMonths);
+                    updatePs.setString(22, bar_code);
+                    updatePs.setString(23, lpo);
+                    updatePs.setDouble(24, Double.parseDouble(selectTax));
+                    updatePs.setString(25, spare_3);
+                    updatePs.setString(26, spare_4);
+                    updatePs.setString(27, spare_5);
+                    updatePs.setString(28, spare_6);
+                    updatePs.setString(29, asset_id);
+
 
 
                 int i =ps.executeUpdate();
@@ -8709,41 +11148,31 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
 
             } catch (Exception ex) {
                 System.out.println("AssetRecordsBean: getAsset2RecordsForApproval()WARN: Error fetching all asset/ updating am_assetUpdate table ->" + ex);
-            } finally {
-                dbConnection.closeConnection(con, ps,rs);
-            }
+            } 
         }
     }
 
  public void setPendingTransRepost(String[] a, String code,int mtid){
 //	 System.out.println("====code 3====> "+code);
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+     
  String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
          "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
          "transaction_level) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
- String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+ String tranLevelQuery = "select level from approval_level_setup where code = ? ";
+    
         try
         {
-            con = dbConnection.getConnection("legendPlus");
-
-
-            /////////////To get transaction level
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+        	PreparedStatement ps = con.prepareStatement(tranLevelQuery);
+        	ps.setString(1, code);
+        	ResultSet rs = ps.executeQuery();
 
 
             while(rs.next()){
             transaction_level = rs.getInt(1);
 
             }//if
-
-
 
             ////////////To set values for approval table
 
@@ -8777,20 +11206,15 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
         {
             System.out.println(">>>AssetRecordBeans:setPendingTransRepost()>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
     }//staticApprovalInfo()
 
     public void updateAssetStatus(String assetid, String status,String space) {
-
-        Connection con = null;
-    PreparedStatement ps = null;
+    	
         String NOTIFY_QUERY = " update am_asset_approval set process_status=?,approval_level_count=?,approval1=?,approval2=?,approval3=?"+
                 ",approval4=?,approval5=?,super_id=?,amount=? where asset_id=? ";
-      //  System.out.println("In AssetRecordsBean+++++++++++++++++++++++++++++++updateAssetStatus++");
+     
         if (vatable_cost == null || vatable_cost.equals("")) {
         vatable_cost = "0.0";
     }
@@ -8805,8 +11229,8 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
               double costPrice = Double.parseDouble(vat_amount) +
                            Double.parseDouble(vatable_cost);
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(NOTIFY_QUERY);
+            Connection con = dbConnection.getConnection("legendPlus");
+          	PreparedStatement ps  = con.prepareStatement(NOTIFY_QUERY);
             ps.setString(1, status);
             ps.setInt(2, 0);
             ps.setInt(3, 0);
@@ -8823,9 +11247,7 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot update am_asset_approval+" + ex.getMessage());
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
     }
 
@@ -8834,13 +11256,11 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
  public boolean insertRaiseEntryTransactionTranId(String userId,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String ip_address,long transId ) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
     String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,trans_id)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+    	PreparedStatement ps  = con.prepareStatement(query);
         ps.setString(1,userId);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -8862,22 +11282,18 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction insertRaiseEntryTransactionTranId ->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
 public boolean insertRaiseEntryTransactionArchiveTranId(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String systemIp,String mac_Address,long tranId ) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
     String query = "INSERT INTO [am_raisentry_transaction_archive](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,mac_address,Trans_id)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+    	PreparedStatement ps  = con.prepareStatement(query);
         ps.setString(1,id);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -8899,26 +11315,22 @@ public boolean insertRaiseEntryTransactionArchiveTranId(String id,String Descrip
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction_archive->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
+    
     return done;
 }
      public boolean updateRaiseEntryTransaction( String asset_id,String page1,String transactionId ,String iso,String ip_address,String tranId) {
 		    boolean done=true;
-
-			   Connection con = null;
-		    PreparedStatement ps = null;
+		    
 		    String query = "update am_raisentry_transaction set iso=?,transaction_date=?,system_ip=? where transactionId=?    and ASSET_ID=? and page1=? and Trans_id=?" ;
 
 		    try {
-		    	con = dbConnection.getConnection("legendPlus");
-		        ps = con.prepareStatement(query);
+		    	Connection con = dbConnection.getConnection("legendPlus");
+	        	PreparedStatement ps  = con.prepareStatement(query);
 		        ps.setString(1,iso);
 		        ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
 		        ps.setString(3, ip_address);
-                        ps.setString(4,transactionId);
-
+                ps.setString(4,transactionId);
 		        ps.setString(5,asset_id);
 		        ps.setString(6, page1);
                          ps.setString(7, tranId);
@@ -8932,22 +11344,18 @@ public boolean insertRaiseEntryTransactionArchiveTranId(String id,String Descrip
 		 	   done = false;
 		        System.out.println("WARNING:cannot update am_raisentry_transaction->" );
 		        ex.printStackTrace();
-		    } finally {
-		    	closeConnection(con, ps);
-		    }
+		    } 
 		    return done;
 		}
 
      public boolean updateRaiseEntryTransactionArchive( String asset_id,String page1,String transactionId ,String iso,String systemIp,String mac_Address,String tranId) {
 		    boolean done=true;
 
-			   Connection con = null;
-		    PreparedStatement ps = null;
 		    String query = "update am_raisentry_transaction_archive set iso=?,transaction_date=? ,system_ip=?,mac_address=? where transactionId=?    and ASSET_ID=? and page1=?  and Trans_id=?" ;
 
 		    try {
-		    	con = dbConnection.getConnection("legendPlus");
-		        ps = con.prepareStatement(query);
+		    	Connection con = dbConnection.getConnection("legendPlus");
+	        	PreparedStatement ps  = con.prepareStatement(query);
 		        ps.setString(1,iso);
 		        ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
 		        ps.setString(3, systemIp);
@@ -8965,21 +11373,17 @@ public boolean insertRaiseEntryTransactionArchiveTranId(String id,String Descrip
 		 	   done = false;
 		        System.out.println("WARNING:cannot update am_raisentry_transaction_archive->" );
 		        ex.printStackTrace();
-		    } finally {
-		    	closeConnection(con, ps);
-		    }
+		    } 
 		    return done;
 		}
         public boolean insertRaiseEntryTransaction(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String ip_address,String tranId ) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
     String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,Trans_id)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+    	PreparedStatement ps  = con.prepareStatement(query);
         ps.setString(1,id);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -9001,22 +11405,19 @@ public boolean insertRaiseEntryTransactionArchiveTranId(String id,String Descrip
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
         public boolean insertRaiseEntryTransactionArchive(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String systemIp,String mac_Address,String tranId ) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
+	
     String query = "INSERT INTO [am_raisentry_transaction_archive](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,mac_address,Trans_id)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+    	PreparedStatement ps  = con.prepareStatement(query);
         ps.setString(1,id);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -9038,9 +11439,7 @@ public boolean insertRaiseEntryTransactionArchiveTranId(String id,String Descrip
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction_archive->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
@@ -9102,8 +11501,7 @@ private boolean rinsertAssetRecordUnclassified(String branch) throws Exception, 
 	}	
     asset_id = new legend.AutoIDSetup().getIdentity(branch_id,
             department_id, section_id, category_id);
-    Connection con = null;
-    PreparedStatement ps = null;
+   
     boolean done = true;
 AssetPaymentManager payment = null;
 //System.out.println("====Uncapitlized Asset Id: "+asset_id);
@@ -9250,8 +11648,8 @@ if (lpo == null || lpo.equals("")) {
         double costPrice = Double.parseDouble(vat_amount) +
                            Double.parseDouble(vatable_cost);
 
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(createQuery);
+        Connection con = dbConnection.getConnection("legendPlus");
+    	PreparedStatement ps  = con.prepareStatement(createQuery);
         ps.setString(1, asset_id);
         ps.setString(2, registration_no);
         ps.setInt(3, Integer.parseInt(branch_id));
@@ -9361,9 +11759,7 @@ if (lpo == null || lpo.equals("")) {
     } catch (Exception ex) {
         done = false;
         System.out.println("WARN:Error creating asset->" + ex);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
 
     return done;
 }
@@ -9388,14 +11784,11 @@ public void getAssetRecordsUnclassified() throws Exception {
                        "FROM AM_ASSET_UNCAPITALIZED A " +
                        "WHERE A.ASSET_ID = '" + asset_id + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+        	PreparedStatement ps  = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
 
@@ -9481,9 +11874,7 @@ public void getAssetRecordsUnclassified() throws Exception {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching all asset ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
     }
 }
 
@@ -9493,19 +11884,16 @@ public String[] setApprovalDataBranch(String id){
 	 //String currentDate  = reArrangeDate(getCurrentDate1());
 	   // System.out.println("the $$$$$$$$$$$ "+currentDate);
 	    String[] result= new String[12];
-	    Connection con = null;
-	        PreparedStatement ps = null;
-	        ResultSet rs = null;
-
+	    
 	         String query ="select asset_id,user_ID,supervisor,Cost_Price,Posting_Date," +
 	                 " description,effective_date,BRANCH_CODE,Asset_Status from AM_ASSET_UNCAPITALIZED where asset_id ='" +id+"'";
 
 
 
 	        try {
-	            con = dbConnection.getConnection("legendPlus");
-	            ps = con.prepareStatement(query);
-	            rs = ps.executeQuery();
+	        	Connection con = dbConnection.getConnection("legendPlus");
+	        	PreparedStatement ps  = con.prepareStatement(query);
+	           ResultSet rs = ps.executeQuery();
 	            while (rs.next()) {
 	                result[0] = rs.getString(1);
 	                result[1]= rs.getString(2);
@@ -9521,8 +11909,6 @@ public String[] setApprovalDataBranch(String id){
 
 	        } catch (Exception ex) {
 	            System.out.println("WARN: Error fetching CategoryCode ->" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
 	        }
 	result[9] = "Asset Creation Uncapitalized";
 	result[10] = "P";
@@ -9532,9 +11918,6 @@ public String[] setApprovalDataBranch(String id){
 	}
 public String subjectToVatBranch(String id){
 	String result="";
-	    Connection con = null;
-	        PreparedStatement ps = null;
-	        ResultSet rs = null;
 
 	         String query =
 	                "SELECT Subject_TO_Vat FROM AM_ASSET_UNCAPITALIZED  " +
@@ -9542,26 +11925,22 @@ public String subjectToVatBranch(String id){
 
 
 	        try {
-	            con = dbConnection.getConnection("legendPlus");
-	            ps = con.prepareStatement(query);
-	            rs = ps.executeQuery();
+	        	Connection con = dbConnection.getConnection("legendPlus");
+	        	PreparedStatement ps  = con.prepareStatement(query);
+	            ResultSet rs = ps.executeQuery();
 	            while (rs.next()) {
 	                result = rs.getString(1);
 	            }
 
 	        } catch (Exception ex) {
 	            System.out.println("WARN: Error fetching Subject To Vat from Uncapitalized ->" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
 
 	        return result;
 	}
 public String whTaxBranch(String id){
 	String result="";
-	    Connection con = null;
-	        PreparedStatement ps = null;
-	        ResultSet rs = null;
+	    
 
 	         String query =
 	                "SELECT wh_tax FROM AM_ASSET_UNCAPITALIZED  " +
@@ -9569,18 +11948,16 @@ public String whTaxBranch(String id){
 
 
 	        try {
-	            con = dbConnection.getConnection("legendPlus");
-	            ps = con.prepareStatement(query);
-	            rs = ps.executeQuery();
+	        	Connection con = dbConnection.getConnection("legendPlus");
+	        	PreparedStatement ps = con.prepareStatement(query);
+	            ResultSet rs = ps.executeQuery();
 	            while (rs.next()) {
 	                result = rs.getString(1);
 	            }
 
 	        } catch (Exception ex) {
 	            System.out.println("WARN: Error fetching WHTAX ->" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
 
 	        return result;
 	}
@@ -9602,26 +11979,19 @@ public String checkAccounAcqusitionSuspenseBranch2 (String category,String branc
 //
 ////	System.out.println("query in checkAccounAcqusitionSuspenseBranch2: "+query);
 	String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'ACTACQSUP'");
-	String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
-	
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	String query = script+" and a.category_code = ? and d.branch_code = ? ";
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
-
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		Connection con = dbConnection.getConnection("legendPlus");
+    	PreparedStatement ps  = con.prepareStatement(query);
+    	ps.setString(1, category);
+    	ps.setString(2, branch);
+    	ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
-
 			assetAcqusitionSuspense  = rs.getString("asd");
-
-
 		 }
 	   }
 		catch (Exception er)
@@ -9629,10 +11999,7 @@ public String checkAccounAcqusitionSuspenseBranch2 (String category,String branc
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	assetAcqusitionSuspense;
 }
 
@@ -9653,28 +12020,22 @@ return 	assetAcqusitionSuspense;
 
     //the methods below are to set the asset code in am_asset_approval and am_asset_approval_archive
 
-    public void setPendingTrans(String[] a, String code,int assetCode){
+    public void setPendingTransOld(String[] a, String code,int assetCode){
 
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+        
  String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
          "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
          "transaction_level,asset_code) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  
- String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+ String tranLevelQuery = "select level from approval_level_setup where code = ? ";
+        
         try
         {
-            con = dbConnection.getConnection("legendPlus");
-
-
-            /////////////To get transaction level
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+        	PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+        	ps.setString(1, code);
+             ResultSet rs = ps.executeQuery();
 
 
             while(rs.next())
@@ -9734,37 +12095,85 @@ return 	assetAcqusitionSuspense;
         {
             System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTrans Three 3>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
 
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
 
     }//staticApprovalInfo()
+    
+    public void setPendingTrans(String[] a, String code, int assetCode) {
+        int transactionLevel = 0;
+
+        String insertQuery = "INSERT INTO am_asset_approval(" +
+                "asset_id, user_id, super_id, amount, posting_date, description," +
+                "effective_date, branchCode, asset_status, tran_type, process_status, tran_sent_time," +
+                "transaction_id, batch_id, transaction_level, asset_code) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        String tranLevelQuery = "SELECT level FROM approval_level_setup WHERE code = ?";
+
+        
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+
+            psLevel.setString(1, code);
+            try (ResultSet rs = psLevel.executeQuery()) {
+                if (rs.next()) {
+                    transactionLevel = rs.getInt(1);
+                }
+            }
+            
+
+
+            try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+                SimpleDateFormat timer = new SimpleDateFormat("kk:mm:ss");
+                String dd = a[6].substring(0,2);
+                String mm = a[6].substring(3,5);
+                String yyyy = a[6].substring(6,10);
+                String effDate = yyyy+"-"+mm+"-"+dd;
+                String mtid = new ApplicationHelper().getGeneratedId("am_asset_approval");
+
+                psInsert.setString(1, a[0] != null ? a[0] : "");
+                psInsert.setString(2, a[1] != null ? a[1] : "");
+                psInsert.setString(3, a[2] != null ? a[2] : "");
+                psInsert.setDouble(4, a[3] != null ? Double.parseDouble(a[3]) : 0);
+                psInsert.setTimestamp(5, dbConnection.getDateTime(new java.util.Date()));
+                psInsert.setString(6, a[5] != null ? a[5] : "");
+                psInsert.setDate(7,(a[6])==null?null:dbConnection.dateConvert(a[6]));
+                psInsert.setString(8, a[7] != null ? a[7] : "");
+                psInsert.setString(9, a[8] != null ? a[8] : "");
+                psInsert.setString(10, a[9] != null ? a[9] : "");
+                psInsert.setString(11, a[10] != null ? a[10] : "");
+                psInsert.setString(12, timer.format(new java.util.Date()));
+                psInsert.setString(13, mtid);
+                psInsert.setString(14, mtid);
+                psInsert.setInt(15, transactionLevel);
+                psInsert.setInt(16, assetCode);
+
+                psInsert.execute();
+            }
+
+        } catch (Exception er) {
+            System.out.println(">>>AssetRecordBeans:setPendingTrans ERROR>>>>>>" + er);
+            er.printStackTrace();
+        }
+    }
 
     public String setPendingTrans2(String[] a, String code,int assetCode){
 
     String mtid_id ="";
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
  String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
          "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
          "transaction_level,asset_code,VATABLE_COST) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+       
         try
         {
-            con = dbConnection.getConnection("legendPlus");
-
-
-            /////////////To get transaction level
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(tranLevelQuery);
+            ResultSet  rs = ps.executeQuery();
 
 
             while(rs.next()){
@@ -9808,9 +12217,6 @@ return 	assetAcqusitionSuspense;
         {
             System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTrans2 for Three Parameter>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
 
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
@@ -9826,24 +12232,17 @@ return mtid_id;
   public void setPendingTransArchive(String[] a, String code,long mtid, int assetCode){
 
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+        
  String pq = "insert into am_asset_approval_archive(asset_id,user_id,super_id,amount,posting_date,description," +
          "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
          "transaction_level,asset_code) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null; 
+       
         try
         {
-            con = dbConnection.getConnection("legendPlus");
-
-
-            /////////////To get transaction level
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+            ResultSet  rs = ps.executeQuery();
 
 
             while(rs.next()){
@@ -9891,33 +12290,23 @@ return mtid_id;
         {
             System.out.println(">>>2 AssetRecordBeans:setPendingTransArchive()>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
     }//staticApprovalInfo()
   public void setPendingTransRepost(String[] a, String code,long mtid,int assetCode){
 
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+        
  String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
          "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
          "transaction_level,asset_code) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+       
         try
         {
-            con = dbConnection.getConnection("legendPlus");
-
-
-            /////////////To get transaction level
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+             ResultSet rs = ps.executeQuery();
 
 
             while(rs.next()){
@@ -9959,9 +12348,6 @@ return mtid_id;
         {
             System.out.println(">>>AssetRecordBeans:setPendingTransRepost()>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
     }//staticApprovalInfo()
@@ -9970,13 +12356,11 @@ return mtid_id;
   public boolean insertRaiseEntryTransactionTranId(String userId,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String ip_address,long transId,int assetCode ) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
     String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,trans_id,asset_code)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query);
         ps.setString(1,userId);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -9998,9 +12382,7 @@ return mtid_id;
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction insertRaiseEntryTransactionTranId ->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
@@ -10008,13 +12390,12 @@ return mtid_id;
   public boolean insertRaiseEntryTransactionArchive(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String systemIp,String mac_Address,String tranId,int assetCode ) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
+	  
     String query = "INSERT INTO [am_raisentry_transaction_archive](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,mac_address,Trans_id,asset_code)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
         ps.setString(1,id);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -10038,9 +12419,7 @@ return mtid_id;
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction_archive->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
@@ -10048,13 +12427,11 @@ return mtid_id;
    public boolean insertRaiseEntryTransaction(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,String ip_address,String tranId, int assetCode ) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
     String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,Trans_id,asset_code)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
         ps.setString(1,id);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -10076,23 +12453,19 @@ return mtid_id;
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
  public boolean insertRaiseEntryTransactiongroup(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,int assetCode,String costdebitAcctName,String costcreditAcctName,String postedBy ) {
     boolean done=true;
 
-	   Connection con = null;
-    PreparedStatement ps = null;
     String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount," +
             "creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,asset_code)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query);
         ps.setString(1,id);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -10116,9 +12489,7 @@ return mtid_id;
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
@@ -10126,13 +12497,11 @@ return mtid_id;
     boolean done=true;
 int tranid = transId == null ? 0 : Integer.parseInt(transId);
 
-	   Connection con = null;
-    PreparedStatement ps = null;
     String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,trans_id,asset_code)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
         ps.setString(1,userId);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -10154,9 +12523,7 @@ int tranid = transId == null ? 0 : Integer.parseInt(transId);
  	   done = false;
         System.out.println("WARNING:cannot insert am_raisentry_transaction insertRaiseEntryTransactionTranId ->" );
         ex.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
@@ -10165,24 +12532,18 @@ int tranid = transId == null ? 0 : Integer.parseInt(transId);
 
     String query = "update am_asset_Uncapitalized SET  asset_status = 'APPROVED' where asset_id ='" +assetId+"'";
      boolean done = true;
-    Connection con = null;
-    PreparedStatement ps = null;
 
     try {
 
-
-
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
-
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
+        ps.setString(1, assetId);
         ps.execute();
 
     } catch (Exception ex) {
         done = false;
         System.out.println("AssetRecordsBean: updateNewAssetStatux(): WARN:Error updating asset->" + ex);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
     return done;
 }
 
@@ -10208,8 +12569,7 @@ int tranid = transId == null ? 0 : Integer.parseInt(transId);
                        "SPARE_3 = ?,SPARE_4 = ?,SPARE_5 = ?,SPARE_6 = ?, SUB_CATEGORY_CODE=?  " +
                        "WHERE	ASSET_ID = '" + asset_id + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
             status = "Z";
@@ -10280,8 +12640,8 @@ int tranid = transId == null ? 0 : Integer.parseInt(transId);
             double costPrice = Double.parseDouble(vat_amount) +
                                Double.parseDouble(vatable_cost);
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+            Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps  = con.prepareStatement(query);
             ps.setString(1, registration_no);
             ps.setString(2, description.toUpperCase());
             ps.setString(3, vendor_account);
@@ -10346,39 +12706,30 @@ int tranid = transId == null ? 0 : Integer.parseInt(transId);
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error updating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
         return done;
 
     }
 public void updateAssetStatuxBranch(String assetId){
-String query_r ="update am_asset_uncapitalized set asset_status=?,raise_entry=? where asset_id = '"+assetId+"'";
+String query_r ="update am_asset_uncapitalized set asset_status=?,raise_entry=? where asset_id = ? ";
 
-Connection con = null;
-        PreparedStatement ps = null;
-        //ResultSet rs = null;
 
 try {
-    con = dbConnection.getConnection("legendPlus");
-
-
-ps = con.prepareStatement(query_r);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps  = con.prepareStatement(query_r);
 
 
 
             ps.setString(1,"APPROVED");
             ps.setString(2,"Y");
-            //ps.setString(2,reject_reason);
+            ps.setString(3,assetId);
            int i =ps.executeUpdate();
             //ps.execute();
 
         } catch (Exception ex) {
 
             System.out.println("AssetRecordBean: updateAssetStatux()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 
 }//updateAssetStatus()
@@ -10403,8 +12754,6 @@ public boolean updateAssetBranch(String assetId,String userId) throws Exception 
                    "WAR_MONTH=?,WAR_EXPIRY_DATE=?, BAR_CODE=? ,SBU_CODE=? , LPO=? , supervisor=?, defer_pay=? ,category_id=?,dep_rate=?,"+
                    "wht_percent=?,SPARE_3=? ,SPARE_4=? ,SPARE_5=? ,SPARE_6=?, sub_category_id=?,SUB_CATEGORY_CODE=?  where asset_id=? and user_id=? " ;
 
-    Connection con = null;
-    PreparedStatement ps = null;
     boolean done = true;
     /*if (require_redistribution.equalsIgnoreCase("Y")) {
         status = "Z";
@@ -10479,8 +12828,8 @@ public boolean updateAssetBranch(String assetId,String userId) throws Exception 
         double costPrice = Double.parseDouble(vat_amount) +
                            Double.parseDouble(vatable_cost);
 //System.out.println("vatable_cost "+vatable_cost);
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+        Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
         ps.setString(1, registration_no);
         ps.setString(2, description.toUpperCase());
         ps.setString(3, vendor_account);
@@ -10552,65 +12901,51 @@ public boolean updateAssetBranch(String assetId,String userId) throws Exception 
     } catch (Exception ex) {
         done = false;
         System.out.println("AssetRecordsBean: updateasset():WARN:Error updating to am_asset table->" + ex);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
     return done;
 
 }
 public void updateAssetStatusBranch(String assetId){
-String query_r ="update am_asset_uncapitalized set asset_status=?,raise_entry=? where asset_id = '"+assetId+"'";
+String query_r ="update am_asset_uncapitalized set asset_status=?,raise_entry=? where asset_id = ? ";
 
-Connection con = null;
-        PreparedStatement ps = null;
-        //ResultSet rs = null;
 
 try {
-    con = dbConnection.getConnection("legendPlus");
-
-
-ps = con.prepareStatement(query_r);
-
-
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query_r);
 
             ps.setString(1,"ACTIVE");
             ps.setString(2,"Y");
-            //ps.setString(2,reject_reason);
+            ps.setString(3,assetId);
            int i =ps.executeUpdate();
             //ps.execute();
 
         } catch (Exception ex) {
 
             System.out.println("AssetRecordBean: updateAssetStatus()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 
 }//updateAssetStatus()
 
 public boolean updateNewAssetStatusBranch(String assetId) throws Exception {
 
-        String query = "update am_asset_uncapitalized SET  asset_status = 'ACTIVE' ,Finacle_Posted_Date= ? where asset_id ='" +assetId+"'";
+        String query = "update am_asset_uncapitalized SET  asset_status = 'ACTIVE' ,Finacle_Posted_Date= ? where asset_id = ? ";
          boolean done = true;
-        Connection con = null;
-        PreparedStatement ps = null;
 
         try {
 
 
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps  = con.prepareStatement(query);
             ps.setTimestamp(1, dbConnection.getDateTime(new java.util.Date()));
+            ps.setString(2, assetId);
             ps.execute();
 
         } catch (Exception ex) {
             done = false;
             System.out.println("AssetRecordsBean: updateNewAssetStatus: WARN:Error updating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
         return done;
 
     }
@@ -10619,19 +12954,14 @@ public boolean updateNewAssetStatusBranch(String assetId) throws Exception {
 public String checkCategoryCodeByAssetCode(int assetCode)
 	{
 		String category="";
-		String query="SELECT CATEGORY_CODE FROM AM_ASSET  where asset_Code="+assetCode;
-
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		String query="SELECT CATEGORY_CODE FROM AM_ASSET  where asset_Code= ? ";
 
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
-
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps  = con.prepareStatement(query);
+            ps.setInt(1, assetCode);
+			ResultSet rs = ps.executeQuery();
 
 			while (rs.next())
 			 {
@@ -10646,28 +12976,22 @@ public String checkCategoryCodeByAssetCode(int assetCode)
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	category;
 	}
 public String checkCategoryCodeByAssetCodeTransfer(int assetCode)
 {
 	String category="";
-	String query="SELECT CATEGORY_CODE FROM AM_ASSET_UNCAPITALIZED  where asset_Code="+assetCode;
+	String query="SELECT CATEGORY_CODE FROM AM_ASSET_UNCAPITALIZED  where asset_Code = ? ";
 
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
-
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
+        ps.setInt(1, assetCode);
+		ResultSet rs = ps.executeQuery();
 
 		while (rs.next())
 		 {
@@ -10682,10 +13006,7 @@ public String checkCategoryCodeByAssetCodeTransfer(int assetCode)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	category;
 }
 
@@ -10711,14 +13032,12 @@ public void getAssetRecords3() throws Exception {
                        "FROM AM_ASSET A " +
                        "WHERE A.asset_code = '" + asset_code + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
+       
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps  = con.prepareStatement(query);
+            ps.setString(1, asset_code);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
 
@@ -10805,27 +13124,20 @@ public void getAssetRecords3() throws Exception {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching all asset ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
     }
 }
 
 public String getDisposalSupervisor3(String asset_code, String trans_type){
-	  String query = "select super_id from am_asset_approval where asset_code ='"+asset_code+"'and tran_type ='"+trans_type+"'";
+	  String query = "select super_id from am_asset_approval where asset_code = ? and tran_type = ? ";
 	   String result="";
-	    Connection con = null;
-	        PreparedStatement ps = null;
-	        ResultSet rs = null;
-
-
-
-
-
+	  
 	        try {
-	            con = dbConnection.getConnection("legendPlus");
-	            ps = con.prepareStatement(query);
-	            rs = ps.executeQuery();
+	        	Connection con = dbConnection.getConnection("legendPlus");
+	            PreparedStatement ps  = con.prepareStatement(query);
+	            ps.setString(1, asset_code);
+	            ps.setString(2, trans_type);
+	            ResultSet rs = ps.executeQuery();
 	            while (rs.next()) {
 	                result = rs.getString(1);
 
@@ -10833,9 +13145,7 @@ public String getDisposalSupervisor3(String asset_code, String trans_type){
 
 	        } catch (Exception ex) {
 	            System.out.println("WARN: Error fetching CategoryCode ->" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
 
 	        return result;
 
@@ -10850,20 +13160,19 @@ public String[] getAssetReclassification(String assetCode){
 	 //String currentDate  = reArrangeDate(getCurrentDate1());
 	   // System.out.println("the $$$$$$$$$$$ "+currentDate);
 	    String[] result= new String[8];
-	    Connection con = null;
-	        PreparedStatement ps = null;
-	        ResultSet rs = null;
+	   
 
 	         String query = " select new_asset_id,new_category_id,new_depr_rate,new_accum_dep,new_total_life, "+
 	         				" new_remaining_life,new_dep_end_date,new_monthly_dep from  dbo.am_assetReclassification "+
-                            " where asset_code ='" +assetCode+"'";
+                            " where asset_code = ? ";
 
 
 
 	        try {
-	            con = dbConnection.getConnection("legendPlus");
-	            ps = con.prepareStatement(query);
-	            rs = ps.executeQuery();
+	        	Connection con = dbConnection.getConnection("legendPlus");
+	            PreparedStatement ps  = con.prepareStatement(query);
+	            ps.setString(1, assetCode);
+	            ResultSet rs = ps.executeQuery();
 	            while (rs.next()) {
 
 	                result[0] = rs.getString(1);
@@ -10879,9 +13188,8 @@ public String[] getAssetReclassification(String assetCode){
 
 	        } catch (Exception ex) {
 	            System.out.println("WARN: Error fetching CategoryCode ->" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
+	        
 	        return result;
 
 	}
@@ -10895,8 +13203,7 @@ public String[] getAssetReclassification(String assetCode){
 		this.oldId = oldId;
 	}
 public boolean rinsertAssetMemoRecord() throws Exception, Throwable {
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
 
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
@@ -11028,8 +13335,8 @@ public boolean rinsertAssetMemoRecord() throws Exception, Throwable {
 
 double costPriceMemo = Double.parseDouble(vat_amount) +  Double.parseDouble(vatable_cost);
 
-con = dbConnection.getConnection("legendPlus");
-ps = con.prepareStatement(createQueryMemo);
+Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps  = con.prepareStatement(createQueryMemo);
 ps.setString(1, memo_asset_id);
 ps.setString(2, registration_no);
 ps.setInt(3, Integer.parseInt(branch_id));
@@ -11119,7 +13426,7 @@ done= ps.execute();
 
                     catch (Exception r)
                     {
-                    	System.out.println("-------------------------------");
+                    //	System.out.println("-------------------------------");
                     	r.printStackTrace();
 //                    	System.out.println("-------------------------------");
 		}
@@ -11152,16 +13459,15 @@ public void getMemoAssetRecords() throws Exception {
                        "AMOUNT_PTD,AMOUNT_REM,PART_PAY,FULLY_PAID, GROUP_ID,A.BAR_CODE,A.SBU_CODE," +
                        "A.LPO,A.SUPERVISOR,A.defer_pay,A.wht_percent,A.asset_code " +
                        "FROM AM_ASSET_MEMO A " +
-                       "WHERE A.MEMO_ASSET_ID = '" + asset_id + "'";
+                       "WHERE A.MEMO_ASSET_ID = ? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps  = con.prepareStatement(query);
+            ps.setString(1, asset_id);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
 
@@ -11246,9 +13552,7 @@ public void getMemoAssetRecords() throws Exception {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching all asset ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
     }
 }  
 
@@ -11261,13 +13565,12 @@ public boolean insertRaiseEntryTransaction(String id,String Description,String d
   }else{
 	  integrifyId = approvalRec.getCodeName("select INTEGRIFY from AM_ASSET where ASSET_ID = '"+asset_id+"'"); 
   }*/
-	   Connection con = null;
-  PreparedStatement ps = null;
+	  
   String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,Trans_id,asset_code,Finacle_trans_id,debitAccountName,creditAccountName,INTEGRIFY_ID,POSTED_BY)" +
                  " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   try {
-      con = dbConnection.getConnection("legendPlus");
-      ps = con.prepareStatement(query);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
       ps.setString(1,id);
       System.out.println("========Description: "+Description);
       ps.setString(2,Description);
@@ -11296,22 +13599,20 @@ public boolean insertRaiseEntryTransaction(String id,String Description,String d
 	   done = false;
       System.out.println("WARNING:cannot insert am_raisentry_transaction->" );
       ex.printStackTrace();
-  } finally {
-      closeConnection(con, ps);
-  }
+  } 
+  
   return done;
 }
 
 public boolean updateRaiseEntryTransaction( String asset_id,String page1,String transactionId ,String iso,String Finacle_trans_id,String spare,String spare2) {
   boolean done=true;
 
-	   Connection con = null;
-  PreparedStatement ps = null;
+	
   String query = "update am_raisentry_transaction set iso=?,transaction_date=?,Finacle_trans_id=? where transactionId=?    and ASSET_ID=? and page1=? " ;
 
   try {
-  	con = dbConnection.getConnection("legendPlus");
-      ps = con.prepareStatement(query);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
       ps.setString(1,iso);
       ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
       ps.setString(3,Finacle_trans_id);
@@ -11329,31 +13630,26 @@ public boolean updateRaiseEntryTransaction( String asset_id,String page1,String 
 	   done = false;
       System.out.println("WARNING:cannot update am_raisentry_transaction->" );
       ex.printStackTrace();
-  } finally {
-  	closeConnection(con, ps);
-  }
+  } 
   return done;
 }
 
 public boolean updateRaiseEntryTransaction( String asset_id,String page1,String transactionId ,String iso,String ip_address,String tranId,String Finacle_trans_id,String spare,String spare2) {
   boolean done=true;
-  Connection con = null;
-  PreparedStatement ps = null;
+
   String query = "update am_raisentry_transaction set iso=?,transaction_date=?,system_ip=?,Finacle_trans_id=? where transactionId=?    and ASSET_ID=? and page1=? and Trans_id=?" ;
 
   try {
-  	con = dbConnection.getConnection("legendPlus");
-      ps = con.prepareStatement(query);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
       ps.setString(1,iso);
       ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
       ps.setString(3, ip_address);
-
       ps.setString(4,Finacle_trans_id);
-              ps.setString(5,transactionId);
-
+      ps.setString(5,transactionId);
       ps.setString(6,asset_id);
       ps.setString(7, page1);
-               ps.setString(8, tranId);
+      ps.setString(8, tranId);
 
 
       ps.execute();
@@ -11364,23 +13660,21 @@ public boolean updateRaiseEntryTransaction( String asset_id,String page1,String 
 	   done = false;
       System.out.println("WARNING:cannot update am_raisentry_transaction->" );
       ex.printStackTrace();
-  } finally {
-  	closeConnection(con, ps);
-  }
+  } 
+  
   return done;
 }
 
 public boolean insertRaiseEntryTransaction(String id,String Description,String debitAccount,String creditAccount,double amount,String iso,String asset_id,String page1,String transactionId,int assetCode,String Finacle_trans_id, String costdebitAcctName,String costcreditAcctName,String postedBy) {
   boolean done=true;
 
-	   Connection con = null;
-  PreparedStatement ps = null;
+	  
   String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount," +
           "creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,asset_code,Finacle_trans_id,debitAccountName,creditAccountName,POSTED_BY)" +
                  " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   try {
-      con = dbConnection.getConnection("legendPlus");
-      ps = con.prepareStatement(query);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
       ps.setString(1,id);
       ps.setString(2,Description);
       ps.setString(3, debitAccount);
@@ -11404,21 +13698,18 @@ public boolean insertRaiseEntryTransaction(String id,String Description,String d
 	   done = false;
       System.out.println("WARNING:cannot insert am_raisentry_transaction->" );
       ex.printStackTrace();
-  } finally {
-      closeConnection(con, ps);
-  }
+  } 
   return done;
 }
 public boolean updateRaiseEntryTransaction2( String asset_id,String page1,String transactionId ,String iso,String tranId,String Finacle_trans_id) {
   boolean done=true;
 
-	   Connection con = null;
-  PreparedStatement ps = null;
+	 
   String query = "update am_raisentry_transaction set iso=?,transaction_date=?,Finacle_trans_id=? where transactionId=?    and ASSET_ID=? and page1=?   and Trans_id = ? " ;
 
   try {
-  	con = dbConnection.getConnection("legendPlus");
-      ps = con.prepareStatement(query);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
       ps.setString(1,iso);
       ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
       ps.setString(3,Finacle_trans_id);
@@ -11436,9 +13727,7 @@ public boolean updateRaiseEntryTransaction2( String asset_id,String page1,String
 	   done = false;
       System.out.println("WARNING:cannot update am_raisentry_transaction->" );
       ex.printStackTrace();
-  } finally {
-  	closeConnection(con, ps);
-  }
+  } 
   return done;
 }
 
@@ -11446,13 +13735,12 @@ public boolean insertRaiseEntryTransactionTranId(String userId,String Descriptio
   boolean done=true;
 //int tranid = transId == null ? 0 : Integer.parseInt(transId);
 
-	   Connection con = null;
-  PreparedStatement ps = null;
+	
   String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip,trans_id,asset_code,Finacle_trans_id)" +
                  " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   try {
-      con = dbConnection.getConnection("legendPlus");
-      ps = con.prepareStatement(query);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
       ps.setString(1,userId);
       ps.setString(2,Description);
       ps.setString(3, debitAccount);
@@ -11476,33 +13764,28 @@ public boolean insertRaiseEntryTransactionTranId(String userId,String Descriptio
 	   done = false;
       System.out.println("WARNING:cannot insert am_raisentry_transaction insertRaiseEntryTransactionTranId ->" );
       ex.printStackTrace();
-  } finally {
-      closeConnection(con, ps);
-  }
+  } 
   return done;
 }
 public boolean updateUncapitalizedNewAssetStatus(String assetId) throws Exception {
 
-        String query = "update am_asset_uncapitalized SET  asset_status = 'ACTIVE' ,Finacle_Posted_Date= ? where asset_id ='" +assetId+"'";
+        String query = "update am_asset_uncapitalized SET  asset_status = 'ACTIVE' ,Finacle_Posted_Date= ? where asset_id = ? ";
          boolean done = true;
-        Connection con = null;
-        PreparedStatement ps = null;
 
         try {
 
 
 
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps  = con.prepareStatement(query);
             ps.setTimestamp(1, dbConnection.getDateTime(new java.util.Date()));
+            ps.setString(2, assetId);
             ps.execute();
 
         } catch (Exception ex) {
             done = false;
             System.out.println("AssetRecordsBean: updateNewAssetStatus: WARN:Error updating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
         return done;
 
     }
@@ -11511,28 +13794,25 @@ public boolean updateUncapitalizedNewAssetStatus(String assetId) throws Exceptio
 
 public String nbv(String id){
 String result="";
-    Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+    
 
          String query =
                 "SELECT nbv FROM am_asset  " +
-                "WHERE asset_id = '" + id + "' ";
+                "WHERE asset_id = ? ";
 
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 result = rs.getString(1);
             }
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching NBV ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
         return result;
 }
@@ -11541,9 +13821,7 @@ public void setUploadPendingTrans(int supervisor, String code,String AssetId,int
 //	System.out.println("setUploadPendingTrans supervisor===> "+supervisor);
 //	System.out.println("setUploadPendingTrans AssetId===> "+AssetId);	
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs; 
+  
 	  	String qrylevel =" select level from approval_level_setup  where code='"+code+"'";
   	    transaction_level = Integer.parseInt(approvalRec.getCodeName(qrylevel));
 //  	  System.out.println("setUploadPendingTrans transaction_level===> "+transaction_level);
@@ -11562,12 +13840,11 @@ String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,post
 //System.out.println("setUploadPendingTrans Query pq===> "+pq);
     try
     {
-        con = dbConnection.getConnection("legendPlus");
-
-        ps = con.prepareStatement(pq);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(pq);
 
         ps.execute();
-        dbConnection.closeConnection(con, ps);
+        //dbConnection.closeConnection(con, ps);
     }
     
     catch(Exception er)
@@ -11578,9 +13855,7 @@ String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,post
 }
 public void setUploadPendingTransArchive(String supervisor, String code,String AssetId, int AssetCode){
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs;
+
 	  	String qrylevel =" select level from approval_level_setup  where code='"+code+"'";
   	    transaction_level = Integer.parseInt(approvalRec.getCodeName(qrylevel));
   	   	
@@ -11595,12 +13870,11 @@ String pq = "insert into am_asset_approval_archive(asset_id,user_id,super_id,amo
 
     try
     {
-        con = dbConnection.getConnection("legendPlus");
-
-        ps = con.prepareStatement(pq);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(pq);
 
         ps.execute();
-        dbConnection.closeConnection(con, ps);
+        //dbConnection.closeConnection(con, ps);
     }
     catch(Exception er)
     {
@@ -11609,24 +13883,22 @@ String pq = "insert into am_asset_approval_archive(asset_id,user_id,super_id,amo
     }
 }
 
+
 public boolean setUploadCompleteTrans(String AssetId){
     //	   System.out.println("Before Update Asset Id ====  "+AssetId);
     //	   System.out.println("Before Update Asset Code ====  "+AssetCode);
-    	    Connection con = null;
-    	    PreparedStatement ps = null;
-    	    ResultSet rs = null;
+    	   
     	    boolean done;
     	    done = false;
-    	    String UpadteQuerry = "UPDATE am_asset set Asset_Status = 'ACTIVE' where ASSET_ID = '"+AssetId+"'";
+    	    String UpadteQuerry = "UPDATE am_asset set Asset_Status = 'ACTIVE' where ASSET_ID = ? ";
     	    try {
-    	        con = dbConnection.getConnection("legendPlus");
-    	        ps = con.prepareStatement(UpadteQuerry);
+    	    	Connection con = dbConnection.getConnection("legendPlus");
+    	        PreparedStatement ps = con.prepareStatement(UpadteQuerry);
+    	        ps.setString(1, AssetId);
     	        done = (ps.executeUpdate() != -1);
 
     	    } catch (Exception ex) {
     	        System.out.println("WARN: Error fetching all asset ->" + ex);
-    	    } finally {
-    	        dbConnection.closeConnection(con, ps);
     	    }
     	    return done;
     	}
@@ -11634,60 +13906,55 @@ public boolean setUploadCompleteTrans(String AssetId){
 public boolean setUncapUploadCompleteTrans(String AssetId){
     //	   System.out.println("Before Update Asset Id ====  "+AssetId);
     //	   System.out.println("Before Update Asset Code ====  "+AssetCode);
-    	    Connection con = null;
-    	    PreparedStatement ps = null;
-    	    ResultSet rs = null;
+    	   
     	    boolean done;
     	    done = false;
     	    String UpadteQuerry = "UPDATE AM_ASSET_UNCAPITALIZED set Asset_Status = 'ACTIVE' where ASSET_ID = '"+AssetId+"'";
     	    try {
-    	        con = dbConnection.getConnection("legendPlus");
-    	        ps = con.prepareStatement(UpadteQuerry);
+    	    	Connection con = dbConnection.getConnection("legendPlus");
+    	        PreparedStatement ps = con.prepareStatement(UpadteQuerry);
+    	        ps.setString(1, AssetId);
     	        done = (ps.executeUpdate() != -1);
 
     	    } catch (Exception ex) {
     	        System.out.println("WARN: Error fetching all asset ->" + ex);
-    	    } finally {
-    	        dbConnection.closeConnection(con, ps);
-    	    }
+    	    } 
     	    return done;
     	}
 public boolean setUpdateUploadTrans(String groupid,String userid){
-    	    Connection con = null;
-    	    PreparedStatement ps = null;
-    	    ResultSet rs = null;
+    	    
     	    boolean done;
     	    done = false;    	    
-    	    String UpadteQuerry = "update am_group_asset set process_flag = 'Y' where  GROUP_ID='"+groupid+"' AND USER_ID='"+userid+"'";
+    	    String UpadteQuerry = "update am_group_asset set process_flag = ? where  GROUP_ID=? AND USER_ID=? ";
     	    try {
-    	        con = dbConnection.getConnection("legendPlus");
-    	        ps = con.prepareStatement(UpadteQuerry);
+    	    	Connection con = dbConnection.getConnection("legendPlus");
+    	        PreparedStatement ps = con.prepareStatement(UpadteQuerry);
+    	        ps.setString(1, "Y");
+    	        ps.setString(2, groupid);
+    	        ps.setString(3, userid);
     	        done = (ps.executeUpdate() != -1);
 
     	    } catch (Exception ex) {
     	        System.out.println("WARN: Error Updateing all Am asset Group ->" + ex);
-    	    } finally {
-    	        dbConnection.closeConnection(con, ps);
-    	    }
+    	    } 
     	    return done;
     	}      
 public boolean setUpdateUnccapUploadTrans(String groupid,String userid){
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+    
     boolean done;
     done = false;    	    
-    String UpadteQuerry = "update AM_GROUP_ASSET_UNCAPITALIZED set process_flag = 'Y' where  GROUP_ID='"+groupid+"' AND USER_ID='"+userid+"'";
+    String UpadteQuerry = "update AM_GROUP_ASSET_UNCAPITALIZED set process_flag = ? where  GROUP_ID=? AND USER_ID=? ";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(UpadteQuerry);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(UpadteQuerry);
+        ps.setString(1, "Y");
+        ps.setString(2, groupid);
+        ps.setString(3, userid);
         done = (ps.executeUpdate() != -1);
 
     } catch (Exception ex) {
         System.out.println("WARN: Error Updateing all Am asset Group Uncapitalized ->" + ex);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
     return done;
 }      
 
@@ -11696,9 +13963,7 @@ public void setInsertGroupMainTrans(int quantity){
 //	System.out.println("setUploadPendingTrans quantity===> "+quantity);
 //	System.out.println("setUploadPendingTrans AssetId===> "+AssetId);	
     int transaction_level=0;
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs; 
+ 
     boolean done = false;
 //	  	String qrylevel =" select level from approval_level_setup  where code='"+code+"'";
 //  	    transaction_level = Integer.parseInt(approvalRec.getCodeName(qrylevel));
@@ -11715,8 +13980,8 @@ String insertquery = "insert into AM_GROUP_ASSET_MAIN(QUANTITY,BRANCH_ID,DEPT_ID
 //System.out.println("setUploadPendingTrans Query pq===> "+pq);
     try
     {
-    	con = getConnection();
-    	ps = con.prepareStatement(insertquery);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(insertquery);
     	ps.setInt(1, quantity);    
     	ps.setInt(2, '1');
     	ps.setInt(3, '1');
@@ -11762,22 +14027,19 @@ String insertquery = "insert into AM_GROUP_ASSET_MAIN(QUANTITY,BRANCH_ID,DEPT_ID
     catch(Exception er)
     {
         System.out.println(">>>AssetRecordBeans:setInsertGroupMainTrans(>>>>>>" + er);
-    } finally {
-	     dbConnection.closeConnection(con, ps);
-  }
+    } 
     
 }
 
 public boolean revaluationsumation( String asset_id,int assetCode,double amount) {
   boolean done=true;
 
-	   Connection con = null;
-  PreparedStatement ps = null;
+	   
   String query = "update am_raisentry_transaction set Revalue_Cost = Revalue_Cost + ? where ASSET_ID=? " ;
 
   try {
-  	con = dbConnection.getConnection("legendPlus");
-      ps = con.prepareStatement(query);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps = con.prepareStatement(query);
       ps.setDouble(1, amount);
       ps.setString(2,asset_id);
       ps.execute();
@@ -11788,18 +14050,14 @@ public boolean revaluationsumation( String asset_id,int assetCode,double amount)
 	   done = false;
       System.out.println("WARNING:cannot update am_raisentry_transaction->" );
       ex.printStackTrace();
-  } finally {
-  	closeConnection(con, ps);
-  }
+  } 
   return done;
 }
 public void setInsertGroupUncapitalizedMainTrans(int quantity){
 //	System.out.println("setUploadPendingTrans supervisor===> "+supervisor);
 //	System.out.println("setUploadPendingTrans AssetId===> "+AssetId);	
     int transaction_level=0;
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null; 
+    
     boolean done = false;
 //	  	String qrylevel =" select level from approval_level_setup  where code='"+code+"'";
 //  	    transaction_level = Integer.parseInt(approvalRec.getCodeName(qrylevel));
@@ -11816,8 +14074,8 @@ String insertquery = "insert into AM_GROUP_ASSET_MAIN(QUANTITY,BRANCH_ID,DEPT_ID
 //System.out.println("setInsertGroupUncapitalizedMainTrans Query pq===> "+insertquery);
     try
     {
-    	con = getConnection();
-    	ps = con.prepareStatement(insertquery);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(insertquery);
     	ps.setInt(1, quantity);    
     	ps.setInt(2, '1');
     	ps.setInt(3, '1');
@@ -11863,8 +14121,6 @@ String insertquery = "insert into AM_GROUP_ASSET_MAIN(QUANTITY,BRANCH_ID,DEPT_ID
     {
         System.out.println(">>>AssetRecordBeans:setInsertGroupUncapitalizedMainTrans(>>>>>>" + er);
 
-    }finally {
-        closeConnection(con, ps);
     }
 }
 
@@ -11872,9 +14128,7 @@ public void setUploadUncapitalPendingTrans(int supervisor, String code,String As
 //	System.out.println("setUploadPendingTrans supervisor===> "+supervisor);
 //	System.out.println("setUploadPendingTrans AssetId===> "+AssetId);	
     int transaction_level=0;
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null; 
+    
 	  	String qrylevel =" select level from approval_level_setup  where code='"+code+"'";
   	    transaction_level = Integer.parseInt(approvalRec.getCodeName(qrylevel));
 //  	  System.out.println("setUploadPendingTrans transaction_level===> "+transaction_level);
@@ -11888,9 +14142,8 @@ String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,post
 //System.out.println("setUploadPendingTrans Query pq===> "+pq);
     try
     {
-        con = dbConnection.getConnection("legendPlus");
-
-        ps = con.prepareStatement(pq);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(pq);
 
         ps.execute();
 
@@ -11899,9 +14152,7 @@ String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,post
     {
         System.out.println(">>>AssetRecordBeans:setUploadPendingTrans(>>>>>>" + er);
 
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
 }
 public void getUncapitalizedAssetRecords() throws Exception {
 
@@ -11924,14 +14175,12 @@ public void getUncapitalizedAssetRecords() throws Exception {
                        "FROM AM_ASSET_UNCAPITALIZED A " +
                        "WHERE A.ASSET_ID = '" + asset_id + "'";
  //       System.out.println("Query getUncapitalizedAssetRecords>>>> "+query);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
 
@@ -12018,9 +14267,7 @@ public void getUncapitalizedAssetRecords() throws Exception {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching all asset ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
     }
 }
 
@@ -12028,76 +14275,57 @@ public void getUncapitalizedAssetRecords() throws Exception {
 public void updateAssetPendingTrans(String batchId){
 String query_r ="update AM_GROUP_ASSET set process_flag='Y' where GROUP_ID = '"+batchId+"'";
 
-Connection con = null;
-        PreparedStatement ps = null;
-
 try {
-    con = dbConnection.getConnection("legendPlus");
-
-
-ps = con.prepareStatement(query_r);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query_r);
            int i =ps.executeUpdate();
         } catch (Exception ex) {
             System.out.println("AssetRecordBean: updateAssetPendingTrans()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 }
 
 public void updateAssetBidPendingTrans(String batchId){
-String query_r ="update AM_GROUP_ASSET_BID set process_flag='Y' where GROUP_ID = '"+batchId+"'";
-
-Connection con = null;
-        PreparedStatement ps = null;
+String query_r ="update AM_GROUP_ASSET_BID set process_flag='Y' where GROUP_ID = ? ";
 
 try {
-    con = dbConnection.getConnection("legendPlus");
-
-
-ps = con.prepareStatement(query_r);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query_r);
+    ps.setString(1, batchId);
            int i =ps.executeUpdate();
         } catch (Exception ex) {
             System.out.println("AssetRecordBean: updateAssetBidPendingTrans()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 }
 
 public void updateAsset2PendingTrans(String batchId){
-String query_r ="update AM_GROUP_ASSET2 set process_flag='Y' where GROUP_ID = '"+batchId+"'";
-
-Connection con = null;
-        PreparedStatement ps = null;
+String query_r ="update AM_GROUP_ASSET2 set process_flag='Y' where GROUP_ID = ? ";
 
 try {
-    con = dbConnection.getConnection("legendPlus");
-    ps = con.prepareStatement(query_r);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query_r);
+    ps.setString(1, batchId);
            int i =ps.executeUpdate();
         } catch (Exception ex) {
   
             System.out.println("AssetRecordBean: updateAssetPendingTrans() for Asset2>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 }
 
 public void updateUncapitalizedAssetPendingTrans(String batchId){
-String query_r ="update AM_GROUP_ASSET_UNCAPITALIZED set process_flag='Y' where GROUP_ID = '"+batchId+"'";
+String query_r ="update AM_GROUP_ASSET_UNCAPITALIZED set process_flag='Y' where GROUP_ID = ? ";
 //System.out.println("query_r updateUncapitalizedAssetPendingTrans>>>> "+query_r);
-		Connection con = null;
-        PreparedStatement ps = null;
+		
 try {
-    con = dbConnection.getConnection("legendPlus");
-    ps = con.prepareStatement(query_r);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query_r);
+    ps.setString(1, batchId);
            int i =ps.executeUpdate();
         } catch (Exception ex) {
             System.out.println("AssetRecordBean: updateUncapitalizedAssetPendingTrans()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 }
 
 public void updateamgroupassetmainTotal(int quantity,String batchId,double total, int supervisor,String branchcode,int userid,String deptcode){
@@ -12105,21 +14333,16 @@ public void updateamgroupassetmainTotal(int quantity,String batchId,double total
 			"cost_price = "+total+", branch_code='"+branchcode+"',user_id="+userid+", dept_code='"+deptcode+"', " +
 					"quantity = "+quantity+" where GROUP_ID = '"+batchId+"'";
 //	System.out.println("query_r updateamgroupassetmainTotal>>>> "+query_r);
-	Connection con = null;
-	        PreparedStatement ps = null;
+
 
 	try { 
-	    con = dbConnection.getConnection("legendPlus");
-
-
-	ps = con.prepareStatement(query_r);
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps= con.prepareStatement(query_r);
 	           int i =ps.executeUpdate();
 	        } catch (Exception ex) {  
 
 	            System.out.println("AssetRecordBean: updateamgroupassetmainTotal()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
 	}
 
 public void updateamgroupasset2mainTotal(int quantity,String batchId,double total, int supervisor,String branchcode,int userid,String deptcode){
@@ -12127,20 +14350,15 @@ public void updateamgroupasset2mainTotal(int quantity,String batchId,double tota
 			"cost_price = "+total+", branch_code="+branchcode+",user_id="+userid+", dept_code="+deptcode+", " +
 					"quantity = "+quantity+" where GROUP_ID = '"+batchId+"'";
 //	System.out.println("query_r updateamgroupasset2mainTotal>>>> "+query_r);
-	Connection con = null;
-	        PreparedStatement ps = null;
+
 
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-
-
-	ps = con.prepareStatement(query_r);
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query_r);
 	           int i =ps.executeUpdate();
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: updateamgroupasset2mainTotal()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
 	        }
 
 
@@ -12158,16 +14376,14 @@ public String bulkAssetTransfer(java.util.ArrayList list) {
 				 "WHERE ASSET_ID=? ";
  
 String mtidassetcode = "";
-Connection con = null;
-PreparedStatement ps = null;  
-ResultSet rs = null;
+
 magma.AssetRecordsBean bd = null;
 String mtid = "";
 int assetcode = 0;
 int[] d = null;
 try {
-	con = getConnection();
-	ps = con.prepareStatement(query);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query);
 
 	for (int i = 0; i < list.size(); i++) {
 		bd = (magma.AssetRecordsBean) list.get(i);
@@ -12240,9 +14456,7 @@ try {
 
 } catch (Exception ex) {
 	System.out.println("Error Updating asset for Transfer ->" + ex);
-} finally {
-	closeConnection(con, ps);
-}
+} 
 mtidassetcode =mtid+String.valueOf(assetcode);
 //System.out.println("bulkAssetTransfer mtidassetcode: "+mtidassetcode);
 return mtidassetcode;
@@ -12260,14 +14474,12 @@ public boolean bulkAssetTransfer(java.util.ArrayList list,String newAsset_id) {
                    "WHERE ASSET_ID=? ";
 
 
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+
 magma.AssetRecordsBean bd = null;
 int[] d = null;
 try {
-	con = getConnection();
-	ps = con.prepareStatement(query);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query);
 
 	for (int i = 0; i < list.size(); i++) {
 		bd = (magma.AssetRecordsBean) list.get(i);
@@ -12333,9 +14545,7 @@ try {
 
 } catch (Exception ex) {
 	System.out.println("Error Updating asset for Transfer ->" + ex);
-} finally {
-	closeConnection(con, ps);
-}
+} 
 
 return (d.length > 0);
 
@@ -12343,9 +14553,7 @@ return (d.length > 0);
 
 public String accountReturn(String assetId) {
 
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+  
     String accountNo = "";
 //    String query = "select c.category_name,(d.country_prefix + d.dr_prefix + b.branch_code + c.Dep_ledger) AS DRACCT,(d.country_prefix + "+
 //    		"d.cr_prefix + b.branch_code + c.Accum_Dep_ledger) AS CRACCT,sum(a.monthly_dep),d.processing_date from "+
@@ -12359,10 +14567,10 @@ public String accountReturn(String assetId) {
 
     
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query);
         ps.setString(1, assetId);
-        rs = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
 
         while (rs.next()) {
 			String dracct = rs.getString("DRACCT");
@@ -12374,9 +14582,7 @@ public String accountReturn(String assetId) {
     } catch (Exception ex) {
         System.out.println("WARN: Error determining  DR & CR accountReturn->" +
                            ex);
-    } finally { 
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
 
     return accountNo;
 }
@@ -12389,17 +14595,15 @@ public String bulkAssetTransferUpdate(java.util.ArrayList list) {
 				 "WHERE transfer_id=? ";
 //System.out.println("bulkAssetTransferUpdate query: "+query);
 String mtidassetcode = "";
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+
 magma.AssetRecordsBean bd = null;
 String mtid = "";
 String newmtid = "";
 int assetcode = 0;
 int[] d = null;
 try {
-	con = getConnection();
-	ps = con.prepareStatement(query);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query);
 
 	for (int i = 0; i < list.size(); i++) {
 		bd = (magma.AssetRecordsBean) list.get(i);
@@ -12417,9 +14621,7 @@ try {
 
 } catch (Exception ex) {
 	System.out.println("Error Updating asset for Transfer ->" + ex);
-} finally {
-	closeConnection(con, ps);
-}
+} 
 mtidassetcode =mtid+String.valueOf(assetcode);
 return mtidassetcode;
 
@@ -12444,17 +14646,11 @@ System.out.println("branch "+branch);*/
 String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'EX'");
 String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
 
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
-
 try {
 
-	con = dbConnection.getConnection("legendPlus");
-
-	ps = con.prepareStatement(query);
-
-	rs = ps.executeQuery();
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query);
+	ResultSet rs = ps.executeQuery();
 
 	if (rs.next())
 	 {
@@ -12469,10 +14665,7 @@ try {
 	 er.printStackTrace();
 
 	}
-	finally
-	{
-		dbConnection.closeConnection(con, ps);
-	}
+	
 return 	assetAcqusitionSuspense;
 }
 
@@ -12493,19 +14686,15 @@ System.out.println("branch "+branch);*/
 //			+" and d.branch_code = '"+branch+"'";
 //System.out.println("query in checkAccounAcqusitionSuspense >>>> " + query);
 String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'DEPCR'");
-String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
-
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+String query = script+" and a.category_code = ? and d.branch_code = ? ";
 
 try {
 
-	con = dbConnection.getConnection("legendPlus");
-
-	ps = con.prepareStatement(query);
-
-	rs = ps.executeQuery();
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(query);
+    ps.setString(1, category);
+    ps.setString(2, branch);
+    ResultSet rs = ps.executeQuery();
 
 	if (rs.next())
 	 {
@@ -12520,23 +14709,18 @@ try {
 	 er.printStackTrace();
 
 	}
-	finally
-	{
-		dbConnection.closeConnection(con, ps);
-	}
+	
 return 	assetAcqusitionSuspense;
 }
 
 public boolean insertVendorTransaction(String userId,String Description,String debitAccount,String creditAccount,double amount,String location,String transactionId,String transactionType,String projectCode,String vendorCode) {
 	  boolean done=true;
 
-		   Connection con = null; 
-	  PreparedStatement ps = null;
 	  String query = "INSERT INTO [VENDOR_TRANSACTIONS](USER_ID,DESCRIPTION,DRACCOUNT_NO,CRACCOUNT_NO,COST_PRICE,LOCATION,TRANS_ID,TRANSACTION_TYPE,TRANSACTION_DATE,PROJECT_CODE,VENDOR_CODE)" +
 	                 " VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 	  try {
-	      con = dbConnection.getConnection("legendPlus");
-	      ps = con.prepareStatement(query);
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query);
 	      ps.setString(1,userId);
 	      ps.setString(2,Description);
 	      ps.setString(3, debitAccount);
@@ -12556,33 +14740,28 @@ public boolean insertVendorTransaction(String userId,String Description,String d
 		   done = false;
 	      System.out.println("WARNING:cannot insert vendor_transaction table->" );
 	      ex.printStackTrace();
-	  } finally {
-	      closeConnection(con, ps);
-	  }
+	  } 
 	  return done;
 	}
 
 public void updateamgroupassetImprovement(String groupId){
-	String query_r ="UPDATE AM_GROUP_IMPROVEMENT SET IMPROVED='P' WHERE REVALUE_ID = '"+groupId+"'";
+	String query_r ="UPDATE AM_GROUP_IMPROVEMENT SET IMPROVED='P' WHERE REVALUE_ID = ? ";
 	String query_del ="DELETE FROM AM_GROUP_IMPROVEMENT WHERE REVALUE_ID = '"+groupId+"'";
 //	System.out.println("query_r updateamgroupassetImprovement>>>> "+query_r);
-	Connection con = null;
-	        PreparedStatement ps = null;
-	        PreparedStatement ps1 = null;
+	
  
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	    	ps = con.prepareStatement(query_r);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query_r);
+	        ps.setString(1, groupId);
 	           int i =ps.executeUpdate();
 //	       	ps1 = con.prepareStatement(query_del);
 //	           int j =ps1.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: updateamgroupassetImprovement()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	            dbConnection.closeConnection(con, ps1);
-	        }
+	        } 
 
 
 	}
@@ -12660,49 +14839,44 @@ public void updateamgroupassetImprovement(String groupId){
                 "AM_ASSET.Description = am_gb_workbookselection.Description, AM_ASSET.BAR_CODE = am_gb_workbookselection.BAR_CODE, " +
                 "AM_ASSET.ASSET_USER = am_gb_workbookselection.ASSET_USER " +
                 "FROM AM_ASSET  INNER JOIN  am_gb_workbookselection ON AM_ASSET.ASSET_ID = am_gb_workbookselection.ASSET_ID " +
-                "AND am_gb_workbookselection.batch_id = "+tranId+" AND am_gb_workbookselection.PROCESS_STATUS = 'APPROVED'" ;
+                "AND am_gb_workbookselection.batch_id = ? AND am_gb_workbookselection.PROCESS_STATUS = 'APPROVED'" ;
 	//   System.out.println("query bulkAssetUpdateFromVerification>>>> "+query);
-	   Connection con = null;
-	           PreparedStatement ps = null;
+	  
 	           boolean result=true;
 	   try {
-	       con = dbConnection.getConnection("legendPlus");
 
-
-	   ps = con.prepareStatement(query);
+			  Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps  = con.prepareStatement(query);
+		        ps.setLong(1, tranId);
 	              int i =ps.executeUpdate();
 	           } catch (Exception ex) {
 
 	               System.out.println("AssetRecordBean: bulkAssetUpdateFromVerification()>>>>>" + ex);
-	           } finally {
-	               dbConnection.closeConnection(con, ps);
-	           }
+	           } 
 	   return result;
 
 	   }
 
 
 public void updateFleetGroupUpload(String groupId){
-	String query_r ="UPDATE FT_GROUP_DUE_PERIOD SET IMPROVED='P' WHERE GROUP_ID = '"+groupId+"'";
-	String query_del ="DELETE FROM FT_GROUP_DUE_PERIOD WHERE GROUP_ID = '"+groupId+"'";
+	String query_r ="UPDATE FT_GROUP_DUE_PERIOD SET IMPROVED='P' WHERE GROUP_ID = ? ";
+	String query_del ="DELETE FROM FT_GROUP_DUE_PERIOD WHERE GROUP_ID = ? ";
 //	System.out.println("query_r updateFleetGroupUpload>>>> "+query_r);
-	Connection con = null;
-	        PreparedStatement ps = null;
-	        PreparedStatement ps1 = null;
+	
  
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	    	ps = con.prepareStatement(query_r);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_r);
+	        ps.setString(1, groupId);
 	           int i =ps.executeUpdate();
-	       	ps1 = con.prepareStatement(query_del);
+	      PreparedStatement ps1 = con.prepareStatement(query_del);
+	      ps1.setString(1, groupId);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: updateFleetGroupUpload()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	            dbConnection.closeConnection(con, ps1);
-	        }
+	        } 
 	}
 
  
@@ -12712,19 +14886,19 @@ public String[] setApprovalDataTranType(String id,String asset_id,String tranTyp
  //String currentDate  = reArrangeDate(getCurrentDate1());
  //  System.out.println("the $$$$$$$$$$$ id: "+id+"  asset_id: "+asset_id+"   tranType: "+tranType+"  supervisor: "+supervisor+"   userId: "+userId+"  amount: "+amount);
     String[] result= new String[12];
-    Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+   
 
          String query ="select asset_id,user_ID,supervisor,Cost_Price,Posting_Date," +
-                 " description,effective_date,BRANCH_CODE,Asset_Status from am_asset where asset_id ='" +asset_id+"'";
+                 " description,effective_date,BRANCH_CODE,Asset_Status from am_asset where asset_id = ? ";
 
 
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(query);
+  	        ps.setString(1, asset_id);
+           ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 //
             	result[0] = rs.getString(1);
@@ -12745,9 +14919,7 @@ public String[] setApprovalDataTranType(String id,String asset_id,String tranTyp
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching setApprovalDataTranType ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 result[9] = tranType;
 result[10] = "P";
 //result[11] = timeInstance();
@@ -12786,23 +14958,16 @@ result[10] = "P";
 ////		System.out.println("query in checkAssetLedgerAccount >>>> " + query);
 		String query = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'FTACT'");
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
 
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			  Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps  = con.prepareStatement(query);
+		        ResultSet rs = ps.executeQuery();
 
 			if (rs.next())
 			 {
-
 				 assetledgeraccount  = rs.getString("asd");
-
 
 			 }
 		   }
@@ -12811,10 +14976,7 @@ result[10] = "P";
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	assetledgeraccount;
 	}
 
@@ -12823,24 +14985,18 @@ public String setPendingTransforAssetProof(String[] a, String code,String mtid){
 //	System.out.println("====code 1====> "+code);
     String mtid_id ="";
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
  String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
          "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
          "transaction_level) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+     
         try
         {
-            con = dbConnection.getConnection("legendPlus");
 
-
-            /////////////To get transaction level
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+             ResultSet rs = ps.executeQuery();
 
 
             while(rs.next()){
@@ -12884,9 +15040,6 @@ public String setPendingTransforAssetProof(String[] a, String code,String mtid){
         {
             System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTransforAssetProof Two 2>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
 
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
@@ -12903,23 +15056,19 @@ public boolean bulkAssetUpdateFromProof(String prooftranId){
             "AM_ASSET.Description = am_Asset_Proof_Selection.Description, AM_ASSET.BAR_CODE = am_Asset_Proof_Selection.BAR_CODE, " +
             "AM_ASSET.ASSET_USER = am_Asset_Proof_Selection.ASSET_USER " +
             "FROM AM_ASSET  INNER JOIN  am_Asset_Proof_Selection ON AM_ASSET.ASSET_ID = am_Asset_Proof_Selection.ASSET_ID " +
-            "AND am_Asset_Proof_Selection.batch_id = '"+prooftranId+"' AND am_Asset_Proof_Selection.PROCESS_STATUS = 'APPROVED'" ;
+            "AND am_Asset_Proof_Selection.batch_id = ? AND am_Asset_Proof_Selection.PROCESS_STATUS = 'APPROVED'" ;
 //   System.out.println("query bulkAssetUpdateFromVerification>>>> "+query);
-   Connection con = null;
-           PreparedStatement ps = null;
+ 
            boolean result=true;
    try {
-       con = dbConnection.getConnection("legendPlus");
-
-
-   ps = con.prepareStatement(query);
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query);
+	        ps.setString(1, prooftranId);
               int i =ps.executeUpdate();
            } catch (Exception ex) {
 
                System.out.println("AssetRecordBean: bulkAssetUpdateFromProof()>>>>>" + ex);
-           } finally {
-               dbConnection.closeConnection(con, ps);
-           }
+           } 
    return result;
 
    }
@@ -12927,24 +15076,18 @@ public boolean bulkAssetUpdateFromProof(String prooftranId){
 public void setPendingTransDisposal(String[] a, String code,int assetCode,String batchId){
 
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs;
+    
 String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
      "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
      "transaction_level,asset_code) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-    con = null;
-    ps = null;
-    rs = null;
+   
     try
     {
-        con = dbConnection.getConnection("legendPlus");
 
-
-        /////////////To get transaction level
-         ps = con.prepareStatement(tranLevelQuery);
-          rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+         ResultSet rs = ps.executeQuery();
 
 
         while(rs.next())
@@ -12989,9 +15132,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
     catch(Exception er)
     {
         System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTrans setPendingTransDisposal>>>>>>" + er);
-
-    }finally{
-    dbConnection.closeConnection(con, ps);
 
     }
 
@@ -13049,8 +15189,7 @@ public int insertAssetTwoRecord() throws Exception, Throwable {
 private void rinsertAssetTwoRecord(String assetId) throws Exception, Throwable {
 // asset_id = new legend.AutoIDSetup().getIdentity(branch_id,
       //  department_id, section_id, category_id);
-Connection con = null;
-PreparedStatement ps = null;
+
 boolean done = true;
 AssetPaymentManager payment = null;
 /*if (require_redistribution.equalsIgnoreCase("Y")) {
@@ -13182,8 +15321,9 @@ try {
     double costPrice = Double.parseDouble(vat_amount) +
                        Double.parseDouble(vatable_cost);
 
-    con = dbConnection.getConnection("legendPlus");
-    ps = con.prepareStatement(createQuery);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(createQuery);
     ps.setString(1, assetId);
     ps.setString(2, registration_no);
     ps.setInt(3, Integer.parseInt(branch_id));
@@ -13271,9 +15411,7 @@ try {
 } catch (Exception ex) {
     done = false;
     System.out.println("WARN:Error inserting into  asset two creation archive->" + ex);
-} finally {
-    dbConnection.closeConnection(con, ps);
-}
+} 
 
 // return done;
 }
@@ -13303,14 +15441,13 @@ public void getAssetTwoRecords() throws Exception {
                        "A.WAREHOUSE_CODE, A.ITEM_CODE,A.ITEMTYPE,A.PROJECT_CODE,REGION_CODE FROM AM_ASSET2 A " +
                        "WHERE A.ASSET_ID = '" + asset_id + "'";
 //		System.out.println("getAssetRecords query: "+query);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+      
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query); 
-            rs = ps.executeQuery();
+
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(query); 
+           ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
 
@@ -13410,9 +15547,7 @@ public void getAssetTwoRecords() throws Exception {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching all asset ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
     }
 }
 
@@ -13422,16 +15557,16 @@ public String[] setApprovalDataGroupAsset2(long id){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
    String[] result= new String[12];
-    Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+  
          String query ="select group_id,user_ID,supervisor,Cost_Price,Posting_Date," +
          		"		description,effective_date,BRANCH_CODE," +
-         				"Asset_Status from am_group_asset2_main where group_id =" +id ;
+         				"Asset_Status from am_group_asset2_main where group_id = ? " ;
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(query);
+  	        ps.setLong(1, id);
+           ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 result[0] = String.valueOf(id);
                 result[1]= rs.getString(2);
@@ -13447,9 +15582,7 @@ public String[] setApprovalDataGroupAsset2(long id){
 //            System.out.println("Final Conversion for Asset2");
         } catch (Exception ex) {
             System.out.println("AssetRecordsBean : setApprovalDataGroupAsset2()WARN: Error setting approval data for group asset2 creation ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
         	result[9] = "Group Asset2 Creation";
         	result[10] = "P";
 //result[11] = timeInstance();
@@ -13460,9 +15593,7 @@ public String[] setApprovalDataGroupAsset2(long id){
 
 public void setInsertAsset2GroupMainTrans(int quantity){
     int transaction_level=0;
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs; 
+  
     boolean done = false;
 
 SimpleDateFormat timer = new SimpleDateFormat("kk:mm:ss");
@@ -13477,8 +15608,9 @@ String insertquery = "insert into AM_GROUP_ASSET2_MAIN(QUANTITY,BRANCH_ID,DEPT_I
 //System.out.println("setUploadPendingTrans Query pq===> "+pq);
     try
     {
-    	con = getConnection();
-    	ps = con.prepareStatement(insertquery);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(insertquery);
     	ps.setInt(1, quantity);    
     	ps.setInt(2, '1');
     	ps.setInt(3, '1');
@@ -13524,9 +15656,7 @@ String insertquery = "insert into AM_GROUP_ASSET2_MAIN(QUANTITY,BRANCH_ID,DEPT_I
     catch(Exception er)
     {
         System.out.println(">>>AssetRecordBeans:setInsertAsset2GroupMainTrans(>>>>>>" + er);
-    } finally {
-	     dbConnection.closeConnection(con, ps);
-  }
+    } 
     
 }
 
@@ -13542,16 +15672,15 @@ public String bulkAsset2Transfer(java.util.ArrayList list) {
 				 "WHERE ASSET_ID=? ";
  
 String mtidassetcode = "";
-Connection con = null;
-PreparedStatement ps = null;  
-ResultSet rs = null;
+
 magma.AssetRecordsBean bd = null;
 String mtid = "";
 int assetcode = 0;
 int[] d = null;
 try {
-	con = getConnection();
-	ps = con.prepareStatement(query);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
 
 	for (int i = 0; i < list.size(); i++) {
 		bd = (magma.AssetRecordsBean) list.get(i);
@@ -13624,9 +15753,7 @@ try {
 
 } catch (Exception ex) {
 	System.out.println("Error Updating asset2 for Transfer ->" + ex);
-} finally {
-	closeConnection(con, ps);
-}
+} 
 mtidassetcode =mtid+String.valueOf(assetcode);
 System.out.println("bulkAsset2Transfer mtidassetcode: "+mtidassetcode);
 return mtidassetcode;
@@ -13645,14 +15772,13 @@ public boolean bulkAsset2Transfer(java.util.ArrayList list,String newAsset_id) {
                    "WHERE ASSET_ID=? ";
 
 
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+
 magma.AssetRecordsBean bd = null;
 int[] d = null;
 try {
-	con = getConnection();
-	ps = con.prepareStatement(query);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
 
 	for (int i = 0; i < list.size(); i++) {
 		bd = (magma.AssetRecordsBean) list.get(i);
@@ -13718,9 +15844,7 @@ try {
 
 } catch (Exception ex) {
 	System.out.println("Error Updating asset2 for Transfer ->" + ex);
-} finally {
-	closeConnection(con, ps);
-}
+} 
 
 return (d.length > 0);
 
@@ -13750,16 +15874,16 @@ public void getAsset2Records() throws Exception {
                        "A.LPO,A.SUPERVISOR,A.defer_pay,A.wht_percent,A.asset_code,A.memo,A.memovalue, " +
                        "A.IMPROV_NBV,A.IMPROV_ACCUMDEP,A.IMPROV_COST,A.IMPROV_MONTHLYDEP,A.TOTAL_NBV, " +
                        "A.WAREHOUSE_CODE, A.ITEM_CODE,A.ITEMTYPE,A.PROJECT_CODE,REGION_CODE FROM AM_ASSET2 A " +
-                       "WHERE A.ASSET_ID = '" + asset_id + "'";
+                       "WHERE A.ASSET_ID = ? ";
 //		System.out.println("getAssetRecords query: "+query);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(query);
+  	        ps.setString(1, asset_id);
+           ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
 
@@ -13859,9 +15983,7 @@ public void getAsset2Records() throws Exception {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching all asset2 ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
     }
 }
 
@@ -13874,17 +15996,16 @@ public String bulkAsset2TransferUpdate(java.util.ArrayList list) {
 				 "WHERE transfer_id=? ";
 System.out.println("bulkAsset2TransferUpdate query: "+query);
 String mtidassetcode = "";
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+
 magma.AssetRecordsBean bd = null;
 String mtid = "";
 String newmtid = "";
 int assetcode = 0;
 int[] d = null;
 try {
-	con = getConnection();
-	ps = con.prepareStatement(query);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
 
 	for (int i = 0; i < list.size(); i++) {
 		bd = (magma.AssetRecordsBean) list.get(i);
@@ -13902,9 +16023,7 @@ try {
 
 } catch (Exception ex) {
 	System.out.println("Error Updating asset2 for Transfer ->" + ex);
-} finally {
-	closeConnection(con, ps);
-}
+} 
 mtidassetcode =mtid+String.valueOf(assetcode);
 return mtidassetcode;
 
@@ -13927,14 +16046,13 @@ return mtidassetcode;
                       "WHERE ASSET_ID=? ";
 
 
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 	magma.AssetRecordsBean bd = null;
 	int[] d = null;
 	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
 
 		for (int i = 0; i < list.size(); i++) {
 			bd = (magma.AssetRecordsBean) list.get(i);
@@ -14069,9 +16187,7 @@ return mtidassetcode;
 
 	} catch (Exception ex) {
 		System.out.println("Error Updating all asset2 ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
 
 	return (d.length > 0);
     
@@ -14082,21 +16198,17 @@ return mtidassetcode;
 
    String mtid_id ="";
        int transaction_level=0; 
-       Connection con;
-       PreparedStatement ps;
-       ResultSet rs;
 String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
         "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
         "transaction_level,asset_code,trans_type,VATABLE_COST) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-       con = null;
-       ps = null;
-       rs = null;  
+       
        try
        {
-           con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(tranLevelQuery);
-             rs = ps.executeQuery();
+
+ 		  Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(tranLevelQuery);
+ 	       ResultSet rs = ps.executeQuery();
            while(rs.next()){
            transaction_level = rs.getInt(1);
 
@@ -14132,10 +16244,8 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
        {
            System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTrans2 with Four Parameters>>>>>>" + er);
 
-       }finally{
-       dbConnection.closeConnection(con, ps);
-
        }
+       
        return mtid_id;
 
    }
@@ -14161,17 +16271,14 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 	     String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS5'");
 	     String query = script+" and d.branch_code = '"+branch+"'";
 	     
- 		Connection con = null;
- 		PreparedStatement ps = null;
- 		ResultSet rs = null;
+ 		
 
  		try {
 
- 			con = dbConnection.getConnection("legendPlus");
 
- 			ps = con.prepareStatement(query);
-
- 			rs = ps.executeQuery();
+ 			  Connection con = dbConnection.getConnection("legendPlus");
+ 		        PreparedStatement ps  = con.prepareStatement(query);
+ 			ResultSet rs = ps.executeQuery();
 
  			if (rs.next())
  			 { 
@@ -14186,10 +16293,7 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
  			 er.printStackTrace();
 
  			}
- 			finally
- 			{
- 				dbConnection.closeConnection(con, ps);
- 			}
+ 			
  	return 	assetledgeraccount;
  	}
 
@@ -14212,17 +16316,14 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 		String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'WHTSTKCR'");
 		String query = script+" and d.branch_code = '"+branch+"'";
 		
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
 
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			  Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps  = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 
 			if (rs.next())
 			 {
@@ -14237,10 +16338,7 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	assetAcqusitionSuspense;
 	}
 
@@ -14274,17 +16372,14 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 //// 		System.out.println("query in witholdingFedTaxCrforENV >>>> " + query);
  		String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'FWTACRENV'");
  		String query = script+" and d.branch_code = '"+branch+"'";
- 		Connection con = null;
- 		PreparedStatement ps = null;
- 		ResultSet rs = null;
+ 		
 
  		try {
 
- 			con = dbConnection.getConnection("legendPlus");
 
- 			ps = con.prepareStatement(query);
-
- 			rs = ps.executeQuery();
+ 			  Connection con = dbConnection.getConnection("legendPlus");
+ 		        PreparedStatement ps  = con.prepareStatement(query);
+ 			ResultSet rs = ps.executeQuery();
 
  			if (rs.next())
  			 { 
@@ -14299,10 +16394,7 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
  			 er.printStackTrace();
 
  			}
- 			finally
- 			{
- 				dbConnection.closeConnection(con, ps);
- 			}
+ 			
  	return 	assetledgeraccount;
  	}
 
@@ -14325,17 +16417,14 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 		
 		String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'ENVDRLDGR'");
 		String query = script+" and fm.TYPE_CODE = '"+tranType+"' and d.branch_code = '"+branchCode+"'";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
 
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			  Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps  = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 
 			if (rs.next())
 			 {
@@ -14350,10 +16439,7 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	costDrAcct;
 	}
 
@@ -14362,24 +16448,18 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
     public void setPendingTrans(String assetId,String userId,String superId,String value,String description,String branchCode,String status,String tranType,String processStatus, String code){
 //    	System.out.println("====code 0====> "+code);
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
  String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
          "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
          "transaction_level) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  String tranLevelQuery = "select level,Transaction_type from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+       
         try
         {
-            con = dbConnection.getConnection("legendPlus");
 
-            
-            /////////////To get transaction level
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+            ResultSet rs = ps.executeQuery();
 
 
             while(rs.next()){
@@ -14419,9 +16499,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
         {
             System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTrans>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
 
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
@@ -14435,24 +16512,18 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 
     public void setPendingTrans(String assetId,String userId,String superId,String description,String branchCode,String status,String tranType,String processStatus, String code){
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+        
  String pq = "insert into am_asset_approval(asset_id,user_id,super_id,posting_date,description," +
          "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
          "transaction_level) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  String tranLevelQuery = "select level,Transaction_type from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+       
         try
         {
-            con = dbConnection.getConnection("legendPlus");
 
-            
-            /////////////To get transaction level
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps = con.prepareStatement(tranLevelQuery);
+            ResultSet rs = ps.executeQuery();
 
 
             while(rs.next()){
@@ -14492,9 +16563,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
         {
             System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTrans>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
 
    //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
@@ -14506,14 +16574,14 @@ public java.util.ArrayList gettransactionRecords(String tranId)
  {
  	java.util.ArrayList list = new java.util.ArrayList();
 
- 	String durationquery = "select transactionId,iso,asset_id,page1, *from am_Raisentry_Transaction where trans_id='"+tranId+"'  ";
- 	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
+ 	String durationquery = "select transactionId,iso,asset_id,page1, *from am_Raisentry_Transaction where trans_id=? ";
+
 	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(durationquery);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(durationquery);
+	        ps.setString(1, tranId);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next())
 			   {
 				String transId = rs.getString("transactionId");
@@ -14532,76 +16600,65 @@ public java.util.ArrayList gettransactionRecords(String tranId)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
  	return list;
  }
 
 public boolean setUpdateAssetBidUploadTrans(String groupid,String userid){
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+   
     boolean done;
     done = false;    	    
-    String UpadteQuerry = "update am_group_asset_Bid set process_flag = 'Y' where  GROUP_ID='"+groupid+"' AND USER_ID='"+userid+"'";
+    String UpadteQuerry = "update am_group_asset_Bid set process_flag = 'Y' where  GROUP_ID=? AND USER_ID=? ";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(UpadteQuerry);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(UpadteQuerry);
+	        ps.setString(1, groupid);
+	        ps.setString(2, userid);
         done = (ps.executeUpdate() != -1);
 
     } catch (Exception ex) {
         System.out.println("WARN: Error Updateing all Am asset Group ->" + ex);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
     return done;
 }      
 
 public boolean setAssetBidUploadCompleteTrans(String AssetId){
     //	   System.out.println("Before Update Asset Id ====  "+AssetId);
     //	   System.out.println("Before Update Asset Code ====  "+AssetCode);
-    	    Connection con = null;
-    	    PreparedStatement ps = null;
-    	    ResultSet rs = null;
+    	   
     	    boolean done;
     	    done = false;
-    	    String UpadteQuerry = "UPDATE am_asset_bid set Asset_Status = 'ACTIVE' where ASSET_ID = '"+AssetId+"'";
+    	    String UpadteQuerry = "UPDATE am_asset_bid set Asset_Status = 'ACTIVE' where ASSET_ID = ? ";
     	    try {
-    	        con = dbConnection.getConnection("legendPlus");
-    	        ps = con.prepareStatement(UpadteQuerry);
+
+    			  Connection con = dbConnection.getConnection("legendPlus");
+    		        PreparedStatement ps  = con.prepareStatement(UpadteQuerry);
+    		        ps.setString(1, AssetId);
     	        done = (ps.executeUpdate() != -1);
 
     	    } catch (Exception ex) {
     	        System.out.println("WARN: Error fetching all asset ->" + ex);
-    	    } finally {
-    	        dbConnection.closeConnection(con, ps);
-    	    }
+    	    } 
+    	    
     	    return done;
     	}
 
 public void setPendingTransArchive(String assetId,String userId,String superId,String value, String description,String branchCode,String status,String tranType,String processStatus, String code,String assetCode,String mtid){
 
       int transaction_level=0;
-      Connection con;
-      PreparedStatement ps;
-      ResultSet rs;
+      
 String pq = "insert into am_asset_approval_archive(asset_id,user_id,super_id,amount,posting_date,description," +
        "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
        "transaction_level,asset_code) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-      con = null;
-      ps = null;
-      rs = null;
+     
       try
       {
-          con = dbConnection.getConnection("legendPlus");
 
-
-          /////////////To get transaction level
-           ps = con.prepareStatement(tranLevelQuery);
-            rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+           ResultSet rs = ps.executeQuery();
 
 
           while(rs.next()){
@@ -14641,9 +16698,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
       {
           System.out.println(">>> 3 AssetRecordBeans:setPendingTransArchive()>>>>>>" + er);
 
-      }finally{
-      dbConnection.closeConnection(con, ps);
-
       }
  //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
   }//staticApprovalInfo()
@@ -14652,22 +16706,22 @@ public String[] setApprovalStockDataGroup(long id){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
    String[] result= new String[12];
-    Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+    
         
         //int groupId = Integer.parseInt(id);
          String query ="select group_id,user_ID,supervisor,Cost_Price,Posting_Date," +
          		"		description,effective_date,BRANCH_CODE," +
-         				"Asset_Status from AM_GROUP_STOCK_MAIN where group_id =" +id ;
+         				"Asset_Status from AM_GROUP_STOCK_MAIN where group_id = ? " ;
  //        System.out.println("Query in setApprovalDataGroup : " + query);
 //         String groupidQry = "select group_id from am_group_asset_main where group_id =" +id;
 //         String Qrygroupid = approvalRec.getCodeName(groupidQry); 
 //        		 System.out.println("Qrygroupid in setApprovalDataGroup : " + Qrygroupid);
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(query);
+  	        ps.setLong(1, id);
+           ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 result[0] = String.valueOf(id);
                 result[1]= rs.getString(2);
@@ -14686,9 +16740,7 @@ public String[] setApprovalStockDataGroup(long id){
 //            System.out.println("Final Conversion");
         } catch (Exception ex) {
             System.out.println("AssetRecordsBean : setApprovalData()WARN: Error setting approval data for group asset creation ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
         	result[9] = "Group Asset Creation";
         	result[10] = "P";
 //result[11] = timeInstance();
@@ -14716,17 +16768,13 @@ public String checkENVCRLedgerAccount (String tranType,String branchCode)
 	String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'ENVCRLDGR'");
 	String query = script+" and fm.TYPE_CODE = '"+tranType+"' and d.branch_code = '"+branchCode+"'";
 	
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
+	        ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -14741,10 +16789,7 @@ public String checkENVCRLedgerAccount (String tranType,String branchCode)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	costDrAcct;
 }
 
@@ -14753,25 +16798,19 @@ return 	costDrAcct;
 public void setPendingTransFleetMaintenance(String[] a, String code,int assetCode){
 
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs;
+
 String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
      "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
      "transaction_level,asset_code) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-    con = null;
-    ps = null;
-    rs = null;
+   
     try
     {
-        con = dbConnection.getConnection("legendPlus");
 
-
-        /////////////To get transaction level
-         ps = con.prepareStatement(tranLevelQuery);
-          rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+         ResultSet rs = ps.executeQuery();
 
 
         while(rs.next())
@@ -14831,9 +16870,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
     {
         System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTransFleetMaintenance Three 3>>>>>>" + er);
 
-    }finally{
-    dbConnection.closeConnection(con, ps);
-
     }
 
 //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
@@ -14844,24 +16880,18 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 public void setPendingTransArchiveFleetMaintenance(String[] a, String code,long mtid, int assetCode){
 
       int transaction_level=0;
-      Connection con;
-      PreparedStatement ps;
-      ResultSet rs;
+      
 String pq = "insert into am_asset_approval_archive(asset_id,user_id,super_id,amount,posting_date,description," +
        "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
        "transaction_level,asset_code) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-      con = null;
-      ps = null;
-      rs = null;
+     
       try
       {
-          con = dbConnection.getConnection("legendPlus");
 
-
-          /////////////To get transaction level
-           ps = con.prepareStatement(tranLevelQuery);
-            rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+           ResultSet  rs = ps.executeQuery();
 
 
           while(rs.next()){
@@ -14908,9 +16938,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
       {
           System.out.println(">>>AssetRecordBeans:setPendingTransArchiveFleetMaintenance()>>>>>>" + er);
 
-      }finally{
-      dbConnection.closeConnection(con, ps);
-
       }
  //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
   }//staticApprovalInfo()
@@ -14954,17 +16981,14 @@ public String witholdingFedTaxCrFT (String category,String branch,String whtax)
 			
 //	System.out.println("query in witholdingFedTaxCr >>>> " + query);
 		
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
+	        ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -14979,10 +17003,7 @@ public String witholdingFedTaxCrFT (String category,String branch,String whtax)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	assetAcqusitionSuspense;
 }	
 
@@ -15002,17 +17023,14 @@ String assetAcqusitionSuspense="";
 String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS3'");
 String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
 
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+
 
 try {
 
-	con = dbConnection.getConnection("legendPlus");
 
-	ps = con.prepareStatement(query);
-
-	rs = ps.executeQuery();
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
+      ResultSet rs = ps.executeQuery();
 
 	if (rs.next())
 	 {
@@ -15027,10 +17045,7 @@ try {
 	 er.printStackTrace();
 
 	}
-	finally
-	{
-		dbConnection.closeConnection(con, ps);
-	}
+	
 return 	assetAcqusitionSuspense;
 }
 
@@ -15072,17 +17087,15 @@ public String witholdingFedTaxCrPara (String category,String branch,String whtax
 		}
 			
 //	System.out.println("query in witholdingFedTaxCr >>>> " + query);
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
+		
+		  Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -15097,10 +17110,7 @@ public String witholdingFedTaxCrPara (String category,String branch,String whtax
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	assetAcqusitionSuspense;
 }	
 
@@ -15108,25 +17118,19 @@ return 	assetAcqusitionSuspense;
 public void setPendingTransAdmin(String[] a, String code,int assetCode,String recType){
 
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs;
+   
 String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
      "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
      "transaction_level,asset_code,RecordType) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 //System.out.println("PQ in setPendingTransAdmin: "+pq);
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-    con = null;
-    ps = null;
-    rs = null;
+    
     try
     {
-        con = dbConnection.getConnection("legendPlus");
 
-//        System.out.println("tranLevelQuery in setPendingTransAdmin: "+tranLevelQuery);
-        /////////////To get transaction level
-         ps = con.prepareStatement(tranLevelQuery);
-          rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+         ResultSet rs = ps.executeQuery();
 
 
         while(rs.next())
@@ -15186,9 +17190,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
     {
         System.out.println(">>>AssetRecordBeans:setPendingTransAdmin >>>>>" + er);
 
-    }finally{
-    dbConnection.closeConnection(con, ps);
-
     }
 
 //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
@@ -15199,25 +17200,19 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 public void setPendingTransAdminMultiApp(String[] a, String code,int assetCode,String recType,String supervisorId,String mtid){
 
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs;
+   
 String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
      "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
      "transaction_level,asset_code,RecordType) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 //System.out.println("PQ in setPendingTransAdmin: "+pq);
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-    con = null;
-    ps = null;
-    rs = null;
+   
     try
     {  
-        con = dbConnection.getConnection("legendPlus");
 
-//        System.out.println("tranLevelQuery in setPendingTransAdmin: "+tranLevelQuery);
-        /////////////To get transaction level
-         ps = con.prepareStatement(tranLevelQuery);
-          rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+        ResultSet rs = ps.executeQuery();
 
 
         while(rs.next())
@@ -15269,9 +17264,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
     {
         System.out.println(">>>AssetRecordBeans:setPendingTransAdminMultiApp >>>>>" + er);
 
-    }finally{
-    dbConnection.closeConnection(con, ps);
-
     }
 
 //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
@@ -15317,21 +17309,19 @@ public String vatAcctCr (String category,String branch,String vat)
 		}
 			
 //	System.out.println("query in vatAcctCr Final>>>> " + query);
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
  
-		con = dbConnection.getConnection("legendPlus");
 
-		 ps = con.prepareStatement(query);
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query);
 		  ps.setString(1, category);
 		  ps.setString(2, branch);
 		  
 //		 ps = con.prepareStatement(query);
 
-		rs = ps.executeQuery();
+		ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -15346,10 +17336,7 @@ public String vatAcctCr (String category,String branch,String vat)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	vatAccount;
 }	
 
@@ -15370,17 +17357,13 @@ public String checkAssetLedgerAccount2(String category,String branch)
 	String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'ASLDGRACT2'");
 	String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
 	
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
-
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query);
+	        ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -15395,10 +17378,7 @@ public String checkAssetLedgerAccount2(String category,String branch)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	assetledgeraccount;
 }
 
@@ -15436,17 +17416,14 @@ public String vatAcctCr2 (String category,String branch,String vat)
 		}
 			
 //	System.out.println("query in vatAcctCr >>>> " + query);
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
+	        ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -15461,10 +17438,7 @@ public String vatAcctCr2 (String category,String branch,String vat)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	vatAccount;
 }	
 
@@ -15489,17 +17463,14 @@ public String checkAccounAcqusitionSuspenseParaBranch2 (String category,String b
 ////	System.out.println("query in checkAccounAcqusitionSuspenseBranch2: "+query);
     String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS4'");
     String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
+	        ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -15514,10 +17485,7 @@ public String checkAccounAcqusitionSuspenseParaBranch2 (String category,String b
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	assetAcqusitionSuspense;
 }
 
@@ -15540,17 +17508,13 @@ System.out.println("branch "+branch);*/
 String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS3'");
 String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
 
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
 
 try {
 
-	con = dbConnection.getConnection("legendPlus");
 
-	ps = con.prepareStatement(query);
-
-	rs = ps.executeQuery();
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query);
+      ResultSet rs = ps.executeQuery();
 
 	if (rs.next())
 	 {
@@ -15565,10 +17529,7 @@ try {
 	 er.printStackTrace();
 
 	}
-	finally
-	{
-		dbConnection.closeConnection(con, ps);
-	}
+	
 return 	assetAcqusitionSuspense;
 }
 
@@ -15590,17 +17551,14 @@ return 	assetAcqusitionSuspense;
 //		//System.out.println("query in checkAssetLedgerAccount >>>> " + query);
 	     String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS'");
 	     String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
 
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			  Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps = con.prepareStatement(query);
+		        ResultSet rs = ps.executeQuery();
 
 			if (rs.next())
 			 {
@@ -15615,10 +17573,7 @@ return 	assetAcqusitionSuspense;
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	assetledgeraccount;
 	}
 
@@ -15641,17 +17596,14 @@ return 	assetAcqusitionSuspense;
 		
 	     String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'AS4'");
 	     String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
 
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			  Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps = con.prepareStatement(query);
+		        ResultSet rs = ps.executeQuery();
 
 			if (rs.next())
 			 {
@@ -15666,10 +17618,7 @@ return 	assetAcqusitionSuspense;
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	assetAcqusitionSuspense;
 	}
 
@@ -15691,17 +17640,14 @@ return 	assetAcqusitionSuspense;
 //		//System.out.println("query in checkAssetLedgerAccount >>>> " + query);
 		String script = approvalRec.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where type = 'LDGRACTREFORM'");
 		String query = script+" and a.category_code = '"+category+"' and d.branch_code = '"+branch+"'";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
 
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			  Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps = con.prepareStatement(query);
+		        ResultSet rs = ps.executeQuery();
 
 			if (rs.next())
 			 {
@@ -15716,10 +17662,7 @@ return 	assetAcqusitionSuspense;
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	assetledgeraccount;
 	}
 
@@ -15729,9 +17672,7 @@ public String[] setApprovalDataTranTypeFT(String id,String asset_id,String tranT
  //String currentDate  = reArrangeDate(getCurrentDate1());
  //  System.out.println("the $$$$$$$$$$$ id: "+id+"  asset_id: "+asset_id+"   tranType: "+tranType+"  supervisor: "+supervisor+"   userId: "+userId+"  amount: "+amount);
     String[] result= new String[12];
-    Connection con = null;
-        PreparedStatement ps = null;  
-        ResultSet rs = null;
+    
         String query = "";
           query ="select asset_id,user_ID,supervisor,Cost_Price,Posting_Date," +
                  " description,effective_date,BRANCH_CODE,Asset_Status from am_asset where asset_id ='" +asset_id+"'";
@@ -15741,9 +17682,10 @@ public String[] setApprovalDataTranTypeFT(String id,String asset_id,String tranT
 
 //          System.out.println("the $$$$$$$$$$$ query: "+query+"    tableType: "+tableType);
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(query);
+           ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 //
             	result[0] = rs.getString(1);
@@ -15764,9 +17706,8 @@ public String[] setApprovalDataTranTypeFT(String id,String asset_id,String tranT
 
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching setApprovalDataTranType ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
+        
 result[9] = tranType;
 result[10] = "P";
 //result[11] = timeInstance();
@@ -15809,17 +17750,13 @@ public String ENVvatAcctCr (String category,String branch,String vat)
 		}
 			
 //	System.out.println("query in vatAcctCr >>>> " + query);
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
-
+	
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -15834,10 +17771,7 @@ public String ENVvatAcctCr (String category,String branch,String vat)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	vatAccount;
 }	
 
@@ -15873,17 +17807,14 @@ public String ENVvatAcctCr2 (String category,String branch,String vat)
 		}
 			
 //	System.out.println("query in vatAcctCr >>>> " + query);
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -15898,10 +17829,7 @@ public String ENVvatAcctCr2 (String category,String branch,String vat)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	vatAccount;
 }	
 
@@ -15945,17 +17873,14 @@ public String ENVwitholdingFedTaxCr (String category,String branch,String whtax)
 
 	     
 //	System.out.println("query in witholdingFedTaxCr >>>> " + query);
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -15970,10 +17895,7 @@ public String ENVwitholdingFedTaxCr (String category,String branch,String whtax)
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	assetAcqusitionSuspense;
 }	
 
@@ -16013,17 +17935,14 @@ public String ENVwitholdingFedTaxCrPara (String category,String branch,String wh
 		}
 			
 //	System.out.println("query in witholdingFedTaxCr >>>> " + query);
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
 	try {
 
-		con = dbConnection.getConnection("legendPlus");
 
-		ps = con.prepareStatement(query);
-
-		rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 
 		if (rs.next())
 		 {
@@ -16038,30 +17957,25 @@ public String ENVwitholdingFedTaxCrPara (String category,String branch,String wh
 		 er.printStackTrace();
 
 		}
-		finally
-		{
-			dbConnection.closeConnection(con, ps);
-		}
+		
 return 	assetAcqusitionSuspense;
 }	
 
 public boolean setUpdateVerifyUploadTrans(String groupid,String userid){
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+   
     boolean done;
     done = false;    	    
     String UpadteQuerry = "update AM_GROUP_ASSET_VERIFICATION set process_flag = 'Y' where  GROUP_ID='"+groupid+"' AND USER_ID='"+userid+"'";
     try {
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(UpadteQuerry);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(UpadteQuerry);
         done = (ps.executeUpdate() != -1);
 
     } catch (Exception ex) {
         System.out.println("WARN: Error Updateing all Am asset Verification Group ->" + ex);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
+    
     return done;
 }      
 
@@ -16070,20 +17984,15 @@ String query_r ="UPDATE a SET a.BAR_CODE = b.BAR_CODE,a.SPARE_1 = b.SPARE_1 "+
 		"from  AM_ASSET a, AM_GROUP_ASSET_VERIFICATION b "+
 		 " where a.ASSET_ID = b.ASSET_ID AND b.GROUP_ID = '"+batchId+"'";
 
-Connection con = null;
-        PreparedStatement ps = null;
 
 try {
-    con = dbConnection.getConnection("legendPlus");
 
-
-ps = con.prepareStatement(query_r);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query_r);
            int i =ps.executeUpdate();
         } catch (Exception ex) {
             System.out.println("AssetRecordBean: updateAmAssetWithVerification()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 }
 
@@ -16091,9 +18000,7 @@ public void setVerifyUploadPendingTrans(int supervisor, String code,String Asset
 //	System.out.println("setUploadPendingTrans supervisor===> "+supervisor);
 //	System.out.println("setUploadPendingTrans AssetId===> "+AssetId);	
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs; 
+   
 	  	String qrylevel =" select level from approval_level_setup  where code='"+code+"'";
   	    transaction_level = Integer.parseInt(approvalRec.getCodeName(qrylevel));
 //  	  System.out.println("setUploadPendingTrans transaction_level===> "+transaction_level);
@@ -16112,9 +18019,9 @@ String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,post
 //System.out.println("setUploadPendingTrans Query pq===> "+pq);
     try
     {
-        con = dbConnection.getConnection("legendPlus");
 
-        ps = con.prepareStatement(pq);
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(pq);
 
         ps.execute();
         dbConnection.closeConnection(con, ps);
@@ -16130,21 +18037,16 @@ String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,post
 public void updateAssetVerifyPendingTrans(String batchId){
 String query_r ="update AM_GROUP_ASSET_VERIFICATION set process_flag='Y' where GROUP_ID = ?";
 
-Connection con = null;
-        PreparedStatement ps = null;
 
 try {
-    con = dbConnection.getConnection("legendPlus");
 
-
-ps = con.prepareStatement(query_r);
-ps.setString(1, batchId);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query_r);
+      ps.setString(1, batchId);
            int i =ps.executeUpdate();
         } catch (Exception ex) {
             System.out.println("AssetRecordBean: updateAssetVerifyPendingTrans()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
 }
 
@@ -16152,25 +18054,21 @@ public void updateamgroupassetDisposal(String groupId){
 	String query_r ="UPDATE AM_GROUP_DISPOSAL SET DISPOSED='P' WHERE DISPOSAL_ID = ?";
 	String query_del ="DELETE FROM AM_GROUP_DISPOSAL WHERE DISPOSAL_ID = ?";
 //	System.out.println("query_r updateamgroupassetImprovement>>>> "+query_r);
-	Connection con = null;
-	        PreparedStatement ps = null;
-	        PreparedStatement ps1 = null;
+	
  
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	    	ps = con.prepareStatement(query_r);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_r);
 			  ps.setString(1, groupId);
 	           int i =ps.executeUpdate();
-	       	ps1 = con.prepareStatement(query_del);
+	       PreparedStatement ps1 = con.prepareStatement(query_del);
 			  ps.setString(1, groupId);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: updateamgroupassetDisposal()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	            dbConnection.closeConnection(con, ps1);
-	        }
+	        } 
 
 
 	}
@@ -16178,20 +18076,17 @@ public void updateamgroupassetDisposal(String groupId){
 public void updateAssetStatusChange(String query_r,String param){
 //String query_r ="update" +tableName+ "set"+columnName+"=? where asset_id = '"+assetId+"'";
 
-Connection con = null;
-        PreparedStatement ps = null;
         //ResultSet rs = null;
 try { 
-    con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(query_r);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query_r);
 			ps.setString(1, param);
            int i =ps.executeUpdate();
-           dbConnection.closeConnection(con, ps);
+         //  dbConnection.closeConnection(con, ps);
         } catch (Exception ex) {
 
             System.out.println("AssetRecordBean: updateAssetStatusChange() with Two Parameter>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
         }
 }//updateAssetStatus()
 
@@ -16199,45 +18094,40 @@ try {
 public void updateAssetStatusChange(String query_r,String param1,String param2){
 //String query_r ="update" +tableName+ "set"+columnName+"=? where asset_id = '"+assetId+"'";
 
-Connection con = null;
-        PreparedStatement ps = null;
-        //ResultSet rs = null;
+
 try { 
-    con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(query_r);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query_r);
 			ps.setString(1, param1);
 			ps.setString(2, param2);
            int i =ps.executeUpdate();
-           dbConnection.closeConnection(con, ps);
+           //dbConnection.closeConnection(con, ps);
         } catch (Exception ex) {
 
             System.out.println("AssetRecordBean: updateAssetStatusChange() with Three Parameter>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 }//updateAssetStatus()
 
 
 public void updateAssetStatusChange(String query_r,String param1,String param2,String param3){
 //String query_r ="update" +tableName+ "set"+columnName+"=? where asset_id = '"+assetId+"'";
 
-Connection con = null;
-        PreparedStatement ps = null;
+
         //ResultSet rs = null;
 try { 
-    con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(query_r);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps = con.prepareStatement(query_r);
 			ps.setString(1, param1);
 			ps.setString(2, param2);
 			ps.setString(3, param3);
            int i =ps.executeUpdate();
-           dbConnection.closeConnection(con, ps);
+          // dbConnection.closeConnection(con, ps);
         } catch (Exception ex) {
 
             System.out.println("AssetRecordBean: updateAssetStatusChange() with Four Parameter>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 }//updateAssetStatus()
 
 
@@ -16245,25 +18135,19 @@ try {
 public void setPendingTransMultiApp(String[] a, String code,int assetCode, String supervisorId,String mtid){
 
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs;
+   
 String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
      "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
      "transaction_level,asset_code,VATABLE_COST) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-    con = null;
-    ps = null;
-    rs = null;
+   
     try
     {
-        con = dbConnection.getConnection("legendPlus");
 
-
-        /////////////To get transaction level
-         ps = con.prepareStatement(tranLevelQuery);
-          rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	       PreparedStatement ps = con.prepareStatement(tranLevelQuery);
+         ResultSet rs = ps.executeQuery();
 
 
         while(rs.next())
@@ -16334,9 +18218,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
     catch(Exception er)
     {
         System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTransMultiApp Three 3>>>>>>" + er);
-
-    }finally{
-    dbConnection.closeConnection(con, ps);
 
     }
 
@@ -16437,9 +18318,7 @@ public void setPendingMultiApprTransArchive(String[] a, String code, long mtid, 
 
 	 System.out.println(" Welcome to  setPendingMultiApprTransArchive >>>>>>>>>>>>>>>>> ");
     int transaction_level = 0;
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+    
 
     String pq = "INSERT INTO am_asset_approval_archive(asset_id, user_id, super_id, amount, posting_date, description, " +
             "effective_date, branchCode, asset_status, tran_type, process_status, tran_sent_time, transaction_id, batch_id, " +
@@ -16448,17 +18327,15 @@ public void setPendingMultiApprTransArchive(String[] a, String code, long mtid, 
     String tranLevelQuery = "SELECT level FROM approval_level_setup WHERE code = ?";
 
     try {
-        con = dbConnection.getConnection("legendPlus");
 
-        // Get transaction level
-        ps = con.prepareStatement(tranLevelQuery);
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
         ps.setString(1, code);
-        rs = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             transaction_level = rs.getInt(1);
         }
-        rs.close();
-        ps.close();
+       
 
         System.out.println(" Preparing to insert into setPendingMultiApprTransArchive >>>>>>>>>>>>>>>>> ");
         ps = con.prepareStatement(pq);
@@ -16485,9 +18362,7 @@ public void setPendingMultiApprTransArchive(String[] a, String code, long mtid, 
 
     } catch (Exception er) {
         System.out.println(">>>2 AssetRecordBeans:setPendingMultiApprTransArchive()>>>>>>" + er);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-    }
+    } 
 }
 
 
@@ -16498,14 +18373,12 @@ public java.util.ArrayList getApprovalsId(String branchId, String deptCode, Stri
     String query = " select USER_ID,User_Name,email,full_name from am_gb_User where is_supervisor = 'Y' and User_Status = 'ACTIVE' and Branch = '"+branchId+"' and User_Name != '"+userName+"' "
     		+ "and dept_code = '"+deptCode+"' order by branch, dept_code ";
 //    System.out.println("$$$$$$$$$$$$$$$$$$$$$$  query in getApprovalsId: "+query);
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
-
+	
 	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next())
 			   {				
 				String strUserId = rs.getString("USER_ID");
@@ -16525,19 +18398,16 @@ public java.util.ArrayList getApprovalsId(String branchId, String deptCode, Stri
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 } 
 
 public void updateAssetStatusChange(String query_r,Timestamp date,int tranId){
-		Connection con = null;
-        PreparedStatement ps = null;
+	
 try {
-	con = (new DataConnect("legendPlus")).getConnection();
-	ps = con.prepareStatement(query_r.toString());
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps = con.prepareStatement(query_r.toString());
 	  ps.setTimestamp(1, date);
 	  ps.setInt(2, tranId);
            int i =ps.executeUpdate();
@@ -16546,19 +18416,17 @@ try {
         } catch (Exception ex) {
 
             System.out.println("HtmlUtility: updateAssetStatusChange()>>>>>" + ex);
-        } finally {
-        	closeConnection(con, ps);
-        }
+        } 
 
 
 }//updateAssetStatus()
 
 public void updateAssetStatusChange(String query_r,String naration,Timestamp date,int tranId){
-		Connection con = null;
-        PreparedStatement ps = null;
+		
 try {
-	con = (new DataConnect("legendPlus")).getConnection();
-	ps = con.prepareStatement(query_r.toString());
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps  = con.prepareStatement(query_r.toString());
 	  ps.setString(1, naration);
 	  ps.setTimestamp(2, date);
 	  ps.setInt(3, tranId);
@@ -16568,9 +18436,7 @@ try {
         } catch (Exception ex) {
 
             System.out.println("HtmlUtility: updateAssetStatusChange()>>>>>" + ex);
-        } finally {
-        	closeConnection(con, ps);
-        }
+        } 
 
 
 }//updateAssetStatus()
@@ -16578,18 +18444,16 @@ try {
 public void deleteOtherSupervisors(String batchId, String supervisorId){
 	String query_del ="DELETE FROM am_asset_approval WHERE Asset_Id = '"+batchId+"' and super_id != '"+supervisorId+"' and Asset_Status = 'PENDING' ";
 //	System.out.println("query_r deleteOtherSupervisors>>>> "+query_del);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query_del);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query_del);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteOtherSupervisors()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
     
 
 	}
@@ -16598,9 +18462,7 @@ public String[] setApprovalDataUploadGroup(long id,String tableName){
 
 //String q ="select asset_id, asset_status,user_ID,supervisor,Cost_Price,Posting_Date,description,effective_date,BRANCH_CODE from am_asset where asset_id ='" +id+"'";
    String[] result= new String[12];
-    Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+   
         String uploadquery = "";
         dbConnection.getDateTime(new java.util.Date());
         Timestamp approveddate =  dbConnection.getDateTime(new java.util.Date());
@@ -16675,9 +18537,10 @@ public String[] setApprovalDataUploadGroup(long id,String tableName){
 //         String Qrygroupid = approvalRec.getCodeName(groupidQry); 
 //        		 System.out.println("Qrygroupid in setApprovalDataGroup : " + Qrygroupid);
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(uploadquery);
-            rs = ps.executeQuery();
+
+  		  Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps  = con.prepareStatement(uploadquery);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 result[0] = String.valueOf(id);
                 result[1]= rs.getString(2);
@@ -16696,9 +18559,7 @@ public String[] setApprovalDataUploadGroup(long id,String tableName){
 //            System.out.println("Final Conversion");
         } catch (Exception ex) {
             System.out.println("AssetRecordsBean : setApprovalDataUploadGroup()WARN: Error setting approval data for group asset creation ->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
         	result[9] = "Group Asset Creation";
         	result[10] = "P";
 //result[11] = timeInstance();
@@ -16709,18 +18570,16 @@ public String[] setApprovalDataUploadGroup(long id,String tableName){
 public void deleteOtherSupervisorswithBatchId(String batchId, String supervisorId){
 	String query_del ="DELETE FROM am_asset_approval WHERE Batch_Id = '"+batchId+"' and super_id != '"+supervisorId+"' and Asset_Status = 'PENDING' ";
 //	System.out.println("query_r deleteOtherSupervisorswithBatchId>>>> "+query_del);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query_del);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_del);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteOtherSupervisorswithBatchId()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
   
 
 	}
@@ -16728,18 +18587,16 @@ public void deleteOtherSupervisorswithBatchId(String batchId, String supervisorI
 public void deleteOtherSupervisorswithAssetId(String batchId, String supervisorId){
 	String query_del ="DELETE FROM am_asset_approval WHERE Asset_Id = '"+batchId+"' and super_id != '"+supervisorId+"' and Asset_Status = 'PENDING' ";
 //	System.out.println("query_r deleteOtherSupervisorswithBatchId>>>> "+query_del);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query_del);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_del);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteOtherSupervisorswithBatchId()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
   
 
 	}
@@ -16749,18 +18606,16 @@ public void deleteOtherSupervisorswithAssetId(String batchId, String supervisorI
 public void deleteOtherSupervisorswithBatchIdSupervisor(String batchId, String supervisorId){
 	String query_del ="DELETE FROM am_asset_approval WHERE Batch_Id = '"+batchId+"' and super_id != '"+supervisorId+"' ";
 //	System.out.println("query_r deleteOtherSupervisorswithBatchId>>>> "+query_del);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query_del);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query_del);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteOtherSupervisorswithBatchId()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
   
 
 	}
@@ -16773,17 +18628,16 @@ public String bulkAssetTransferUpdateforApproval(java.util.ArrayList list) {
 				 "WHERE transfer_id=? ";
 //System.out.println("bulkAssetTransferUpdate query: "+query);
 String mtidassetcode = "";
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+
 magma.AssetRecordsBean bd = null;
 String mtid = "";
 String newmtid = "";
 int assetcode = 0;
 int[] d = null;
 try {
-	con = getConnection();
-	ps = con.prepareStatement(query);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps = con.prepareStatement(query);
 
 	for (int i = 0; i < list.size(); i++) {
 		bd = (magma.AssetRecordsBean) list.get(i);
@@ -16801,9 +18655,7 @@ try {
 
 } catch (Exception ex) {
 	System.out.println("Error Updating asset for Transfer in bulkAssetTransferUpdateforApproval ->" + ex);
-} finally {
-	closeConnection(con, ps);
-}
+} 
 mtidassetcode =mtid+String.valueOf(assetcode);
 return mtidassetcode;
 
@@ -16818,17 +18670,16 @@ public String bulkAssetTransferUpdateBulkTable(java.util.ArrayList list,String b
 				 "WHERE Batch_id=? ";
 //System.out.println("bulkAssetTransferUpdate query: "+query);
 String mtidassetcode = "";
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
+
 magma.AssetRecordsBean bd = null;
 String mtid = "";
 String newmtid = "";
 int assetcode = 0;
 int[] d = null;
 try {
-	con = getConnection();
-	ps = con.prepareStatement(query);
+
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps = con.prepareStatement(query);
 
 	for (int i = 0; i < list.size(); i++) {
 		bd = (magma.AssetRecordsBean) list.get(i);
@@ -16846,8 +18697,6 @@ try {
 
 } catch (Exception ex) {
 	System.out.println("Error Updating asset for Transfer ->" + ex);
-} finally {
-	closeConnection(con, ps);
 }
 mtidassetcode =mtid+String.valueOf(assetcode);
 return mtidassetcode;
@@ -16858,18 +18707,16 @@ return mtidassetcode;
 public void deleteOtherUsers(String batchId, String userId){
 	String query_del ="DELETE FROM am_asset_approval WHERE Asset_Id = '"+batchId+"' and user_id != '"+userId+"' and Asset_Status = 'PENDING' ";
 //	System.out.println("query_r deleteOtherUsers>>>> "+query_del);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query_del);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_del);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteOtherUsers()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
   
 
 	}
@@ -16877,25 +18724,19 @@ public void deleteOtherUsers(String batchId, String userId){
 public void setPendingTransMultiProofApp(String[] a, String code,int assetCode, String supervisorId,String mtid){
 
     int transaction_level=0;
-    Connection con;
-    PreparedStatement ps;
-    ResultSet rs;
+    
 String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
      "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time,transaction_id,batch_id," +
      "transaction_level,asset_code,VATABLE_COST) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-    con = null;
-    ps = null;
-    rs = null;
+  
     try
     {
-        con = dbConnection.getConnection("legendPlus");
 
-
-        /////////////To get transaction level
-         ps = con.prepareStatement(tranLevelQuery);
-          rs = ps.executeQuery();
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(tranLevelQuery);
+         ResultSet rs = ps.executeQuery();
 
 
         while(rs.next())
@@ -16953,9 +18794,6 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
     {
         System.out.println(">>>AssetRecordBeans:setPendingTrans in setPendingTransMultiProofApp Three 3>>>>>>" + er);
 
-    }finally{
-    dbConnection.closeConnection(con, ps);
-
     }
 
 //String pq = "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description,effective_date,branchCode,tran_type, process_status,tran_sent_time) values(?,?,?,?,?,?,?,?,?,?,?)";
@@ -16966,20 +18804,18 @@ String tranLevelQuery = "select level from approval_level_setup where code ='"+c
 public void deleteOtherSupervisorswithTransactionId(String transactionId, String supervisorId){
 	String query_del ="DELETE FROM am_asset_approval WHERE transaction_id = ? and super_id != ? and Asset_Status = 'PENDING' ";
 //	System.out.println("query_r deleteOtherSupervisorswithTransactionId>>>> "+query_del);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query_del);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_del);
 			  ps.setString(1, transactionId);
 			  ps.setString(2, supervisorId);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteOtherSupervisorswithTransactionId()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
   
 
 	}
@@ -16987,36 +18823,32 @@ public void deleteOtherSupervisorswithTransactionId(String transactionId, String
 public void deleteOtherSupervisorswithBatchId(String batchId, String supervisorId,String status){
 	String query_del ="DELETE FROM am_asset_approval WHERE Batch_Id = '"+batchId+"' and super_id != '"+supervisorId+"' and Asset_Status = '"+status+"' ";
 //	System.out.println("query_r deleteOtherSupervisorswithBatchId>>>> "+query_del);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query_del);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_del);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteOtherSupervisorswithBatchId()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
   
 
 	}
 
 public void deleteRecords(String query){
 //	System.out.println("query deleteRecords>>>> "+query);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteRecords()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
   
 
 	}
@@ -17027,20 +18859,17 @@ public void bulkAssetTransferWithZeroUpdateBulkTable(String batchId){
 		 		+ "and a.NEW_ASSET_ID = b.new_asset_id "
 		 		+ "and a.Batch_id = ? "
 		 		+ "and a.newAsset_User = '0' ";	
-	Connection con = null;
-	        PreparedStatement ps = null;
- 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	    	ps = con.prepareStatement(query_r);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_r);
 			  ps.setString(1, batchId);
 	           int i =ps.executeUpdate();           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: bulkAssetTransferWithZeroUpdateBulkTable()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
 	}
 
 
@@ -17049,18 +18878,15 @@ public void WrongAssetWithCodes(String asseId){
 	 String query_CategoryCode = "update a set a.CATEGORY_CODE=b.category_code from am_asset a, am_ad_category b where a.CATEGORY_ID = b.category_ID and a.CATEGORY_CODE = 0 and a.Asset_id = ? ";
 	 String query_DeptCode = "update a set a.DEPT_CODE=b.Dept_code from am_asset a, am_ad_department b where a.Dept_ID = b.Dept_ID and a.DEPT_CODE = 0 and a.Asset_id = ? ";
 	 String query_SubCategory = "update am_asset set SUB_CATEGORY_CODE='000',SUB_CATEGORY_ID='1' from am_asset where SUB_CATEGORY_ID = '0' and Asset_id = ? ";
-	Connection con = null;
-	        PreparedStatement ps = null;
-	        PreparedStatement ps1 = null;
-	        PreparedStatement ps2 = null;
-	        PreparedStatement ps3 = null;
+	
  
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	    	ps = con.prepareStatement(query_BranchCode);
-	    	ps1 = con.prepareStatement(query_CategoryCode);
-	    	ps2 = con.prepareStatement(query_DeptCode);
-	    	ps3 = con.prepareStatement(query_SubCategory);
+
+		  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps  = con.prepareStatement(query_BranchCode);
+	        PreparedStatement ps1 = con.prepareStatement(query_CategoryCode);
+	        PreparedStatement ps2 = con.prepareStatement(query_DeptCode);
+	        PreparedStatement ps3 = con.prepareStatement(query_SubCategory);
 			   ps.setString(1, asseId);
 	           int i =ps.executeUpdate();     
 			   ps1.setString(1, asseId);
@@ -17072,12 +18898,7 @@ public void WrongAssetWithCodes(String asseId){
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: WrongAssetWithCodes()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	            dbConnection.closeConnection(con, ps1);
-	            dbConnection.closeConnection(con, ps2);
-	            dbConnection.closeConnection(con, ps3);
-	        }
+	        } 
 	}
 
 }

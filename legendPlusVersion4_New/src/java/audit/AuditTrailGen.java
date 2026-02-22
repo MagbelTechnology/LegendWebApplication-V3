@@ -86,7 +86,7 @@ public class AuditTrailGen extends Bag{
  * @author  Bolaji L. Ogeyingbo.
   * @version 1.0
  */
-  public final Connection connect()  throws Exception
+  public final Connection connectOld()  throws Exception
    {  
    try {
    /**
@@ -104,6 +104,24 @@ public class AuditTrailGen extends Bag{
      return con;
   }
 
+  
+  public final Connection connect() throws SQLException {
+	    Connection con = null;
+	    try {
+	        // Use your Legend connection class
+	        legend.ConnectionClass cc = new legend.ConnectionClass();
+	        con = cc.getConnection();
+	        
+	        if (con == null || con.isClosed()) {
+	            throw new SQLException("Failed to obtain a valid connection");
+	        }
+	    } catch (Exception e) {
+	        System.out.println("StandardQuery.connect() -> Exception occurred: " + e);
+	        e.printStackTrace();
+	        throw new SQLException("Error connecting to DB", e);
+	    }
+	    return con;
+	}
 
   public void closeConnection(Connection con, PreparedStatement ps)
   {
@@ -181,7 +199,7 @@ public class AuditTrailGen extends Bag{
  * @author  Bolaji L. Ogeyingbo.
   * @version 1.0
  */
-  public final void select(int updatestatus, String selstmnt) throws Exception
+  public final void selectOld(int updatestatus, String selstmnt) throws Exception
    {
 	   try {
 			con = connect();  String val = ""; String nullstring = null;
@@ -363,6 +381,37 @@ public class AuditTrailGen extends Bag{
      finally { con.close(); dbConnection.closeConnection(con,prepstmnt, rs);}
   }
   
+  public final void select(int updatestatus, String selstmnt) throws Exception {
+	    try (Connection con = connect();
+	         Statement stmnt = con.createStatement();
+	         ResultSet rs = stmnt.executeQuery(selstmnt)) {
+
+	        ResultSetMetaData rsmd = rs.getMetaData();
+	        int numColumns = rsmd.getColumnCount();
+
+	        while (rs.next()) {
+	            for (int i = 1; i <= numColumns; i++) {
+	                String cname = rsmd.getColumnName(i);
+	                int columntype = rsmd.getColumnType(i);
+
+	                Object valObj = rs.getObject(i);
+	                String val = valObj == null ? "null" : valObj.toString().trim();
+
+	                if (updatestatus == this.BEFORE_UPDATE) {
+	                    this.setField(cname, val, columntype, i);
+	                } else if (updatestatus == this.AFTER_UPDATE) {
+	                    this.setValue(cname, val);
+	                }
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("StandardQuery.select() -> Exception occurred: " + e);
+	        e.printStackTrace();
+	        throw e;
+	    }
+	}
+  
   public final boolean checkUpdate()
      {
 	     if(checkupdate == true) // checks for updates in the relevant database table
@@ -478,7 +527,7 @@ public class AuditTrailGen extends Bag{
     * @version 1.0
    */
 	
-  public boolean logAuditTrail(String TableName,  String BranchCode,  int Login_Id, String RowId,String hostName,String ipAddress,String macAddress) throws Exception 
+  public boolean logAuditTrailOld(String TableName,  String BranchCode,  int Login_Id, String RowId,String hostName,String ipAddress,String macAddress) throws Exception 
 	//updateAuditLog  IN  parameters  are  actPerf,  branchcode,  descriptio 
  
   {
@@ -595,6 +644,60 @@ public class AuditTrailGen extends Bag{
 		return isupdate;
 	}//end method block
   
+  
+  public boolean logAuditTrail(String tableName, String branchCode, int loginId,
+          String rowId, String hostName, String ipAddress, String macAddress) throws Exception {
+
+boolean isUpdate = false;
+java.sql.Date today = dbConnection.dateConvert(new java.util.Date());
+
+String auditSQL = "INSERT INTO AM_AD_UPDATE_AUDIT " +
+"(TABLE_NAME, COLUMN_NAME, ROW_ID, PREV_VAL, NEW_VAL, EFF_DATE, LOGIN_ID, BRANCH_CODE, [DATE], ACT_PERFMD, MACHINE_NAME, IP_ADDRESS, MAC_ADDRESS) " +
+"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+try (Connection con = connect()) {
+
+Iterator it = this.getContainer().values().iterator();
+
+while (it.hasNext()) {
+Field fld = (Field) it.next();
+if (fld.isChanged()) {
+isUpdate = true;
+
+try (PreparedStatement ps = con.prepareStatement(auditSQL)) {
+ ps.setString(1, tableName);
+ ps.setString(2, fld.getName());
+ ps.setString(3, rowId);
+ ps.setString(4, fld.getOldValue());
+ ps.setString(5, fld.getNewValue());
+ ps.setDate(6, today);
+ ps.setInt(7, loginId);
+ ps.setString(8, branchCode);
+ ps.setDate(9, today);
+ ps.setString(10, "Updated");
+ ps.setString(11, hostName);
+ ps.setString(12, ipAddress);
+ ps.setString(13, macAddress);
+
+ ps.executeUpdate();
+}
+}
+}
+
+} catch (SQLException ex) {
+System.out.println("SQLException in logAuditTrail:");
+while (ex != null) {
+System.out.println("Message: " + ex.getMessage());
+System.out.println("SQLState: " + ex.getSQLState());
+System.out.println("ErrorCode: " + ex.getErrorCode());
+ex = ex.getNextException();
+System.out.println();
+}
+throw ex; // rethrow to let caller handle
+}
+
+return isUpdate;
+}
 	
 /**
  *   Logs audit trail : for use within bean
@@ -602,7 +705,7 @@ public class AuditTrailGen extends Bag{
  * @author  Bolaji L. Ogeyingbo.
   * @version 1.0
  */
-	 public  boolean logAuditTrail(AuditInfo ai) throws Exception 
+	 public  boolean logAuditTrailOld(AuditInfo ai) throws Exception 
 	//updateAuditLog  IN  parameters  are  actPerf,  branchcode,  description
     {
 	   try {
@@ -676,8 +779,54 @@ public class AuditTrailGen extends Bag{
 	}//end method block
 	
 	
+	 public boolean logAuditTrail(AuditInfo ai) throws Exception {
+		    boolean isUpdate = false;
+		    java.sql.Date today = dbConnection.dateConvert(new java.util.Date());
+
+		    String auditSQL = "INSERT INTO AM_AD_INSERT_AUDIT " +
+		            "(TABLE_NAME, COLUMN_NAME, ROW_ID, PREV_VAL, NEW_VAL, EFF_DATE, LOGIN_ID, BRANCH_CODE) " +
+		            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+		    try (Connection con = connect()) {
+
+		        Iterator it = this.getContainer().values().iterator();
+
+		        while (it.hasNext()) {
+		            Field fld = (Field) it.next();
+		            if (fld.isChanged()) {
+		                isUpdate = true;
+
+		                try (PreparedStatement ps = con.prepareStatement(auditSQL)) {
+		                    ps.setString(1, ai.getTableName());
+		                    ps.setString(2, fld.getName());
+		                    ps.setString(3, ai.getRowId());
+		                    ps.setString(4, ""); // previous value is empty for insert
+		                    ps.setString(5, fld.getNewValue());
+		                    ps.setDate(6, today);
+		                    ps.setInt(7, ai.getLoginId());
+		                    ps.setString(8, ai.getBranchCode());
+
+		                    ps.executeUpdate();
+		                }
+		            }
+		        }
+
+		    } catch (SQLException ex) {
+		        System.out.println("\n--- SQLException in logAuditTrail ---\n");
+		        while (ex != null) {
+		            System.out.println("Message:   " + ex.getMessage());
+		            System.out.println("SQLState:  " + ex.getSQLState());
+		            System.out.println("ErrorCode: " + ex.getErrorCode());
+		            ex = ex.getNextException();
+		            System.out.println();
+		        }
+		        throw ex; 
+		    }
+
+		    return isUpdate;
+		}
 	
-	public String selectx(String selstmnt) throws Exception
+	public String selectxOld(String selstmnt) throws Exception
    {
 	String strval = "";
 	   try {
@@ -696,9 +845,28 @@ public class AuditTrailGen extends Bag{
   }
 
   
+	public String selectx(String selstmnt) throws Exception {
+	    String strval = "";
+	    
+	    try (Connection con = connect();
+	         Statement stmt = con.createStatement();
+	         ResultSet rs = stmt.executeQuery(selstmnt)) {
+
+	        if (rs.next()) { 
+	            int j = rs.getInt(2); 
+	            strval = String.valueOf(j);
+	        }
+
+	    } catch (SQLException e) {
+	        System.out.println("StandardQuery.selectx() -> SQLException: " + e.getMessage());
+	        throw e; // propagate exception
+	    }
+
+	    return strval;
+	}
+	
   
-  
-  public final void updateLogin(int loginId, boolean loginlogout)
+  public final void updateLoginOld(int loginId, boolean loginlogout)
   {
      try
 	   {
@@ -718,8 +886,24 @@ public class AuditTrailGen extends Bag{
 		}
 	 catch(Exception e) { e.printStackTrace(); 	} finally{ closeConnection(con,prepstmnt);}
 	}
+  
 	     
-	
+  public final void updateLogin(int loginId, boolean loginlogout) {
+	    String updateQuery = "UPDATE AM_GB_USER SET login_status = ? WHERE user_Id = ?";
+
+	    try (Connection con = connect();
+	         PreparedStatement ps = con.prepareStatement(updateQuery)) {
+
+	        ps.setInt(1, loginlogout ? 1 : 0);
+	        ps.setInt(2, loginId);
+
+	        int rowsUpdated = ps.executeUpdate();
+	       
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
 	
 	
 	  public final void updateLogin(int loginId, boolean loginlogout,String querypart1,String querypart2)
@@ -765,7 +949,7 @@ public class AuditTrailGen extends Bag{
 	}
 
 
-public void updateLoginAudit(int userid, String mtid) {
+public void updateLoginAuditOld(int userid, String mtid) {
 
 		PreparedStatement ps = null;
 		boolean done = false;
@@ -795,8 +979,33 @@ public void updateLoginAudit(int userid, String mtid) {
 }
 
 
+public void updateLoginAudit(int userId, String mtid) {
+    String query = "UPDATE gb_user_login SET time_out = ? WHERE user_id = ? AND MTID = ?";
+
+    
+    try (Connection con = connect();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        
+        
+        ps.setString(1,df.getDateTime().substring(10));
+        ps.setInt(2, userId);
+        ps.setString(3, mtid);
+
+        int updatedRows = ps.executeUpdate();
+        if (updatedRows == 0) {
+            System.out.println("No rows updated for userId=" + userId + ", MTID=" + mtid);
+        }
+
+    } catch (Exception e) {
+        System.out.println(this.getClass().getName()
+            + " ERROR: Error updating gb_user_login timeout -> " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
 	
-  public final void updateLoginAudit(String SessionId, int LoginID)
+  public final void updateLoginAuditOld(String SessionId, int LoginID)
   {
  	 String session_Id = htmlUtil.getCodeName("SELECT Session_id FROM  GB_USER_LOGIN   WHERE Session_Id = '"+SessionId+"' ");
  	 System.out.println("======>sessionId: "+session_Id);
@@ -828,9 +1037,51 @@ public void updateLoginAudit(int userid, String mtid) {
 		}
 	 catch(Exception e) { e.printStackTrace(); 	}finally{ closeConnection(con,prepstmnt);}
 }
+  
+  
+  public final void updateLoginAudit(String sessionId, int loginId) {
+	    if (sessionId == null || sessionId.isEmpty()) return;
+
+	    String selectSession = "SELECT Session_id FROM GB_USER_LOGIN WHERE Session_Id = ?";
+	    String selectMaxMtid = "SELECT MAX(mtid) FROM GB_USER_LOGIN WHERE USER_ID = ?";
+	    String updateQuery = "UPDATE GB_USER_LOGIN SET time_out = GETDATE() WHERE Session_Id = ? AND User_Id = ?";
+
+	    try (Connection con = connect();
+	         PreparedStatement psSelect = con.prepareStatement(selectSession)) {
+
+	        
+	        psSelect.setString(1, sessionId);
+	        try (ResultSet rs = psSelect.executeQuery()) {
+	            if (!rs.next()) {
+	                
+	                try (PreparedStatement psMax = con.prepareStatement(selectMaxMtid)) {
+	                    psMax.setInt(1, loginId);
+	                    try (ResultSet rsMax = psMax.executeQuery()) {
+	                        if (rsMax.next()) {
+	                            String mtid = rsMax.getString(1);
+	                            updateLoginAudit(loginId, mtid); 
+	                        }
+	                    }
+	                }
+	                return; 
+	            }
+	        }
+
+	     
+	        try (PreparedStatement psUpdate = con.prepareStatement(updateQuery)) {
+	            psUpdate.setString(1, sessionId);
+	            psUpdate.setInt(2, loginId);
+	            int rowsUpdated = psUpdate.executeUpdate();
+	           
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
 
 
- public final boolean sessionIdExist(String SessionId)
+ public final boolean sessionIdExistOld(String SessionId)
  {
 	String sessionId = "";
       try
@@ -856,6 +1107,29 @@ public void updateLoginAudit(int userid, String mtid) {
 }
 	
 	
+ public final boolean sessionIdExist(String sessionId) {
+	    if (sessionId == null || sessionId.isEmpty()) return false;
+
+	    String query = "SELECT 1 FROM GB_USER_LOGIN WHERE Session_Id = ?";
+	    boolean exists = false;
+
+	    try (Connection con = connect();
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, sessionId);
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                exists = true; 
+	            }
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    System.out.println("Session exists: " + exists + " for SessionId: " + sessionId);
+	    return exists;
+	}
 	
 	
 	public final void captureAuditFields(String[] AuditFields) throws Exception 
@@ -885,7 +1159,7 @@ public void updateLoginAudit(int userid, String mtid) {
 
 		 
 		 
-		public void auditLogin(int loginID, String branchcode, String workstationName, String workstationIp, String sessionId)
+		public void auditLoginOld(int loginID, String branchcode, String workstationName, String workstationIp, String sessionId)
 		{	 
 			 try {
 			      
@@ -924,9 +1198,31 @@ public void updateLoginAudit(int userid, String mtid) {
 	}	 
 		 
 		 
+		public void auditLogin(int loginID, String branchCode, String workstationName, String workstationIp, String sessionId) {
+		    String insertQuery = "INSERT INTO gb_user_login " +
+		            "(login_date, user_id, branch_code, time_in, time_out, workstation_name, ip_address, session_id) " +
+		            "VALUES (?, ?, ?, GETDATE(), NULL, ?, ?, ?)";
+
+		    try (Connection con = connect();
+		         PreparedStatement ps = con.prepareStatement(insertQuery)) {
+
+		        ps.setDate(1, dbConnection.dateConvert(new java.util.Date())); 
+		        ps.setInt(2, loginID);                                         
+		        ps.setString(3, branchCode);                                   
+		        ps.setString(4, workstationName);                              
+		        ps.setString(5, workstationIp);                                
+		        ps.setString(6, sessionId);                                    
+
+		        int rowsInserted = ps.executeUpdate();
+		        System.out.println("auditLogin: rows inserted = " + rowsInserted);
+
+		    } catch (SQLException e) {
+		        System.out.println("ERROR: auditLogin failed");
+		        e.printStackTrace();
+		    }
+		}
 		 
-		 
-		 public String getUserName(int LoginId, String field, String tableName)
+		 public String getUserNameOld(int LoginId, String field, String tableName)
 		 {
 		   String username = "";
 			try
@@ -945,7 +1241,32 @@ public void updateLoginAudit(int userid, String mtid) {
 		 return username;	
 	}	
 				
-				
+		
+		 public String getUserName(int loginId, String field, String tableName) {
+			    String username = "";
+			    
+			    if (!field.matches("[a-zA-Z0-9_]+") || !tableName.matches("[a-zA-Z0-9_]+")) {
+			        throw new IllegalArgumentException("Invalid field or table name");
+			    }
+
+			    String query = "SELECT " + field + " FROM " + tableName + " WHERE login_id = ?";
+
+			    try (Connection con = connect();
+			         PreparedStatement ps = con.prepareStatement(query)) {
+
+			        ps.setInt(1, loginId);
+			        try (ResultSet rs = ps.executeQuery()) {
+			            if (rs.next()) {
+			                username = rs.getString(1);
+			            }
+			        }
+
+			    } catch (SQLException e) {
+			        e.printStackTrace();
+			    }
+
+			    return username;
+			}
 		 
 		 
     //overloaded method to take arraylist	
@@ -976,7 +1297,7 @@ public void updateLoginAudit(int userid, String mtid) {
 	**/
 	
 	
-public	final void update(String updtstmnt)
+public	final void updateOld(String updtstmnt)
     {
 	  try{
 	     con = connect();
@@ -992,7 +1313,20 @@ public	final void update(String updtstmnt)
 	}
 		 
 		 
-		 
+public final void update(String updtstmnt) {
+    rowsupdated = 0; 
+
+    try (Connection con = connect();
+         PreparedStatement ps = con.prepareStatement(updtstmnt)) {
+
+        rowsupdated = ps.executeUpdate();
+        setCheckedChanges(rowsupdated > 0);
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        setCheckedChanges(false);
+    }
+}	 
 		 
 		 
 	
@@ -1011,7 +1345,7 @@ public static void main(String[] args)
 
   }
  **/ 
-    public final void updateLoginAudit(String SessionId, int LoginID, boolean loginlogout)
+    public final void updateLoginAuditOld(String SessionId, int LoginID, boolean loginlogout)
   {
      try
 	   {
@@ -1026,9 +1360,27 @@ public static void main(String[] args)
 	 catch(Exception e) { e.printStackTrace(); 	}
 }
 
+    
+    public final void updateLoginAudit(String sessionId, int loginID, boolean loginlogout) {
+        String updateQuery = "UPDATE GB_USER_LOGIN SET time_out = getDate() WHERE session_Id = ? AND user_Id = ?";
+        rowsupdated = 0;
+
+        try (Connection con = connect();
+             PreparedStatement ps = con.prepareStatement(updateQuery)) {
+
+            ps.setString(1, sessionId);
+            ps.setInt(2, loginID);
+
+            rowsupdated = ps.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println("Error updating login audit:");
+            e.printStackTrace();
+        }
+    }
 
 
-public boolean logAuditTrail(String TableName,  String BranchCode,  int LoginId, String RowId, String RecordId,String ActionPerformed, String hostName,String ipAddress, String macAddress) throws Exception
+public boolean logAuditTrailOld(String TableName,  String BranchCode,  int LoginId, String RowId, String RecordId,String ActionPerformed, String hostName,String ipAddress, String macAddress) throws Exception
 	//updateAuditLog  IN  parameters  are  actPerf,  branchcode,  description
     { 
 	   try {
@@ -1111,10 +1463,57 @@ public boolean logAuditTrail(String TableName,  String BranchCode,  int LoginId,
 	}//end method block
 
 
+public boolean logAuditTrail(String tableName, String branchCode, int loginId, String rowId,
+        String recordId, String actionPerformed, String hostName,
+        String ipAddress, String macAddress) {
+
+boolean isUpdate = false;
+String insertSQL = "INSERT INTO AM_AD_UPDATE_AUDIT("
++ "TABLE_NAME, COLUMN_NAME, ROW_ID, PREV_VAL, NEW_VAL, EFF_DATE, "
++ "LOGIN_ID, BRANCH_CODE, DATE, ACT_PERFMD, MACHINE_NAME, IP_ADDRESS, MAC_ADDRESS) "
++ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+try (Connection con = connect()) {
+
+Iterator<Field> it = this.getContainer().values().iterator();
+
+while (it.hasNext()) {
+Field fld = it.next();
+if (fld.isChanged()) {
+isUpdate = true;
+
+try (PreparedStatement ps = con.prepareStatement(insertSQL)) {
+ps.setString(1, tableName.trim());
+ps.setString(2, fld.getName());
+ps.setString(3, rowId.trim());
+ps.setString(4, fld.getOldValue());
+ps.setString(5, fld.getNewValue());
+ps.setDate(6, dbConnection.dateConvert(new java.util.Date()));
+ps.setInt(7, loginId);
+ps.setString(8, branchCode.trim());
+ps.setDate(9, dbConnection.dateConvert(new java.util.Date()));
+ps.setString(10, actionPerformed.trim());
+ps.setString(11, hostName);
+ps.setString(12, ipAddress);
+ps.setString(13, macAddress);
+
+ps.executeUpdate();
+}
+}
+}
+
+} catch (SQLException e) {
+System.out.println("Error in logAuditTrail:");
+e.printStackTrace();
+}
+
+return isUpdate;
+}
+
 
 
 //Ganiyu's code
-public boolean logAuditTrailActionPerformed(String TableName,  String BranchCode,  int LoginId, String RowId,String action_performed) throws Exception
+public boolean logAuditTrailActionPerformedOld(String TableName,  String BranchCode,  int LoginId, String RowId,String action_performed) throws Exception
 	//updateAuditLog  IN  parameters  are  actPerf,  branchcode,  description
     {
 	   DatetimeFormat df = new DatetimeFormat();
@@ -1193,7 +1592,52 @@ public boolean logAuditTrailActionPerformed(String TableName,  String BranchCode
 		return isupdate;  
 	}//end method block
 
-public String getAuditDescription(String role_id) throws Exception{
+
+public boolean logAuditTrailActionPerformed(String tableName, String branchCode, int loginId, 
+        String rowId, String actionPerformed) {
+
+boolean isUpdate = false;
+String insertSQL = "INSERT INTO AM_AD_UPDATE_AUDIT("
++ "AUDIT_INDEX, TABLE_NAME, COLUMN_NAME, ROW_ID, PREV_VAL, NEW_VAL, "
++ "EFF_DATE, LOGIN_ID, BRANCH_CODE, DATE, ACT_PERFMD) "
++ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+try (Connection con = connect()) {
+
+Iterator<Field> it = this.getContainer().values().iterator();
+
+while (it.hasNext()) {
+Field fld = it.next();
+if (fld.isChanged()) {
+isUpdate = true;
+
+try (PreparedStatement ps = con.prepareStatement(insertSQL)) {
+ps.setLong(1, System.currentTimeMillis());          
+ps.setString(2, tableName.trim());
+ps.setString(3, fld.getName());
+ps.setString(4, rowId.trim());
+ps.setString(5, fld.getOldValue());
+ps.setString(6, fld.getNewValue());
+ps.setDate(7, dbConnection.dateConvert(new java.util.Date()));
+ps.setInt(8, loginId);
+ps.setString(9, branchCode.trim());
+ps.setDate(10, dbConnection.dateConvert(new java.util.Date()));
+ps.setString(11, actionPerformed.trim());
+
+ps.executeUpdate();
+}
+}
+}
+
+} catch (SQLException e) {
+System.out.println("Error in logAuditTrailActionPerformed:");
+e.printStackTrace();
+}
+
+return isUpdate;
+}
+
+public String getAuditDescriptionOld(String role_id) throws Exception{
 	//Connection con = null;
 //	System.out.println("\n\n\n\n it entered  in getAuditDescription");
 	
@@ -1241,7 +1685,31 @@ public String getAuditDescription(String role_id) throws Exception{
 	
 }
 
-public String getAuditDescriptionDept(String dept_code) throws Exception{
+public String getAuditDescription(String roleId) {
+    String result = "";
+    String query = "SELECT CONVERT(varchar, role_uuid) + ' - ' + role_name " +
+                   "FROM am_ad_privileges " +
+                   "WHERE role_uuid IN (SELECT role_uuid FROM am_ad_class_privileges WHERE role_uuid = ?)";
+
+    try (Connection con = connect();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setInt(1, Integer.parseInt(roleId));
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getString(1);
+            }
+        }
+
+    } catch (Exception e) {
+        System.out.println("Error occurred in getAuditDescription:");
+        e.printStackTrace();
+    }
+
+    return result;
+}
+
+public String getAuditDescriptionDeptOld(String dept_code) throws Exception{
 	//Connection con = null;
 //	System.out.println("\n\n\n\n it entered  in getAuditDescription");
 //	System.out.println("\n\n\n\n it entered  in getAuditDescription");
@@ -1295,7 +1763,36 @@ public String getAuditDescriptionDept(String dept_code) throws Exception{
 		return result;
 	
 }
-public void logAuditTrailSecurityComp(String TableName, String BranchCode,int LoginId,String eff_date,String role_id,String oldvalue,String newvalue, String coulmname) 
+
+public String getAuditDescriptionDept(String deptCode) {
+    String result = "";
+    String query = "SELECT CONVERT(varchar, dept_Code) + ' - ' + Dept_name " +
+                   "FROM am_ad_department " +
+                   "WHERE dept_Code IN (SELECT deptCode FROM sbu_branch_dept WHERE deptCode = ?)";
+
+    try (Connection con = connect();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setInt(1, Integer.parseInt(deptCode));
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getString(1);
+            }
+        }
+
+    } catch (NumberFormatException nfe) {
+        System.out.println("Invalid department code: " + deptCode);
+    } catch (Exception e) {
+        System.out.println("Error occurred in getAuditDescriptionDept:");
+        e.printStackTrace();
+    }
+
+    return result;
+}
+
+
+public void logAuditTrailSecurityCompOld(String TableName, String BranchCode,int LoginId,String eff_date,String role_id,String oldvalue,String newvalue, String coulmname) 
 throws Exception {
 	
 //	System.out.println("=========Entered logAuditTrailSecurityComp METHOD==========");
@@ -1366,7 +1863,54 @@ throws Exception {
 
 }
 
-public void logAuditTrailSecurityComp(String TableName, String BranchCode,int LoginId,String eff_date,String role_id,String oldvalue,String newvalue, String coulmname, String description) 
+
+public void logAuditTrailSecurityComp(
+        String tableName,
+        String branchCode,
+        int loginId,
+        String effDate,
+        String roleId,
+        String oldValue,
+        String newValue,
+        String columnName) {
+
+    String description = "";
+    String auditQuery = "INSERT INTO AM_AD_UPDATE_AUDIT (" +
+            "TABLE_NAME, COLUMN_NAME, ROW_ID, PREV_VAL, NEW_VAL, EFF_DATE, " +
+            "LOGIN_ID, BRANCH_CODE, DATE, ACT_PERFMD, DESCRIPTION) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection con = connect();
+         PreparedStatement pstmt = con.prepareStatement(auditQuery)) {
+
+        // Fetch description safely
+        description = getAuditDescription(roleId);
+
+        pstmt.setString(1, tableName);
+        pstmt.setString(2, columnName);
+        pstmt.setString(3, roleId);        
+        pstmt.setString(4, oldValue);
+        pstmt.setString(5, newValue);
+        pstmt.setDate(6, dbConnection.dateConvert(new java.util.Date())); 
+        pstmt.setInt(7, loginId);
+        pstmt.setString(8, branchCode);
+        pstmt.setDate(9, dbConnection.dateConvert(new java.util.Date())); 
+        pstmt.setString(10, "Updated");    
+        pstmt.setString(11, description);
+
+        int rowsUpdated = pstmt.executeUpdate();
+        
+
+    } catch (SQLException ex) {
+        System.out.println("SQL Exception in logAuditTrailSecurityComp: " + ex.getMessage());
+        ex.printStackTrace();
+    } catch (Exception e) {
+        System.out.println("Exception in logAuditTrailSecurityComp: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+public void logAuditTrailSecurityCompOld(String TableName, String BranchCode,int LoginId,String eff_date,String role_id,String oldvalue,String newvalue, String coulmname, String description) 
 throws Exception {
 	
 //	System.out.println("=========Entered logAuditTrailSecurityComp METHOD==========");
@@ -1436,7 +1980,46 @@ throws Exception {
 
 }
 
-public void logAuditTrailSecurityComp_Dept(String TableName, String BranchCode,int LoginId,String eff_date,String dept_code,String oldvalue,String newvalue, String coulmname) 
+public void logAuditTrailSecurityComp(
+        String tableName,
+        String branchCode,
+        int loginId,
+        String effDate,
+        String roleId,
+        String oldValue,
+        String newValue,
+        String columnName,
+        String description) {
+
+    String auditSql = "INSERT INTO AM_AD_UPDATE_AUDIT (" +
+            "TABLE_NAME, COLUMN_NAME, ROW_ID, PREV_VAL, NEW_VAL, EFF_DATE, " +
+            "LOGIN_ID, BRANCH_CODE, DATE, ACT_PERFMD, DESCRIPTION) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection con = connect();
+         PreparedStatement pstmt = con.prepareStatement(auditSql)) {
+
+        pstmt.setString(1, tableName);
+        pstmt.setString(2, columnName);
+        pstmt.setString(3, roleId);
+        pstmt.setString(4, oldValue);
+        pstmt.setString(5, newValue);
+        pstmt.setDate(6, dbConnection.dateConvert(new java.util.Date()));
+        pstmt.setInt(7, loginId);
+        pstmt.setString(8, branchCode);
+        pstmt.setDate(9, dbConnection.dateConvert(new java.util.Date()));
+        pstmt.setString(10, "Updated");
+        pstmt.setString(11, description);
+
+        pstmt.executeUpdate();
+
+    } catch (SQLException ex) {
+        System.out.println("SQL Exception in logAuditTrailSecurityComp:");
+        ex.printStackTrace();
+    }
+}
+
+public void logAuditTrailSecurityComp_DeptOld(String TableName, String BranchCode,int LoginId,String eff_date,String dept_code,String oldvalue,String newvalue, String coulmname) 
 throws Exception {
 	
 //	System.out.println("=========Entered logAuditTrailSecurityComp_Dept METHOD==========");
@@ -1506,7 +2089,53 @@ throws Exception {
 	  }
 
 }
-public void logAuditTrailSecurityComp_Sbu(String TableName, String BranchCode,int LoginId,String eff_date,String sbu_code,String oldvalue,String newvalue, String coulmname) 
+
+
+public void logAuditTrailSecurityComp_Dept(
+        String tableName,
+        String branchCode,
+        int loginId,
+        String effDate,
+        String deptCode,
+        String oldValue,
+        String newValue,
+        String columnName) {
+
+    String auditSql = "INSERT INTO AM_AD_UPDATE_AUDIT (" +
+            "TABLE_NAME, COLUMN_NAME, ROW_ID, PREV_VAL, NEW_VAL, EFF_DATE, " +
+            "LOGIN_ID, BRANCH_CODE, DATE, ACT_PERFMD, DESCRIPTION) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection con = connect();
+         PreparedStatement pstmt = con.prepareStatement(auditSql)) {
+
+        String description = getAuditDescription2(deptCode);
+
+        pstmt.setString(1, tableName);
+        pstmt.setString(2, columnName);
+        pstmt.setString(3, deptCode);
+        pstmt.setString(4, oldValue);
+        pstmt.setString(5, newValue);
+        pstmt.setDate(6, dbConnection.dateConvert(new java.util.Date()));
+        pstmt.setInt(7, loginId);
+        pstmt.setString(8, branchCode);
+        pstmt.setDate(9, dbConnection.dateConvert(new java.util.Date()));
+        pstmt.setString(10, "Updated");
+        pstmt.setString(11, description);
+
+        pstmt.executeUpdate();
+
+    } catch (SQLException ex) {
+        System.out.println("SQL Exception in logAuditTrailSecurityComp_Dept:");
+        ex.printStackTrace();
+    } catch (Exception e) {
+        System.out.println("Error fetching department description:");
+        e.printStackTrace();
+    }
+}
+
+
+public void logAuditTrailSecurityComp_SbuOld(String TableName, String BranchCode,int LoginId,String eff_date,String sbu_code,String oldvalue,String newvalue, String coulmname) 
 throws Exception { 
 	
 //	System.out.println("=========Entered logAuditTrailSecurityComp_Sbu METHOD==========");
@@ -1576,7 +2205,53 @@ throws Exception {
 	  }
 
 }
-public String getAuditDescription2(String dept_code) throws Exception{
+
+public void logAuditTrailSecurityComp_Sbu(
+        String tableName,
+        String branchCode,
+        int loginId,
+        String effDate,
+        String sbuCode,
+        String oldValue,
+        String newValue,
+        String columnName) {
+
+    String auditSql = "INSERT INTO AM_AD_UPDATE_AUDIT (" +
+            "TABLE_NAME, COLUMN_NAME, ROW_ID, PREV_VAL, NEW_VAL, EFF_DATE, " +
+            "LOGIN_ID, BRANCH_CODE, DATE, ACT_PERFMD, DESCRIPTION) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection con = connect();
+         PreparedStatement pstmt = con.prepareStatement(auditSql)) {
+
+        String description = getAuditDescriptionSbu(sbuCode);
+
+        pstmt.setString(1, tableName);
+        pstmt.setString(2, columnName);
+        pstmt.setString(3, sbuCode);
+        pstmt.setString(4, oldValue);
+        pstmt.setString(5, newValue);
+        pstmt.setDate(6, dbConnection.dateConvert(new java.util.Date()));
+        pstmt.setInt(7, loginId);
+        pstmt.setString(8, branchCode);
+        pstmt.setDate(9, dbConnection.dateConvert(new java.util.Date()));
+        pstmt.setString(10, "Updated");
+        pstmt.setString(11, description);
+
+        pstmt.executeUpdate();
+
+    } catch (SQLException ex) {
+        System.out.println("SQL Exception in logAuditTrailSecurityComp_Sbu:");
+        ex.printStackTrace();
+    } catch (Exception e) {
+        System.out.println("Error getting SBU description:");
+        e.printStackTrace();
+    }
+}
+
+
+
+public String getAuditDescription2Old(String dept_code) throws Exception{
 	//Connection con = null;
 
 	
@@ -1621,7 +2296,36 @@ public String getAuditDescription2(String dept_code) throws Exception{
 		return result;
 	
 }
-public String getAuditDescriptionSbu(String sbu_code) throws Exception{
+
+public String getAuditDescription2(String deptCode) {
+
+    String result = "";
+    String query = "SELECT CONVERT(varchar, dept_Code) + ' - ' + Dept_name " +
+                   "FROM am_ad_department " +
+                   "WHERE dept_Code IN (" +
+                   "    SELECT deptCode FROM sbu_branch_dept WHERE deptCode = ?" +
+                   ")";
+
+    try (Connection con = connect();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, deptCode);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getString(1);
+            }
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error in getAuditDescription2:");
+        e.printStackTrace();
+    }
+
+    return result;
+}
+
+public String getAuditDescriptionSbuOld(String sbu_code) throws Exception{
 	//Connection con = null;
 
 
@@ -1670,7 +2374,36 @@ public String getAuditDescriptionSbu(String sbu_code) throws Exception{
 	
 }
 
-public boolean logAuditTrail(String TableName,  String BranchCode,  int LoginId, String RowId, String RecordId,String ActionPerformed) throws Exception
+public String getAuditDescriptionSbu(String sbuCode) {
+
+    String result = "";
+
+    String query = "SELECT CONVERT(varchar, Sbu_Code) + ' - ' + Sbu_name " +
+                   "FROM Sbu_SetUp " +
+                   "WHERE Sbu_Code IN (" +
+                   "    SELECT Sbu_Code FROM AM_SBU_ATTACHEMENT WHERE Sbu_Code = ?" +
+                   ")";
+
+    try (Connection con = connect();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, sbuCode);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getString(1);
+            }
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error in getAuditDescriptionSbu:");
+        e.printStackTrace();
+    }
+
+    return result;
+}
+
+public boolean logAuditTrailOld(String TableName,  String BranchCode,  int LoginId, String RowId, String RecordId,String ActionPerformed) throws Exception
 	//updateAuditLog  IN  parameters  are  actPerf,  branchcode,  description
     { 
 	   try {
@@ -1749,7 +2482,57 @@ public boolean logAuditTrail(String TableName,  String BranchCode,  int LoginId,
 	}//end method block
 
 
+public boolean logAuditTrail(String tableName,
+        String branchCode,
+        int loginId,
+        String rowId,
+        String recordId,
+        String actionPerformed) {
 
+boolean isUpdate = false;
+
+String auditSql = "INSERT INTO AM_AD_UPDATE_AUDIT " +
+"(TABLE_NAME, COLUMN_NAME, ROW_ID, PRE_VALUE, CUR_VALUE, " +
+" LOGIN_ID, BRANCH_CODE, EFF_DATE, ACTION_PERFORMED) " +
+"VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), ?)";
+
+try (Connection con = connect();
+PreparedStatement ps = con.prepareStatement(auditSql)) {
+
+con.setAutoCommit(false);  
+
+Iterator<Field> it = this.getContainer().values().iterator();
+
+while (it.hasNext()) {
+
+Field fld = it.next();
+
+if (fld.isChanged()) {
+
+isUpdate = true;
+
+ps.setString(1, tableName.trim());
+ps.setString(2, fld.getName());
+ps.setString(3, rowId.trim());
+ps.setString(4, fld.getOldValue());
+ps.setString(5, fld.getNewValue());
+ps.setInt(6, loginId);
+ps.setString(7, branchCode.trim());
+ps.setString(8, actionPerformed.trim());
+
+ps.addBatch();   
+}
+}
+
+ps.executeBatch();   
+con.commit();
+
+} catch (SQLException ex) {
+ex.printStackTrace();
+}
+
+return isUpdate;
+}
 
 
 

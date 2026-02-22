@@ -122,9 +122,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
     }
 
   private MagmaDBConnection dbConnection = new MagmaDBConnection();
-         Connection con1 = null;
-            PreparedStatement ps1 = null;
-            ResultSet rs1 = null;
+        
 
 
     /**
@@ -183,8 +181,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         //if (freq == null) {
         intFreq = Integer.parseInt(freq);
         // } 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_MAINTENANCE_HISTORY( " +
                              " TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO " +
@@ -201,8 +198,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } else {
 
             try {
-                con = getConnection("legendPlus");
-                ps = con.prepareStatement(createQuery);
+            	 Connection con = dbConnection.getConnection("legendPlus");
+     	        PreparedStatement ps = con.prepareStatement(createQuery);
 //                System.out.println("=======techName: "+techName);
                 ps.setString(1, type);
                 ps.setDouble(2, cost);
@@ -281,8 +278,6 @@ public class FleetHistoryManager extends MagmaDBConnection {
             } catch (Exception e) {
                 System.out.println("INFO:Error creating MAINTENANCE_HISTORY ->" +
                                    e.getMessage());
-            } finally {
-                closeConnection(con, ps);
             }
         }
     }
@@ -321,8 +316,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         if (freq == null) {
             intFreq = Integer.parseInt(freq);
         }
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_MAINTENANCE_HISTORY( " +
                              " TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO " +
@@ -338,8 +332,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } else {
             cost = cost * ( -1);
             try {
-                con = getConnection("legendPlus");
-                ps = con.prepareStatement(createQuery);
+            	 Connection con = dbConnection.getConnection("legendPlus");
+     	        PreparedStatement ps= con.prepareStatement(createQuery);
 
                 ps.setString(1, type);
                 ps.setDouble(2, cost);
@@ -409,9 +403,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             } catch (Exception e) {
                 System.out.println("INFO:Error creating MAINTENANCE_HISTORY ->" +
                                    e.getMessage());
-            } finally {
-                closeConnection(con, ps);
-            }
+            } 
         }
     }
 
@@ -448,8 +440,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             intFreq = Integer.parseInt(freq);
         }
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_INSURANCE_HISTORY(" +
                              "TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO" +
@@ -458,8 +449,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
 
             ps.setString(1, "I");
             ps.setDouble(2, cost);
@@ -529,9 +520,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println("INFO:Error creating INSURANCE_HISTORY ->" +
                                e.getMessage());
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     public void reverseInssuranceRecord(String assetId, String registrationNo,
@@ -555,8 +544,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             intFreq = Integer.parseInt(freq);
         }
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_INSURANCE_HISTORY(" +
                              ",TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO" +
@@ -565,8 +553,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         cost = cost * ( -1);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
 
             ps.setString(1, "I");
             ps.setDouble(2, cost);
@@ -635,9 +623,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println("INFO:Error creating INSURANCE_HISTORY ->" +
                                e.getMessage());
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
 
@@ -670,8 +656,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         intFreq = Integer.parseInt(freq);
         //}
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_FUEL_HISTORY(" +
                              "TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO," +
@@ -680,8 +665,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
 
             ps.setString(1, "F");
             ps.setDouble(2, cost);
@@ -751,9 +736,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println("INFO:Error creating FUEL_RECORDS ->" +
                                e.getMessage());
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     public void reverseFuelRecord(String assetId, String registrationNo,
@@ -776,8 +759,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             intFreq = Integer.parseInt(freq);
         }
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_FUEL_HISTORY(" +
                              "TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO," +
@@ -786,8 +768,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
 
             ps.setString(1, "F");
             ps.setDouble(2, cost);
@@ -856,9 +838,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println("INFO:Error creating FUEL_RECORDS ->" +
                                e.getMessage());
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
 
@@ -899,8 +879,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             intFreq = Integer.parseInt(freq);
         }
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_LICENCE_HISTORY( " +
                              " TYPE,COST_PRICE,ASSET_ID " +
@@ -909,8 +888,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "VALUES( ?,?,?,?,?,?,?,?,?,?,?,?) ";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
 
             ps.setString(1, type);
             ps.setDouble(2, cost);
@@ -975,9 +954,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error creating LICENCE_HISTORY in createLicencePermitRecord ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     public void reverseLicencePermitRecord(String assetId,
@@ -1005,8 +982,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             intFreq = Integer.parseInt(freq);
         }
         cost = cost * ( -1);
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_LICENCE_HISTORY( " +
                              " TYPE,COST_PRICE,ASSET_ID " +
@@ -1015,8 +991,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "VALUES( ?,?,?,?,?,?,?,?,?,?) ";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
 
             ps.setString(1, type);
             ps.setDouble(2, cost);
@@ -1079,9 +1055,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error creating LICENCE_HISTORY in reverseLicencePermitRecord ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     /**
@@ -1134,8 +1108,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         intFreq = Integer.parseInt(freq);
         //}
   
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_ACCIDENT_HISTORY(" +
                              " TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO " +
@@ -1147,8 +1120,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "USER_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO,HIST_ID,INSURER,TRANS_DATE,BATCH_ID  " +
                              ") VALUES( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
 
             ps.setString(1, "A");
             ps.setDouble(2, repairCost);
@@ -1224,9 +1197,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error creating ACCIDENT_HISTORY in createAccidentRecord ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     public void reverseAccidentRecord(String assetId, String registrationNo,
@@ -1257,8 +1228,6 @@ public class FleetHistoryManager extends MagmaDBConnection {
         intFreq = Integer.parseInt(freq);
         //}
         repairCost = repairCost * ( -1);
-        Connection con = null;
-        PreparedStatement ps = null;
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_ACCIDENT_HISTORY( " +
                              " TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO " +
@@ -1271,8 +1240,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              ") VALUES( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
 
             ps.setString(1, "A");
             ps.setDouble(2, repairCost);
@@ -1344,9 +1313,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error creating ACCIDENT_HISTORY in reverseAccidentRecord ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
 
@@ -1382,19 +1349,16 @@ public class FleetHistoryManager extends MagmaDBConnection {
     }
 
     private void excuteSQLCode(String sqlCode) {
-        Connection con = null;
-        PreparedStatement ps = null;
+        
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(sqlCode);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(sqlCode);
             ps.execute();
         } catch (Exception ex) {
             System.out.println("Error executing SQL Code ->\n" + sqlCode + "\n" +
                                ex);
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     /**
@@ -1404,9 +1368,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public ArrayList findAllMaintenaceRecord() {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE " +
@@ -1417,9 +1379,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "FROM FT_MAINTENANCE_HISTORY ";
 //System.out.println("selectQuery in findAllMaintenaceRecord: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("LT_ID");
@@ -1465,9 +1427,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println(
                     "INFO:Error Fecthing Maintenance Record Details ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -1480,9 +1440,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public ArrayList findFleetMaintenanceRecordByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE " +
@@ -1493,9 +1451,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "FROM FT_MAINTENANCE_HISTORY " + queryFilter;
 //        System.out.println("selectQuery in findFleetMaintenanceRecordByQuery: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -1543,9 +1501,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println(
                     "INFO:Error Fecthing Maintenance Record Details ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -1558,9 +1514,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public FleetManatainanceRecord findMaintenaceRecordById(String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE " +
@@ -1571,10 +1525,10 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "FROM FT_MAINTENANCE_HISTORY WHERE HIST_ID = ?";
 //        System.out.println("selectQuery in findMaintenaceRecordById: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -1616,18 +1570,14 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findMaintenaceRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return maintenanceRecord;
     }
 
     public FleetManatainanceRecord findMaintenaceRecordById(String tranId,
             String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE " +
@@ -1638,10 +1588,10 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "FROM FT_MAINTENANCE_HISTORY WHERE HIST_ID = ?";
 //        System.out.println("selectQuery in findMaintenaceRecordById2: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, tranId);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -1685,9 +1635,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findMaintenaceRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return maintenanceRecord;
     }
 
@@ -1699,9 +1648,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public ArrayList findMaintenaceRecordByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -1713,9 +1660,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "FROM FT_MAINTENANCE_HISTORY WHERE LT_ID != ''  " + queryFilter;
 //        System.out.println("<<<<selectQuery in findMaintenaceRecordByQuery====: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps= con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("LT_ID");
@@ -1758,9 +1705,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findMaintenaceRecordByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return finder;
     }
 
@@ -1771,9 +1717,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public ArrayList findLicencePermitRecordByQuery(String filter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         String selectQuery = "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,STATUS " +
                              ",REGISTRATION_NO,DATE_OBTAINED,EXPIRY_DATE,INVOICE_NO " +
@@ -1781,9 +1725,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              filter;
 //        System.out.println("<<<<<selectQuery in findLicencePermitRecordByQuery: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("LT_ID");
@@ -1804,9 +1748,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         } catch (Exception e) {
             System.out.println("INFO:Error creating Budget ->" + e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -1819,19 +1761,17 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public FleetLicencePermit findLicencePermitById(String id) {
         FleetLicencePermit licence = null;
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String selectQuery = "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID " +
                              ",REGISTRATION_NO,LICENCE_NO,DATE_OBTAINED " +
                              ",EXPIRY_DATE,STATUS,FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO " +
                              "FROM FT_LICENCE_HISTORY WHERE BATCH_ID =?";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps= con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 //String id = rs.getString("LICENCE_ID");
@@ -1855,28 +1795,24 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching license records ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return licence;
     }
 
     public FleetLicencePermit findLicencePermitById(String tranId, String id) {
         FleetLicencePermit licence = null;
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String selectQuery = "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID " +
                              ",REGISTRATION_NO,LICENCE_NO,DATE_OBTAINED " +
                              ",EXPIRY_DATE,STATUS,FIRST_NOT_DATE,NOTIFICATION_FREQ,INVOICE_NO " +
                              "FROM FT_LICENCE_HISTORY WHERE BATCH_ID =?";
         DataConnect connect = new DataConnect();
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, tranId);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String ltId = rs.getString("LT_ID");
@@ -1901,9 +1837,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching license records ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return licence;
     }
@@ -1916,19 +1850,17 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public FleetLicencePermit findLicencePermitByRegNo(String registrationNo) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String selectQuery = "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID " +
                              ",REGISTRATION_NO,LICENCE_NO,DATE_OBTAINED " +
                              ",EXPIRY_DATE,STATUS,INVOICE_NO " +
                              "FROM FT_LICENCE_HISTORY WHERE REGISTRATION_NO =?";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, registrationNo);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("LT_ID");
@@ -1948,9 +1880,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         } catch (Exception e) {
             System.out.println("INFO:Error creating Budget ->" + e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return null;
     }
@@ -1962,9 +1892,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public ArrayList findAccidentRecordByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
         String selectQuery = "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID " +
                              " ,REGISTRATION_NO,DRIVER_INVOLVED,LOCATION " +
@@ -1976,9 +1904,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "WHERE ASSET_ID != '' " + queryFilter;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2020,9 +1948,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching Accident Records ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -2035,9 +1961,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public ArrayList findAllAccidentRecord() {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         String selectQuery = "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID " +
                              " ,REGISTRATION_NO,DRIVER_INVOLVED,LOCATION " +
@@ -2049,9 +1973,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         ;
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+           ResultSet  rs = ps.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("ACCIDENT_ID");
@@ -2090,9 +2014,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching accident history ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -2105,9 +2027,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public FleetAccidentRecord findAccidentRecordById(String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         String selectQuery = "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID " +
                              " ,REGISTRATION_NO,DRIVER_INVOLVED,LOCATION " +
                              ",ACCIDENT_DATE,POLICE_REPORT_OBTAINED,POLICE_REPORT_DATE " +
@@ -2119,9 +2039,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         FleetAccidentRecord accidentRecord = null;
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 //String id = rs.getString("ACCIDENT_ID");
@@ -2161,18 +2081,14 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fecthing accidents ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return accidentRecord;
     }
 
     public FleetAccidentRecord findAccidentRecordById(String tranId, String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String selectQuery = "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID " +
                              " ,REGISTRATION_NO,DRIVER_INVOLVED,LOCATION " +
                              ",ACCIDENT_DATE,POLICE_REPORT_OBTAINED,POLICE_REPORT_DATE " +
@@ -2185,9 +2101,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         FleetAccidentRecord accidentRecord = null;
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String ltId = rs.getString("LT_ID");
@@ -2227,9 +2143,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fecthing accidents ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return accidentRecord;
     }
@@ -2243,9 +2157,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public FleetInsurranceRecord findInsurranceRecordById(String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO " +
                 " ,COMPANY,DATE_OBTAINED,EXPIRY_DATE,STATUS,HIST_ID,PROJECT_CODE " +
@@ -2254,10 +2166,10 @@ public class FleetHistoryManager extends MagmaDBConnection {
 //System.out.println("<<<<<<<findInsurranceRecordById selectQuery: "+selectQuery);
         FleetInsurranceRecord insRecord = null;
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2288,9 +2200,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching insurance record in findInsurranceRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return insRecord;
     }
@@ -2299,9 +2209,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
     public FleetInsurranceRecord findInsurranceRecordById(String tranId,
             String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO " +
                 " ,COMPANY,DATE_OBTAINED,EXPIRY_DATE,STATUS,HIST_ID " +
@@ -2310,10 +2218,10 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         FleetInsurranceRecord insRecord = null;
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, tranId);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2341,9 +2249,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching insurance record in findInsurranceRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return insRecord;
     }
@@ -2355,9 +2261,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      * @return ArrayList
      */
     public ArrayList findInsuranceRecordByQuery(String queryFilter) {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO, PROJECT_CODE " +
                 " ,COMPANY,DATE_OBTAINED,EXPIRY_DATE,STATUS,HIST_ID,FIRST_NOT_DATE,NOTIFICATION_FREQ " +
@@ -2365,9 +2269,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         ArrayList list = new ArrayList();
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2397,9 +2301,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching all Insurance Record ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -2411,9 +2313,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      */
     public ArrayList findAllInsurranceRecordByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         String selectQuery =
                 "SELECT a.LT_ID,a.TYPE,a.COST_PRICE,a.ASSET_ID,a.REGISTRATION_NO,a.PROJECT_CODE " +
                 " ,b.INSURANCE_NAME AS COMPANY,a.DATE_OBTAINED,a.EXPIRY_DATE,a.STATUS,a.INVOICE_NO " +
@@ -2422,9 +2322,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         ArrayList list = new ArrayList();
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2452,9 +2352,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching all Insurance Record ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -2465,9 +2363,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      * @return ArrayList
      */
     public ArrayList findFuelRecordsByQuery(String filter) {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE, " +
                 "VOLUME,FUEL_TYPE,INVOICE_NO,EFFECTIVE_DATE,ENTRY_DATE,STATUS,UNIT_PRICE  " +
@@ -2475,9 +2371,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         ArrayList list = new ArrayList();
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+ 	        ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2505,9 +2401,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching Fuel ALL Records  ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -2519,9 +2413,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
      * @return FleetFuelRecord
      */
     public FleetFuelRecord findFuelRecordById(String id) {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetFuelRecord fuelRecord = null;
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE," +
@@ -2529,9 +2421,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "FROM FT_FUEL_HISTORY WHERE BATCH_ID = '" + id + "'";
       
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps= con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2562,18 +2454,14 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching Fuel Record By ID in FleetFuelRecord ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return fuelRecord;
     }
 
     //added by Olabo
     public FleetFuelRecord findFuelRecordById(String tranId, String id) {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+      
         FleetFuelRecord fuelRecord = null;
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE," +
@@ -2581,9 +2469,9 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "FROM FT_FUEL_HISTORY WHERE BATCH_ID = '" + tranId + "'";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2612,10 +2500,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching Fuel Record By ID in findFuelRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-
+        } 
         return fuelRecord;
     }
 
@@ -2732,9 +2617,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "?,?,?,?,?,?,?,?,?,?,?" +
                 ")";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
 
         if (assetid == null || assetid.equals("")) {
             try {
@@ -2747,8 +2630,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
         }
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(CREATE_QUERY);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(CREATE_QUERY);
 
             ps.setString(1, assetid);
             ps.setString(2, regno);
@@ -2810,9 +2693,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println("INFO:Error creating Asset ->" +
                                e.getMessage());
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
     }
 
 
@@ -2832,15 +2713,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE   " +
                 "FROM AM_ASSET  ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2892,8 +2771,6 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAllAsset ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
         }
 
         return list;
@@ -2911,15 +2788,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE, Asset_Status,REQ_REDISTRIBUTION   " +
                 "FROM AM_ASSET  WHERE Req_Depreciation = 'Y'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2976,9 +2851,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetForDepreciation ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -3001,16 +2874,14 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE   " +
                 "FROM AM_ASSET WHERE CATEGORY_ID = ? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, categoryCode);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -3062,9 +2933,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetByCategory ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -3093,17 +2962,15 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "WHERE A.CATEGORY_ID = C.CATEGORY_ID " +
                 " AND A.CATEGORY_ID = ? AND A.ASSET_MAKE = ?";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	         PreparedStatement ps= con.prepareStatement(selectQuery);
             ps.setInt(1, Integer.parseInt(categoryCode));
             ps.setInt(2, Integer.parseInt(makeCode));
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -3158,9 +3025,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println(
                     "INFO:Error fetching ALL Asset By Make Category\n ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -3185,15 +3050,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE,REQ_REDISTRIBUTION   " +
                 "FROM AM_ASSET  WHERE ASSET_ID = ?";
 //        System.out.println("<<<<<<<selectQuery in findAssetById: "+selectQuery+"         Asset Id: "+id);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -3243,10 +3106,8 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching assetDetail ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-
+        } 
+        
         return finder;
     }
 
@@ -3276,16 +3137,14 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE,REQ_REDISTRIBUTION   " +
                 "FROM AM_ASSET2  WHERE ASSET_ID = ?";
         System.out.println("<<<<<<<selectQuery in findAssetFleetById: "+selectQuery+"         Asset Id: "+id);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
             ps.setString(2, id);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -3335,9 +3194,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching assetDetail ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return finder;
     }
@@ -3381,17 +3238,14 @@ public class FleetHistoryManager extends MagmaDBConnection {
 //        String selectQuery = "select * from am_asset where Asset_id not in (select Asset_id from am_gb_bulkTransfer) and Asset_id !=(?)";
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+selectQuery);	
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+queryFilter);	
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
 //            ps.setString(1, queryFilter);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -3467,9 +3321,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetByQuery First ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -3523,17 +3375,14 @@ public class FleetHistoryManager extends MagmaDBConnection {
 //        String selectQuery = "select * from am_asset where Asset_id not in (select Asset_id from am_gb_bulkTransfer) and Asset_id !=(?)";
 //       System.out.println("<<<<<<<selectQuery in findAssetByQueryFleet: "+selectQuery);	
 //       System.out.println("<<<<<<<selectQuery in findAssetByQueryFleet: "+queryFilter);	
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
 //            ps.setString(1, queryFilter);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -3610,9 +3459,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetByQueryFleet->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -3658,15 +3505,12 @@ public class FleetHistoryManager extends MagmaDBConnection {
        String selectQuery = "select * from am_asset where Asset_id not in (select Asset_id from am_gb_bulkTransfer) and Asset_id !='' "+queryFilter;
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+selectQuery);	
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+queryFilter);	
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery.toString());
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery.toString());
             if(queryFilter.contains("ASSET_STATUS")){
           	  ps.setString(1, status);
             }    
@@ -3760,7 +3604,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         	  ps.setString(4, dFromDate);
         	  ps.setString(5, dToDate);
           }            
-            rs = ps.executeQuery();  
+            ResultSet rs = ps.executeQuery();  
 
             while (rs.next()) {
 
@@ -3836,9 +3680,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetByQuery second ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -4124,16 +3966,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
         String selectQuery = "select *from am_asset where Asset_id !='' " +
 		queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetFacilityByQuery: "+selectQuery);		
-        Connection con = null;
-        PreparedStatement ps = null;
 
-        ResultSet rs = null;
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -4209,9 +4048,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetFacilityByQuery->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -4230,15 +4067,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "FRONT_VIEW,SIDE_VIEW,AREA_VIEW,BACK_VIEW   " +
                 "FROM FT_ACCIDENT_IMAGE  WHERE REGISTRATION_NO = ?";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps= con.prepareStatement(selectQuery);
             ps.setString(1, registrationNo);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -4259,9 +4094,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching Accident Image ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return finder;
 
@@ -4287,15 +4120,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "AND A.BRANCH_ID = B.BRANCH_ID   " +
                 "AND A.ASSET_ID = ? ";
 //System.out.println("<<<<<selectQuery in findAssetDetailById: "+selectQuery);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -4336,9 +4167,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching findAssetDetailById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return finder;
     }
 
@@ -4373,16 +4202,14 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "AND A.BRANCH_ID = B.BRANCH_ID   " +
                 "AND A.ASSET_ID = ? ";                
 //System.out.println("<<<<<selectQuery in findAssetFleetDetailById: "+selectQuery);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
             ps.setString(2, id);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -4425,9 +4252,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching findAssetFleetDetailById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return finder;
     }
 
@@ -4452,15 +4277,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "AND A.BRANCH_ID = B.BRANCH_ID   " +
                 "AND A.ASSET_ID = ? ";
 //System.out.println("<<<<<selectQuery in findAssetDetailById: "+selectQuery);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -4501,9 +4324,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching findFacilityAssetDetailById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return finder;
     }
 
@@ -4518,12 +4339,11 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         String selectQuery = this.getDataFleetMigrationQuery();
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
 
         try {  
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
             ps.setString(2, id);
             ps.execute();
@@ -4531,30 +4351,25 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error Copying Asset Data to Fleet ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
     
     public void copyAssetDataToFM(String id) {
 
         String selectQuery = this.getDataFMMigrationQuery();
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
 
         try {  
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
             ps.execute();
 
         } catch (Exception e) {
             System.out.println("INFO:Error Copying Asset Data to FM ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
     
     /**
@@ -4571,15 +4386,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                              "AND A.ASSET_ID = ?";
 
         boolean isRequired = false;
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps= con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String required = rs.getString(1);
@@ -4590,9 +4403,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
             System.out.println(
                     "INFO:Error validating fleet requirement for asset ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
 
         return isRequired;
     }
@@ -4619,20 +4430,18 @@ public class FleetHistoryManager extends MagmaDBConnection {
             qaurter = 4;
         }
         String TRANS_QUERY = getTransactionQuery(qaurter);
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
 
         String query = "SELECT " + TRANS_QUERY + " FROM FT_FLEET_MASTER " +
                        "WHERE CATEGORY_ID = ? AND ASSET_MAKE = ?";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps= con.prepareStatement(query);
             ps.setDouble(1, amount);
             ps.setString(2, categoryId);
             ps.setString(3, makeId);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 balance = rs.getDouble(1);
@@ -4640,10 +4449,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error getting transaction Balance " + ex);
-        } finally {
-            closeConnection(con, ps, rs);
-            System.out.println(query);
-        }
+        } 
 
         return balance;
     }
@@ -4689,17 +4495,15 @@ public class FleetHistoryManager extends MagmaDBConnection {
     }
 
     public boolean isQaurterlyRequired() {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         boolean isAllowedQuarter = false;
 
         String query = "SELECT require_quarterly_pm FROM am_gb_company ";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 isAllowedQuarter = (rs.getString(1).equalsIgnoreCase("Y")) ? true : false;
@@ -4707,25 +4511,21 @@ public class FleetHistoryManager extends MagmaDBConnection {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error validing qaurterly PM " + ex);
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return true;
     }
 
     public boolean isQaurterlyOverFlowAllowed() {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         boolean isAllowedOverFlow = false;
 
         String query = "SELECT quarterly_surplus_cf FROM am_gb_company ";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 isAllowedOverFlow = (rs.getString(1).equalsIgnoreCase("Y")) ? true : false;
@@ -4734,9 +4534,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception ex) {
             System.out.println(
                     "WARN: Error getting isQaurterlyOverFlowAllowed() " + ex);
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return true;
     }
@@ -4748,15 +4546,12 @@ public class FleetHistoryManager extends MagmaDBConnection {
                               "NOTIFY_EVERY_DAYS  " +
                               "FROM AM_AD_CATEGORY     " +
                               "WHERE CATEGORY_ID = ?    ";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
+       
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(SELECT_QUERY);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(SELECT_QUERY);
             ps.setString(1, category);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 notificationParams[0] = rs.getString(1);
@@ -4767,9 +4562,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching PMCycleParams ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return notificationParams;
     }
@@ -4780,15 +4573,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "SELECT '0' AS PM_CYCLE_PERIOD,NOTIFY_DAYS,EVERY_DAYS  " +
                 "FROM AM_AD_LICENSETYPE     " +
                 "WHERE LICENSE_ID = ?  ";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(SELECT_QUERY);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(SELECT_QUERY);
             ps.setString(1, licenseid);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 notificationParams[0] = rs.getString(1);
@@ -4799,9 +4590,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching PMCycleParams ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return notificationParams;
     }
@@ -4812,15 +4601,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "SELECT '0' AS PM_CYCLE_PERIOD,NOTIFY_DAYS,EVERY_DAYS   " +
                 "FROM AM_AD_INSURANCE    " +
                 "WHERE INSURANCE_ID = ?    ";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(SELECT_QUERY);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(SELECT_QUERY);
             ps.setString(1, insuranceid);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 notificationParams[0] = rs.getString(1);
@@ -4831,10 +4618,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching InsuranceCycleParams ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
         }
-
         return notificationParams;
     }
 
@@ -4842,18 +4626,16 @@ public class FleetHistoryManager extends MagmaDBConnection {
         String comboString = "";
         StringBuffer comboBuffer = new StringBuffer();
         String SELECT_QUERY = "SELECT DISTINCT(ASSET_STATUS) FROM AM_ASSET";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
 
         String val = "";
         String desc = "";
         String sel = "";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(SELECT_QUERY);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(SELECT_QUERY);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 val = rs.getString(1);
@@ -4882,9 +4664,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching AssetStatusForCombo ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return comboBuffer.toString();
     }
@@ -4969,15 +4749,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
                 "category_code" +
                 "FROM AM_BARCODE_HISTORY WHERE ASSET_ID IS NOT NULL && PRINT_FLD = 'N'" + queryFilter;
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         ArrayList barcodelist = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -4999,9 +4777,7 @@ public class FleetHistoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findBarCodeByQuery->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return barcodelist;
 
@@ -5012,12 +4788,13 @@ public class FleetHistoryManager extends MagmaDBConnection {
 String branch_name= "";
  try {
      //System.out.println("the value of id received by getBranchName() is " +id);
-            con1 = dbConnection.getConnection("legendPlus");
+            
 
             String query = "select BRANCH_NAME from am_ad_branch where BRANCH_CODE ='"+id+"'";
 
-            ps1 = con1.prepareStatement(query);
-            rs1 = ps1.executeQuery();
+            Connection con1 = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps1 = con1.prepareStatement(query);
+            ResultSet rs1 = ps1.executeQuery();
              //int counter =0;
             while(rs1.next()){
 
@@ -5031,9 +4808,7 @@ String branch_name= "";
         } catch (Exception e) {
             System.out.println("BarCodePrintServlet:=== DB erorr occured in method getBranchName()" +e);
         }
-    finally{
-      dbConnection.closeConnection(con1, ps1,rs1);
-    }
+    
 
     return branch_name;
 
@@ -5045,12 +4820,12 @@ String branch_name= "";
 String category_name= "";
  try {
      //System.out.println("the value of id received by getBranchName() is " +id);
-            con1 = dbConnection.getConnection("legendPlus");
+           
 
             String query = "select category_name from am_ad_category where category_code ='"+id+"'";
-
-            ps1 = con1.prepareStatement(query);
-            rs1 = ps1.executeQuery();
+            Connection con1 = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps1 = con1.prepareStatement(query);
+            ResultSet rs1 = ps1.executeQuery();
              //int counter =0;
             while(rs1.next()){
 
@@ -5064,9 +4839,7 @@ String category_name= "";
         } catch (Exception e) {
             System.out.println("BarCodePrintServlet:=== DB erorr occured in method getCategoryName()" +e);
         }
-    finally{
-      dbConnection.closeConnection(con1, ps1,rs1);
-    }
+   
 
     return category_name;
 
@@ -5086,15 +4859,13 @@ String category_name= "";
 			"IMPROV_MONTHLYDEP,IMPROV_ACCUMDEP,IMPROV_NBV,IMPROV_VATABLECOST,TOTAL_NBV,IMPROV_EffectiveDate,IMPROV_EndDate "+
 			"FROM AM_ASSET  WHERE ASSET_ID NOT IN (SELECT ASSET_ID FROM DEPRECIATION_PROCESSING_VALIDATION) AND Req_Depreciation = 'Y' AND ASSET_STATUS = 'ACTIVE' " + filter;
 //		System.out.println("<<<<<<<<selectQuery: "+selectQuery);
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		ArrayList list = new ArrayList();
 
 		try {
-			con = getConnection("legendPlus");
-			ps = con.prepareStatement(selectQuery);
-			rs = ps.executeQuery();
+			 Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps = con.prepareStatement(selectQuery);
+			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
 
@@ -5173,10 +4944,8 @@ String category_name= "";
 		} catch (Exception e) {
 			System.out.println("INFO:Error fetching ALL Asset in findAssetForDepreciation ->" +
 					e.getMessage());
-		} finally {
-			closeConnection(con, ps, rs);
-		}
-		closeConnection(con, ps, rs);
+		} 
+		
 		return list;
 
 	}
@@ -5250,16 +5019,13 @@ String category_name= "";
                 "system_ip,mac_address,Bid_Period,BID,BID_TAG,STAFFID,BASE_PRICE,LOCATION_CODE " +
                 "FROM AM_ASSET_BID  WHERE ASSET_ID IS NOT NULL " + queryFilter;
 //        System.out.println("the query in findAssetBIDByQuery is <<<<<<<<<<<<< "+ selectQuery);
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+ 	        ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -5447,9 +5213,7 @@ String category_name= "";
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetBIDByQuery ->>>> " +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -5469,15 +5233,14 @@ String category_name= "";
                 "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         //ResultSet rs = null;
         magma.net.vao.Asset bd = null;
 
         int[] d = null;
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
 
             for(int i = 0; i < list.size(); i++) {
                 bd = (magma.net.vao.Asset) list.get(i);
@@ -5631,9 +5394,7 @@ String category_name= "";
 
         }catch(Exception ex) {
             System.out.println("Error InsertBIDSelection() In FleetHistoryManager -> " + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
         return (d.length > 0);
     }
@@ -5644,16 +5405,14 @@ public boolean findExistedBidLimit(magma.net.vao.Asset asset,ArrayList lists){
 
     String selectQuery = "SELECT * FROM AM_BID_LIMIT WHERE ASSET_ID='"+asset.getId()+"' ";
 
-   Connection con = null;
-   PreparedStatement ps = null;
-   ResultSet rs = null;
+   
    ArrayList list = new ArrayList();
    boolean done = false;
 
    try{
-       con = getConnection("legendPlus");
-       ps = con.prepareStatement(selectQuery);
-       rs = ps.executeQuery();
+	   Connection con = dbConnection.getConnection("legendPlus");
+       PreparedStatement ps = con.prepareStatement(selectQuery);
+       ResultSet rs = ps.executeQuery();
       if(rs.next())
       {
    	  // System.out.print("  Record existed...");
@@ -5667,9 +5426,7 @@ public boolean findExistedBidLimit(magma.net.vao.Asset asset,ArrayList lists){
    }catch (Exception e) {
        System.out.println("INFO:Error Finding Existed Records. " +
                           e.getMessage());
-   } finally {
-       closeConnection(con, ps, rs);
-   }
+   } 
 
    return done;
 
@@ -5682,19 +5439,16 @@ public boolean updatebidLimit(java.util.ArrayList list) {
 	String query2 = "UPDATE AM_ASSET_BID "+
 			"SET Bid_Tag = ?,Description = ?,BASE_PRICE = ?,LOCATION_CODE = ? "
 		+ " WHERE Asset_id=? ";
-	Connection con = null;
-	PreparedStatement ps = null;
-	PreparedStatement ps2 = null;
-	ResultSet rs = null;
+	
 	int[] d = null;
 	boolean done = false;
 	magma.net.vao.Asset asset = null;
 	try {
 
 
-		con = getConnection("legendPlus");
-		ps = con.prepareStatement(query);
-		ps2 = con.prepareStatement(query2);
+		 Connection con = dbConnection.getConnection("legendPlus");
+	      PreparedStatement ps = con.prepareStatement(query);
+		PreparedStatement ps2 = con.prepareStatement(query2);
 		for(int i = 0; i <list.size(); i++){
 			asset = (magma.net.vao.Asset)list.get(i);
 
@@ -5718,9 +5472,6 @@ public boolean updatebidLimit(java.util.ArrayList list) {
 
 	}catch (Exception ex) {
 		System.out.println("WARN: Error Upating Asset Bid limit  ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-		closeConnection(con, ps2);
 	}
 	return (d.length > 0);
 }
@@ -5740,18 +5491,16 @@ public boolean InsertBidLimit(ArrayList list) {
 			"SET Bid_Tag = ?,Description = ?,BASE_PRICE = ?,LOCATION_CODE = ? "
 		+ " WHERE Asset_id=? ";
 	
-    Connection con = null;
-    PreparedStatement ps = null;
-    PreparedStatement ps2 = null;
+   
     //ResultSet rs = null;
     magma.net.vao.Asset bd = null;
 
     int[] d = null;
     magma.net.vao.Asset asset = null;
     try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(query);
-        ps2 = con.prepareStatement(query2);
+    	 Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query);
+	        PreparedStatement ps2 = con.prepareStatement(query2);
         for(int i = 0; i < list.size(); i++) {
             bd = (magma.net.vao.Asset) list.get(i);
 
@@ -5816,10 +5565,7 @@ public boolean InsertBidLimit(ArrayList list) {
 
     }catch(Exception ex) {
         System.out.println("Error InsertBidLimit In FleetHistoryManager -> " + ex);
-    } finally {
-        dbConnection.closeConnection(con, ps);
-        dbConnection.closeConnection(con, ps2);
-    }
+    } 
 
     return (d.length > 0);
 }
@@ -5876,16 +5622,13 @@ public ArrayList findAssetByQueryy(String queryFilter) {
         "FROM AM_ASSET  where ASSET_ID NOT IN (select Asset_Id from am_asset_bid) "+queryFilter;
 
 
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -6066,10 +5809,8 @@ public ArrayList findAssetByQueryy(String queryFilter) {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetByQueryy  ->>>> " +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-
+        } 
+        
         return list;
 
     }
@@ -6078,16 +5819,14 @@ public boolean findExistedBidTransfer(magma.net.vao.Asset asset,ArrayList lists)
 
         String selectQuery = "SELECT * FROM AM_ASSET_BID WHERE ASSET_ID='"+asset.getId()+"' ";
 
-       Connection con = null;
-       PreparedStatement ps = null;
-       ResultSet rs = null;
+       
        ArrayList list = new ArrayList();
        boolean done = false;
 
        try{
-           con = getConnection("legendPlus");
-           ps = con.prepareStatement(selectQuery);
-           rs = ps.executeQuery();
+    	   Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(selectQuery);
+           ResultSet rs = ps.executeQuery();
           if(rs.next())
           {
        	   done = true;
@@ -6102,9 +5841,7 @@ public boolean findExistedBidTransfer(magma.net.vao.Asset asset,ArrayList lists)
        }catch (Exception e) {
            System.out.println("INFO:Error Finding Existed Records. " +
                               e.getMessage());
-       } finally {
-           closeConnection(con, ps, rs);
-       }
+       } 
 
        return done;
 
@@ -6114,17 +5851,15 @@ public boolean updateBidTransfer(java.util.ArrayList list) {
     	String query = "UPDATE AM_ASSET_BID "+
     			"SET Asset_id = ?,LOCATION_CODE = ? "
     		+ " WHERE Asset_id=? ";
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    	
     	int[] d = null;
     	boolean done = false;
     	magma.net.vao.Asset asset = null;
     	try {
 
 
-    		con = getConnection("legendPlus");
-    		ps = con.prepareStatement(query);
+    		 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
     		for(int i = 0; i <list.size(); i++){
     			asset = (magma.net.vao.Asset)list.get(i);
 
@@ -6136,12 +5871,10 @@ public boolean updateBidTransfer(java.util.ArrayList list) {
     			//done=( ps.executeUpdate()!=-1);
     		}
     		d = ps.executeBatch();
-    		closeConnection(con, ps);
+    		
     	}catch (Exception ex) {
     		System.out.println("WARN: Error Upating Asset Bid limit  ->" + ex);
-    	} finally {
-    		closeConnection(con, ps);
-    	}
+    	} 
     	return (d.length > 0);
     }
 public boolean insertBID(ArrayList list) {
@@ -6168,15 +5901,14 @@ public boolean insertBID(ArrayList list) {
                 "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         //ResultSet rs = null;
         magma.net.vao.Asset bd = null;
 
         int[] d = null;
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
 
             for (int i = 0; i < list.size(); i++) {
                 bd = (magma.net.vao.Asset) list.get(i);
@@ -6467,13 +6199,11 @@ public boolean insertBID(ArrayList list) {
             }
             d = ps.executeBatch();
            // System.out.println("Executed Successfully ");
-            dbConnection.closeConnection(con, ps);
+          //  dbConnection.closeConnection(con, ps);
         } catch (Exception ex) {
             System.out.println("Error insertBIDING() In FleetHistoryManager -> "+ex.getMessage()) ;
             		ex.printStackTrace();
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
         return (d.length > 0);
     }
@@ -6567,17 +6297,15 @@ public boolean updatebid(java.util.ArrayList list) {
 		String query = "UPDATE AM_ASSET_BID_SELECTION "+
 				"SET Bid_Value = ? "
 			+ " WHERE Asset_id=? AND First_Name=? ";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		int[] d = null;
 		boolean done = false;
 		magma.net.vao.Asset asset = null;
 		try {
 
 
-			con = getConnection("legendPlus");
-			ps = con.prepareStatement(query);
+			 Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps = con.prepareStatement(query);
 			for(int i = 0; i <list.size(); i++){
 				asset = (magma.net.vao.Asset)list.get(i);
 
@@ -6594,23 +6322,19 @@ public boolean updatebid(java.util.ArrayList list) {
 
 		}catch (Exception ex) {
 			System.out.println("WARN: Error Upating Asset Bid  ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return (d.length > 0);
 	}
 
 public boolean deleteBid(java.util.ArrayList list) {
 		String query = "DELETE FROM AM_ASSET_BID_SELECTION"
 				+ " WHERE Asset_id=? AND First_Name=? ";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		magma.net.vao.Asset asset = null;
 		int[] d = null;
 		try {
-			con = getConnection("legendPlus");
-			ps = con.prepareStatement(query);
+			 Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps = con.prepareStatement(query);
 			for (int i = 0; i < list.size(); i++) {
 				asset = (magma.net.vao.Asset)list.get(i);
 
@@ -6623,9 +6347,7 @@ public boolean deleteBid(java.util.ArrayList list) {
 
 		} catch (Exception ex) {
 			System.out.println("WARN: Error removing Bid Records ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return (d.length > 0);
 	}
 
@@ -6642,16 +6364,13 @@ public boolean deleteBid(java.util.ArrayList list) {
                 "Useage_Years,Asset_Status,First_Name,Sur_Name,Category_Id,Bid_Code,Address_1,Address_2,Phone_No,Email_Address " +
                 "FROM AM_ASSET_BID_SELECTION WHERE ASSET_ID IS NOT NULL " + queryFilter;
        // System.out.println("the query is <<<<<<<<<<<<< "+ selectQuery);
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -6706,9 +6425,7 @@ public boolean deleteBid(java.util.ArrayList list) {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL AM_ASSET_BID_SELECTIONt ->>>> " +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -6719,18 +6436,16 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 
   String selectQuery ="select user_name,password from am_gb_User where user_name='"+usern+"' AND password='"+passwords+"' ";
 
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+   
     java.util.ArrayList list = new java.util.ArrayList();
     magma.net.vao.Asset asset = null;
 
     boolean done = false;
 
     try{
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(selectQuery);
-        rs = ps.executeQuery();
+    	 Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(selectQuery);
+        ResultSet rs = ps.executeQuery();
 //        System.out.print("DID IT GOT HERE ??????????? "+selectQuery);
         while(rs.next()){
 //        	 System.out.print("DID IT GOT HERE ??????????? PART 2 "+selectQuery);
@@ -6749,25 +6464,14 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
     } catch (Exception e) {
         System.out.println("INFO:Error fetching and FINDING User Details ->>>> ");
         e.printStackTrace();
-    } finally {
-        closeConnection(con, ps, rs);
-    }
+    } 
 
     return list;
 
 }
  public boolean createBidSorting(magma.net.vao.Asset asset,String bittitle,String biddate,String userId,String workstationIp,String workstationAddName) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		PreparedStatement ps0 = null;
-		PreparedStatement psd = null;
-		PreparedStatement ps1 = null;
-		PreparedStatement ps2 = null;
-		PreparedStatement ps3 = null;
-		PreparedStatement ps4 = null;
-		PreparedStatement ps5 = null;
-		PreparedStatement psdete = null; 
+		
 		
 		boolean done = false;
 		boolean done0 = false;
@@ -6820,26 +6524,26 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 //		  System.out.print("BID UPDATE_QUERY HERE ??????????? "+UPDATE_QUERY2);
 //		  System.out.print("BID UPDATE_PERIOD_QUERY HERE ??????????? "+UPDATE_PERIOD_QUERY);
 			try{ 
-				con = getConnection("legendPlus");
-				ps = con.prepareStatement(EXIST_TABLE_QUERY);
+				 Connection con = dbConnection.getConnection("legendPlus");
+			        PreparedStatement ps= con.prepareStatement(EXIST_TABLE_QUERY);
 				done =(ps.executeUpdate()!=-1);
-				psdete = con.prepareStatement(DELETE_RESULT_QUERY);
+				PreparedStatement psdete = con.prepareStatement(DELETE_RESULT_QUERY);
 				deleted =(psdete.executeUpdate()!=-1);
-				ps0 = con.prepareStatement(CREATE_TABLE_QUERY);
+				PreparedStatement ps0 = con.prepareStatement(CREATE_TABLE_QUERY);
 				done0 =(ps0.executeUpdate()!=-1);
-				ps1 = con.prepareStatement(BID_TEMP_QUERY);
+				PreparedStatement ps1 = con.prepareStatement(BID_TEMP_QUERY);
 				done1 =(ps1.executeUpdate()!=-1);
-				ps2 = con.prepareStatement(query2); 
+				PreparedStatement ps2 = con.prepareStatement(query2); 
 				done2 =(ps2.executeUpdate()!=-1);
-				ps3 = con.prepareStatement(UPDATE_QUERY);
+				PreparedStatement ps3 = con.prepareStatement(UPDATE_QUERY);
 				ps3.setString(1, "YES");
 				ps3.setString(2,biddate);
 				done3 =(ps3.executeUpdate()!=-1);
 				
-				psd = con.prepareStatement(UPDATE_PERIOD_QUERY);
+				PreparedStatement psd = con.prepareStatement(UPDATE_PERIOD_QUERY);
 				doned =(psd.executeUpdate()!=-1);
 				
-				ps4 = con.prepareStatement(UPDATE_QUERY2);
+				PreparedStatement ps4 = con.prepareStatement(UPDATE_QUERY2);
 				ps4.setString(1, "YES");
 				ps4.setDate(2, df.dateConvert(new java.util.Date()));
 				ps4.setString(3, "Y");
@@ -6852,17 +6556,8 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error creating bidsorting ->" + e.getMessage());
 			e.printStackTrace();
-		} finally {
-			closeConnection(con, ps);
-			closeConnection(con, ps0);
-			closeConnection(con, psd);
-			closeConnection(con, psdete);
-			closeConnection(con, ps1);
-			closeConnection(con, ps2);
-			closeConnection(con, ps3);
-			closeConnection(con, ps4);
-
-		}
+		} 
+			
 		return done2;
 
 	}
@@ -6873,15 +6568,13 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 	+"Asset_Model,Registration_No,Description,Vendor_Ac,Date_purchased,Asset_Make,Asset_Model,Asset_Serial_No,Asset_Engine_No,Location,Category_Id,Useage_Years,Asset_Status,Bid_Date,Creation_Date,User_Id,Ip_Address,Mac_Address ";
 
 
-      Connection con = null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
+     
       ArrayList list = new ArrayList();
 
       try {
-    	  con = getConnection("legendPlus");
-          ps = con.prepareStatement(selectQuery);
-          rs = ps.executeQuery();
+    	  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(selectQuery);
+          ResultSet rs = ps.executeQuery();
 
           while(rs.next()){
 
@@ -6934,10 +6627,7 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
                              e.getMessage());
           e.printStackTrace();
 
-      } finally {
-          closeConnection(con, ps, rs);
-      }
-
+      } 
       return list;
 
   }
@@ -6954,16 +6644,13 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 	"max(bid_Value)Bid_Value,BID_TAG,STAFFID from AM_BID_RESULT group by asset_id, " +
 	"coalesce(Asset_Model,0),Asset_Status,Description,Bid_Date,Bid_Title,BID_TAG,STAFFID "+queryFilter;
 //     System.out.println("the query is <<<<<<<<<<<<< "+ selectQuery);
-      Connection con = null;
-      PreparedStatement ps = null;
-
-      ResultSet rs = null;
+      
       ArrayList list = new ArrayList();
 
       try {
-          con = getConnection("legendPlus");
-          ps = con.prepareStatement(selectQuery);
-          rs = ps.executeQuery();
+    	  Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(selectQuery);
+          ResultSet rs = ps.executeQuery();
 
           while (rs.next()) {
 
@@ -6994,25 +6681,22 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
       } catch (Exception e) {
           System.out.println("INFO:Error fetching ALL AM_ASSET_BID_Result Menue ->>>> " +
                              e.getMessage());
-      } finally {
-          closeConnection(con, ps, rs);
-      }
+      } 
 
       return list;
 
   }
  public boolean createBIDPeriod(magma.net.vao.Bid_Period period) {
 
-	Connection con = null;
-	PreparedStatement ps = null;
+	
 	boolean done = false;
 	String query = "INSERT INTO AM_BID_Period_SetUp(BID_Start_Date,BID_End_Date"
 			+ " ,BID_Title,User_Id,create_date,Status,location)"
 			+ " VALUES(?,?,?,?,?,?,?)";
 
 	try {
-		con = getConnection("legendPlus");
-		ps = con.prepareStatement(query);
+		 Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query);
 		ps.setString(1, period.getStartDate());
 		ps.setString(2, period.getEndDate());
 		ps.setString(3,period.getBid_title());
@@ -7025,9 +6709,7 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 	} catch (Exception e) {
 		System.out.println(this.getClass().getName()
 				+ " ERROR:Error creating Bid Period ->" + e.getMessage());
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
 	return done;
 
 }
@@ -7039,14 +6721,12 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 			+ " FROM AM_BID_Period_SetUp ";
 
 	query = query + filter;
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
+	
 
 	try {
-		c = getConnection("legendPlus");
-		s = c.createStatement();
-		rs = s.executeQuery(query);
+		 Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 		while (rs.next()) {
 			String mtId = rs.getString("MTID");
 			String bid_State_Dat = rs.getString("BID_Start_Date");
@@ -7065,9 +6745,6 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 		e.printStackTrace();
 	}
 
-	finally {
-		closeConnection(c, s, rs);
-	}
 	return _list;
 
 }
@@ -7080,14 +6757,12 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 				+ " FROM AM_BID_Period_SetUp ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+		
 
 		try {
-			c = getConnection("legendPlus");
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+			 Connection con = dbConnection.getConnection("legendPlus");
+		        PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				String mtId = rs.getString("MTID");
 				String bid_State_Dat = rs.getString("BID_Start_Date");
@@ -7106,9 +6781,7 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -7118,21 +6791,17 @@ public java.util.ArrayList findAppUsers(String usern,String passwords){
  public void BidPeriodExpired(String query_r)
 {
 
-	Connection con = null;
-    PreparedStatement ps = null;
+	
 
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-
-	    	ps = con.prepareStatement(query_r);
+		 Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(query_r);
 	           int i =ps.executeUpdate();
 
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: updateAssetStatusChange()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
 
 
 	}
@@ -7155,16 +6824,12 @@ public ArrayList findAssetBIDRESULT(){
 	"Asset_Model,Description order by BID_Value desc ";
 
 
-    Connection con = null;
-    PreparedStatement ps = null;
-
-    ResultSet rs = null;
     ArrayList list = new ArrayList();
 
     try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(selectQuery);
-        rs = ps.executeQuery();
+    	 Connection con = dbConnection.getConnection("legendPlus");
+	        PreparedStatement ps = con.prepareStatement(selectQuery);
+       ResultSet rs = ps.executeQuery();
 
         while(rs.next()){
 
@@ -7186,8 +6851,6 @@ public ArrayList findAssetBIDRESULT(){
     }catch (Exception e){
         System.out.println("INFO:Error fetching ALL AM_ASSET_BID_Result Menue ->>>> " +
                            e.getMessage());
-    }finally{
-        closeConnection(con, ps, rs);
     }
 
     return list;
@@ -7201,14 +6864,12 @@ public java.util.List getBidPeriodByQuery() {
 			+ " FROM AM_BID_Period_SetUp ";
 
 	//query = query + filter;
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
+	
 
 	try {
-		c = getConnection("legendPlus");
-		s = c.createStatement();
-		rs = s.executeQuery(query);
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query);
+	ResultSet rs = ps.executeQuery();
 		while (rs.next()) {
 			String mtId = rs.getString("MTID");
 			String bid_State_Dat = rs.getString("BID_Start_Date");
@@ -7227,9 +6888,7 @@ public java.util.List getBidPeriodByQuery() {
 		e.printStackTrace();
 	}
 
-	finally {
-		closeConnection(c, s, rs);
-	}
+	
 	return _list;
 
 }
@@ -7258,16 +6917,13 @@ public java.util.List getBidPeriodByQuery() {
                 "NBV,REMAINING_LIFE,TOTAL_LIFE,EFFECTIVE_DATE,Asset_Status,asset_code   " +
                 "FROM AM_ASSET_UNCAPITALIZED  WHERE ASSET_ID IS NOT NULL " + queryFilter;
  //       System.out.println("the query in findAssetByQueryUncapitalized is <<<<<<<<<<<<< "+ selectQuery);
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps= con.prepareStatement(selectQuery);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -7329,9 +6985,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetByQueryUncapitalized ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -7351,16 +7005,13 @@ public java.util.List getBidPeriodByQuery() {
                 "FROM AM_ASSET a, am_gb_bulkTransfer b WHERE a.ASSET_ID IS NOT NULL  AND a.Asset_id <> b.asset_id " +
                 " AND b.STATUS = 'N' " + queryFilter;
  //       System.out.println("the query for findAssetTransferByQuery is <<<<<<<<<<<<< "+ selectQuery);
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {   
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -7424,9 +7075,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetTransferByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -7439,16 +7088,13 @@ public java.util.List getBidPeriodByQuery() {
         String selectQuery = "select *from ST_STOCK where  Asset_id !='' " +
         					queryFilter;
         		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -7524,9 +7170,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findStockByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -7605,16 +7249,15 @@ public java.util.List getBidPeriodByQuery() {
     					   "AND b.Asset_id = 'null' AND b.PROCESS_STATUS = 'A' AND a.BAR_CODE = c.RFID_TAG  " + queryFilter;
 //      System.out.println("the query in findStockByQueryy is <<<<<<<<<<<<< "+ selectstockQuery);
  
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectstockQuery);
-            rs = ps.executeQuery();
+          
+            
+            Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectstockQuery);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -7804,9 +7447,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Stock in findStockByQueryy ->>>> " +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -7890,16 +7531,15 @@ public java.util.List getBidPeriodByQuery() {
                "  GROUP BY DESCRIPTION, ASSET_STATUS,BRANCH_ID,CATEGORY_ID,UNIT_PRICE";
 //      System.out.println("the query in findStockByQueryforreq is <<<<<<<<<<<<< "+ selectQuerybyGroup);       
  
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuerybyGroup);
-            rs = ps.executeQuery();
+            
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuerybyGroup);
+           ResultSet rs = ps.executeQuery();
+      
 
             while (rs.next()) {
 
@@ -7924,27 +7564,23 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Stock in findStockByQueryforreq ->>>> " +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
     }
     public boolean notifyRaisedEntry(String id, String tableName)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         String createQuery;
         boolean done;
-        con = null;
-        ps = null;
+       
         createQuery = (new StringBuilder("UPDATE ")).append(tableName).append(" SET RAISED_ENTRY=?").append(" WHERE HIST_ID=?").toString();
         done = false;
         try
         {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
             ps.setString(1, "R");
             ps.setString(2, id);
             done = ps.executeUpdate() != -1;
@@ -7953,16 +7589,12 @@ public java.util.List getBidPeriodByQuery() {
         {
             System.out.println((new StringBuilder("INFO:Error RAISED ENTRY IN ")).append(tableName).append("  ->").append(e.getMessage()).toString());
         }
-        finally {
-        	closeConnection(con, ps);
-        }        
+              
         return done;
     }
     public FleetInsurranceRecord findInsurranceRecordByIdApproval(String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO " +
                 " ,COMPANY,DATE_OBTAINED,EXPIRY_DATE,STATUS,HIST_ID " +
@@ -7971,10 +7603,10 @@ public java.util.List getBidPeriodByQuery() {
 
         FleetInsurranceRecord insRecord = null;
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -8006,9 +7638,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching insurance record in findInsurranceRecordByIdApproval ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return insRecord;
     }
@@ -8030,16 +7660,13 @@ public java.util.List getBidPeriodByQuery() {
     //    String selectQuery = "select  *from am_asset where Asset_id in (select Asset_id from AM_GROUP_RECONCILIATION where STATUS = 'ACTIVE') and Asset_id !='' " +
  //       					queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetVerificationByQuery: "+selectQuery);		
-        Connection con = null; 
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -8115,9 +7742,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetVerificationByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -8125,9 +7750,7 @@ public java.util.List getBidPeriodByQuery() {
 
     public FleetManatainanceRecord findMaintenaceRecordByAssetId(String Id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE " +
@@ -8138,9 +7761,9 @@ public java.util.List getBidPeriodByQuery() {
                 "FROM FT_MAINTENANCE_HISTORY WHERE HIST_ID = '"+Id+"' ";
 //        System.out.println("selectQuery in findMaintenaceRecordByAssetId: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -8187,9 +7810,8 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findMaintenaceRecordByAssetId ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return maintenanceRecord;
     }
     
@@ -8211,16 +7833,13 @@ public java.util.List getBidPeriodByQuery() {
     //    String selectQuery = "select  *from am_asset where Asset_id in (select Asset_id from AM_GROUP_RECONCILIATION where STATUS = 'ACTIVE') and Asset_id !='' " +
  //       					queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetProofByBranchByQuery: "+selectQuery);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+           ResultSet  rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -8296,9 +7915,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetVerificationByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -8565,16 +8182,13 @@ public java.util.List getBidPeriodByQuery() {
         String selectQuery = "select *from am_asset where Asset_id not in (select Asset_id from AM_ASSET_PROOF WHERE GROUP_ID = ('"+userId+"'+SUBSTRING((SELECT CONVERT(VARCHAR(10), getdate(), 112)),0,7))) and Asset_id !='' " +
         					queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetforBranchProofByQuery: "+selectQuery+"     userId: "+userId);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -8653,9 +8267,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetforBranchProofByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -8683,16 +8295,13 @@ public java.util.List getBidPeriodByQuery() {
         String selectQuery = "select *from am_asset2 where Asset_id not in (select Asset_id from am_gb_bulkAsset2Transfer) and Asset_id !='' " +
         					queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+selectQuery);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -8768,9 +8377,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset2 ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -8799,16 +8406,13 @@ public java.util.List getBidPeriodByQuery() {
         String selectQuery = "select *from am_asset2 where Asset_id !='' " +
         					queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+selectQuery);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -8896,9 +8500,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset2 ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -8929,16 +8531,13 @@ public java.util.List getBidPeriodByQuery() {
     					   "AND b.PROCESS_STATUS = 'A' " + queryFilter;
 //      System.out.println("the query in findStockByQueryy2 is <<<<<<<<<<<<< "+ selectstockQuery);
  
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectstockQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectstockQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -9130,9 +8729,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Stock in findStockByQueryy2 ->>>> " +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -9317,13 +8914,11 @@ public java.util.List getBidPeriodByQuery() {
     	String finacleTransId= null;
     		String query = " SELECT LT_ID,HIST_ID,TYPE,COST_PRICE,QUANTITY,DESCRIPTION " +
     				"FROM FT_MAINTENANCE_DETAILS WHERE HIST_ID = '"+histId+"' ";
-    	Connection c = null;
-    	ResultSet rs = null;
-    	Statement s = null; 
+    	
     	try {
-    		    c = getConnection("legendPlus");
-    			s = c.createStatement();
-    			rs = s.executeQuery(query);
+    		 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
+    			ResultSet rs = ps.executeQuery();
     			while (rs.next())
     			   {	
     				int ltId = rs.getInt("LT_ID");
@@ -9343,10 +8938,7 @@ public java.util.List getBidPeriodByQuery() {
     					{
     						e.printStackTrace();
     					}
-    					finally
-    					{
-    						closeConnection(c, s, rs);
-    					}
+    					
     	return _list;
     }
 
@@ -9358,16 +8950,13 @@ public java.util.List getBidPeriodByQuery() {
         String selectQuery = "select *from am_asset where category_id in (select category_id from am_ad_category where Required_for_fleet = 'Y') " +
         					queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetforFleetByQuery: "+selectQuery+"     userId: "+userId);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery(); 
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery(); 
 
             while (rs.next()) {
 
@@ -9446,10 +9035,8 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Fleet Asset ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-
+        } 
+        
         return list;
 
     }
@@ -9463,16 +9050,13 @@ public java.util.List getBidPeriodByQuery() {
    //     		+ " UNION SELECT DISTINCT 0.00 AS sum_insured,a.Asset_id,a.BRANCH_ID,a.DEPT_ID,a.SECTION,a.CATEGORY_ID,a.CATEGORY_ID,a.DESCRIPTION,a.REGISTRATION_NO,a.DATE_PURCHASED,a.DEP_RATE,a.ASSET_MAKE,a.LPO,a.vendor_ac,a.ASSET_USER,a.ASSET_MAINTENANCE,a.ACCUM_DEP,a.MONTHLY_DEP,a.DEP_END_DATE,a.RESIDUAL_VALUE,a.POSTING_DATE,a.RAISE_ENTRY,a.DEP_YTD,a.NBV,a.REVALUE_COST,a.REMAINING_LIFE,a.TOTAL_LIFE,a.EFFECTIVE_DATE,a.ASSET_STATUS,a.asset_code,a.IMPROV_COST,a.IMPROV_NBV,a.IMPROV_ACCUMDEP,a.IMPROV_MONTHLYDEP,a.TOTAL_NBV FROM AM_ASSET a, am_ad_category c, FLEET_SUMINSURED f where a.category_id = c.category_id and  a.Asset_id != f.Asset_Id and Required_for_fleet = 'Y'  AND(ASSET_STATUS = 'ACTIVE' AND f.TRAN_TYPE = 'I' )  AND BRANCH_ID = '43' " +
    //     		queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetforFleetSumInsuredByQuery: "+selectQuery+"     userId: "+userId);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
             	
@@ -9551,9 +9135,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Fleet Asset for Insurance and VIO ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -9565,8 +9147,7 @@ public java.util.List getBidPeriodByQuery() {
                                         String detailNarration,double cost,String userid,
                                         String suppliedBy, String invoiceNo, String tranId,
                                         double vatAmt, double whtAmt,String projectCode,String subjectToVat,String subjectToWHT,String batchId) {
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         FleetTransaction fleetTran = null;
         java.sql.Date transactionDate = null;  
         int isCreated = 0;
@@ -9586,8 +9167,8 @@ public java.util.List getBidPeriodByQuery() {
         } else {
 */
             try {
-                con = getConnection("legendPlus");
-                ps = con.prepareStatement(createQuery);
+            	 Connection con = dbConnection.getConnection("legendPlus");
+     	        PreparedStatement ps = con.prepareStatement(createQuery);
                 ps.setString(1, tranId);
                 ps.setString(2, itemType);
                 ps.setString(3, branchCode);
@@ -9612,9 +9193,7 @@ public java.util.List getBidPeriodByQuery() {
             } catch (Exception e) {
                 System.out.println("INFO:Error creating FM_SOCIALENVIRONMENT_SUMMARY in createEnvironmenteRecord ->" +
                                    e.getMessage());
-            } finally {
-                closeConnection(con, ps);
-            }
+            } 
      //   }
 			return isCreated;
     }
@@ -9622,9 +9201,7 @@ public java.util.List getBidPeriodByQuery() {
     public FleetManatainanceRecord findFMRecordById(String tranId,
             String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT LT_ID,HIST_ID,TYPE,BRANCH_ID,COST_PRICE," +
@@ -9636,10 +9213,10 @@ public java.util.List getBidPeriodByQuery() {
                 "FROM FM_MAINTENANCE_HISTORY WHERE HIST_ID = ?";
 //        System.out.println("selectQuery in findFMRecordById: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, tranId); 
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -9690,17 +9267,13 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Facility Maintenace Records ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return maintenanceRecord;
     }
 
     public ArrayList findFMRecordByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         FleetManatainanceRecord maintenanceRecord = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -9710,9 +9283,9 @@ public java.util.List getBidPeriodByQuery() {
                 "FROM FM_MAINTENANCE_HISTORY WHERE LT_ID != ''  " + queryFilter;
 //        System.out.println("<<<<selectQuery in findFMRecordByQuery====: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String ltId = rs.getString("LT_ID");
@@ -9738,9 +9311,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findFMRecordByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return finder;
     }
 
@@ -9757,16 +9328,13 @@ public java.util.List getBidPeriodByQuery() {
         String selectQuery = "select *from am_asset where Asset_id not in (select Asset_id from AM_ASSET_PROOF WHERE GROUP_ID = ('"+userId+"'+SUBSTRING((SELECT CONVERT(VARCHAR(10), getdate(), 112)),0,5))) and Asset_id !='' " +
         					queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findAssetforBranchProofByQuery: "+selectQuery+"     userId: "+userId);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -9845,9 +9413,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetforVerificationsByQuery->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list; 
 
@@ -9859,18 +9425,16 @@ public java.util.List getBidPeriodByQuery() {
      * @return ArrayList
      */
     public ArrayList findAllPPMAllocation() {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         String selectQuery = "SELECT BRANCH_ID,BRANCH_NAME,VENDOR_CODE,VENDOR_NAME,DESCRIPTION" +
                              "Q1_DATE,Q2_DATE,Q3_DATE,Q4_DATE" +
                              "FROM FM_PPM_TMP  ";
  //       System.out.println("<<<<<<< selectQuery in findAllPPMAllocation: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -9896,9 +9460,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching all PPM Schedule findAllPPMAllocation ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -9936,9 +9498,7 @@ public java.util.List getBidPeriodByQuery() {
         String departCode = user.getDeptCode();
         String branch = user.getBranch();
 //        System.out.println("userID >>>>>>>>> " +userID+"    userName: "+userName+"    departCode: "+departCode+"      branch: "+branch); 
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        
 
          String ReqnInsertQry = "insert into FM_Requisition (ReqnID,UserID,ReqnBranch,ReqnSection,ReqnDepartment," +
                 " ReqnUserID,Status,ApprovalLevel,ApprovalLevelLimit,Supervisor,Image," +
@@ -9949,8 +9509,8 @@ public java.util.List getBidPeriodByQuery() {
         boolean result = false; 
         try {
         	ad = new AssetRecordsBean();
-        	con = getConnection("legendPlus");
-            pstmt = con.prepareStatement(ReqnInsertQry);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement pstmt = con.prepareStatement(ReqnInsertQry);
             pstmt.setString(1, reqnID);
             pstmt.setString(2, userID);
             pstmt.setString(3, reqnBranch);
@@ -10051,25 +9611,21 @@ public java.util.List getBidPeriodByQuery() {
             } catch (Exception e) {
                 System.out.println("INFO:Error creating FM_Requisition ->" +
                                    e.getMessage());
-            } finally {
-            	closeConnection(con, pstmt, rs);
-            }
+            } 
         return reqnID;
     }
  
     public ArrayList findvendorAssessmentCriteriaByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         ArrayList finder = new ArrayList();
         String selectQuery =
                 "SELECT *FROM VENDOR_ASSESSMENT_CRITERIA WHERE ID IS NOT NULL  " + queryFilter;
  //       System.out.println("<<<<selectQuery====: "+selectQuery);
         try {  
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("ID");
@@ -10084,9 +9640,7 @@ public java.util.List getBidPeriodByQuery() {
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Assessment Criterial Records ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return finder;
     }
 
@@ -10094,8 +9648,6 @@ public void createAssessmentHeaderRecord(String groupId,String branchCode, Strin
 java.sql.Date noticeDate = null;  
 int intFreq = 0;
 
-Connection con = null;
-PreparedStatement ps = null;
 FleetTransaction fleetTran = null;
 String createQuery = "INSERT INTO VENDOR_ASSESSMENT(GROUP_ID," +
  " BRANCH_CODE,DEPT_CODE,VENDOR_CODE,SERVICE_TYPE,ASSESSMENT_DATE,CREATE_DATE,BATCH_ID) " +
@@ -10108,8 +9660,8 @@ String yyyy = transDate.substring(6,10);
 transDate = yyyy+"-"+mm+"-"+dd;
 
 try {
-con = getConnection("legendPlus");
-ps = con.prepareStatement(createQuery);
+	 Connection con = dbConnection.getConnection("legendPlus");
+     PreparedStatement ps = con.prepareStatement(createQuery);
 ps.setString(1, groupId);
 ps.setString(2, branchCode);
 ps.setString(3, departCode);
@@ -10125,9 +9677,7 @@ ps.execute();
 } catch (Exception e) {
 System.out.println("INFO:Error creating VENDOR_ASSESSMENT in createAssessmentHeaderRecord ->" +
        e.getMessage());
-} finally {
-closeConnection(con, ps);
-}
+} 
 
 }
 
@@ -10142,16 +9692,15 @@ String mm = transDate.substring(3,5);
 String dd = transDate.substring(6,10);
 //System.out.println("<<<mm: "+mm+"   DD: "+dd+"   YY: "+yyyy);
 transDate = dd+"-"+mm+"-"+yyyy;
-Connection con = null;
-PreparedStatement ps = null;
+
 FleetTransaction fleetTran = null;
 String createQuery = "INSERT INTO FM_BRANCH_VISIT(GROUP_ID," +
  " BRANCH_CODE,INSPECTED_BY,INSPECT_DATE,VISIT_SUMMARY,TRANS_DATE) " +
  "VALUES(?,?,?,?,?,?) ";
 //System.out.println("<<<groupId: "+groupId+"  <<<inspectedBy: "+inspectedBy+"   <<dateInspect: "+dateInspect+"  <<visitSummary: "+visitSummary+"  <<transDate: "+transDate);
 try {
-con = getConnection("legendPlus");
-ps = con.prepareStatement(createQuery);
+ Connection con = dbConnection.getConnection("legendPlus");
+PreparedStatement ps = con.prepareStatement(createQuery);
 ps.setString(1, groupId);
 ps.setString(2, branchCode);
 ps.setString(3, inspectedBy);
@@ -10164,9 +9713,7 @@ ps.execute();
 } catch (Exception e) {
 System.out.println("INFO:Error creating FM_BRANCH_VISIT in createVisitHeaderRecord ->" +
        e.getMessage());
-} finally {
-closeConnection(con, ps);
-}
+} 
 
 }
 
@@ -10176,13 +9723,11 @@ closeConnection(con, ps);
     	String finacleTransId= null;
     		String query = " SELECT ID,GROUP_ID,SNO,ELEMENT,CONDITION,REMARK,ACTION,DUEDATE " +
     				"FROM FM_BRANCH_VISIT_DETAILS WHERE GROUP_ID = '"+groupId+"' ";
-    	Connection c = null;
-    	ResultSet rs = null;
-    	Statement s = null; 
+    	
     	try {
-    		    c = getConnection("legendPlus");
-    			s = c.createStatement();
-    			rs = s.executeQuery(query);
+    		Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
+    		ResultSet rs = ps.executeQuery();
     			while (rs.next())
     			   {	
     				String id = rs.getString("ID");
@@ -10207,27 +9752,22 @@ closeConnection(con, ps);
     					{
     						e.printStackTrace();
     					}
-    					finally
-    					{
-    						closeConnection(c, s, rs);
-    					}
+    					
     	return _list;
     }
 
     public BranchVisit findBranchVisitRecordByGroupId(String Id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         BranchVisit visitRecord = null;
         String selectQuery =
                 "SELECT ID,BRANCH_CODE,INSPECTED_BY,INSPECT_DATE,VISIT_SUMMARY,TRANS_DATE " +
                 "FROM FM_BRANCH_VISIT WHERE GROUP_ID = '"+Id+"' ";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("ID");
@@ -10242,9 +9782,8 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Baranch Visit Records in findBranchVisitRecordByGroupId ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return visitRecord;
     }
 
@@ -10321,16 +9860,13 @@ closeConnection(con, ps);
     					   "AND b.PROCESS_STATUS = 'A' " + queryFilter;
 //      System.out.println("the query in findStockIssuanceByQueryy is <<<<<<<<<<<<< "+ selectstockQuery);
  
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectstockQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectstockQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -10520,9 +10056,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Stock in findStockIssuanceByQueryy ->>>> " +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -10539,16 +10073,13 @@ closeConnection(con, ps);
                "  GROUP BY ITEM_CODE,WAREHOUSE_CODE,DESCRIPTION, ASSET_STATUS,BRANCH_ID,CATEGORY_ID,ASSET_ID,QUANTITY";
 //      System.out.println("the selectQuery in findStockByQueryforAdjustment is <<<<<<<<<<<<< "+ selectQuery);       
  
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -10579,9 +10110,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Stock in findStockByQueryforAdjustment ->>>> " +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -10589,9 +10118,7 @@ closeConnection(con, ps);
 
     public ArrayList findSMRecordByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -10601,9 +10128,9 @@ closeConnection(con, ps);
                 "FROM FM_SOCIALENVIRONMENT_SUMMARY WHERE ID != ''  " + queryFilter;
 //        System.out.println("<<<<selectQuery====: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String ltId = rs.getString("ID");
@@ -10627,17 +10154,14 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findSMRecordByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return finder;
     }
 
     public FleetManatainanceRecord findSMRecordById(String tranId,String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT ID,HIST_ID,ITEM_TYPE,BRANCH_ID,DEPT_ID,SECT_ID,SBU_CODE,COST_PRICE," +
@@ -10646,10 +10170,10 @@ closeConnection(con, ps);
                 "FROM FM_SOCIALENVIRONMENT_SUMMARY WHERE BATCH_ID = ?";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, tranId);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -10681,9 +10205,8 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Facility ESMS Records in findSMRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return maintenanceRecord;
     }
 
@@ -10698,13 +10221,11 @@ closeConnection(con, ps);
     	String finacleTransId= null;
     		String query = " SELECT ID,HIST_ID,ITEM_TYPE,AMOUNT,QUANTITY,DESCRIPTION " +
     				"FROM FM_SOCIALENVIRONMENT_DETAILS WHERE HIST_ID = '"+histId+"' ";
-    	Connection c = null;
-    	ResultSet rs = null;
-    	Statement s = null; 
+    	
     	try {
-    		    c = getConnection("legendPlus");
-    			s = c.createStatement();
-    			rs = s.executeQuery(query);
+    		 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
+    		ResultSet rs = ps.executeQuery();
     			while (rs.next())
     			   {	
     				int id = rs.getInt("ID");
@@ -10726,10 +10247,7 @@ closeConnection(con, ps);
     					{
     						e.printStackTrace();
     					}
-    					finally
-    					{
-    						closeConnection(c, s, rs);
-    					}
+    					
     	return _list;
     }
 
@@ -10743,8 +10261,7 @@ closeConnection(con, ps);
     {
         java.sql.Date noticeDate;
         int intFreq;
-        Connection con;
-        PreparedStatement ps;
+       
         String createQuery;
         if(lastPerformedDate == null || lastPerformedDate.equals(""))
         {
@@ -10764,8 +10281,7 @@ closeConnection(con, ps);
             noticeDate = dateConvert(firstNoticeDate);
         }
         intFreq = Integer.parseInt(freq);
-        con = null;
-        ps = null;
+        
         createQuery = "INSERT INTO FM_MAINTENANCE_HISTORY(  TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO  ," +
 "REPAIRED_DATE,TECHNICIAN_TYPE,TECHNICIAN_NAME ,MILLEAGE_BEFORE_MAINT,MILLEAGE_AF" +
 "TER_MAINT ,DETAILS,COMPONENT_REPLACED,LAST_PM_DATE ,NEXT_PM_DATE,MAINTENANCE_TYP" +
@@ -10779,8 +10295,8 @@ closeConnection(con, ps);
         }
         try
         { 
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(createQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(createQuery);
             ps.setString(1, type);
             ps.setDouble(2, cost);
             ps.setString(3, assetId);
@@ -10835,9 +10351,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error creating FM_MAINTENANCE_HISTORY in createCorrectMaintenanceRecord ->" +
                                e.getMessage());
-        } finally {
-        	closeConnection(con, ps);
-        }
+        } 
             
         }
 
@@ -10850,13 +10364,11 @@ closeConnection(con, ps);
     		String query = " SELECT ID,GROUP_ID,CRITERIA,CRITERIONA,CRITERIONB,CRITERIONC,CRITERIOND,CRITERIONE,STATUS " +
     				"FROM VENDOR_ASSESSMENT_DETAILS WHERE ID IS NOT NULL "+filter+" ";
 //    		System.out.println("<<<<<query in findvendorAssessmentDetailsByQuery: "+query);
-    	Connection c = null;
-    	ResultSet rs = null;
-    	Statement s = null; 
+    	
     	try {
-    		    c = getConnection("legendPlus");
-    			s = c.createStatement();
-    			rs = s.executeQuery(query);
+    		 Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps = con.prepareStatement(query);
+     		ResultSet rs = ps.executeQuery();
     			while (rs.next())
     			   {	
     				String id = rs.getString("ID");
@@ -10882,10 +10394,7 @@ closeConnection(con, ps);
     					{
     						e.printStackTrace();
     					}
-    					finally
-    					{
-    						closeConnection(c, s, rs);
-    					}
+    					
     	return _list;
     }
 
@@ -10893,22 +10402,18 @@ closeConnection(con, ps);
     {
         ArrayList _list;
         String query;
-        Connection c;
-        ResultSet rs;
-        Statement s;
+        
         _list = new ArrayList();
         String finacleTransId = null;
         query = " SELECT ID,HIST_ID,ITEM_TYPE,COST_PRICE,QUANTITY,DESCRIPTION FROM FM_MAINTENANCE" +
         		"_DETAILS WHERE HIST_ID = '"+histId+"' ";
-        c = null;
-        rs = null;
-        s = null;
+        
 //        System.out.println("<<<<<query in findFMMaintenaceDetailRecordById: "+query);
         try
         {
-            c = getConnection("legendPlus");
-            s = c.createStatement();
-            rs = s.executeQuery(query);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps = con.prepareStatement(query);
+     		ResultSet rs = ps.executeQuery();
             AssetRecordsBean trans;
             while (rs.next())
 //            for(rs = s.executeQuery(query); rs.next(); _list.add(trans))
@@ -10931,7 +10436,7 @@ closeConnection(con, ps);
         {
             e.printStackTrace();
         }
-        closeConnection(c, s, rs);
+       
         return _list;
     }
 
@@ -10943,9 +10448,7 @@ closeConnection(con, ps);
      */
     public FleetManatainanceRecord findExpensesRecordById(String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;  
+       
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT LT_ID,HIST_ID,ITEM_TYPE,BRANCH_ID,SBU_CODE,COST_PRICE," +
@@ -10955,10 +10458,10 @@ closeConnection(con, ps);
 //        System.out.println("========>selectQuery: "+selectQuery+"      ====Id: "+id);
         
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String ltId = rs.getString("LT_ID");
@@ -10986,17 +10489,14 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findExpensesRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return maintenanceRecord;
     }
 
     public ArrayList findExpensesRecordByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         FleetManatainanceRecord maintenanceRecord = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -11006,9 +10506,9 @@ closeConnection(con, ps);
                 "FROM PR_EXPENSES_HISTORY WHERE LT_ID != ''  " + queryFilter;
 //        System.out.println("<<<<selectQuery====: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String ltId = rs.getString("LT_ID");
@@ -11031,9 +10531,8 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findExpensesRecordByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return finder;
     }
 
@@ -11042,8 +10541,7 @@ closeConnection(con, ps);
                                         String detailNarration,double cost,String userid,
                                         String invoiceNo, String tranId,
                                         double vatAmt, double whtAmt,String projectCode) {
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetTransaction fleetTran = null;
         java.sql.Date transactionDate = null;  
         int isCreated = 0;
@@ -11063,8 +10561,8 @@ closeConnection(con, ps);
         } else {
 */
             try {
-                con = getConnection("legendPlus");
-                ps = con.prepareStatement(createQuery);
+            	 Connection con = dbConnection.getConnection("legendPlus");
+     	        PreparedStatement ps = con.prepareStatement(createQuery);
                 ps.setString(1, tranId);
                 ps.setString(2, itemType);
                 ps.setString(3, branchCode);
@@ -11084,9 +10582,7 @@ closeConnection(con, ps);
             } catch (Exception e) {
                 System.out.println("INFO:Error creating PR_EXPENSES_HISTORY in createExpensesRecord ->" +
                                    e.getMessage());
-            } finally {
-                closeConnection(con, ps);
-            }
+            } 
      //   }
 			return isCreated;
     }
@@ -11097,14 +10593,12 @@ closeConnection(con, ps);
     	String finacleTransId= null;
     		String query = " SELECT ID,HIST_ID,ITEM_TYPE,COST_PRICE,QUANTITY,DESCRIPTION " +
     				"FROM PR_EXPENSES_DETAILS WHERE HIST_ID = '"+histId+"' ";
-    	Connection c = null;
-    	ResultSet rs = null;
-    	Statement s = null; 
+    	
  //   	System.out.println("======query in findExpensesDetailRecordById: "+query);
     	try {
-    		    c = getConnection("legendPlus");
-    			s = c.createStatement();
-    			rs = s.executeQuery(query);
+    		 Connection con = dbConnection.getConnection("legendPlus");
+  	        PreparedStatement ps = con.prepareStatement(query);
+     		ResultSet rs = ps.executeQuery();
     			while (rs.next())
     			   {	
     				int id = rs.getInt("ID");
@@ -11126,10 +10620,7 @@ closeConnection(con, ps);
     					{
     						e.printStackTrace();
     					}
-    					finally
-    					{
-    						closeConnection(c, s, rs);
-    					}
+    					
     	return _list;
     }
 
@@ -11172,15 +10663,12 @@ closeConnection(con, ps);
        selectQuery = selectQuery+" "+order;
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+selectQuery);	
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+queryFilter);	
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         
         try {  
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery.toString());
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery.toString());
           if(queryFilter.contains("PART_PAY") && queryFilter.contains("ASSET_STATUS") && queryFilter.contains("ASSET_STATUS")){  
 //        	  System.out.println("<========getAssetByQuery=======>0 asset_Id: "+assetId);
         	  ps.setString(1, payType);
@@ -11252,7 +10740,7 @@ closeConnection(con, ps);
         	  ps.setString(3, branch);
         	  ps.setString(4, assetId);
           } 
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -11328,9 +10816,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -11368,15 +10854,12 @@ closeConnection(con, ps);
        String selectQuery = "select * from am_asset where Asset_id not in (select Asset_id from am_gb_bulkTransfer) and Asset_id !='' "+queryFilter;
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+selectQuery);	
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+queryFilter);	
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery.toString());
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery.toString());
             if(!queryFilter.contains("asset_user") && !queryFilter.contains("Cost_Price") && !queryFilter.contains("DATE_PURCHASED") 
             		&& !queryFilter.contains("BRANCH_ID") && queryFilter.contains("ASSET_STATUS")){  
         	  System.out.println("<========getAssetByQuery=======>Asset Status: ");
@@ -11510,7 +10993,7 @@ closeConnection(con, ps);
         	  ps.setString(2, to_price);
         	  ps.setString(3, status);
           } 
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -11586,9 +11069,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetByQuery Third ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -11601,16 +11082,13 @@ closeConnection(con, ps);
  
         String selectQuery = "select * from AM_ASSET_PROOF WHERE GROUP_ID = '"+groupId+"' ";
 //        System.out.println("<<<<<<<selectQuery in findAssetforVerificationsViewByQuery: "+selectQuery+"     userId: "+userId);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -11689,9 +11167,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetforVerificationsViewByQuery->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list; 
 
@@ -11701,9 +11177,7 @@ closeConnection(con, ps);
     public FleetManatainanceRecord findMaterialRecordById(String tranId,
             String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE " +
@@ -11714,10 +11188,10 @@ closeConnection(con, ps);
                 "FROM FT_MATERIALRETRIEVAL_HISTORY WHERE HIST_ID = ?";
 //        System.out.println("selectQuery in findMaintenaceRecordById2: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, tranId);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -11761,9 +11235,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Material Records in findMaterialRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return maintenanceRecord;
     }
 
@@ -11824,8 +11296,7 @@ closeConnection(con, ps);
         //if (freq == null) {
         intFreq = Integer.parseInt(freq);
         // } 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetTransaction fleetTran = null;
         String createQuery = "INSERT INTO FT_MATERIALRETRIEVAL_HISTORY( " +
                              " TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO " +
@@ -11842,8 +11313,8 @@ closeConnection(con, ps);
         } else {
 
             try {
-                con = getConnection("legendPlus");
-                ps = con.prepareStatement(createQuery);
+            	 Connection con = dbConnection.getConnection("legendPlus");
+     	        PreparedStatement ps = con.prepareStatement(createQuery);
 //                System.out.println("=======techName: "+techName);
                 ps.setString(1, type);
                 ps.setDouble(2, cost);
@@ -11922,18 +11393,14 @@ closeConnection(con, ps);
             } catch (Exception e) {
                 System.out.println("INFO:Error creating MATERIALRETRIEVAL_HISTORY ->" +
                                    e.getMessage());
-            } finally {
-                closeConnection(con, ps);
-            }
+            } 
         }
     }
 
 
     public FleetManatainanceRecord findMaterialRetrievalRecordByAssetId(String Id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE " +
@@ -11944,9 +11411,9 @@ closeConnection(con, ps);
                 "FROM FT_MAINTENANCE_HISTORY WHERE HIST_ID = '"+Id+"' ";
 //        System.out.println("selectQuery in findMaterialRetrievalRecordByAssetId: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -11993,9 +11460,8 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Material Retrieval Records in findMaterialRetrievalRecordByAssetId ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return maintenanceRecord;
     }
 
@@ -12012,9 +11478,7 @@ closeConnection(con, ps);
      */
     public ArrayList findMaterialRetrievalRecordByQuery(String queryFilter) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -12026,9 +11490,9 @@ closeConnection(con, ps);
                 "FROM FT_MATERIALRETRIEVAL_HISTORY WHERE LT_ID != ''  " + queryFilter;
 //        System.out.println("<<<<selectQuery in findMaterialRetrievalRecordByQuery====: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String id = rs.getString("LT_ID");
@@ -12071,9 +11535,8 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching MaterialRetrieval Records in findMaterialRetrievalRecordByQuery ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return finder;
     }
 
@@ -12083,14 +11546,12 @@ closeConnection(con, ps);
     	String finacleTransId= null;
     		String query = " SELECT LT_ID,HIST_ID,TYPE,COST_PRICE,QUANTITY,DESCRIPTION,RET_SERIAL_NO,RET_MAKE,RET_QUANTITY,QUANTITY_SOLD " +
     				"FROM FT_MAINTENANCE_DETAILS WHERE HIST_ID = '"+histId+"' ";
-    	Connection c = null;
-    	ResultSet rs = null;
-    	Statement s = null; 
+    	
 //    	 System.out.println("the Query  in findMaterialRetrievalDetailRecordById is <<<<<<<<<<<<< " + query);
     	try {
-    		    c = getConnection("legendPlus");
-    			s = c.createStatement();
-    			rs = s.executeQuery(query);
+    		 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
+    		ResultSet rs = ps.executeQuery();
     			while (rs.next())
     			   {	 
     				int ltId = rs.getInt("LT_ID");
@@ -12117,10 +11578,7 @@ closeConnection(con, ps);
     					{
     						e.printStackTrace();
     					}
-    					finally
-    					{
-    						closeConnection(c, s, rs);
-    					}
+    					
     	return _list;
     }
 
@@ -12141,17 +11599,14 @@ closeConnection(con, ps);
         		+queryFilter;
 //        System.out.println("<<<<<<<selectQuery in findMaterialRetrievalByQuery: "+selectQuery);	
 //       System.out.println("<<<<<<<selectQuery in findMaterialRetrievalByQuery: "+queryFilter);	
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
 //            ps.setString(1, queryFilter);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -12231,9 +11686,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Material Retrieval in findMaterialRetrievalByQuery First ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -12253,17 +11706,14 @@ closeConnection(con, ps);
         String selectQuery = "select 'ASSET1' AS TableType,*from am_asset a, FT_MAINTENANCE_HISTORY b where a.Asset_id = b.ASSET_ID and a.Asset_id !='' "+ 
 				  queryFilter;       
 //       System.out.println("<<<<<<<selectQuery in findAssetByQueryFleet: "+selectQuery);		
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
 //            ps.setString(1, queryFilter);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -12342,9 +11792,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetMaterialByQueryFleet->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -12365,17 +11813,16 @@ closeConnection(con, ps);
                 + "ASSET_CODE,TECHNICIAN_CODE,subject_TO_Vat,subject_TO_WHT "
                 + "FROM FT_MAINTENANCE_HISTORY  WHERE ASSET_ID = ?";
 //        System.out.println("<<<<<<<selectQuery in findAssetFleetById: "+selectQuery+"         Asset Id: "+id);
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         ArrayList finder = new ArrayList();
-        ResultSet rs = null;
+        
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, assetId);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -12420,9 +11867,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching assetDetail ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return finder;
     }
@@ -12435,9 +11880,7 @@ closeConnection(con, ps);
      */
     public FleetManatainanceRecord findMatRecordById(String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         FleetManatainanceRecord maintenanceRecord = null;
         String selectQuery =
                 "SELECT LT_ID,TYPE,COST_PRICE,ASSET_ID,REGISTRATION_NO,PROJECT_CODE " +
@@ -12448,10 +11891,10 @@ closeConnection(con, ps);
                 "FROM FT_MAINTENANCE_HISTORY WHERE HIST_ID = ?";
 //        System.out.println("selectQuery in findMaintenaceRecordById: "+selectQuery);
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -12493,9 +11936,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error Fetching Maintenace Records in findMaintenaceRecordById ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return maintenanceRecord;
     }
 
@@ -12505,14 +11946,12 @@ closeConnection(con, ps);
     	String finacleTransId= null;
     		String query = " SELECT LT_ID,HIST_ID,TYPE,AMOUNT_SOLD,QUANTITY,DESCRIPTION,RET_SERIAL_NO,RET_MAKE,RET_QUANTITY,QUANTITY_SOLD " +
     				"FROM FT_MAINTENANCE_DETAILS_TMP WHERE HIST_ID = '"+histId+"' ";
-    	Connection c = null;
-    	ResultSet rs = null;
-    	Statement s = null; 
+    	
 //    	 System.out.println("the Query  in findMaterialRetrievalDetailRecordById is <<<<<<<<<<<<< " + query);
     	try {
-    		    c = getConnection("legendPlus");
-    			s = c.createStatement();
-    			rs = s.executeQuery(query);
+    		 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(query);
+    			ResultSet rs =ps.executeQuery();
     			while (rs.next())
     			   {	 
     				int ltId = rs.getInt("LT_ID");
@@ -12539,10 +11978,7 @@ closeConnection(con, ps);
     					{
     						e.printStackTrace();
     					}
-    					finally
-    					{
-    						closeConnection(c, s, rs);
-    					}
+    					
     	return _list;
     }
 
@@ -12573,17 +12009,14 @@ closeConnection(con, ps);
 //        String selectQuery = "select * from am_asset where Asset_id not in (select Asset_id from am_gb_bulkTransfer) and Asset_id !=(?)";
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+selectQuery);	
 //       System.out.println("<<<<<<<selectQuery in findAssetByQuery: "+queryFilter);	
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+        
         ArrayList list = new ArrayList();
         
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+ 	        PreparedStatement ps = con.prepareStatement(selectQuery);
 //            ps.setString(1, queryFilter);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -12659,9 +12092,7 @@ closeConnection(con, ps);
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset in findAssetReclassificationByQuery First ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 

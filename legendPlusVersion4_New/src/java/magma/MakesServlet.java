@@ -40,7 +40,7 @@ public class MakesServlet extends HttpServlet {
     }
 
     //Process the HTTP Get request
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws
+    public void doGetOld(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
         //Selected Category
         String cat = request.getParameter("cat");
@@ -109,6 +109,62 @@ public class MakesServlet extends HttpServlet {
         
         
     }
+    
+    
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws
+    ServletException, IOException {
+
+String cat = request.getParameter("cat");
+if (cat == null || cat.trim().isEmpty()) {
+    cat = "0";
+}
+dbConnection = new MagmaDBConnection();
+response.setContentType("text/xml;charset=UTF-8");
+response.setHeader("Cache-Control", "no-cache");
+
+PrintWriter out = response.getWriter();
+out.write("<message>");
+
+String query = "SELECT assetmake_id, assetmake " +
+               "FROM am_gb_assetmake " +
+               "WHERE category_id = ? AND STATUS = 'ACTIVE'";
+
+try (Connection con = dbConnection.getConnection("legendPlus");
+     PreparedStatement ps = con.prepareStatement(query)) {
+
+    ps.setString(1, cat);
+
+    try (ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            String id = escapeXml(rs.getString("assetmake_id"));
+            String name = escapeXml(rs.getString("assetmake"));
+
+            out.write("<make>");
+            out.write("<id>" + id + "</id>");
+            out.write("<name>" + name + "</name>");
+            out.write("</make>");
+        }
+    }
+
+} catch (Exception ex) {
+    ex.printStackTrace();
+    System.out.println("WARNING: Error fetching asset makes -> " + ex.getMessage());
+}
+
+out.write("</message>");
+out.flush();
+out.close();
+}
+
+//Utility method to escape XML special characters
+private String escapeXml(String value) {
+if (value == null) return "";
+return value.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&apos;");
+}
 
     //Clean up resources
     public void destroy() {
