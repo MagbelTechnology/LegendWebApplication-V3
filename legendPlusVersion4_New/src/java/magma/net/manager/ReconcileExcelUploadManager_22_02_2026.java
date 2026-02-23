@@ -11,7 +11,6 @@ import magma.ExcelAssetReconcileBean;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 
 import com.magbel.util.ApplicationHelper;
@@ -23,7 +22,7 @@ import com.magbel.legend.bus.ApprovalRecords;
 // Referenced classes of package magma.net.manager:
 //            FleetTransactManager
 
-public class ReconcileExcelUploadManager extends MagmaDBConnection
+public class ReconcileExcelUploadManager_22_02_2026 extends MagmaDBConnection
 {
 
     private ArrayList assetList;
@@ -34,7 +33,7 @@ public class ReconcileExcelUploadManager extends MagmaDBConnection
     private MagmaDBConnection dbConnection;
     String userid;
     SimpleDateFormat sdf;
-    public ReconcileExcelUploadManager(String uid)
+    public ReconcileExcelUploadManager_22_02_2026(String uid)
     {
         userid = uid;
         admin = new AdminHandler();
@@ -250,7 +249,7 @@ public class ReconcileExcelUploadManager extends MagmaDBConnection
         if(!sNo.equalsIgnoreCase("S/No")){
         status = true;        	
         String error = "";
-        String param = "select cast(ASSET_CODE as varchar(50))+'#'+BRANCH_CODE+'#'+ASSET_ID+'#'+DESCRIPTION+'#'+SBU_CODE+'#'+cast((coalesce(SUB_CATEGORY_ID,0)) as varchar(5))+'#'+cast((coalesce(Dept_ID,0)) as varchar(5))+'#'+cast((coalesce(Section_id,0)) as varchar(5))+'#'+cast((coalesce(Location,0)) as varchar(5))+'#'+cast((coalesce(State,0)) as varchar(5)) from AM_ASSET where BAR_CODE = '"+barCode+"' ";
+        String param = "select cast(ASSET_CODE as varchar(50))+'#'+BRANCH_CODE+'#'+ASSET_ID+'#'+DESCRIPTION+'#'+SBU_CODE+'#'+cast((coalesce(SUB_CATEGORY_ID,0)) as varchar(5))+'#'+cast((coalesce(Dept_ID,0)) as varchar(5))+'#'+cast((coalesce(Section_id,0)) as varchar(5))+'#'+cast((coalesce(Location,0)) as varchar(5))+'#'+cast((coalesce(State,0)) as varchar(5)) from AM_ASSET where ASSET_CODE = '"+assetCode+"' ";
 //        String param = "select cast(ASSET_CODE as varchar(50))+'#'+BRANCH_CODE from AM_ASSET where ASSET_ID = '"+assetId+"' ";
  //       String param = "select cast(ASSET_CODE as varchar(50))+'#'+BRANCH_CODE from AM_ASSET where BAR_CODE = '"+barCode+"' ";
 //        System.out.println("<<<<<<<param: "+param); 
@@ -261,7 +260,7 @@ public class ReconcileExcelUploadManager extends MagmaDBConnection
         assetCode = convertparam[0];
         existbranchCode = convertparam[1];
         assetId = convertparam[2];
-//        System.out.println("<<<<<<<<existbranchCode: "+existbranchCode+"  branchId: "+branchId+"   assetCode: "+assetCode);
+ //       System.out.println("<<<<<<<<existbranchCode: "+existbranchCode+"  branchId: "+branchId+"   assetCode: "+assetCode);
 //        description = convertparam[3];
 //        sbuCode = convertparam[4];
 //        subcatId = convertparam[5];
@@ -306,7 +305,6 @@ public class ReconcileExcelUploadManager extends MagmaDBConnection
                 asset.setAsset_code(assetCode);
                 asset.setBranch_code(branchCode);
                 asset.setExistBranchCode(existbranchCode);
-                System.out.println("<<<<<<<<existbranchCode: "+existbranchCode);
                 asset.setAssetMaintainBy(maintainedby);
                 asset.setSubCategory_id(subcatId);
                 asset.setSubCategory_code(subcategory_code);
@@ -402,13 +400,15 @@ public class ReconcileExcelUploadManager extends MagmaDBConnection
 public boolean insertErrorTransaction(String errorMessge,String userId) {
 	  boolean done=true;
 
+		   Connection con = null; 
+	  PreparedStatement ps = null;
 	  String transtype = "Reconciliation Upload";
 	  String query2 = "INSERT INTO [am_uploadCheckErrorLog](USER_ID,ERRORDESCRIPTION,TRANSACTION_TYPE,ERRORDATE)" +
               " VALUES('"+userId+"','"+errorMessge+"','"+transtype+"','"+dbConnection.getDateTime(new java.util.Date())+"')";
 //	  System.out.println("<<<<<query: "+query2);
 	  try {
-		  Connection con = dbConnection.getConnection("legendPlus");
-		  PreparedStatement ps = con.prepareStatement(query2);      
+	      con = dbConnection.getConnection("legendPlus");
+	      ps = con.prepareStatement(query2);      
 	      ps.execute();
 
 	  }
@@ -417,7 +417,9 @@ public boolean insertErrorTransaction(String errorMessge,String userId) {
 		   done = false;
 	      System.out.println("WARNING:cannot insert error_transaction table in insertErrorTransaction->" );
 	      ex.printStackTrace();
-	  } 
+	  } finally {
+	      closeConnect(con, ps);
+	  }
 	  return done;
 	}
 public void closeConnect(Connection con, PreparedStatement ps) {

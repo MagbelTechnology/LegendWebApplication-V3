@@ -47,14 +47,13 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
                 " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 
-        Connection con = null;
-        PreparedStatement ps = null;
+     
         //ResultSet rs = null;
         magma.UncapitalisedRecordsBean bd = null;
         int[] d = null;
         try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
 
             for (int i = 0; i < list.size(); i++) {
                 bd = (magma.UncapitalisedRecordsBean) list.get(i);
@@ -161,9 +160,7 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
 
         } catch (Exception ex) {
             System.out.println("Error insertBulkUpdate() of BulkUpdateManager -> " + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
         return (d.length > 0);
     }
@@ -172,12 +169,11 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
 
         String query = "update am_asset_approval set asset_id=? where transaction_id=? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         boolean done = true;
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, batchId);
             ps.setInt(2, Integer.parseInt(batchId));
 
@@ -186,9 +182,7 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
         } catch (Exception ex) {
             done = false;
             System.out.println("BulkUpdateManager: setBatchId():WARN:Error updating to am_asset_approval table->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
         return done;
     }
 
@@ -199,18 +193,15 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
         String selectQuery =
                 "select * from am_gb_UncapitalisedbulkUpdate where batch_id=? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
 
-        ResultSet rs = null;
         ArrayList listNew = new ArrayList();
         ArrayList listOld = new ArrayList();
         ArrayList[] listNewOld = new ArrayList[2];
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setInt(1, Integer.parseInt(tranId));
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
             Asset aset = null;
             while (rs.next()) {
@@ -268,10 +259,8 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
         } catch (Exception e) {
             System.out.println("INFO:Error findAssetByBatchId() in BulkUpdateManager-> " +
                     e.getMessage());
-        } finally {
-
-            dbConnection.closeConnection(con, ps, rs);
-        }
+        } 
+        
         System.out.println("the size of listNew is >>>>>> " + listNew.size());
         listNewOld[0] = listNew;
         listNewOld[1] = listOld;
@@ -301,18 +290,15 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
                 "FROM AM_ASSET_UNCAPITALIZED  WHERE ASSET_ID IS NOT NULL and (ASSET_STATUS = 'ACTIVE' OR ASSET_STATUS='APPROVED') " + queryFilter;
         System.out.println("the query is <<<<<<<<<<<<< " + selectQuery);
 
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
 
         ArrayList listOld = new ArrayList();
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
 
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             Asset aset =null;
             while (rs.next()) {
                 String id = rs.getString("ASSET_ID");
@@ -362,10 +348,7 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
         } catch (Exception e) {
             System.out.println("INFO:Error findAssetByID() in BulkUpdaUncapialisedteManager-> " +
                     e.getMessage());
-        } finally {
-
-            dbConnection.closeConnection(con, ps, rs);
-        }
+        } 
         System.out.println("the size of listOld is >>>>>>> " + listOld.size());
         return listOld;
 
@@ -376,8 +359,7 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
 
         ArrayList newList = null;
         Asset asset = null;
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         int[] d =null;
         String query= "UPDATE AM_ASSET_UNCAPITALIZED SET REGISTRATION_NO=?," +
                 " DESCRIPTION=?,ASSET_USER=?,ASSET_MAINTENANCE=?,Vendor_AC=?,Asset_Model=?," +
@@ -385,7 +367,8 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
                 "SBU_CODE=?,Spare_1=?,Spare_2=?,BAR_CODE=? WHERE ASSET_ID=?" ;
 
         try {
-             con = dbConnection.getConnection("legendPlus");
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
 
              for (int i = 0; i < list.size(); ++i) {
         asset = (Asset)list.get(i);
@@ -407,7 +390,7 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
                 String barCode = asset.getBarCode();
                  System.out.println("the asset id in bulk update manager is >>>>>>>>>>> " + assetId);
                 asset=null;
-                 ps = con.prepareStatement(query);
+
 
              ps.setString(1,registrationNo);
              ps.setString(2,description);
@@ -433,9 +416,7 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
 
         } catch (Exception ex) {
             System.out.println("BulkUpdateManager: updateBulkUncapitaliseAsset()>>>>>" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
             return (d.length > 0);
     }
 
@@ -447,16 +428,15 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
         String selectQuery =
                 "select * from am_gb_UncapitalisedbulkUpdate where batch_id=? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
 
         ResultSet rs = null;
         ArrayList listNew = new ArrayList();
        // ArrayList listOld = new ArrayList();
        // ArrayList[] listNewOld = new ArrayList[2];
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setInt(1, Integer.parseInt(tranId));
             rs = ps.executeQuery();
             Asset aset = null;
@@ -515,10 +495,7 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
         } catch (Exception e) {
             System.out.println("INFO:Error findAssetsByBatchId() in BulkUpdateUncapitalisedManager-> " +
                     e.getMessage());
-        } finally {
-
-            dbConnection.closeConnection(con, ps, rs);
-        }
+        } 
         System.out.println("the size of listNew is >>>>>> " + listNew.size());
         /*
         listNewOld[0] = listNew;
@@ -629,16 +606,13 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
         double[] result = new double[2];
         String selectQuery =  "select cost_price from AM_ASSET_UNCAPITALIZED where asset_id=?";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-
-        ResultSet rs = null;
+       
 
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
             ps.setString(1,assetId);
-            rs = ps.executeQuery();
+           ResultSet rs = ps.executeQuery();
 
 
             while (rs.next()) {
@@ -651,10 +625,7 @@ public class BulkUpdateUncapitalisedManager extends legend.ConnectionClass {
         } catch (Exception e) {
             System.out.println("INFO:Error findMinMaxAssetCost() in BulkUpdateManager-> " +
                     e.getMessage());
-        } finally {
-
-            dbConnection.closeConnection(con, ps, rs);
-        }
+        } 
 
 
         return result;

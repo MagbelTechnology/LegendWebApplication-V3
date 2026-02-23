@@ -9,7 +9,7 @@ import com.magbel.legend.bus.ApprovalRecords;
 import magma.net.dao.MagmaDBConnection;
 
 
-public class AutoIDSetup extends ConnectionClass {
+public class AutoIDSetup extends legend.ConnectionClass {
 	public ApprovalRecords approve;
     public AutoIDSetup() throws Exception {
     	approve = new ApprovalRecords(); 
@@ -25,17 +25,15 @@ public class AutoIDSetup extends ConnectionClass {
         //StringBuffer sq = new StringBuffer(100);
         //sq.append("am_msp_select_auto_identities");
         //select * from dbo.am_ad_auto_identity
-        Connection cnn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        MagmaDBConnection dbConn = new MagmaDBConnection();
+
+        MagmaDBConnection dbConnection = new MagmaDBConnection();
 
         String query = "select * from am_ad_auto_identity";
         String[] values = new String[11];
         try {
-            cnn = dbConn.getConnection("legendPlus");
-            ps = cnn.prepareStatement(query);
-            rs = ps.executeQuery();
+            Connection cnn = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = cnn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
             rs.next();
             for (int x = 0; x < values.length; x++) {
                 values[x] = rs.getString(x + 1);
@@ -43,8 +41,6 @@ public class AutoIDSetup extends ConnectionClass {
         } catch (Exception e) {
             System.out.println("INFO:Error selectAutoIdentities() ->" +
                                e.getMessage());
-        } finally {
-            dbConn.closeConnection(cnn, ps, rs);
         }
         // ResultSet rv = getStatement().executeQuery(
         //  sq.toString());
@@ -100,24 +96,20 @@ public class AutoIDSetup extends ConnectionClass {
     public String[][] selectSequIdentities() throws Exception {
         //StringBuffer cq = new StringBuffer(100);lll
         //cq.append("am_msp_count_sequ_identities");
-        Connection cnn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        ResultSet rc = null;
-        ResultSet rv = null;
+
         MagmaDBConnection dbConn = new MagmaDBConnection();
 
         String queryCount = "select count(*) from am_ad_sequ_identity";
         String querySelect = "select * from am_ad_sequ_identity";
         String[][] values = null;
         try {
-            cnn = dbConn.getConnection("legendPlus");
-            ps = cnn.prepareStatement(queryCount);
+            Connection cnn = dbConn.getConnection("legendPlus");
+            PreparedStatement ps = cnn.prepareStatement(queryCount);
 
             //ResultSet rc = getStatement().executeQuery(
             //cq.toString());
             int j = 0;
-            rc = ps.executeQuery();
+            ResultSet rc = ps.executeQuery();
             while (rc.next()) {
                 j = rc.getInt(1);
             } //count number of rows
@@ -126,7 +118,7 @@ public class AutoIDSetup extends ConnectionClass {
             //sq.append("am_msp_select_sequ_identities");
 
             ps = cnn.prepareStatement(querySelect);
-            rv = ps.executeQuery();
+            ResultSet rv = ps.executeQuery();
             //ResultSet rv = getStatement().executeQuery(
             //sq.toString());
 
@@ -142,9 +134,7 @@ public class AutoIDSetup extends ConnectionClass {
         } catch (Exception e) {
             System.out.println("INFO:Error selectSequIdentities() ->" +
                                e.getMessage());
-        } finally {
-            dbConn.closeConnection(cnn, ps, rs);
-        }
+        } 
 
         return values;
     }
@@ -174,16 +164,14 @@ public class AutoIDSetup extends ConnectionClass {
         // iq.append("am_msp_process_auto_identities" + " '" + a1 + "','" + a2 + "','" + a3 +
         // "','" + a4 + "','" + a5 + "','" + a6 + "','" + a7 + "','" + dm + "','" + fm + "','" + us + "'");
         boolean result = false;
-        Connection cnn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         MagmaDBConnection dbConn = new MagmaDBConnection();
 
         String query = "insert into am_ad_auto_identity (priority1,priority2,priority3,priority4,priority5,priority6,priority7,delimiter,format,user_id,date_cr)" +
                        " values(?,?,?,?,?,?,?,?,?,?,?)";
         try {
-            cnn = dbConn.getConnection("legendPlus");
-            ps = cnn.prepareStatement(query);
+            Connection cnn = dbConn.getConnection("legendPlus");
+            PreparedStatement ps = cnn.prepareStatement(query);
             ps.setString(1, a1);
             ps.setString(2, a2);
             ps.setString(3, a3);
@@ -199,9 +187,8 @@ public class AutoIDSetup extends ConnectionClass {
         } catch (Exception e) {
             System.out.println("INFO:Error processAutoIdentities() ->" +
                                e.getMessage());
-        } finally {
-            dbConn.closeConnection(cnn, ps, rs);
         }
+
         return (result);
     }
 
@@ -214,7 +201,7 @@ public class AutoIDSetup extends ConnectionClass {
      * @return boolean
      * @throws Exception
      */
-    public boolean processCartIdentities(String[] iden, String[] cati,
+    public boolean processCartIdentitiesOld(String[] iden, String[] cati,
                                          String user) throws Exception {
         //StringBuffer iq = new StringBuffer(100);
 
@@ -249,6 +236,46 @@ public class AutoIDSetup extends ConnectionClass {
         //   iq.toString()) == -1);
     }
 
+    public boolean processCartIdentities(String[] iden,
+                                         String[] cati,
+                                         String user) {
+
+        if (iden == null || cati == null || iden.length != cati.length) {
+            return false;
+        }
+
+        String query = "INSERT INTO am_ad_cart_identity " +
+                "(cart_id, cart_st, cart_cr, user_id, date_cr) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection con = new MagmaDBConnection()
+                .getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            con.setAutoCommit(false);
+
+            for (int i = 0; i < iden.length; i++) {
+
+                ps.setInt(1, Integer.parseInt(iden[i]));
+                ps.setInt(2, Integer.parseInt(cati[i]));
+                ps.setInt(3, Integer.parseInt(cati[i])); // confirm if correct
+                ps.setInt(4, Integer.parseInt(user));
+                ps.setDate(5,
+                        new java.sql.Date(System.currentTimeMillis()));
+
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            con.commit();
+
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     /**
      * processAutoIdentity
      *
@@ -259,24 +286,20 @@ public class AutoIDSetup extends ConnectionClass {
         //StringBuffer iq = new StringBuffer(100);
 
         //iq.append("exec am_msp_reset_str_identities");
-        Connection cnn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         MagmaDBConnection dbConn = new MagmaDBConnection();
         String query1 = "truncate table am_ad_auto_identity";
         String query2 = "truncate table am_ad_cart_identity";
         int x = 0;
         try {
-            cnn = dbConn.getConnection("legendPlus");
-            ps = cnn.prepareStatement(query1);
+            Connection cnn = dbConn.getConnection("legendPlus");
+            PreparedStatement ps = cnn.prepareStatement(query1);
             x = ps.executeUpdate();
             ps = cnn.prepareStatement(query2);
             x = ps.executeUpdate();
         } catch (Exception e) {
             System.out.println("INFO:Error resetStruIdentities() ->" +
                                e.getMessage());
-        } finally {
-            dbConn.closeConnection(cnn, ps, rs);
         }
         return (x == -1);
 
@@ -294,21 +317,17 @@ public class AutoIDSetup extends ConnectionClass {
         // StringBuffer iq = new StringBuffer(100);
         // iq.append("exec am_msp_reset_seq_identities");
 
-        Connection cnn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         boolean result = false;
         MagmaDBConnection dbConn = new MagmaDBConnection();
         String query = "truncate table am_ad_sequ_identity";
         try {
-            cnn = dbConn.getConnection("legendPlus");
-            ps = cnn.prepareStatement(query);
+            Connection cnn = dbConn.getConnection("legendPlus");
+            PreparedStatement ps = cnn.prepareStatement(query);
             result = ps.execute() ? false : true;
         } catch (Exception e) {
             System.out.println("INFO:Error resetSequIdentities() ->" +
                                e.getMessage());
-        } finally {
-            dbConn.closeConnection(cnn, ps, rs);
         }
         //return (getStatement().executeUpdate(
         //  iq.toString()) == -1);
@@ -326,9 +345,7 @@ public class AutoIDSetup extends ConnectionClass {
     //modified by Olabo
     public boolean processSequIdentities(String cati, String user) {
         //StringBuffer iq = new StringBuffer(100);
-        Connection cnn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         boolean result = false;
         MagmaDBConnection dbConn = new MagmaDBConnection();
         // iq.append("am_msp_process_sequ_identities" + " " + cati + ",'" + user + "'");
@@ -337,8 +354,8 @@ public class AutoIDSetup extends ConnectionClass {
                 "insert into am_ad_sequ_identity (sequ_st,sequ_cr,user_id,date_cr) " +
                 "values (?,?,?,?)";
         try {
-            cnn = dbConn.getConnection("legendPlus");
-            ps = cnn.prepareStatement(query);
+            Connection cnn = dbConn.getConnection("legendPlus");
+            PreparedStatement ps = cnn.prepareStatement(query);
 
             ps.setInt(1, Integer.parseInt(cati));
             ps.setInt(2, Integer.parseInt(cati));
@@ -348,8 +365,6 @@ public class AutoIDSetup extends ConnectionClass {
         } catch (Exception e) {
             System.out.println("INFO:Error processSequIdentities() ->" +
                                e.getMessage());
-        } finally {
-            dbConn.closeConnection(cnn, ps, rs);
         }
 
         return (result);
@@ -366,24 +381,20 @@ public class AutoIDSetup extends ConnectionClass {
     public boolean queryAssets() {
         //StringBuffer cq = new StringBuffer(20);
         //cq.append("am_msp_query_assets");
-        Connection cnn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         boolean result = false;
         MagmaDBConnection dbConn = new MagmaDBConnection();
         String query = "SELECT ASSET_ID FROM AM_ASSET";
         try {
-            cnn = dbConn.getConnection("legendPlus");
-            ps = cnn.prepareStatement(query);
-            rs = ps.executeQuery();
+            Connection cnn = dbConn.getConnection("legendPlus");
+            PreparedStatement ps = cnn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 result = true;
             }
         } catch (Exception e) {
             System.out.println("INFO:Error queryAssets() ->" +
                                e.getMessage());
-        } finally {
-            dbConn.closeConnection(cnn, ps, rs);
         }
 
         return (result);
@@ -402,24 +413,20 @@ public class AutoIDSetup extends ConnectionClass {
     public boolean queryAutoId() throws Exception {
         //StringBuffer cq = new StringBuffer(20);
         //cq.append("am_msp_query_auto_id");
-        Connection cnn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         MagmaDBConnection dbConn = new MagmaDBConnection();
         String query = "SELECT AUTO_GENERATE_ID FROM AM_GB_COMPANY";
         String result = new String();
         try {
-            cnn = dbConn.getConnection("legendPlus");
-            ps = cnn.prepareStatement(query);
-            rs = ps.executeQuery();
+            Connection cnn = dbConn.getConnection("legendPlus");
+            PreparedStatement ps = cnn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 result = rs.getString(1);
             }
         } catch (Exception e) {
             System.out.println("INFO:Error queryAutoId() ->" +
                                e.getMessage());
-        } finally {
-            dbConn.closeConnection(cnn, ps, rs);
         }
         //ResultSet rs = getStatement().executeQuery(cq.toString());
 
@@ -1731,10 +1738,7 @@ String query2 = "update am_ad_cart_identity set cart_cr = " + currValue +
 "'" + cat + "')";
 String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 
-      Connection con = null;
-      ResultSet rs = null;
-      Statement stmt = null;
-      PreparedStatement ps = null;
+
    String comp = "";
    String group = "";
    String region = "";
@@ -1748,9 +1752,9 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
    int count = 0;
    boolean done = false;
    try {
-       con=getConnection();
-       stmt = con.createStatement();
-       rs = stmt.executeQuery(query);
+       Connection cnn = dbConn.getConnection("legendPlus");
+       PreparedStatement ps = cnn.prepareStatement(query);
+       ResultSet rs = ps.executeQuery();
        while (rs.next()) {
     	   count = count + 1;
  //   	   System.out.println("====Count :"+count);
@@ -1767,19 +1771,15 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 //       System.out.println("====comp: "+comp+"  group: "+group+"  region: "+region+"  branch: "+branch+"  dept: "+dept+"  section: "+section+"  category: "+category+"  catrCr: "+catrCr+"  sequCr: "+sequCr);
        new_assetId = comp+delim+branch+delim+category+delim+catrCr;
 //       System.out.println("====New Asset Id: "+new_assetId);
-       ps = con.prepareStatement(query2);
+       ps = cnn.prepareStatement(query2);
        done = (ps.executeUpdate() != -1);
 //       System.out.println("====New done Id  & query2: "+done+"    query2: "+query2);
-       ps = con.prepareStatement(query3);
+       ps = cnn.prepareStatement(query3);
        done = (ps.executeUpdate() != -1);
  //      System.out.println("====New done Id  & query3: "+done+"    query2: "+query3);
  //      System.out.println("====>>>CURR: "+findObject("select cart_cr from am_ad_cart_identity where cart_id = "+cat+""));
    } catch (Exception ex) {
        ex.printStackTrace();
-   } finally {
-	   dbConn.closeConnection(con,stmt,rs);
-	   dbConn.closeConnection(con, ps);
-       
    }
 //   System.out.println("====new_assetId in getNewIdentity: "+new_assetId);
    return new_assetId;
@@ -1819,10 +1819,7 @@ String query2 = "update am_ad_cart_identity set bidupload_cart_cr = " + currValu
 "'" + cat + "')";
 String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 
-      Connection con = null;
-      ResultSet rs = null;
-      Statement stmt = null;
-      PreparedStatement ps = null;
+
    String comp = "";
    String group = "";
    String region = "";
@@ -1836,9 +1833,9 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
    int count = 0;
    boolean done = false;
    try {
-       con=getConnection();
-       stmt = con.createStatement();
-       rs = stmt.executeQuery(query);
+       Connection cnn = dbConn.getConnection("legendPlus");
+       PreparedStatement ps = cnn.prepareStatement(query);
+       ResultSet rs = ps.executeQuery();
        while (rs.next()) {
     	   count = count + 1;
  //   	   System.out.println("====Count :"+count);
@@ -1855,19 +1852,15 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 //       System.out.println("====comp: "+comp+"  group: "+group+"  region: "+region+"  branch: "+branch+"  dept: "+dept+"  section: "+section+"  category: "+category+"  catrCr: "+catrCr+"  sequCr: "+sequCr);
        new_assetId = comp+delim+branch+delim+category+delim+"BID"+catrCr;
 //       System.out.println("====New Asset Id: "+new_assetId);
-       ps = con.prepareStatement(query2);
+       ps = cnn.prepareStatement(query2);
        done = (ps.executeUpdate() != -1);
 //       System.out.println("====New done Id  & query2: "+done+"    query2: "+query2);
-       ps = con.prepareStatement(query3);
+       ps = cnn.prepareStatement(query3);
        done = (ps.executeUpdate() != -1);
  //      System.out.println("====New done Id  & query3: "+done+"    query2: "+query3);
  //      System.out.println("====>>>CURR: "+findObject("select bidupload_cart_cr  from am_ad_cart_identity where cart_id = "+cat+""));
    } catch (Exception ex) {
        ex.printStackTrace();
-   } finally {
-	   dbConn.closeConnection(con,stmt,rs);
-	   dbConn.closeConnection(con, ps);
-       
    }
 //   System.out.println("====new_assetId in getBidIdentity: "+new_assetId);
    return new_assetId;
@@ -1906,10 +1899,7 @@ String query2 = "update am_ad_cart_identity set cart_cr = " + currValue +
 "'" + cat + "')";
 String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 
-      Connection con = null;
-      ResultSet rs = null;
-      Statement stmt = null;
-      PreparedStatement ps = null;
+
    String comp = "";
    String group = "";
    String region = "";
@@ -1923,9 +1913,9 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
    int count = 0;
    boolean done = false;
    try {
-       con=getConnection();
-       stmt = con.createStatement();
-       rs = stmt.executeQuery(query);
+       Connection cnn = dbConn.getConnection("legendPlus");
+       PreparedStatement ps = cnn.prepareStatement(query);
+       ResultSet rs = ps.executeQuery();
        while (rs.next()) {
     	   count = count + 1;
  //   	   System.out.println("====Count :"+count);
@@ -1942,18 +1932,15 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 //       System.out.println("====comp: "+comp+"  group: "+group+"  region: "+region+"  branch: "+branch+"  dept: "+dept+"  section: "+section+"  category: "+category+"  catrCr: "+catrCr+"  sequCr: "+sequCr);
        new_assetId = comp+delim+branch+delim+category+delim+catrCr;
 //       System.out.println("====New Asset Id: "+new_assetId);
-       ps = con.prepareStatement(query2);
+       ps = cnn.prepareStatement(query2);
        done = (ps.executeUpdate() != -1);
 //       System.out.println("====New done Id  & query2: "+done+"    query2: "+query2);
-       ps = con.prepareStatement(query3);
+       ps = cnn.prepareStatement(query3);
        done = (ps.executeUpdate() != -1);
  //      System.out.println("====New done Id  & query3: "+done+"    query2: "+query3);
  //      System.out.println("====>>>CURR: "+findObject("select cart_cr from am_ad_cart_identity where cart_id = "+cat+""));
    } catch (Exception ex) {
        ex.printStackTrace();
-   } finally {
-	   dbConn.closeConnection(con,stmt,rs);
-	   dbConn.closeConnection(con, ps);
    }
 //   System.out.println("====new_assetId in getNewIdentity: "+new_assetId);
    return new_assetId;
@@ -1993,10 +1980,7 @@ String query2 = "update am_ad_cart_identity set cart_cr = " + currValue +
 "'" + cat + "')";
 String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 //System.out.println("====query2 in getNewIdentity :"+query2);
-      Connection con = null;
-      ResultSet rs = null;
-      Statement stmt = null;
-      PreparedStatement ps = null;
+
    String comp = "";
    String group = "";
    String region = "";
@@ -2010,9 +1994,9 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
    int count = 0;
    boolean done = false;
    try {
-       con=getConnection();
-       stmt = con.createStatement();
-       rs = stmt.executeQuery(query);
+       Connection cnn = dbConn.getConnection("legendPlus");
+       PreparedStatement ps = cnn.prepareStatement(query);
+       ResultSet rs = ps.executeQuery();
        while (rs.next()) {
     	   count = count + 1;
  //   	   System.out.println("====Count :"+count);
@@ -2029,18 +2013,15 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 //       System.out.println("====comp: "+comp+"  group: "+group+"  region: "+region+"  branch: "+branch+"  dept: "+dept+"  section: "+section+"  category: "+category+"  catrCr: "+catrCr+"  sequCr: "+sequCr);
        new_assetId = comp+delim+branch+delim+category+delim+catrCr;
 //       System.out.println("====New Asset Id: "+new_assetId);
-       ps = con.prepareStatement(query2);
+       ps = cnn.prepareStatement(query2);
        done = (ps.executeUpdate() != -1);
 //       System.out.println("====New done Id  & query2: "+done+"    query2: "+query2);
-       ps = con.prepareStatement(query3);
+       ps = cnn.prepareStatement(query3);
        done = (ps.executeUpdate() != -1);
  //      System.out.println("====New done Id  & query3: "+done+"    query2: "+query3);
  //      System.out.println("====>>>CURR: "+findObject("select cart_cr from am_ad_cart_identity where cart_id = "+cat+""));
    } catch (Exception ex) {
        ex.printStackTrace();
-   } finally {
-	   dbConn.closeConnection(con,stmt,rs);
-	   dbConn.closeConnection(con, ps);
    }
 //   System.out.println("====new_assetId in getNewIdentity: "+new_assetId);
    return new_assetId;
@@ -2051,9 +2032,7 @@ public String findObject(String query)
 {
 	MagmaDBConnection dbConn = new MagmaDBConnection();
 //	System.out.println("====findObject query=====  "+query);
-    Connection Con2 = null;
-    PreparedStatement Stat = null;
-    ResultSet result = null;
+
     String found = null;
 
     //String finder = "UNKNOWN";
@@ -2062,9 +2041,9 @@ public String findObject(String query)
    // double sequence = 0.00d;
     try {
 
-    	Con2 = getConnection();
-        Stat = Con2.prepareStatement(query);
-        result = Stat.executeQuery();
+        Connection cnn = dbConn.getConnection("legendPlus");
+        PreparedStatement ps = cnn.prepareStatement(query);
+        ResultSet result = ps.executeQuery();
 
         while (result.next()) {
             finder = result.getString(1);
@@ -2073,8 +2052,6 @@ public String findObject(String query)
     } catch (Exception ee2) {
         System.out.println("WARN:ERROR OBTAINING OBJ --> " + ee2);
         ee2.printStackTrace();
-    } finally {
-        dbConn.closeConnection(Con2, Stat, result);
     }
 
     return finder;

@@ -23,12 +23,12 @@ import legend.admin.objects.User;
  * @author Jejelowo.B.Festus
  * @version 1.0
  */
-public class GroupAssetManager extends MagmaDBConnection {
+public class GroupAssetManager_22_02_2026 extends MagmaDBConnection {
 
     SimpleDateFormat sdf;
     private boolean overFlow;
 
-    public GroupAssetManager() {
+    public GroupAssetManager_22_02_2026() {
         super();
         sdf = new SimpleDateFormat("dd-MM-yyyy");
     }
@@ -118,6 +118,9 @@ public class GroupAssetManager extends MagmaDBConnection {
      */
     public ArrayList findGroupAssetByQuery(String queryFilter) {
 
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         GroupAsset groupAsset = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -139,10 +142,9 @@ public class GroupAssetManager extends MagmaDBConnection {
 //        System.out.println("selectQuery : " + selectQuery);
 
         try {
-
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(selectQuery);
-			ResultSet rs = ps.executeQuery();
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -182,6 +184,8 @@ public class GroupAssetManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Records ->" +
                                e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
         }
         return finder;
     }
@@ -189,13 +193,14 @@ public class GroupAssetManager extends MagmaDBConnection {
     
     public String processFlagStatus(String qry)
     {
-
+    	Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         String status="";
         try {
-
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(qry);
-			ResultSet rs = ps.executeQuery();
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(qry);
+            rs = ps.executeQuery();
             while (rs.next())
             {
             	status = rs.getString(1);
@@ -203,12 +208,17 @@ public class GroupAssetManager extends MagmaDBConnection {
 
         } catch (Exception ex) {
             System.out.println("WARN: Error in GroupAssetManager fetching processFlagStatus ->" + ex);
-        } 
+        } finally {
+            closeConnection(con, ps);
+        }
     	return status;
     }
     
     public ArrayList findGroupAssetByQuery_posting(String queryFilter) {
 
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         GroupAsset groupAsset = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -230,10 +240,9 @@ public class GroupAssetManager extends MagmaDBConnection {
        // System.out.println("selectQuery in findGroupAssetByQuery_posting : " + selectQuery);
 
         try {
-            
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(selectQuery);
-			ResultSet rs = ps.executeQuery();
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -280,12 +289,17 @@ public class GroupAssetManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Records ->" +
                                e.getMessage());
-        } 
+        } finally {
+            closeConnection(con, ps, rs);
+        }
         return finder;
     }
 
       public ArrayList findGroupAssetByQueryBranch(String queryFilter) {
 
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         GroupAsset groupAsset = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -307,11 +321,10 @@ public class GroupAssetManager extends MagmaDBConnection {
         //System.out.println("selectQuery : " + selectQuery);
 
         try {
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
 
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(selectQuery);
-			ResultSet rs = ps.executeQuery();
-			
             while (rs.next()) {
 
 				String id = rs.getString("ASSET_ID");
@@ -351,12 +364,17 @@ public class GroupAssetManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Records ->" +
                                e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
         }
         return finder;
     }
 
       public ArrayList findGroupAsset2ByQueryBranch(String queryFilter) {
 
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         GroupAsset groupAsset = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -378,10 +396,9 @@ public class GroupAssetManager extends MagmaDBConnection {
         //System.out.println("selectQuery : " + selectQuery);
 
         try {
-            
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(selectQuery);
-			ResultSet rs = ps.executeQuery();
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -422,6 +439,8 @@ public class GroupAssetManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset2 Records ->" +
                                e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
         }
         return finder;
     }
@@ -429,6 +448,9 @@ public class GroupAssetManager extends MagmaDBConnection {
 
           public ArrayList findGroupAssetByQuery_postingBranch(String queryFilter) {
 
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         GroupAsset groupAsset = null;
         ArrayList finder = new ArrayList();
         String selectQuery =
@@ -450,10 +472,9 @@ public class GroupAssetManager extends MagmaDBConnection {
        // System.out.println("selectQuery in findGroupAssetByQuery_posting : " + selectQuery);
 
         try {
-            
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(selectQuery);
-			ResultSet rs = ps.executeQuery();
+            con = getConnection("legendPlus");
+            ps = con.prepareStatement(selectQuery);
+            rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -497,11 +518,16 @@ public class GroupAssetManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Records ->" +
                                e.getMessage());
-        } 
+        } finally {
+            closeConnection(con, ps, rs);
+        }
         return finder;
     }
           public ArrayList findUncapitalizedGroupAssetByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -523,10 +549,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               //System.out.println("selectQuery : " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -566,13 +591,18 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:findUncapitalizedGroupAssetByQuery-Error Fetching Group Uncapitalized Asset Records ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               //System.out.println("Finished with INFO:findUncapitalizedGroupAssetByQuery : " );
               return finder;
           }
  
           public ArrayList findGroupStockByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -595,10 +625,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               //System.out.println("selectQuery : " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -648,7 +677,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Records ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }
 
@@ -660,6 +691,9 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findGroupAssetImproveByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -675,10 +709,9 @@ public class GroupAssetManager extends MagmaDBConnection {
 //              System.out.println("selectQuery : " + selectQuery);
 
               try {
-
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -720,7 +753,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Improvement Records ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }
 
@@ -732,6 +767,9 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findGroupAssetReconciliationByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -745,10 +783,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               //System.out.println("selectQuery : " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -824,12 +861,17 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:findGroupAssetReconciliationByQuery in GroupAssetManager-Error Fetching GroupAsset Records ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }
           
           public ArrayList findGroupFleetByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -840,10 +882,9 @@ public class GroupAssetManager extends MagmaDBConnection {
 //              System.out.println("selectQuery : " + selectQuery);
 
               try {
-
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
                 	 String groupId = rs.getString("GROUP_ID");
@@ -889,7 +930,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching Group Fleet ByQuery  ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }
                      
@@ -902,6 +945,9 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findGroupAsset2ByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -923,11 +969,10 @@ public class GroupAssetManager extends MagmaDBConnection {
               //System.out.println("selectQuery : " + selectQuery);
 
               try {
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
-    			
                   while (rs.next()) {
 
       				String id = rs.getString("ASSET_ID");
@@ -966,6 +1011,8 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:findGroupAsset2ByQuery in GroupAssetManager-Error Fetching GroupAsset2 Records ->" +
                                      e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
               }
               return finder;
           }
@@ -979,16 +1026,18 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findSBUUploadByQuery() {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
               			"SELECT SBU_CODE,SBU_NAME,SBU_CONTACT,CONTACT_EMAIL,STATUS "+
       					"FROM Sbu_SetUp_Upload  ";
               try {
-
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
                     String sbu_code = rs.getString("SBU_CODE");
@@ -1009,6 +1058,8 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching SBU Records ->" +
                                      e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
               }
               return finder;
           }
@@ -1023,16 +1074,18 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findUserUploadByQuery() {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               User user = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
               			"SELECT User_Name,Full_Name,Legacy_Sys_id,Class,Branch,dept_code,email,region_code,zone_code "+
       					"FROM am_gb_User_Upload  ";
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
                     String userName = rs.getString("User_Name");
@@ -1061,7 +1114,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching SBU Records ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }
 
@@ -1073,6 +1128,9 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findBulkAssetTransferByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -1088,10 +1146,9 @@ public class GroupAssetManager extends MagmaDBConnection {
 //              System.out.println("selectQuery : " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -1133,6 +1190,8 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Improvement Records ->" +
                                      e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
               }
               return finder;
           }
@@ -1145,6 +1204,9 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findGroupStockByQueryList(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -1166,10 +1228,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               //System.out.println("selectQuery : " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -1209,6 +1270,8 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupStock Records ->" +
                                      e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
               }
               return finder;
           }
@@ -1216,6 +1279,9 @@ public class GroupAssetManager extends MagmaDBConnection {
           
           public ArrayList findGroupStockByQuery_posting(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
 /*              String selectQuery =
@@ -1251,10 +1317,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               //System.out.println("selectQuery in findGroupAssetByQuery_posting : " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -1298,12 +1363,17 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Records ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }
           
           public ArrayList findGroupAssetBidByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null; 
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -1325,10 +1395,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               //System.out.println("selectQuery in findGroupAssetBidByQuery: " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -1368,6 +1437,8 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Records for Bid ->" +
                                      e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
               }
               return finder;
           }
@@ -1380,6 +1451,9 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findGroupAssetVerificationByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -1390,10 +1464,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               System.out.println("selectQuery : " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -1426,7 +1499,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Records in findGroupAssetVerificationByQuery ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }
 
@@ -1438,6 +1513,9 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findGroupAssetVerifyByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -1448,10 +1526,9 @@ public class GroupAssetManager extends MagmaDBConnection {
 //              System.out.println("selectQuery : " + selectQuery);
 
               try {
-                  
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
                   while (rs.next()) {
 
@@ -1487,7 +1564,9 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Verification Records ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }
 
@@ -1499,6 +1578,9 @@ public class GroupAssetManager extends MagmaDBConnection {
            */
           public ArrayList findGroupAssetDisposalByQuery(String queryFilter) {
 
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery =
@@ -1513,11 +1595,10 @@ public class GroupAssetManager extends MagmaDBConnection {
 //              System.out.println("selectQuery : " + selectQuery);
 
               try {
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  rs = ps.executeQuery();
 
-      			Connection con = getConnection("legendPlus");
-    			PreparedStatement ps = con.prepareStatement(selectQuery);
-    			ResultSet rs = ps.executeQuery();
-    			
                   while (rs.next()) {
 
       				String id = rs.getString("ASSET_ID");
@@ -1563,296 +1644,172 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Disposal Records ->" +
                                      e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
               }
               return finder;
           }
-//          
-//          public ArrayList findAssetSummaryPostingByQuery(String Id,String tranType) {
-////        	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
-//              Connection con = null;
-//              PreparedStatement ps = null;
-//              ResultSet rs = null;
-//              GroupAsset groupAsset = null;
-//              ArrayList finder = new ArrayList();
-//              String selectQuery = "";
-//              if(Id.equals("3")) {
-//              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//              			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
-//              			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//              			+ "and page = ? --Capitalised Group Asset Creation ";
-//              }
-//              if(Id.equals("24")) {
-//              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where a.Group_id = p.Id and convert(varchar,a.Group_id) = b.asset_id "
-//            			+ "and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//            			+ "and page = ? --Capitalised Upload Asset Creation Debit ";    
-//              }
-//              if(Id.equals("1")) {
-//              selectQuery = "select a.Group_id, a.Asset_id,Vendor_AC AS CREDIT_ACCOUNT,c.Asset_Ledger AS DEBIT_ACCOUNT,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//              		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b "
-//              		+ "where a.Asset_id = p.Id and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' and page = ? --Single Asset Creation Debit";    
-//              }
-//              if(Id.equals("74")) {
-//              selectQuery =	"select a.disposal_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.BRANCH_CODE,a.Disposal_Date AS Date_purchased,a.effDate AS effective_date,p.Posting_Date,c.category_code from AM_GROUP_DISPOSAL a, am_asset s, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.disposal_ID) = p.Id "
-//            			+ "and a.asset_id = s.asset_id and convert(varchar,a.disposal_ID) = b.asset_id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//            			+ "and page = ? --Capitalised Upload Disposal Assset ";    
-//              }
-//              if(Id.equals("2")) {
-//              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice,c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code from am_AssetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s,am_asset_approval ap where a.asset_id = p.Id "
-//            			+ "and a.asset_id = s.Asset_id and a.Asset_id = ap.asset_id and s.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and ap.process_status = 'A' "
-//            			+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit  ";    
-//              }
-//              if(Id.equals("6")) {
-//              selectQuery =	"select DISTINCT a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,Date_purchased,a.effDate AS effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_assetTransfer a, "
-//            			+ "am_raisentry_post p,am_ad_category c, am_asset t,am_asset_approval b where a.asset_id = p.Id and a.asset_id = t.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and a.approval_status='ACTIVE' AND b.process_status = 'A' and b.tran_type = 'Asset Transfer' "
-//            			+ "and page = ? --Capitalised Asset Transfer Debit ";    
-//              }
-//              if(Id.equals("28")) {
-//              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "t.BRANCH_CODE, Date_purchased,t.effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_gb_bulkTransfer a, "
-//            			+ "am_raisentry_post p,am_ad_category c, am_asset t, am_asset_approval b where convert(varchar,a.Batch_id) = p.Id and a.asset_id = t.Asset_id and convert(varchar,a.Batch_id) = b.asset_id and t.CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//            			+ "and page = ? --Capitalised Bulk Asset Transfer ";    
-//              }              
-//              if(Id.equals("4")) {
-//              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.reclassify_date AS effective_date,p.Posting_Date,c.category_code from am_assetReclassification a,"
-//            			+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = s.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//            			+ "and page = ? --Capitalised Asset Reclasification Debit ";    
-//              }
-//              if(Id.equals("12")) {
-//              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
-//            			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//            			+ "and page = ? --Single Close Asset  Debit ";    
-//              }
-//              if(Id.equals("10")) {
-//              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-//              		+ "a.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from am_asset_improvement a, "
-//              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and a.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//              		+ "and approval_status = 'ACTIVE' and revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
-//              		+ "and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
-//              		+ "and page = ? --Capitalised Asset Improvement Debit ";    
-//              }              
-//              if(Id.equals("13")) {
-//              selectQuery =	"select a.Revalue_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//              			+ "a.BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where CONVERT(varchar, a.Revalue_ID) = p.Id "
-//              			+ "and a.Category_Code = c.category_Code and a.asset_id = s.Asset_id and CONVERT(varchar, a.Revalue_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//              			+ "and page = ? --Capitalised Asset Improvement Upload ";
-//              }
-//              if(Id.equals("16")) {
-//                  selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//                			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id and a.asset_id = b.asset_id "
-//                			+ "and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//                			+ "and page = ? --Single WIP RECLASSIFICATION";  
-//              }
-//              if(Id.equals("29")) {
-//              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-//              		+ "s.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effective_date,a.Accelerated_Date AS Posting_Date,c.category_code from am_AcceleratedDepreciation a, "
-//              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and s.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-//              		+ "and page = ? --Capitalised Accelerated Depreciation ";    
-//              }              
-//              if(Id.equals("EXCPT")) {
-//                  selectQuery = "select a.Group_id, '' AS Asset_id,a.Description,a.Cost_Price AS costPrice, a.ACCOUNT_NO AS accountNo,'D' AS transType,"
-//                  		+ "a.BRANCH_CODE,a.DATE_FIELD,a.DATE_FIELD,a.DATE_FIELD,'' AS category_code from AM_GB_BATCH_POSTING a, AM_GB_POSTING_EXCEPTION p "
-//                  		+ "where a.GROUP_ID = P.GROUP_ID and a.ID = P.SERIAL_NO and a.GROUP_DESCRIPTION = ? --Exception Transaction Posting";  
-//              }                   
-// //             System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
-//
-//              try {
-//                  con = getConnection("legendPlus");
-//                  ps = con.prepareStatement(selectQuery);
-//                  ps.setString(1, tranType);
-//                  rs = ps.executeQuery();
-//                  while (rs.next()) {
-//
-//      				String assetId = rs.getString("ASSET_ID");
-//      				String description = rs.getString("DESCRIPTION");
-//      			   double costPrice = rs.getDouble("COSTPRICE");
-//      			   String dateCreated = formatDate(rs.getDate("POSTING_DATE"));
-//      			   String purchaseDate = formatDate(rs.getDate("DATE_PURCHASED"));
-//      			   String depreciationStartDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
-//      			   String branchCode = rs.getString("BRANCH_CODE");
-//      			   String categoryCode = rs.getString("CATEGORY_CODE");
-//                      
-//                      groupAsset = new GroupAsset();
-//                      groupAsset.setId(assetId); 
-//                      groupAsset.setDescription(description);
-//                      groupAsset.setBranchCode(branchCode);
-//                      groupAsset.setCostPrice(costPrice);
-//                      groupAsset.setDateCreated(dateCreated);
-//                      groupAsset.setDate_of_purchase(purchaseDate);
-//                      groupAsset.setDepreciation_start_date(depreciationStartDate);
-//                      groupAsset.setCategory_code(categoryCode);
-//                      finder.add(groupAsset);
-//
-//                  }
-//
-//              } catch (Exception e) {
-//                  System.out.println("INFO:GroupAssetManager-Error Fetching Records by findAssetSummaryPostingByQuery ->" +
-//                                     e.getMessage());
-//              } finally {
-//                  closeConnection(con, ps, rs);
-//              }
-//              return finder;
-//          }                                    
-//                                               
-     
+          
           public ArrayList findAssetSummaryPostingByQuery(String Id,String tranType) {
-//      	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
-            GroupAsset groupAsset = null;
-            ArrayList finder = new ArrayList();
-            String selectQuery = "";
-            if(Id.equals("3")) {
-            selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT,'D' AS transType,"
-            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
-            			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            			+ "and page = ? --Capitalised Group Asset Creation ";
-            }
-            if(Id.equals("24")) {
-            selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where a.Group_id = p.Id and convert(varchar,a.Group_id) = b.asset_id "
-            		+ "and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            		+ "and page = ? --Capitalised Upload Asset Creation Debit "
-            		+ "";    
-            }
-            if(Id.equals("1")) { 
-            selectQuery = "select a.Group_id, a.Asset_id,Vendor_AC AS CREDIT_ACCOUNT,c.Asset_Ledger AS DEBIT_ACCOUNT,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b "
-            		+ "where a.Asset_id = p.Id and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' and page = ? --Single Asset Creation Debit";    
-            }
-            if(Id.equals("74")) {
-            selectQuery =	" select distinct a.disposal_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "a.BRANCH_CODE,a.Disposal_Date AS Date_purchased,a.effDate AS effective_date,p.Posting_Date,c.category_code, "
-            		+ "(select DISTINCT b.suspense_acct asd from am_ad_category a,  am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b,AM_GROUP_DISPOSAL g where a.currency_id = c.currency_id   "
-            		+ "and a.category_code = a.CATEGORY_CODE and d.branch_code = g.branch_code) AS DEBIT_ACCOUNT, "
-            		+ "(select TOP 1 a.Asset_Ledger asd from am_ad_category a, am_ad_branch d, AM_GB_CURRENCY_CODE c, am_gb_company b,AM_GROUP_DISPOSAL g where a.currency_id = c.currency_id  "
-            		+ "and a.category_code = g.category_code and d.branch_code = g.branch_code) AS CREDIT_ACCOUNT "
-            		+ "from AM_GROUP_DISPOSAL a, am_asset s, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.disposal_ID) = p.Id "
-            		+ "and a.asset_id = s.asset_id and convert(varchar,a.disposal_ID) = b.asset_id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            		+ "and page =  ? --Capitalised Upload Disposal Assset";    
-            }
-            if(Id.equals("2")) {
-            selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice,c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code, "
-            		+ "(select b.suspense_acct asd from am_ad_category a,  am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b where a.currency_id = c.currency_id and a.category_code = s.CATEGORY_CODE "
-            		+ "and d.branch_code = s.BRANCH_CODE)AS DEBIT_ACCOUNT, "
-            		+ "(select b.suspense_acct asd from am_ad_category a, am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b where a.currency_id = c.currency_id and a.category_code = s.CATEGORY_CODE  "
-            		+ "and d.branch_code = S.BRANCH_CODE) AS CREDIT_ACCOUNT "
-            		+ "from am_AssetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s,am_asset_approval ap where a.asset_id = p.Id "
-            		+ "and a.asset_id = s.Asset_id and a.Asset_id = ap.asset_id and s.Category_ID = c.category_ID and disposal_status='P' and entryPostFlag = 'N' and GroupIdStatus = 'N' and ap.process_status = 'A' "
-            		+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit ";    
-            }
-            if(Id.equals("6")) {
-            selectQuery =	"select DISTINCT a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,Date_purchased,a.effDate AS effective_date,a.Transfer_Date AS Posting_Date,c.category_code, "
-            		+ "a.NEW_BRANCH_CODE+'-'+ c.Asset_Ledger AS DEBIT_ACCOUNT,a.OLD_BRANCH_CODE+'-'+c.Asset_Ledger AS CREDIT_ACCOUNT from am_assetTransfer a, "
-            		+ "am_raisentry_post p,am_ad_category c, am_asset t,am_asset_approval b where a.asset_id = p.Id and a.asset_id = t.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and a.approval_status='ACTIVE' AND b.process_status = 'A' and b.tran_type = 'Asset Transfer' "
-            		+ "and page = ? --Capitalised Asset Transfer Debit ";    
-            }
-            if(Id.equals("28")) {
-            selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "t.BRANCH_CODE, Date_purchased,t.effective_date,a.Transfer_Date AS Posting_Date,c.category_code, "
-            		+ "a.NEW_BRANCH_CODE+'-'+ c.Asset_Ledger AS DEBIT_ACCOUNT,(select BRANCH_CODE from am_ad_branch where BRANCH_ID = a.oldbranch_id)+'-'+c.Asset_Ledger AS CREDIT_ACCOUNT from am_gb_bulkTransfer a, "
-            		+ "am_raisentry_post p,am_ad_category c, am_asset t, am_asset_approval b where convert(varchar,a.Batch_id) = p.Id and a.asset_id = t.Asset_id and convert(varchar,a.Batch_id) = b.asset_id and t.CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            		+ "and page = ? --Capitalised Bulk Asset Transfer ";    
-            }              
-            if(Id.equals("4")) {
-            selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.reclassify_date AS effective_date,p.Posting_Date,c.category_code, "
-            		+ "(select Asset_Ledger from am_ad_category where CATEGORY_CODE = a.old_category_code) AS CREDIT_ACCOUNT, "
-            		+ "(select Asset_Ledger from am_ad_category where category_Id = a.new_category_Id) AS DEBIT_ACCOUNT from am_assetReclassification a, "
-            		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = s.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            		+ "and page = ? --Capitalised Asset Reclasification Debit ";    
-            }
-            if(Id.equals("12")) {
-            selectQuery =	"select distinct a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code, "
-            		+ "a.Vendor_AC AS DEBIT_ACCOUNT,(select Asset_Ledger from am_ad_category where category_code = a.category_code) AS CREDIT_ACCOUNT from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
-            		+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            		+ "and page = ? --Single Close Asset  Debit ";    
-            }
-            if(Id.equals("10")) {
-            selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "a.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT from am_asset_improvement a, "
-            		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and a.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            		+ "and approval_status = 'ACTIVE' and revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
-            		+ "and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
-            		+ "and page = ? --Capitalised Asset Improvement Debit ";    
-            }              
-            if(Id.equals("13")) {
-            selectQuery =	"select distinct a.Revalue_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "a.BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where CONVERT(varchar, a.Revalue_ID) = p.Id "
-            		+ "and a.Category_Code = c.category_Code and a.asset_id = s.Asset_id and CONVERT(varchar, a.Revalue_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            		+ "and page = ? --Capitalised Asset Improvement Upload ";
-            }
-            if(Id.equals("16")) {
-                selectQuery = "select distinct a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-                		+ "  a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code, "
-                		+ "  c.Asset_Ledger CREDIT_ACCOUNT,c.Asset_Ledger DEBIT_ACCOUNT from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id and a.asset_id = b.asset_id "
-                		+ "  and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-                		+ "  and page = ? --Single WIP RECLASSIFICATION";  
-            }
-            if(Id.equals("29")) {
-            selectQuery =	" select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "s.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effective_date,a.Accelerated_Date AS Posting_Date,c.category_code, "
-            		+ "c.Dep_ledger AS DEBIT_ACCOUNT,c.Accum_Dep_ledger AS CREDIT_ACCOUNT from am_AcceleratedDepreciation a, "
-            		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and s.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
-            		+ "and page = ? --Capitalised Accelerated Depreciation";    
-            }              
-            if(Id.equals("EXCPT")) {
-                selectQuery = "select a.Group_id, '' AS Asset_id,a.Description,a.Cost_Price AS costPrice, a.ACCOUNT_NO AS accountNo,'D' AS transType,"
-                		+ "a.BRANCH_CODE,a.DATE_FIELD,a.DATE_FIELD,a.DATE_FIELD,'' AS category_code from AM_GB_BATCH_POSTING a, AM_GB_POSTING_EXCEPTION p "
-                		+ "where a.GROUP_ID = P.GROUP_ID and a.ID = P.SERIAL_NO and a.GROUP_DESCRIPTION = ? --Exception Transaction Posting";  
-            }                   
-//             System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
+//        	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
+              GroupAsset groupAsset = null;
+              ArrayList finder = new ArrayList();
+              String selectQuery = "";
+              if(Id.equals("3")) {
+              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT,'D' AS transType,"
+              			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
+              			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              			+ "and page = ? --Capitalised Group Asset Creation ";
+              }
+              if(Id.equals("24")) {
+              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where a.Group_id = p.Id and convert(varchar,a.Group_id) = b.asset_id "
+              		+ "and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Upload Asset Creation Debit "
+              		+ "";    
+              }
+              if(Id.equals("1")) {
+              selectQuery = "select a.Group_id, a.Asset_id,Vendor_AC AS CREDIT_ACCOUNT,c.Asset_Ledger AS DEBIT_ACCOUNT,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+              		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b "
+              		+ "where a.Asset_id = p.Id and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' and page = ? --Single Asset Creation Debit";    
+              }
+              if(Id.equals("74")) {
+              selectQuery =	" select distinct a.disposal_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE,a.Disposal_Date AS Date_purchased,a.effDate AS effective_date,p.Posting_Date,c.category_code, "
+              		+ "(select DISTINCT b.suspense_acct asd from am_ad_category a,  am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b,AM_GROUP_DISPOSAL g where a.currency_id = c.currency_id   "
+              		+ "and a.category_code = a.CATEGORY_CODE and d.branch_code = g.branch_code) AS DEBIT_ACCOUNT, "
+              		+ "(select TOP 1 a.Asset_Ledger asd from am_ad_category a, am_ad_branch d, AM_GB_CURRENCY_CODE c, am_gb_company b,AM_GROUP_DISPOSAL g where a.currency_id = c.currency_id  "
+              		+ "and a.category_code = g.category_code and d.branch_code = g.branch_code) AS CREDIT_ACCOUNT "
+              		+ "from AM_GROUP_DISPOSAL a, am_asset s, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.disposal_ID) = p.Id "
+              		+ "and a.asset_id = s.asset_id and convert(varchar,a.disposal_ID) = b.asset_id and a.Category_Code = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page =  ? --Capitalised Upload Disposal Assset";    
+              }
+              if(Id.equals("2")) {
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice,c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code, "
+              		+ "(select b.suspense_acct asd from am_ad_category a,  am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b where a.currency_id = c.currency_id and a.category_code = s.CATEGORY_CODE "
+              		+ "and d.branch_code = s.BRANCH_CODE)AS DEBIT_ACCOUNT, "
+              		+ "(select b.suspense_acct asd from am_ad_category a, am_ad_branch d, AM_GB_CURRENCY_CODE c,am_gb_company b where a.currency_id = c.currency_id and a.category_code = s.CATEGORY_CODE  "
+              		+ "and d.branch_code = S.BRANCH_CODE) AS CREDIT_ACCOUNT "
+              		+ "from am_AssetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s,am_asset_approval ap where a.asset_id = p.Id "
+              		+ "and a.asset_id = s.Asset_id and a.Asset_id = ap.asset_id and s.Category_ID = c.category_ID and disposal_status='P' and entryPostFlag = 'N' and GroupIdStatus = 'N' and ap.process_status = 'A' "
+              		+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit ";    
+              }
+              if(Id.equals("6")) {
+              selectQuery =	"select DISTINCT a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,Date_purchased,a.effDate AS effective_date,a.Transfer_Date AS Posting_Date,c.category_code, "
+              		+ "a.NEW_BRANCH_CODE+'-'+ c.Asset_Ledger AS DEBIT_ACCOUNT,a.OLD_BRANCH_CODE+'-'+c.Asset_Ledger AS CREDIT_ACCOUNT from am_assetTransfer a, "
+              		+ "am_raisentry_post p,am_ad_category c, am_asset t,am_asset_approval b where a.asset_id = p.Id and a.asset_id = t.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and a.approval_status='ACTIVE' AND b.process_status = 'A' and b.tran_type = 'Asset Transfer' "
+              		+ "and page = ? --Capitalised Asset Transfer Debit ";    
+              }
+              if(Id.equals("28")) {
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "t.BRANCH_CODE, Date_purchased,t.effective_date,a.Transfer_Date AS Posting_Date,c.category_code, "
+              		+ "a.NEW_BRANCH_CODE+'-'+ c.Asset_Ledger AS DEBIT_ACCOUNT,(select BRANCH_CODE from am_ad_branch where BRANCH_ID = a.oldbranch_id)+'-'+c.Asset_Ledger AS CREDIT_ACCOUNT from am_gb_bulkTransfer a, "
+              		+ "am_raisentry_post p,am_ad_category c, am_asset t, am_asset_approval b where convert(varchar,a.Batch_id) = p.Id and a.asset_id = t.Asset_id and convert(varchar,a.Batch_id) = b.asset_id and t.CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Bulk Asset Transfer ";    
+              }              
+              if(Id.equals("4")) {
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.reclassify_date AS effective_date,p.Posting_Date,c.category_code, "
+              		+ "(select Asset_Ledger from am_ad_category where CATEGORY_CODE = a.old_category_code) AS CREDIT_ACCOUNT, "
+              		+ "(select Asset_Ledger from am_ad_category where category_Id = a.new_category_Id) AS DEBIT_ACCOUNT from am_assetReclassification a, "
+              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = s.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Asset Reclasification Debit ";    
+              }
+              if(Id.equals("12")) {
+              selectQuery =	"select distinct a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code, "
+              		+ "a.Vendor_AC AS DEBIT_ACCOUNT,(select Asset_Ledger from am_ad_category where category_code = a.category_code) AS CREDIT_ACCOUNT from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
+              		+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Single Close Asset  Debit ";    
+              }
+              if(Id.equals("10")) {
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT from am_asset_improvement a, "
+              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and a.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and approval_status = 'ACTIVE' and revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+              		+ "and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+              		+ "and page = ? --Capitalised Asset Improvement Debit ";    
+              }              
+              if(Id.equals("13")) {
+              selectQuery =	"select distinct a.Revalue_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code,Vendor_AC AS CREDIT_ACCOUNT, c.Asset_Ledger AS DEBIT_ACCOUNT from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where CONVERT(varchar, a.Revalue_ID) = p.Id "
+              		+ "and a.Category_Code = c.category_Code and a.asset_id = s.Asset_id and CONVERT(varchar, a.Revalue_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Asset Improvement Upload ";
+              }
+              if(Id.equals("16")) {
+                  selectQuery = "select distinct a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+                  		+ "  a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code, "
+                  		+ "  c.Asset_Ledger CREDIT_ACCOUNT,c.Asset_Ledger DEBIT_ACCOUNT from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id and a.asset_id = b.asset_id "
+                  		+ "  and a.Category_ID = c.category_ID and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+                  		+ "  and page = ? --Single WIP RECLASSIFICATION";  
+              }
+              if(Id.equals("29")) {
+              selectQuery =	" select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "s.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effective_date,a.Accelerated_Date AS Posting_Date,c.category_code, "
+              		+ "c.Dep_ledger AS DEBIT_ACCOUNT,c.Accum_Dep_ledger AS CREDIT_ACCOUNT from am_AcceleratedDepreciation a, "
+              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and s.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' and b.process_status = 'A' "
+              		+ "and page = ? --Capitalised Accelerated Depreciation";    
+              }              
+              if(Id.equals("EXCPT")) {
+                  selectQuery = "select a.Group_id, '' AS Asset_id,a.Description,a.Cost_Price AS costPrice, a.ACCOUNT_NO AS accountNo,'D' AS transType,"
+                  		+ "a.BRANCH_CODE,a.DATE_FIELD,a.DATE_FIELD,a.DATE_FIELD,'' AS category_code from AM_GB_BATCH_POSTING a, AM_GB_POSTING_EXCEPTION p "
+                  		+ "where a.GROUP_ID = P.GROUP_ID and a.ID = P.SERIAL_NO and a.GROUP_DESCRIPTION = ? --Exception Transaction Posting";  
+              }                   
+ //             System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
 
-            try {
-            	Connection con = getConnection("legendPlus");
-            	PreparedStatement ps = con.prepareStatement(selectQuery);
-    			
-                ps.setString(1, tranType);
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
+              try {
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  ps.setString(1, tranType);
+                  rs = ps.executeQuery();
+                  while (rs.next()) {
 
-    				String assetId = rs.getString("ASSET_ID");
-    				String description = rs.getString("DESCRIPTION");
-    			   double costPrice = rs.getDouble("COSTPRICE");
-    			   String dateCreated = formatDate(rs.getDate("POSTING_DATE"));
-    			   String purchaseDate = formatDate(rs.getDate("DATE_PURCHASED"));
-    			   String depreciationStartDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
-    			   String branchCode = rs.getString("BRANCH_CODE");
-    			   String categoryCode = rs.getString("CATEGORY_CODE");
-    			   String creditAccount =  rs.getString("CREDIT_ACCOUNT");
-    			 String debitAccount =  rs.getString("DEBIT_ACCOUNT");
-                    
-                    groupAsset = new GroupAsset();
-                    groupAsset.setId(assetId); 
-                    groupAsset.setDescription(description);
-                    groupAsset.setBranchCode(branchCode);
-                    groupAsset.setCostPrice(costPrice);
-                    groupAsset.setDateCreated(dateCreated);
-                    groupAsset.setDate_of_purchase(purchaseDate);
-                    groupAsset.setDepreciation_start_date(depreciationStartDate);
-                    groupAsset.setCategory_code(categoryCode);
-                    groupAsset.setSpare1(creditAccount);
-                    groupAsset.setSpare2(debitAccount);
-                    finder.add(groupAsset);
+      				String assetId = rs.getString("ASSET_ID");
+      				String description = rs.getString("DESCRIPTION");
+      			   double costPrice = rs.getDouble("COSTPRICE");
+      			   String dateCreated = formatDate(rs.getDate("POSTING_DATE"));
+      			   String purchaseDate = formatDate(rs.getDate("DATE_PURCHASED"));
+      			   String depreciationStartDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+      			   String branchCode = rs.getString("BRANCH_CODE");
+      			   String categoryCode = rs.getString("CATEGORY_CODE");
+      			   String creditAccount =  rs.getString("CREDIT_ACCOUNT");
+      			 String debitAccount =  rs.getString("DEBIT_ACCOUNT");
+                      
+                      groupAsset = new GroupAsset();
+                      groupAsset.setId(assetId); 
+                      groupAsset.setDescription(description);
+                      groupAsset.setBranchCode(branchCode);
+                      groupAsset.setCostPrice(costPrice);
+                      groupAsset.setDateCreated(dateCreated);
+                      groupAsset.setDate_of_purchase(purchaseDate);
+                      groupAsset.setDepreciation_start_date(depreciationStartDate);
+                      groupAsset.setCategory_code(categoryCode);
+                      groupAsset.setSpare1(creditAccount);
+                      groupAsset.setSpare2(debitAccount);
+                      finder.add(groupAsset);
 
-                }
+                  }
 
-            } catch (Exception e) {
-                System.out.println("INFO:GroupAssetManager-Error Fetching Records by findAssetSummaryPostingByQuery ->" +
-                                   e.getMessage());
-            } 
-            return finder;
-        }
+              } catch (Exception e) {
+                  System.out.println("INFO:GroupAssetManager-Error Fetching Records by findAssetSummaryPostingByQuery ->" +
+                                     e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
+              return finder;
+          }                                    
+                                               
           
           public ArrayList findUncapitalisedSummaryPostingByQuery(String Id,String tranType) {
 //        	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
-
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery = "";
@@ -1909,11 +1866,10 @@ public class GroupAssetManager extends MagmaDBConnection {
 //              System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
 
               try {
-            	  Connection con = getConnection("legendPlus");
-            	  PreparedStatement ps = con.prepareStatement(selectQuery);
-                  
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
                   ps.setString(1, tranType);
-                  ResultSet  rs = ps.executeQuery();
+                  rs = ps.executeQuery();
                   while (rs.next()) {
 
       				String assetId = rs.getString("ASSET_ID");
@@ -1941,13 +1897,17 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching Records by findAssetSummaryPostingByQuery ->" +
                                      e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
               }
               return finder;
           }                                    
           
           public ArrayList findAssetSummaryPostingExceptByQuery(String Id,String tranType) {
 //        	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
-
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery = "";
@@ -1959,11 +1919,10 @@ public class GroupAssetManager extends MagmaDBConnection {
 //              System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
 
               try {
-            	  Connection con = getConnection("legendPlus");
-            	  PreparedStatement ps = con.prepareStatement(selectQuery);                 
-          			
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
                   ps.setString(1, tranType);
-                  ResultSet rs = ps.executeQuery();
+                  rs = ps.executeQuery();
                   while (rs.next()) {
 
       				String assetId = rs.getString("ASSET_ID");
@@ -1991,272 +1950,151 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching Records by findAssetSummaryPostingByQuery ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return finder;
           }                                    
-//          
-//          public double findAssetSummaryPostingByQueryTotal(String Id,String tranType) {
-////        	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
-//              Connection con = null;
-//              PreparedStatement ps = null;
-//              ResultSet rs = null;
-//              GroupAsset groupAsset = null;
-//              ArrayList finder = new ArrayList();
-//              String selectQuery = "";
-//              double costTotal = 0.00;
-//              if(Id.equals("3")) {
-//              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//              			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
-//              			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-//              			+ "and page = ? --Capitalised Group Asset Creation ";
-//              }
-//              if(Id.equals("24")) {
-//              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
-//            			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-//            			+ "and page = ? --Capitalised Upload Asset Creation Debit ";    
-//              }
-//              if(Id.equals("1")) {
-//              selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//          			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
-//          			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-//          			+ "and page = ? --Single Asset Creation Debit";    
-//              }
-//              if(Id.equals("74")) {
-//              selectQuery =	"select a.disposal_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.BRANCH_CODE,a.Disposal_Date AS Date_purchased,a.effDate AS effective_date,p.Posting_Date,c.category_code from AM_GROUP_DISPOSAL a, am_asset s, am_raisentry_post p,am_ad_category c, am_asset_approval b where convert(varchar,a.disposal_ID) = p.Id "
-//            			+ "and a.asset_id = s.asset_id and a.Category_Code = c.category_Code and convert(varchar,a.disposal_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-//            			+ "and page = ? --Capitalised Upload Disposal Assset ";    
-//              }
-//              if(Id.equals("2")) {
-//              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-//              		+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code from am_assetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s, am_asset_approval ab where a.asset_id = p.Id "
-//              		+ "and a.asset_id = s.Asset_id and s.Category_ID = c.category_ID and a.asset_id = ab.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
-//              		+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit  ";    
-//              }            
-//              if(Id.equals("6")) {
-//              selectQuery =	"select DISTINCT a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,Date_purchased,a.effDate AS effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_assetTransfer a, "
-//            			+ "am_raisentry_post p,am_ad_category c, am_asset t,am_asset_approval b where a.asset_id = p.Id and a.asset_id = t.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and a.approval_status='ACTIVE' AND b.process_status = 'A' and b.tran_type = 'Asset Transfer' "
-//            			+ "and page = ? --Capitalised Asset Transfer Debit ";    
-//              }
-//              if(Id.equals("28")) {
-//              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "t.BRANCH_CODE, Date_purchased,t.effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_gb_bulkTransfer a, "
-//            			+ "am_raisentry_post p,am_ad_category c, am_asset t, am_asset_approval b where convert(varchar,a.Batch_id) = p.Id and a.asset_id = t.Asset_id and t.CATEGORY_CODE = c.category_Code and convert(varchar,a.Batch_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' "
-//            			+ " AND ab.process_status = 'A' and page = ? --Capitalised Bulk Asset Transfer ";    
-//              }                 
-//              if(Id.equals("4")) {
-//              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.reclassify_date AS effective_date,p.Posting_Date,c.category_code from am_assetReclassification a,"
-//            			+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = s.Asset_id and a.OLD_CATEGORY_CODE = c.category_Code and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-//            			+ "and page = ? --Capitalised Asset Reclasification Debit ";    
-//              }
-//              if(Id.equals("12")) {
-//              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
-//            			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
-//            			+ "and page = ? --Single Close Asset  Debit ";    
-//              }
-//              if(Id.equals("10")) {
-//              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-//              		+ "a.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from am_asset_improvement a,  "
-//              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and a.asset_id = b.asset_id "
-//              		+ "and entryPostFlag = 'N' and GroupIdStatus = 'N' AND approval_status = 'ACTIVE' AND b.process_status = 'A'  "
-//              		+ "and revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1)))  "
-//              		+ "and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
-//              		+ "and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1)))  "
-//              		+ "and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
-//              		+ "and page = ? --Capitalised Asset Improvement Debit ";    
-//              }              
-//              if(Id.equals("13")) {
-//              selectQuery =	"select a.Revalue_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//              			+ "a.BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where CONVERT(varchar, a.Revalue_ID) = p.Id "
-//              			+ "and a.Category_Code = c.category_Code and a.asset_id = s.Asset_id and CONVERT(varchar, a.Revalue_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
-//              			+ "and page = ? --Capitalised Asset Improvement Upload ";
-//              }
-//              if(Id.equals("16")) {
-//                  selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-//                			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_caty c, am_asset_approval b where a.Asset_id = p.Id "
-//                			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
-//                			+ "and page = ? --Single WIP RECLASSIFICATION";  
-//              }       
-//              if(Id.equals("EXCPT")) {
-//                  selectQuery = "select a.Group_id, '' AS Asset_id,a.Description,a.Cost_Price AS costPrice, a.ACCOUNT_NO AS accountNo,'D' AS transType,"
-//                  		+ "a.BRANCH_CODE,a.DATE_FIELD,a.DATE_FIELD,a.DATE_FIELD,'' AS category_code from AM_GB_BATCH_POSTING a, AM_GB_POSTING_EXCEPTION p "
-//                  		+ "where a.GROUP_ID = P.GROUP_ID and a.ID = P.SERIAL_NO and a.GROUP_DESCRIPTION = ? --Exception Transaction Posting";  
-//              }    
-//              if(Id.equals("29")) {
-//              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-//              		+ "s.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effective_date,a.Accelerated_Date AS Posting_Date,c.category_code from am_AcceleratedDepreciation a, "
-//              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.asset_id = b.asset_id and s.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' "
-//              		+ " AND ab.process_status = 'A' and page = ? --Capitalised Accelerated Depreciation ";    
-//              }               
-////              System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
-//
-//              try {
-//                  con = getConnection("legendPlus");
-//                  ps = con.prepareStatement(selectQuery);
-//                  ps.setString(1, tranType);
-//                  rs = ps.executeQuery();
-//                  while (rs.next()) {
-////      				String assetId = rs.getString("ASSET_ID");
-////      				String description = rs.getString("DESCRIPTION");
-//                	  	double costPrice = rs.getDouble("COSTPRICE");
-//                	  	costTotal = costTotal + rs.getDouble("COSTPRICE");
-////      			   String dateCreated = formatDate(rs.getDate("POSTING_DATE"));
-////      			   String purchaseDate = formatDate(rs.getDate("DATE_PURCHASED"));
-////      			   String depreciationStartDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
-////      			   String branchCode = rs.getString("BRANCH_CODE");
-////      			   String categoryCode = rs.getString("CATEGORY_CODE");
-//                  }
-//                  
-//              } catch (Exception e) {
-//                  System.out.println("INFO:GroupAssetManager-Error Fetching Records by findAssetSummaryPostingByQueryTotal ->" +
-//                                     e.getMessage());
-//              } finally {
-//                  closeConnection(con, ps, rs);
-//              }
-//              return costTotal;
-//          }                                    
-//          
           
-
           public double findAssetSummaryPostingByQueryTotal(String Id,String tranType) {
-//      	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
-
-            GroupAsset groupAsset = null;
-            ArrayList finder = new ArrayList();
-            String selectQuery = "";
-            double costTotal = 0.00;
-            if(Id.equals("3")) {
-            selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
+//        	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
+              GroupAsset groupAsset = null;
+              ArrayList finder = new ArrayList();
+              String selectQuery = "";
+              double costTotal = 0.00;
+              if(Id.equals("3")) {
+              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+              			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c,am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
+              			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+              			+ "and page = ? --Capitalised Group Asset Creation ";
+              }
+              if(Id.equals("24")) {
+              selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+            			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
             			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-            			+ "and page = ? --Capitalised Group Asset Creation ";
-            }
-            if(Id.equals("24")) {
-            selectQuery =	"select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-          			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_group_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where convert(varchar,a.Group_id) = p.Id "
-          			+ "and a.Category_ID = c.category_ID and convert(varchar,a.Group_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-          			+ "and page = ? --Capitalised Upload Asset Creation Debit ";    
-            }
-            if(Id.equals("1")) {
-            selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-        			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
-        			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-        			+ "and page = ? --Single Asset Creation Debit";    
-            }
-            if(Id.equals("74")) {
-            selectQuery =	"select a.disposal_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-          			+ "a.BRANCH_CODE,a.Disposal_Date AS Date_purchased,a.effDate AS effective_date,p.Posting_Date,c.category_code from AM_GROUP_DISPOSAL a, am_asset s, am_raisentry_post p,am_ad_category c, am_asset_approval b where convert(varchar,a.disposal_ID) = p.Id "
-          			+ "and a.asset_id = s.asset_id and a.Category_Code = c.category_Code and convert(varchar,a.disposal_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
-          			+ "and page = ? --Capitalised Upload Disposal Assset ";    
-            }
-            if(Id.equals("2")) {
-            selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code from am_assetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s, am_asset_approval ab where a.asset_id = p.Id "
-            		+ "and a.asset_id = s.Asset_id and s.Category_ID = c.category_ID and a.asset_id = ab.asset_id and disposal_status='P' and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
-            		+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit  ";    
-            }            
-            if(Id.equals("6")) {
-            selectQuery =	"select DISTINCT a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-          			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,Date_purchased,a.effDate AS effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_assetTransfer a, "
-          			+ "am_raisentry_post p,am_ad_category c, am_asset t,am_asset_approval b where a.asset_id = p.Id and a.asset_id = t.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and a.approval_status='ACTIVE' AND b.process_status = 'A' and b.tran_type = 'Asset Transfer' "
-          			+ "and page = ? --Capitalised Asset Transfer Debit ";    
-            }
-            if(Id.equals("28")) {
-            selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-          			+ "t.BRANCH_CODE, Date_purchased,t.effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_gb_bulkTransfer a, "
-          			+ "am_raisentry_post p,am_ad_category c, am_asset t, am_asset_approval b where convert(varchar,a.Batch_id) = p.Id and a.asset_id = t.Asset_id and t.CATEGORY_CODE = c.category_Code and convert(varchar,a.Batch_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' "
-          			+ " AND ab.process_status = 'A' and page = ? --Capitalised Bulk Asset Transfer ";    
-            }                 
-            if(Id.equals("4")) {
-            selectQuery =	"select sum(a.Cost_Price) AS costPrice from am_assetReclassification a, am_raisentry_post p,am_asset s, "
-            		+ "am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = b.asset_id "
-            		+ "and a.asset_id = s.Asset_id and b.tran_type='Asset Reclassification' "
-            		+ "and b.process_status = 'A' and entryPostFlag = 'N' "
-            		+ "and GroupIdStatus = 'N' and page = ? --Capitalised Asset Reclasification Debit  ";    
-            }
-            if(Id.equals("12")) {
-            selectQuery =	"select sum(a.Cost_Price) AS costPrice from am_asset a, am_raisentry_post p, am_asset_approval b "
-            		+ "where a.asset_id = p.Id and a.Asset_id = b.asset_id and b.tran_type='CloseAsset' "
-            		+ "and  b.process_status = 'A' and entryPostFlag = 'N' and GroupIdStatus = 'N' "
-            		+ "and page = ? --Single Close Asset  Debit ";    
-            }
-            if(Id.equals("10")) {
-            selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
-            		+ "a.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from am_asset_improvement a,  "
-            		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and a.asset_id = b.asset_id "
-            		+ "and entryPostFlag = 'N' and GroupIdStatus = 'N' AND approval_status = 'ACTIVE' AND b.process_status = 'A'  "
-            		+ "and revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1)))  "
-            		+ "and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
-            		+ "and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1)))  "
-            		+ "and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
-            		+ "and page = ? --Capitalised Asset Improvement Debit ";    
-            }              
-            if(Id.equals("13")) {
-            selectQuery =	" select sum(a.Cost_Price) AS costPrice from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c, am_asset_approval b "
-            		+ "where a.Revalue_ID = p.Id "
-            		+ "and convert(varchar, a.Revalue_ID) = b.asset_id "
-            		+ "and a.Category_Code = c.category_Code "
-            		+ "and b.tran_type='Asset Improve Upload' "
-            		+ "and  b.process_status = 'A' "
-            		+ "and entryPostFlag = 'N' "
-            		+ "and GroupIdStatus = 'N' "
-            		+ "and page = ? --Capitalised Asset Improvement Upload ";
-            }
-            if(Id.equals("16")) {
-                selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
-              			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_caty c, am_asset_approval b where a.Asset_id = p.Id "
-              			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
-              			+ "and page = ? --Single WIP RECLASSIFICATION";  
-            }       
-            if(Id.equals("EXCPT")) {
-                selectQuery = "select a.Group_id, '' AS Asset_id,a.Description,a.Cost_Price AS costPrice, a.ACCOUNT_NO AS accountNo,'D' AS transType,"
-                		+ "a.BRANCH_CODE,a.DATE_FIELD,a.DATE_FIELD,a.DATE_FIELD,'' AS category_code from AM_GB_BATCH_POSTING a, AM_GB_POSTING_EXCEPTION p "
-                		+ "where a.GROUP_ID = P.GROUP_ID and a.ID = P.SERIAL_NO and a.GROUP_DESCRIPTION = ? --Exception Transaction Posting";  
-            }    
-            if(Id.equals("29")) {
-            selectQuery =	"select sum(s.Cost_Price) AS costPrice from am_AcceleratedDepreciation a, am_raisentry_post p,am_ad_category c, am_asset s, am_asset_approval b  "
-            		+ "where a.Asset_id = p.Id and a.asset_id = b.asset_id and a.Asset_id = s.Asset_id "
-            		+ "and s.Category_ID = c.category_ID "
-            		+ "and b.tran_type='Accelerated Depreciation' "
-            		+ "and  b.process_status = 'A' "
-            		+ "and entryPostFlag = 'N' "
-            		+ "and GroupIdStatus = 'N' and page = ? --Capitalised Accelerated Depreciation ";    
-            }               
-//            System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
+            			+ "and page = ? --Capitalised Upload Asset Creation Debit ";    
+              }
+              if(Id.equals("1")) {
+              selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+          			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_category c, am_asset_approval b where a.Asset_id = p.Id "
+          			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+          			+ "and page = ? --Single Asset Creation Debit";    
+              }
+              if(Id.equals("74")) {
+              selectQuery =	"select a.disposal_ID AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+            			+ "a.BRANCH_CODE,a.Disposal_Date AS Date_purchased,a.effDate AS effective_date,p.Posting_Date,c.category_code from AM_GROUP_DISPOSAL a, am_asset s, am_raisentry_post p,am_ad_category c, am_asset_approval b where convert(varchar,a.disposal_ID) = p.Id "
+            			+ "and a.asset_id = s.asset_id and a.Category_Code = c.category_Code and convert(varchar,a.disposal_ID) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND b.process_status = 'A' "
+            			+ "and page = ? --Capitalised Upload Disposal Assset ";    
+              }
+              if(Id.equals("2")) {
+              selectQuery =	"select distinct a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+s.Description AS Description,s.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "b.BRANCH_CODE,s.Date_purchased,a.effective_date,a.disposal_date AS Posting_Date,c.category_code from am_assetDisposal a, am_raisentry_post p,am_ad_category c, am_ad_branch b,am_asset s, am_asset_approval ab where a.asset_id = p.Id "
+              		+ "and a.asset_id = s.Asset_id and s.Category_ID = c.category_ID and a.asset_id = ab.asset_id and disposal_status='P' and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
+              		+ "and s.branch_code = b.BRANCH_CODE and page = ? --Capitalised Asset Disposal Debit  ";    
+              }            
+              if(Id.equals("6")) {
+              selectQuery =	"select DISTINCT a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+            			+ "a.OLD_BRANCH_CODE AS BRANCH_CODE,Date_purchased,a.effDate AS effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_assetTransfer a, "
+            			+ "am_raisentry_post p,am_ad_category c, am_asset t,am_asset_approval b where a.asset_id = p.Id and a.asset_id = t.Asset_id and a.asset_id = b.asset_id and a.OLD_CATEGORY_CODE = c.category_Code and entryPostFlag = 'N' and GroupIdStatus = 'N' and a.approval_status='ACTIVE' AND b.process_status = 'A' and b.tran_type = 'Asset Transfer' "
+            			+ "and page = ? --Capitalised Asset Transfer Debit ";    
+              }
+              if(Id.equals("28")) {
+              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+            			+ "t.BRANCH_CODE, Date_purchased,t.effective_date,a.Transfer_Date AS Posting_Date,c.category_code from am_gb_bulkTransfer a, "
+            			+ "am_raisentry_post p,am_ad_category c, am_asset t, am_asset_approval b where convert(varchar,a.Batch_id) = p.Id and a.asset_id = t.Asset_id and t.CATEGORY_CODE = c.category_Code and convert(varchar,a.Batch_id) = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' "
+            			+ " AND ab.process_status = 'A' and page = ? --Capitalised Bulk Asset Transfer ";    
+              }                 
+              if(Id.equals("4")) {
+              selectQuery =	"select sum(a.Cost_Price) AS costPrice from am_assetReclassification a, am_raisentry_post p,am_asset s, "
+              		+ "am_asset_approval b where a.new_asset_id = p.Id and a.asset_id = b.asset_id "
+              		+ "and a.asset_id = s.Asset_id and b.tran_type='Asset Reclassification' "
+              		+ "and b.process_status = 'A' and entryPostFlag = 'N' "
+              		+ "and GroupIdStatus = 'N' and page = ? --Capitalised Asset Reclasification Debit  ";    
+              }
+              if(Id.equals("12")) {
+              selectQuery =	"select sum(a.Cost_Price) AS costPrice from am_asset a, am_raisentry_post p, am_asset_approval b "
+              		+ "where a.asset_id = p.Id and a.Asset_id = b.asset_id and b.tran_type='CloseAsset' "
+              		+ "and  b.process_status = 'A' and entryPostFlag = 'N' and GroupIdStatus = 'N' "
+              		+ "and page = ? --Single Close Asset  Debit ";    
+              }
+              if(Id.equals("10")) {
+              selectQuery =	"select a.asset_id AS Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType, "
+              		+ "a.BRANCH_CODE AS BRANCH_CODE,s.Date_purchased,a.effDate AS effective_date,a.revalue_Date AS Posting_Date,c.category_code from am_asset_improvement a,  "
+              		+ "am_raisentry_post p,am_ad_category c,am_asset s, am_asset_approval b where a.asset_id = p.Id and a.CATEGORY_CODE = c.category_Code and a.asset_id = s.Asset_id and a.asset_id = b.asset_id "
+              		+ "and entryPostFlag = 'N' and GroupIdStatus = 'N' AND approval_status = 'ACTIVE' AND b.process_status = 'A'  "
+              		+ "and revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1)))  "
+              		+ "and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+              		+ "and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1)))  "
+              		+ "and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+              		+ "and page = ? --Capitalised Asset Improvement Debit ";    
+              }              
+              if(Id.equals("13")) {
+              selectQuery =	" select sum(a.Cost_Price) AS costPrice from AM_GROUP_IMPROVEMENT a, am_raisentry_post p,am_ad_category c, am_asset_approval b "
+              		+ "where a.Revalue_ID = p.Id "
+              		+ "and convert(varchar, a.Revalue_ID) = b.asset_id "
+              		+ "and a.Category_Code = c.category_Code "
+              		+ "and b.tran_type='Asset Improve Upload' "
+              		+ "and  b.process_status = 'A' "
+              		+ "and entryPostFlag = 'N' "
+              		+ "and GroupIdStatus = 'N' "
+              		+ "and page = ? --Capitalised Asset Improvement Upload ";
+              }
+              if(Id.equals("16")) {
+                  selectQuery = "select a.Group_id, a.Asset_id,a.Asset_id+'**'+a.Description AS Description,a.Cost_Price AS costPrice, c.Asset_Ledger AS accountNo,'D' AS transType,"
+                			+ "a.BRANCH_CODE,a.Date_purchased,a.effective_date,a.Posting_Date,c.category_code from am_asset a, am_raisentry_post p,am_ad_caty c, am_asset_approval b where a.Asset_id = p.Id "
+                			+ "and a.Category_ID = c.category_ID and a.asset_id = b.asset_id and entryPostFlag = 'N' and GroupIdStatus = 'N' AND ab.process_status = 'A' "
+                			+ "and page = ? --Single WIP RECLASSIFICATION";  
+              }       
+              if(Id.equals("EXCPT")) {
+                  selectQuery = "select a.Group_id, '' AS Asset_id,a.Description,a.Cost_Price AS costPrice, a.ACCOUNT_NO AS accountNo,'D' AS transType,"
+                  		+ "a.BRANCH_CODE,a.DATE_FIELD,a.DATE_FIELD,a.DATE_FIELD,'' AS category_code from AM_GB_BATCH_POSTING a, AM_GB_POSTING_EXCEPTION p "
+                  		+ "where a.GROUP_ID = P.GROUP_ID and a.ID = P.SERIAL_NO and a.GROUP_DESCRIPTION = ? --Exception Transaction Posting";  
+              }    
+              if(Id.equals("29")) {
+              selectQuery =	"select sum(s.Cost_Price) AS costPrice from am_AcceleratedDepreciation a, am_raisentry_post p,am_ad_category c, am_asset s, am_asset_approval b  "
+              		+ "where a.Asset_id = p.Id and a.asset_id = b.asset_id and a.Asset_id = s.Asset_id "
+              		+ "and s.Category_ID = c.category_ID "
+              		+ "and b.tran_type='Accelerated Depreciation' "
+              		+ "and  b.process_status = 'A' "
+              		+ "and entryPostFlag = 'N' "
+              		+ "and GroupIdStatus = 'N' and page = ? --Capitalised Accelerated Depreciation ";    
+              }               
+//              System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
 
-            try {
-            	Connection con = getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
-                     			
-                ps.setString(1, tranType);
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-//    				String assetId = rs.getString("ASSET_ID");
-//    				String description = rs.getString("DESCRIPTION");
-              	  	double costPrice = rs.getDouble("COSTPRICE");
-              	  	costTotal = costTotal + rs.getDouble("COSTPRICE");
-//    			   String dateCreated = formatDate(rs.getDate("POSTING_DATE"));
-//    			   String purchaseDate = formatDate(rs.getDate("DATE_PURCHASED"));
-//    			   String depreciationStartDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
-//    			   String branchCode = rs.getString("BRANCH_CODE");
-//    			   String categoryCode = rs.getString("CATEGORY_CODE");
-                }
-                
-            } catch (Exception e) {
-                System.out.println("INFO:GroupAssetManager-Error Fetching Records by findAssetSummaryPostingByQueryTotal ->" +
-                                   e.getMessage());
-            } 
-            return costTotal;
-        }          
-          
+              try {
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
+                  ps.setString(1, tranType);
+                  rs = ps.executeQuery();
+                  while (rs.next()) {
+//      				String assetId = rs.getString("ASSET_ID");
+//      				String description = rs.getString("DESCRIPTION");
+                	  	double costPrice = rs.getDouble("COSTPRICE");
+                	  	costTotal = costTotal + rs.getDouble("COSTPRICE");
+//      			   String dateCreated = formatDate(rs.getDate("POSTING_DATE"));
+//      			   String purchaseDate = formatDate(rs.getDate("DATE_PURCHASED"));
+//      			   String depreciationStartDate = formatDate(rs.getDate("EFFECTIVE_DATE"));
+//      			   String branchCode = rs.getString("BRANCH_CODE");
+//      			   String categoryCode = rs.getString("CATEGORY_CODE");
+                  }
+                  
+              } catch (Exception e) {
+                  System.out.println("INFO:GroupAssetManager-Error Fetching Records by findAssetSummaryPostingByQueryTotal ->" +
+                                     e.getMessage());
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
+              return costTotal;
+          }                                    
           
           public double findUncapitalisedSummaryPostingByQueryTotalCost(String Id,String tranType) {
 //        	  	System.out.println("=======Id: "+Id+"    tranType: "+tranType);
-
+              Connection con = null;
+              PreparedStatement ps = null;
+              ResultSet rs = null;
               GroupAsset groupAsset = null;
               ArrayList finder = new ArrayList();
               String selectQuery = "";
@@ -2313,11 +2151,10 @@ public class GroupAssetManager extends MagmaDBConnection {
 //              System.out.println("selectQuery in findAssetSummaryPostingByQuery : " + selectQuery);
 
               try {
-            	  Connection con = getConnection("legendPlus");
-                  PreparedStatement ps = con.prepareStatement(selectQuery);
-                        			
+                  con = getConnection("legendPlus");
+                  ps = con.prepareStatement(selectQuery);
                   ps.setString(1, tranType);
-                  ResultSet rs = ps.executeQuery();
+                  rs = ps.executeQuery();
                   while (rs.next()) {
 //      				String assetId = rs.getString("ASSET_ID");
 //      				String description = rs.getString("DESCRIPTION");
@@ -2333,72 +2170,10 @@ public class GroupAssetManager extends MagmaDBConnection {
               } catch (Exception e) {
                   System.out.println("INFO:GroupAssetManager-Error Fetching Records by findUncapitalisedSummaryPostingByQueryTotalCost ->" +
                                      e.getMessage());
-              } 
+              } finally {
+                  closeConnection(con, ps, rs);
+              }
               return costTotal;
           }                                    
-
-          /**
-           * findGroupAssetImproveByQuery
-           *
-           * @param id String
-           * @return FleetManatainanceRecord
-           */
-          public ArrayList findGroupMovementBalanceByQuery(String queryFilter) {
-
-              GroupAsset groupAsset = null;
-              ArrayList finder = new ArrayList();
-              String selectQuery =
-              			" Schedule_Id,Asset_Id,cost_increase,adjust_reason,adjust_Date,User_Id,cost_price,vatable_cost,"+
-      					"effDate,approval_status,description,status "+
-      					"FROM AM_GROUP_MOVEMENT_BAL WHERE ASSET_ID != ''  " + queryFilter;
-              
-//              System.out.println("selectQuery : " + selectQuery);
-
-              try {
-        			Connection con = getConnection("legendPlus");
-          			PreparedStatement ps = con.prepareStatement(selectQuery);
-          			ResultSet rs = ps.executeQuery();
-
-                  while (rs.next()) {
-
-      				String id = rs.getString("ASSET_ID");
-   //   				String registrationNo = rs.getString("REGISTRATION_NO");
-      				String description = rs.getString("DESCRIPTION");
-
-      			   double costPrice = rs.getDouble("COST_PRICE");
-//      			   double oldcostPrice = rs.getDouble("old_cost_price");
-      			   String dateCreated = formatDate(rs.getDate("effDate"));
-      			   double accumulatedDepreciation = 0.00d;//rs.getString("");
-      	//		   String depreciationEndDate = formatDate(rs.getDate("DEP_END_DATE"));
-
-      			//   String make = rs.getString("ASSET_MAKE");
-      			//   String model = rs.getString("ASSET_MODEL");
-      		//	   String tax = rs.getString("WH_TAX");
-//      			   String taxAmount = rs.getString("BRANCH_CODE");
-//        			   String maintainBy  = rs.getString("wht_amount");
-//        			   String vat = rs.getString("vat_amount");
-//        			   double vatableCost = rs.getDouble("VATABLE_COST");
-//        			   String process_flag = rs.getString("IMPROVED");
-//        			//   String sbu_code = rs.getString("SBU_CODE");
-//        			   String assetcode = rs.getString("ASSET_CODE");
-                      groupAsset = new GroupAsset();
-                      groupAsset.setId(id);
-                      groupAsset.setDescription(description);
-                      groupAsset.setCostPrice(costPrice);
-                      groupAsset.setDateCreated(dateCreated);
-//                      groupAsset.setProcess_flag(process_flag);
-//                      groupAsset.setOldcost_price(oldcostPrice);;
-//  //                    groupAsset.setSbu_code(sbu_code);
-//                      groupAsset.setAsset_code(assetcode);
-                      finder.add(groupAsset);
-
-                  }
-              } catch (Exception e) {
-                  System.out.println("INFO:GroupAssetManager-Error Fetching GroupAsset Improvement Records ->" +
-                                     e.getMessage());
-              } 
-              return finder;
-          }
-
-
+                                                                                             
 }

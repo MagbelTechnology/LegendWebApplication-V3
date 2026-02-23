@@ -2499,13 +2499,17 @@ Date date = new Date();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, assetid);
-            return ps.executeQuery().next();
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
 
         } catch (Exception e) {
             System.out.println("WARN: chkidExists -> " + e);
             return false;
         }
     }
+
 
     public int insertAssetRecord(String branch) throws Exception, Throwable {
         String[] budget = getBudgetInfo();

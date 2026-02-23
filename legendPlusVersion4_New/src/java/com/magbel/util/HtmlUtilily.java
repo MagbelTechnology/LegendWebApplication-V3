@@ -15,7 +15,7 @@ public class HtmlUtilily
     {
     }
 
-    public String getResources(String selected, String query)
+    public String getResourcesOld(String selected, String query)
     {
         Connection mcon;
         PreparedStatement mps;
@@ -102,6 +102,38 @@ public class HtmlUtilily
         }    
         return html;
     }
+    
+    public String getResources(String selected, String query) {
+
+        if (selected == null) {
+            selected = "";
+        }
+
+        StringBuilder html = new StringBuilder();
+
+        try {Connection con = new DataConnect("ias").getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String id = rs.getString(1);
+                String name = rs.getString(2);
+
+                html.append("<option ")
+                    .append(id.equals(selected) ? "selected " : "")
+                    .append("value='")
+                    .append(id)
+                    .append("'>")
+                    .append(name)
+                    .append("</option>");
+            }
+
+        } catch (Exception e) {
+            System.out.println("WARNING::HtmlUtil:-> " + e);
+        }
+
+        return html.toString();
+    }
 
     public String getUnique(String epostId)
     {
@@ -129,35 +161,24 @@ public class HtmlUtilily
 
     public String findObject(String query)
     {
-        Connection Con2;
-        Statement Stat;
+
         String finder;
-        Con2 = null;
-        Stat = null;
+
   //      ResultSet result = null;
         String found = null;
         finder = "UNKNOWN";
         double sequence = 0.0D;
         try
         {
-        Con2 = (new DataConnect("ias")).getConnection();
-        Stat = Con2.createStatement();
+        	Connection Con2 = (new DataConnect("ias")).getConnection();
+        	Statement Stat = Con2.createStatement();
         for(ResultSet result = Stat.executeQuery(query); result.next();)
         {
             finder = result.getString(1);
         }
 
         try
-        {
-            if(Stat != null)
-            {
-                Stat.close();
-            }
-            if(Con2 != null)
-            {
-                Con2.close();
-            }
-        }
+        {}
         catch(Exception errorClosing)
         {
             System.out.println((new StringBuilder()).append("WARNING::Error Closing Connection >> ").append(errorClosing).toString());
@@ -166,49 +187,16 @@ public class HtmlUtilily
         System.out.println((new StringBuilder()).append("WARNING::ERROR OBTAINING OBJ --> ").append(ee2).toString());
         ee2.printStackTrace();
 	}
-        try
-        {
-            if(Stat != null)
-            {
-                Stat.close();
-            }
-            if(Con2 != null)
-            {
-                Con2.close();
-            }
-        }
-        catch(Exception errorClosing)
-        {
-            System.out.println((new StringBuilder()).append("WARNING::Error Closing Connection >> ").append(errorClosing).toString());
-        }
-        try
-        {
-            if(Stat != null)
-            {
-                Stat.close();
-            }
-            if(Con2 != null)
-            {
-                Con2.close();
-            }
-        }
-        catch(Exception errorClosing)
-        {
-            System.out.println((new StringBuilder()).append("WARNING::Error Closing Connection >> ").append(errorClosing).toString());
-        }    
+       
         return finder;
 
     }
 
     public String getResources2(String selected, String query)
     {
-        Connection mcon;
-        PreparedStatement mps;
-        ResultSet mrs;
+
         String html;
-        mcon = null;
-        mps = null;
-        mrs = null;
+
         html = "";
        // String id = "";
         try
@@ -217,29 +205,16 @@ public class HtmlUtilily
         {
             selected = "";
         }
-        mcon = (new DataConnect("ias")).getConnection();
-        mps = mcon.prepareStatement(query);
-        for(mrs = mps.executeQuery(); mrs.next();)
+        Connection mcon = (new DataConnect("ias")).getConnection();
+        PreparedStatement mps = mcon.prepareStatement(query);
+        for(ResultSet mrs = mps.executeQuery(); mrs.next();)
         {
             String id = mrs.getString(2);
             html = (new StringBuilder()).append(html).append("<option ").append(id.equals(selected) ? " selected " : "").append(" value='").append(id).append("'>").append(mrs.getString(2)).append("</option> ").toString();
         }
 
         try
-        {
-            if(mps != null)
-            {
-                mps.close();
-            }
-            if(mrs != null)
-            {
-                mrs.close();
-            }
-            if(mcon != null)
-            {
-                mcon.close();
-            }
-        }
+        {}
         catch(Exception closingError)
         {
             System.out.println((new StringBuilder()).append("WARNING::Error cloing Connection->").append(closingError).toString());
@@ -248,39 +223,13 @@ public class HtmlUtilily
         System.out.println((new StringBuilder()).append("WARNING::HtmlUtil:->").append(ee).toString());
 	}
         try
-        {
-            if(mps != null)
-            {
-                mps.close();
-            }
-            if(mrs != null)
-            {
-                mrs.close();
-            }
-            if(mcon != null)
-            {
-                mcon.close();
-            }
-        }
+        {}
         catch(Exception closingError)
         {
             System.out.println((new StringBuilder()).append("WARNING::Error cloing Connection->").append(closingError).toString());
         }
         try
-        {
-            if(mps != null)
-            {
-                mps.close();
-            }
-            if(mrs != null)
-            {
-                mrs.close();
-            }
-            if(mcon != null)
-            {
-                mcon.close();
-            }
-        }
+        {}
         catch(Exception closingError)
         {
             System.out.println((new StringBuilder()).append("WARNING::Error cloing Connection->").append(closingError).toString());
@@ -289,19 +238,17 @@ public class HtmlUtilily
     }
     public double findintObject(String query)
     {
-        Connection Con2;
-        Statement Stat;
+
       //  double finder;
-        Con2 = null;
-        Stat = null;
+
   //      ResultSet result = null;
         String found = null;
         double finder = 0.0D;
         double sequence = 0.0D;
         try
         {
-        Con2 = (new DataConnect("ias")).getConnection();
-        Stat = Con2.createStatement();
+        	Connection Con2 = (new DataConnect("ias")).getConnection();
+        	Statement Stat = Con2.createStatement();
         for(ResultSet result = Stat.executeQuery(query); result.next();)
         {
             finder = result.getDouble(1);
@@ -328,29 +275,7 @@ System.out.println("====finder====  "+finder);
 	}
         try
         {
-            if(Stat != null)
-            {
-                Stat.close();
-            }
-            if(Con2 != null)
-            {
-                Con2.close();
-            }
-        }
-        catch(Exception errorClosing)
-        {
-            System.out.println((new StringBuilder()).append("WARNING::Error Closing Connection >> ").append(errorClosing).toString());
-        }
-        try
-        {
-            if(Stat != null)
-            {
-                Stat.close();
-            }
-            if(Con2 != null)
-            {
-                Con2.close();
-            }
+
         }
         catch(Exception errorClosing)
         {
@@ -362,19 +287,18 @@ System.out.println("====finder====  "+finder);
 
     public String getCodeName(String query) {
 		String result = "";
-		Connection con = null;
-		ResultSet rs = null;
+
 		int rs1 = 0;
-		PreparedStatement ps = null;
+
 	//	System.out.println("query===>> "+query);
 		
 		try {
 			String validate = query.substring(0, 6);
 //			con = getConnection();
-			con = (new DataConnect("ias")).getConnection();
-			ps = con.prepareStatement(query);
+			Connection con = (new DataConnect("ias")).getConnection();
+			PreparedStatement ps = con.prepareStatement(query);
 			if(!validate.equalsIgnoreCase("UPDATE")){	
-			rs = ps.executeQuery();
+				ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				result = rs.getString(1) == null ? "" : rs.getString(1);
 			}

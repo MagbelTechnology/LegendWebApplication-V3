@@ -24,38 +24,29 @@ public class RemoteMethods extends RemoteScripting {
         System.out.println("RemoteScripting: " + msg);
     }
 
-    public static String getDepRateOld(String Category) {
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    public static String getDepRate(String Category) {
+    	
         String query = "select dep_rate from am_ad_category  " +
-                       "where category_id='" + Category + "'";
+                       "where category_id=?";
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
-//            conClass = new ConnectionClass();
-//            rs = con.getStatement().executeQuery(query);
-//            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, Category);
+            ResultSet rs = ps.executeQuery();
+           
             if (rs.next()) {
                 return rs.getString(1);
             }
-            dbConnection.closeConnection(con, ps, rs);
-        } catch (SQLException ex) {
-        } catch (Exception ex) {
+            
+        }  catch (Exception ex) {
             System.out.println("WARN : RemoteMethod >> error getting depRate " +
                                ex);
-        } finally {
- //           conClass.freeResource();
-        	dbConnection.closeConnection(con, ps, rs);
-        }
+        } 
         return "";
     }
     
-    public static String getDepRate(String categoryId) {
-        dbConnection = new MagmaDBConnection();
+    public static String getDepRate2(String categoryId) {
+       
         String depRate = "";
 
         String query = "SELECT dep_rate FROM am_ad_category WHERE category_id = ?";

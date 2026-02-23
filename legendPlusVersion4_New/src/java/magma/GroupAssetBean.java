@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Connection;
 
 import com.magbel.legend.bus.ApprovalRecords;
@@ -303,10 +304,7 @@ public class GroupAssetBean extends legend.ConnectionClass {
 
 		AssetRecordsBean ad = new AssetRecordsBean();
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
+       
 	public GroupAssetBean() throws Exception
 	{
 		super();
@@ -326,10 +324,8 @@ public class GroupAssetBean extends legend.ConnectionClass {
 
 	public long createGroup(String groupAssetByAsset,String branch) throws Exception,Throwable
 	{
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    	
+    	
 		aprecords = new ApprovalRecords();
 		System.out.println(">>>>>>>>> INSIDE CREATE GROUP IN GROUP ASSET BEAN <<<<<<<<<< ");
 		
@@ -388,7 +384,7 @@ public class GroupAssetBean extends legend.ConnectionClass {
 		for (int x = 0; x < itemsCount; x++)
 		{
 			try {
-	            con = dbConnection.getConnection("legendPlus");
+
 			//asset_id = new legend.AutoIDSetup().getIdentity(branch_id,department_id, section_id, category_id);
 	        if(groupAssetByAsset.equalsIgnoreCase("Y")){asset_id = new ApplicationHelper().getGeneratedId("am_group_asset");}
 //			if(groupAssetByAsset.equalsIgnoreCase("N")){asset_id= new legend.AutoIDSetup().getIdentity(branch_id,department_id, section_id, category_id);}
@@ -419,7 +415,8 @@ public class GroupAssetBean extends legend.ConnectionClass {
 					"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
 					"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-		ps = con.prepareStatement(query);
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query);
 		//b.append(query);
 		amountPTD = amountPTD.replaceAll(",","");
 		//b.append(asset_id);
@@ -645,12 +642,7 @@ public class GroupAssetBean extends legend.ConnectionClass {
 
                         catch (Exception r) {
 				System.out.println("INFO: Error creating group aset >>" + r);
-			} finally {
-//				freeResource();
-//	        	if((con != null) || (!con.equals(null))) {
-//	        	con.close();}
-				dbConnection.closeConnection(con, ps, rs);
-			}
+			} 
         }
 		//ad.updateGroupAssetStatus(Long.toString(gid));
 		return gid;
@@ -658,10 +650,7 @@ public class GroupAssetBean extends legend.ConnectionClass {
 
 	public long createGroupUnclassified(String branch) throws Exception,Throwable
 	{
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    	
 		aprecords = new ApprovalRecords();
 //		System.out.println(">>>>>>>>> INSIDE CREATE GROUP IN GROUP ASSET BEAN <<<<<<<<<< ");
 		StringBuffer b = new StringBuffer(400);
@@ -716,7 +705,7 @@ public class GroupAssetBean extends legend.ConnectionClass {
 
 			//asset_id = new legend.AutoIDSetup().getIdentity(branch_id,department_id, section_id, category_id);
 			asset_id = new ApplicationHelper().getGeneratedId("am_group_asset");
-                  con = dbConnection.getConnection("legendPlus");
+                
 
 
 //		System.out.println(">>>>>>>>>  GENERATED ASSET_ID <<<<<<<<<< " + asset_id);
@@ -743,7 +732,8 @@ public class GroupAssetBean extends legend.ConnectionClass {
 			+ "INTEGRIFY,VENDOR_NAME )	VALUES " +
 					"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
 					"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		ps = con.prepareStatement(query);
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query);
 		//b.append(query);
 		amountPTD = amountPTD.replaceAll(",","");
 		//b.append(asset_id);
@@ -955,10 +945,7 @@ public class GroupAssetBean extends legend.ConnectionClass {
 
                         catch (Exception r) {
 				System.out.println("INFO: Error creating group aset >>" + r);
-			} finally {
-	//			freeResource();
-				dbConnection.closeConnection(con, ps, rs);
-			}
+			} 
         }
 		//ad.updateGroupAssetStatus(Long.toString(gid));
 		return gid;
@@ -968,9 +955,7 @@ public class GroupAssetBean extends legend.ConnectionClass {
         public void archiveUpdate(String asset_id,int itemsCount,long gid)
         {
         	dbConnection = new MagmaDBConnection();
-        	Connection con = null;
-        	PreparedStatement ps = null;
-        	ResultSet rs = null;
+        	
             Codes code = new Codes();
             String query = "INSERT INTO AM_GROUP_ASSET_ARCHIVE( ASSET_ID,"
 			+ "REGISTRATION_NO,BRANCH_ID,DEPT_ID,"
@@ -996,8 +981,8 @@ public class GroupAssetBean extends legend.ConnectionClass {
 					"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
             try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+            	Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);
 		//b.append(query);
 		amountPTD = amountPTD.replaceAll(",","");
 		//b.append(asset_id);
@@ -1208,23 +1193,15 @@ public class GroupAssetBean extends legend.ConnectionClass {
             }
 catch (Exception r) {
 				System.out.println("INFO: Error creating group aset in archive >>" + r);
-			} finally {
-				//freeResource();
-				dbConnection.closeConnection(con, ps, rs);
-			}
+			} 
         }
 
 
 
 
 	public long createGroupMain() throws Exception {
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	Connection con2 = null;
-    	PreparedStatement ps = null;
-    	PreparedStatement ps2 = null;
-    	ResultSet rs = null;
-    	ResultSet rs2 = null;
+    	
+    	
 		//System.out.println(">>>>>> INSIDE CREATE GROUP MAIN OF GROUP ASSET BEAN <<<<<<");
 		StringBuffer b = new StringBuffer(400);
                 StringBuffer sbf = new StringBuffer(400);
@@ -1299,8 +1276,8 @@ catch (Exception r) {
 //		System.out.println("=====b.toString(): "+b.toString());
 	//	ad.setPendingTrans(ad.setApprovalDataGroup(Integer.parseInt(groupid)),"3"); 
 		
-		  con = getConnection("legendPlus");
-		  ps = con.prepareStatement(query);
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query);
 		  ps.setLong(1,gid);  
 		  ps.setInt(2, itemsCount);
 		  ps.setString(3, registration_no);
@@ -1428,8 +1405,8 @@ catch (Exception r) {
                         
                // getStatement().executeUpdate(sbf.toString());
                         
-                        con2 = getConnection("legendPlus");
-              		  ps2 = con2.prepareStatement(query_archive);
+                        Connection con2 = dbConnection.getConnection("legendPlus");
+              		PreparedStatement  ps2 = con2.prepareStatement(query_archive);
               		ps2.setLong(1, gid); 
               		ps2.setInt(2, itemsCount);
               		ps2.setString(3, registration_no);
@@ -1512,11 +1489,7 @@ catch (Exception r) {
 			{
 				System.out.println("INFO: Error creating AM_GROUP_ASSET_MAIN_Archive >>" + r.getMessage());
 			}
-			finally
-			{
-//				freeResource();
-				dbConnection.closeConnection(con, ps, rs);
-			}
+			
 
 		return gid;
 	}
@@ -2168,46 +2141,37 @@ catch (Exception r) {
 	 * @throws Exception
 	 */
 	public String getResidualvalue() throws Exception {
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    	
 		String selectQuery = "SELECT RESIDUAL_VALUE FROM AM_GB_COMPANY";
 		String residualValue = "0.00";
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(selectQuery);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
+			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			 {
 				residualValue = rs.getString(1);
 			 }
 		} catch (Exception e) {
 			System.out.println("INFO: Error getting residualValue >>" + e);
-		} finally {
-//			freeResource();
-			dbConnection.closeConnection(con, ps, rs);
-		}
+		} 
 
 		return residualValue;
 
 	}
 
 	public String getCreatedGroupId(String category, String description) {
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+
 		String id = "";
 		String selectQuery = "SELECT ASSET_ID FROM AM_GROUP_ASSET "
 				+ "WHERE CATEGORY_ID = " + category + " AND DESCRIPTION = '"
 				+ description + "'";
 
 		try {
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(selectQuery);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
+			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			 {
 				id = rs.getString(1);
@@ -2216,28 +2180,22 @@ catch (Exception r) {
 		} catch (Exception er) {
 			System.out.println("INFO: Error fetching groupid >>" + er);
 			id = "";
-		} finally {
-//			freeResource();
-			dbConnection.closeConnection(con, ps, rs);
-		}
+		} 
 
 		return id;
 	}
 
 	public String getCreateStockdGroupId(String category, String description) {
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    	
 		String id = "";
 		String selectQuery = "SELECT ASSET_ID FROM AM_GROUP_STOCK "
 				+ "WHERE CATEGORY_ID = " + category + " AND DESCRIPTION = '"
 				+ description + "'";
 
 		try {
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(selectQuery);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
+			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			 {
 				id = rs.getString(1);
@@ -2245,28 +2203,22 @@ catch (Exception r) {
 		} catch (Exception er) {
 			System.out.println("INFO: Error fetching Stock groupid >>" + er);
 			id = "";
-		} finally {
-//			freeResource();
-			dbConnection.closeConnection(con, ps, rs);
-		}
+		} 
 
 		return id;
 	}
 
 	public String getCreatedAsset2GroupId(String category, String description) {
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    	
 		String id = "";
 		String selectQuery = "SELECT ASSET_ID FROM AM_GROUP_ASSET2 "
 				+ "WHERE CATEGORY_ID = " + category + " AND DESCRIPTION = '"
 				+ description + "'";
 
 		try {
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(selectQuery);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
+			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			 {
 				id = rs.getString(1);
@@ -2274,19 +2226,13 @@ catch (Exception r) {
 		} catch (Exception er) {
 			System.out.println("INFO: Error fetching groupid in Asset2 >>" + er);
 			id = "";
-		} finally {
-//			freeResource();
-			dbConnection.closeConnection(con, ps, rs);
-		}
+		} 
 
 		return id;
 	}
 	
 	public void getCreatedGroup(long id) {
-    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    	
 
 		//String id = "";
 		String selectQuery = "SELECT group_id, quantity, Registration_No, " +
@@ -2311,10 +2257,9 @@ catch (Exception r) {
 		//System.out.println("========================================");
 	//	System.out.println("getCreatedGroup selectQuery  "+selectQuery);
 		try {
-			con = dbConnection.getConnection("legendPlus");
-//			rs = getStatement().executeQuery(selectQuery);
-			ps = con.prepareStatement(selectQuery);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
+			ResultSet rs = ps.executeQuery();
 			while(rs.next())
 				{
 		//		System.out.println("=========== VALUES OBTAINED FROM THE DATABASE ===============");
@@ -2453,10 +2398,7 @@ catch (Exception r) {
 		} catch (Exception er) {
 			System.out.println("INFO: Error fetching groupid >>" + er);
 			//id = "";
-		} finally {
-	//		freeResource();
-			dbConnection.closeConnection(con, ps, rs);
-		}
+		} 
 
 		//return id;
 	}
@@ -2809,13 +2751,11 @@ catch (Exception r) {
 				+ ",financial_end_date,enforce_acq_budget,quarterly_surplus_cf"
 				+ " FROM am_gb_company";
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		try {
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				result[0] = sdf.format(rs.getDate("financial_start_date"));
 				result[1] = rs.getString("financial_no_ofmonths");
@@ -2828,9 +2768,7 @@ catch (Exception r) {
 			String warning = "WARNING:Error Fetching Company Details in getBudgetInfo" + " ->"
 					+ e.getMessage();
 			System.out.println(warning);
-		} finally {
-			dbConnection.closeConnection(con, ps, rs);
-		}
+		} 
 
 		return result;
 	}
@@ -2846,13 +2784,11 @@ catch (Exception r) {
 				+ " FROM [AM_ACQUISITION_BUDGET] WHERE [CATEGORY_CODE]='"
 				+ getCatCode() + "' AND " + " [BRANCH_ID]='" + branch_id + "'";
 		 System.out.println("=====>>>>query in getBudgetValues: "+query);
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		try {
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				result[0] = rs.getDouble("Q1_ALLOCATION");
 				result[1] = rs.getDouble("Q1_ACTUAL");
@@ -2871,9 +2807,7 @@ catch (Exception r) {
 			String warning = "WARNING:Error Fetching Company Details IN getBudgetValues" + " ->"
 					+ e.getMessage();
 			System.out.println(warning);
-		} finally {
-			dbConnection.closeConnection(con, ps, rs);
-		}
+		} 
 //		System.out.println("=====>>>>result[3] in getBudgetValues: "+result[3]);
 		return result;
 	}
@@ -2916,26 +2850,21 @@ catch (Exception r) {
 
 	public String getCatCode() {
 //    	dbConnection = new MagmaDBConnection();
-    	Connection con = null;
-    	PreparedStatement ps = null;
-    	ResultSet rs = null;
+    	
 		String query = "SELECT CATEGORY_CODE  FROM am_ad_category  "
 				+ "WHERE category_id = '" + category_id + "' ";
 		String catid = "0";
 		try {
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			 {
 				catid = rs.getString(1);
 			 }
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		} finally {
-//			freeResource();
-			dbConnection.closeConnection(con, ps, rs);
-		}
+		} 
 
 		return catid;
 
@@ -2991,7 +2920,7 @@ catch (Exception r) {
 		return allocation;
 	}
 
-	public void updateBudget(String quarter, String[] bugdetinfo) {
+	public void updateBudgetOld(String quarter, String[] bugdetinfo) throws SQLException {
 
 		String fisdate = "";
 		int finomonth = 0;
@@ -3079,10 +3008,60 @@ catch (Exception r) {
 		System.out
 				.println("Exiting update of Aquicisition Budget due to Reclassification");
 	}
+	
+	public void updateBudget(String quarter, String[] budgetInfo) {
+
+	    String columnName;
+
+	    switch (quarter.toUpperCase()) {
+	        case "FIRST":
+	            columnName = "Q1_ACTUAL";
+	            break;
+	        case "2ND":
+	            columnName = "Q2_ACTUAL";
+	            break;
+	        case "3RD":
+	            columnName = "Q3_ACTUAL";
+	            break;
+	        case "4TH":
+	            columnName = "Q4_ACTUAL";
+	            break;
+	        default:
+	            throw new IllegalArgumentException("Invalid quarter: " + quarter);
+	    }
+
+	    String updateSql =
+	        "UPDATE AM_ACQUISITION_BUDGET " +
+	        "SET " + columnName + " = (" + columnName + " + ?) " +
+	        "WHERE BRANCH_ID = ? " +
+	        "AND CATEGORY = ? " +
+	        "AND ACC_START_DATE = ? " +
+	        "AND ACC_END_DATE = ?";
+
+	    try (Connection conn = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = conn.prepareStatement(updateSql)) {
+
+	        double cost = Double.parseDouble(
+	                vatable_cost.replace(",", "")
+	        );
+
+	        ps.setDouble(1, cost);
+	        ps.setString(2, branch_id);
+	        ps.setString(3, getCatCode());
+	        ps.setDate(4, dateFormat.dateConvert(budgetInfo[0]));
+	        ps.setDate(5, dateFormat.dateConvert(budgetInfo[2]));
+
+	        ps.executeUpdate();
+
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
+
+	    System.out.println("Budget updated successfully.");
+	}
 
 	private boolean rinsertAssetRecord() throws Exception, Throwable {
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = true;
 		/*
 		 * if (require_redistribution.equalsIgnoreCase("Y")) { status = "Z"; }
@@ -3173,8 +3152,8 @@ catch (Exception r) {
 		try {
 			double costPrice = Double.parseDouble(vat_amount)
 					+ Double.parseDouble(vatable_cost);
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(createQuery);
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(createQuery);
 			ps.setString(1, registration_no);
 			ps.setInt(2, Integer.parseInt(branch_id));
 			ps.setInt(3, Integer.parseInt(department_id));
@@ -3221,9 +3200,7 @@ catch (Exception r) {
 		} catch (Exception ex) {
 			done = false;
 			System.out.println("WARN:Error creating asset->" + ex);
-		} finally {
-			dbConnection.closeConnection(con, ps);
-		}
+		} 
 
 		return done;
 	}
@@ -3237,26 +3214,22 @@ catch (Exception r) {
 	 */
 	private String getDepreciationRate(String category_id) throws Exception {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 
 		String rate = "0.0";
 		String query = "SELECT DEP_RATE FROM AM_AD_CATEGORY "
 				+ "WHERE CATEGORY_ID = " + category_id;
 		try {
-			con = dbConnection.getConnection("legendPlus");
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				rate = rs.getString(1);
 			}
 
 		} catch (Exception ex) {
 			System.out.println("WARN: Error fetching DepreciationRate ->" + ex);
-		} finally {
-			dbConnection.closeConnection(con, ps);
-		}
+		} 
 
 		return rate;
 	}
@@ -3458,18 +3431,16 @@ catch (Exception r) {
 
     public long getGroupID(String aid) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         long numRecords=0;
         //boolean multipleComponent = false;
         String query = "SELECT distinct group_id FROM am_group_asset where asset_id='"+aid +"'";
         /*System.out.println("<<<<<<<< Inside getGrtoupID >>>>>>>>");
         System.out.println("Query >>>> " + query);*/
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -3480,27 +3451,23 @@ catch (Exception r) {
         } catch (Exception ex) {
             System.out.println("GroupAssetBean: getGroupID(): WARN: Error determining  group id->" +
                                ex);
-        } finally {
-            dbConnection.closeConnection(con, ps,rs);
-        }
+        } 
 
         return numRecords;
     }
 
     public long getGroupUncapID(String aid) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         long numRecords=0;
         //boolean multipleComponent = false;
         String query = "SELECT distinct group_id FROM AM_GROUP_ASSET_UNCAPITALIZED where asset_id='"+aid +"'";
         /*System.out.println("<<<<<<<< Inside getGrtoupID >>>>>>>>");
         System.out.println("Query >>>> " + query);*/
         try {
-            con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -3511,17 +3478,13 @@ catch (Exception r) {
         } catch (Exception ex) {
             System.out.println("GroupAssetBean: getGroupUncapID(): WARN: Error determining  group id->" +
                                ex);
-        } finally {
-            dbConnection.closeConnection(con, ps,rs);
-        }
+        } 
 
         return numRecords;
     }    
     public String subjectToVat(String id){
     	String result="";
-    	    Connection con = null;
-    	        PreparedStatement ps = null;
-    	        ResultSet rs = null;
+    	   
 
     	         String query =
     	                "SELECT Subject_TO_Vat FROM am_group_asset_main  " +
@@ -3529,26 +3492,22 @@ catch (Exception r) {
     	        //System.out.println("Query in Subject To Vat : " + query);
 
     	        try {
-    	            con = dbConnection.getConnection("legendPlus");
-    	            ps = con.prepareStatement(query);
-    	            rs = ps.executeQuery();
+    	        	Connection con = dbConnection.getConnection("legendPlus");
+    	             PreparedStatement ps = con.prepareStatement(query);
+    	            ResultSet rs = ps.executeQuery();
     	            while (rs.next()) {
     	                result = rs.getString(1);
     	            }
 
     	        } catch (Exception ex) {
     	            System.out.println("WARN: Error fetching Subject_TO_Vat ->" + ex);
-    	        } finally {
-    	            dbConnection.closeConnection(con, ps);
-    	        }
+    	        } 
 
     	        return result;
     	}
     public String whTax(String id){
     	String result="";
-    	    Connection con = null;
-    	        PreparedStatement ps = null;
-    	        ResultSet rs = null;
+    	   
 
     	         String query =
     	                "SELECT wh_tax FROM am_group_asset_main  " +
@@ -3556,30 +3515,27 @@ catch (Exception r) {
 
     	         //System.out.println("Query in whTax : " + query);
     	        try {
-    	            con = dbConnection.getConnection("legendPlus");
-    	            ps = con.prepareStatement(query);
-    	            rs = ps.executeQuery();
+    	        	Connection con = dbConnection.getConnection("legendPlus");
+    	             PreparedStatement ps = con.prepareStatement(query);
+    	            ResultSet rs = ps.executeQuery();
     	            while (rs.next()) {
     	                result = rs.getString(1);
     	            }
 
     	        } catch (Exception ex) {
     	            System.out.println("WARN: Error fetching WHTAX ->" + ex);
-    	        } finally {
-    	            dbConnection.closeConnection(con, ps);
-    	        }
+    	        } 
 
     	        return result;
     	}
     public void updateGroupAssetRaiseEntry(String group_id) {
 
-	       Connection con = null;
-	       PreparedStatement ps = null;
+	      
 	       String NOTIFY_QUERY ="UPDATE am_group_asset_main SET raise_entry = ? WHERE Group_id = ?  ";
 
 	       try {
-	           con = dbConnection.getConnection("legendPlus");
-	           ps = con.prepareStatement(NOTIFY_QUERY);
+	    	   Connection con = dbConnection.getConnection("legendPlus");
+	             PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY);
 	           ps.setString(1, "Y");
 	           ps.setString(2, group_id);
 	           int result =  ps.executeUpdate();
@@ -3588,53 +3544,43 @@ catch (Exception r) {
 
 	       } catch (Exception ex) {
 	           System.out.println("WARNING: cannot update am_group_asset_main : "+ex.getMessage());
-	       } finally {
-	    	   dbConnection.closeConnection(con, ps);
-	       }
-
+	       } 
 	   }
 
     public void updateGroupAssetMainRaiseEntry(String group_id) {
 
-	       Connection con = null;
-	       PreparedStatement ps = null;
+	       
 	       String NOTIFY_QUERY ="UPDATE am_group_asset SET raise_entry = ? WHERE Group_id = ?  ";
 
 	       try {
-	           con = dbConnection.getConnection("legendPlus");
-	           ps = con.prepareStatement(NOTIFY_QUERY);
+	    	   Connection con = dbConnection.getConnection("legendPlus");
+	           PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY);
 	           ps.setString(1, "Y");
 	           ps.setString(2, group_id);
 	           ps.executeUpdate();
 
 	       } catch (Exception ex) {
 	           System.out.println("WARNING: cannot update am_group_asset : "+ex.getMessage());
-	       } finally {
-	    	   dbConnection.closeConnection(con, ps);
-	       }
+	       } 
 
 	   }
 
     public String setGroupPendingTrans(String[] a, String code){
 
         int transaction_level=0;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+        
  String pq =
 	 "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
 	 "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time," +
 	 "transaction_id,batch_id,transaction_level) " +
 	 "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  String tranLevelQuery = "select level from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+        
         try
         {
-            con = dbConnection.getConnection("legendPlus");
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(tranLevelQuery);
+            ResultSet  rs = ps.executeQuery();
             while(rs.next()){
             transaction_level = rs.getInt(1);
             }
@@ -3671,10 +3617,8 @@ catch (Exception r) {
         {
             System.out.println(">>>GroupAssetBean:setGroupPendingTrans(>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
+        
         return mtid;
     }
 
@@ -3791,8 +3735,7 @@ catch (Exception r) {
 		}
     	// System.out.println("update_am_group_asset_main_qry >>>> " + update_am_group_asset_main_qry);
          //System.out.println("update_am_group_asset_main_archive_qry >>>> " + update_am_group_asset_main_archive_qry);
-		Connection con = null;
-        PreparedStatement ps = null;
+		
         try
 	    {
         	/*System.out.println("Description >>>>>>>>>> " + description);
@@ -3803,8 +3746,8 @@ catch (Exception r) {
         	System.out.println("group_id >>>>>>>>>> " + gid);
         	amountPTD = amountPTD.replaceAll(",","");
         	//System.out.println("amountPTD >>>>>>>>>> " + amountPTD);
-        	con = dbConnection.getConnection("legendPlus");
-            ps = con.prepareStatement(update_am_group_asset_main_qry);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(update_am_group_asset_main_qry);
             ps.setInt(1, itemsCount);
             ps.setString(2, registration_no);
             ps.setInt(3, Integer.parseInt(branch_id));
@@ -3988,10 +3931,8 @@ catch (Exception r) {
         {
 	           System.out.println("WARNING: update am_group_asset_main in GroupAssetBean: "+ex.getMessage());
 	    }
-        finally
-        {
-	    	   dbConnection.closeConnection(con, ps);
-	    }
+        
+        
 		return Long.parseLong(gid);
 	}
 
@@ -4018,13 +3959,12 @@ catch (Exception r) {
 
 		Codes code = new Codes();
 		int itemsCount = Integer.parseInt(no_of_items);
-		Connection con = null;
-        PreparedStatement ps = null;
-		con = dbConnection.getConnection("legendPlus");
+		
 
 			try
 			{
-				ps = con.prepareStatement(update_created_asset_qry);
+				Connection con = dbConnection.getConnection("legendPlus");
+	             PreparedStatement ps = con.prepareStatement(update_created_asset_qry);
 				ps.setString(1, "N");
 	            ps.setString(2, DateManipulations.CalendarToDb(date_of_purchase));
 	            ps.setString(3, getDepreciationRate(category_id));
@@ -4062,21 +4002,17 @@ catch (Exception r) {
 			{
 				System.out.println("WARNING: update am_group_asset in GroupAssetRepost: " + ex.getMessage());
 			}
-			finally
-			{
-				 dbConnection.closeConnection(con, ps);
-			}
+			
 	}
 
 	public boolean deleteGrpImage(String query)
     {
 		boolean result = false;//pessimistic
-    	Connection con = null;
-    	PreparedStatement ps = null;
+    	
         try
         {
-        	con = dbConnection.getConnection("legendPlus");
-        	ps = con.prepareStatement(query);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
         	int val =ps.executeUpdate();
         	System.out.println("Result After Deleting From Group Image : " + val);
         	if(val > 0)
@@ -4088,10 +4024,8 @@ catch (Exception r) {
         {
             System.out.println("GroupAssetBean: deleteGrpImage -" + ex);
         }
-        finally
-        {
-            dbConnection.closeConnection(con, ps);
-        }
+       
+        
 		return result;
 	}
 
@@ -4113,17 +4047,13 @@ catch (Exception r) {
 					+" and d.branch_code = '"+branch+"'";
 		System.out.println("query in checkAssetLedgerAccount >>>> " + query);
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
-
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 
 			if (rs.next())
 			 {
@@ -4138,10 +4068,8 @@ catch (Exception r) {
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
+		
 	return 	assetledgeraccount;
 	}
 
@@ -4151,17 +4079,13 @@ catch (Exception r) {
 		String query="select  vendor_name from am_ad_vendor where vendor_id=" +
                 "(select supplier_name from am_group_asset_main where group_id='"+groupID+"')";
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 
 		try {
 
-			con = dbConnection.getConnection("legendPlus");
-
-			ps = con.prepareStatement(query);
-
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 
 			if (rs.next())
 			 {
@@ -4176,26 +4100,21 @@ catch (Exception r) {
 			 er.printStackTrace();
 
 			}
-			finally
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	vendor;
 	}
 
         public void insGrpApprovalRemark(String id,String next_sprv,String Remark,String status,
                 int apprvCount,String systemIP,String tranID,String tranType)
         {
-            Connection con = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
+          
 
             String insGrpRemarkQry="insert into am_approval_remark (asset_id,supervisorID,Remark,Status," +
                     "ApprovalLevel,System_IP,Transaction_id,tran_type) values (?,?,?,?,?,?,?,?)";
             try
             {
-                con = dbConnection.getConnection("legendPlus");
-                ps = con.prepareStatement(insGrpRemarkQry);
+            	Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(insGrpRemarkQry);
                 ps.setString(1, id);
                 ps.setInt(2, Integer.parseInt(next_sprv));
                 ps.setString(3, Remark);
@@ -4210,33 +4129,26 @@ catch (Exception r) {
             {
                 System.out.println("WARN:Error inserting into am_approval_remark ->" + ex);
             }
-            finally
-            {
-                dbConnection.closeConnection(con, ps);
-            }
+            
         }
 
             public String setGroupPendingTrans(String[] a, String code,int assetCode){
 
         int transaction_level=0;
         String transaction_type = "";
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+        
  String pq =
 	 "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
 	 "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time," +
 	 "transaction_id,batch_id,transaction_level,asset_code) " +
 	 "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
  String tranLevelQuery = "select level,Transaction_type from approval_level_setup where code ='"+code+"'";
-        con = null;
-        ps = null;
-        rs = null;
+       
         try
         {
-            con = dbConnection.getConnection("legendPlus");
-             ps = con.prepareStatement(tranLevelQuery);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(tranLevelQuery);
+            ResultSet  rs = ps.executeQuery();
             while(rs.next()){
             transaction_level = rs.getInt(1);
             transaction_type = rs.getString(2);
@@ -4275,10 +4187,8 @@ catch (Exception r) {
         {
             System.out.println(">>>GroupAssetBean:setGroupPendingTrans(>>>>>>" + er);
 
-        }finally{
-        dbConnection.closeConnection(con, ps);
-
         }
+        
         return mtid;
     }
             
@@ -4346,10 +4256,8 @@ catch (Exception r) {
 
         	public long createGroupAsset2() throws Exception,Throwable
         	{
-            	dbConnection = new MagmaDBConnection();
-            	Connection con = null;
-            	PreparedStatement ps = null;
-            	ResultSet rs = null;
+            	
+            	
         		aprecords = new ApprovalRecords();
         		//System.out.println(">>>>>>>>> INSIDE CREATE GROUP IN GROUP ASSET BEAN <<<<<<<<<< ");
         		StringBuffer b = new StringBuffer(400);
@@ -4390,7 +4298,7 @@ catch (Exception r) {
 
         			//asset_id = new legend.AutoIDSetup().getIdentity(branch_id,department_id, section_id, category_id);
         			asset_id = new ApplicationHelper().getGeneratedId("am_group_asset2");
-                                con = dbConnection.getConnection("legendPlus");
+                              
                      asset_id = asset_id+"-Two";
          
 //        		System.out.println(">>>>>>>>>  category_id <<<<<<<<<< " + category_id);
@@ -4417,8 +4325,9 @@ catch (Exception r) {
         			+ " )	VALUES " +
         					"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
         					"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-        		ps = con.prepareStatement(query);
+        		
+        		Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);
         		amountPTD = amountPTD.replaceAll(",","");
         		ps.setString(1, asset_id);
         		ps.setString(2, registration_no);
@@ -4502,9 +4411,8 @@ catch (Exception r) {
 
                                 catch (Exception r) {
         				System.out.println("INFO: Error creating group asset2 >>" + r);
-        			} finally {
-        				dbConnection.closeConnection(con, ps,rs);
-        			}
+        			} 
+        			
                 }
         		//ad.updateGroupAssetStatus(Long.toString(gid));
         		return gid;
@@ -4512,10 +4420,8 @@ catch (Exception r) {
 
 
         	public long createAsset2GroupMain() throws Exception {
-            	dbConnection = new MagmaDBConnection();
-            	Connection con = null;
-            	PreparedStatement ps = null;
-            	ResultSet rs = null;
+            	//dbConnection = new MagmaDBConnection();
+            	
         		//System.out.println(">>>>>> INSIDE CREATE GROUP MAIN OF GROUP ASSET BEAN <<<<<<");
         		StringBuffer b = new StringBuffer(400);
                         StringBuffer sbf = new StringBuffer(400);
@@ -4717,7 +4623,10 @@ catch (Exception r) {
         		b.append("') SET IDENTITY_INSERT AM_GROUP_ASSET2_MAIN OFF");
         			try
         			{
-        				getStatement().executeUpdate(b.toString());
+        				Connection con = dbConnection.getConnection("legendPlus");
+        	             PreparedStatement ps = con.prepareStatement(b.toString());
+        	             ps.executeUpdate();
+        	            // getStatement().executeUpdate(b.toString());
                     String query_archive = "SET IDENTITY_INSERT AM_GROUP_ASSET2_MAIN_Archive ON INSERT INTO AM_GROUP_ASSET2_MAIN_Archive(group_id,QUANTITY,"
         			+ "REGISTRATION_NO,BRANCH_ID,DEPT_ID,"
         			+ "CATEGORY_ID,SECTION_ID,DESCRIPTION,"
@@ -4885,34 +4794,32 @@ catch (Exception r) {
                 sbf.append(code.getSubCategoryCode(sub_category_id));                 
         		sbf.append("')  SET IDENTITY_INSERT AM_GROUP_ASSET2_MAIN_Archive OFF ");
 //                        System.out.println("Query Used>>>>>>>>>> " + sbf.toString());
-                        getStatement().executeUpdate(sbf.toString());
+        		Connection con2 = dbConnection.getConnection("legendPlus");
+	             PreparedStatement ps2 = con2.prepareStatement(sbf.toString());
+	             ps.executeUpdate();
+                       // getStatement().executeUpdate(sbf.toString());
         			}
         			catch (Exception r)
         			{
         				System.out.println("INFO: Error creating AM_GROUP_ASSET2_MAIN_Archive >>" + r);
         			}
-        			finally
-        			{
-        				dbConnection.closeConnection(con, ps,rs);
-        			}
+        			
 
         		return gid;
         	}
 
             public long getGroupAsset2ID(String aid) {
 
-                Connection con = null;
-                PreparedStatement ps = null;
-                ResultSet rs = null;
+               
                 long numRecords=0;
                 //boolean multipleComponent = false;
                 String query = "SELECT distinct group_id FROM am_group_asset2 where asset_id='"+aid +"'";
                 /*System.out.println("<<<<<<<< Inside getGrtoupID >>>>>>>>");
                 System.out.println("Query >>>> " + query);*/
                 try {
-                    con = dbConnection.getConnection("legendPlus");
-                    ps = con.prepareStatement(query);
-                    rs = ps.executeQuery();
+                	Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(query);
+                    ResultSet rs = ps.executeQuery();
 
                     while (rs.next())
                     {
@@ -4923,18 +4830,14 @@ catch (Exception r) {
                 } catch (Exception ex) {
                     System.out.println("GroupAssetBean: getGroupAsset2ID(): WARN: Error determining  group id->" +
                                        ex);
-                } finally {
-                    dbConnection.closeConnection(con, ps,rs);
-                }
+                } 
 
                 return numRecords;
             }
 
         	public void getCreatedAsset2Group(long id) {
             	dbConnection = new MagmaDBConnection();
-            	Connection con = null;
-            	PreparedStatement ps = null;
-            	ResultSet rs = null;
+            	
         		String selectQuery = "SELECT group_id, quantity, Registration_No, " +
         				"Branch_ID,province, Dept_ID, Category_ID,Sub_Category_ID, section_id, Description, " +
         				"Vendor_AC, Date_purchased, dep_rate, asset_make, asset_model, " +
@@ -4951,7 +4854,10 @@ catch (Exception r) {
                                         "LPO,BAR_CODE,defer_pay,SBU_CODE,Invoice_no  " +
         				" FROM am_group_asset2_main WHERE GROUP_ID="+id;
         		try {
-        			rs = getStatement().executeQuery(selectQuery);
+        			Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(selectQuery);
+                    ResultSet rs = ps.executeQuery();
+        			//rs = getStatement().executeQuery(selectQuery);
         			while(rs.next())
         				{
         				group_id =rs.getString("GROUP_ID");
@@ -5021,9 +4927,7 @@ catch (Exception r) {
         		} catch (Exception er) {
         			System.out.println("INFO: Error fetching groupid in getCreatedAsset2Group >>" + er);
         			//id = "";
-        		} finally {
-        			dbConnection.closeConnection(con, ps,rs);
-        		}
+        		} 
 
         		//return id;
         	}
@@ -5032,9 +4936,7 @@ catch (Exception r) {
             public void archiveAsset2Update(String asset_id,int itemsCount,long gid)
             {
             	dbConnection = new MagmaDBConnection();
-            	Connection con = null;
-            	PreparedStatement ps = null;
-            	ResultSet rs = null;
+            	
                 Codes code = new Codes();
                 String query = "INSERT INTO AM_GROUP_ASSET2_ARCHIVE( ASSET_ID,"
     			+ "REGISTRATION_NO,BRANCH_ID,DEPT_ID,"
@@ -5060,8 +4962,8 @@ catch (Exception r) {
     					"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
                 try {
-                con = dbConnection.getConnection("legendPlus");
-                ps = con.prepareStatement(query);
+                	Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(query);
     		amountPTD = amountPTD.replaceAll(",","");
     		ps.setString(1, asset_id);
     		ps.setString(2, registration_no);
@@ -5139,17 +5041,13 @@ catch (Exception r) {
                 }
     catch (Exception r) {
     				System.out.println("INFO: Error creating group aset2 in archive in archiveAsset2Update>>" + r);
-    			} finally {
-    				dbConnection.closeConnection(con, ps,rs);
-    			}
+    			} 
             }
 
         	
         	public void getCreatedStockGroup(long id) {
             	dbConnection = new MagmaDBConnection();
-            	Connection con = null;
-            	PreparedStatement ps = null;
-            	ResultSet rs = null;
+            	
         		//String id = "";
         		String selectQuery = "SELECT group_id, quantity, Registration_No, " +
         				"Branch_ID,province, Dept_ID, Category_ID,Sub_Category_ID, section_id, Description, " +
@@ -5168,7 +5066,10 @@ catch (Exception r) {
         				" FROM am_group_Stock_main WHERE GROUP_ID="+id;
 
         		try {
-        			rs = getStatement().executeQuery(selectQuery);
+        			Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(selectQuery);
+                    ResultSet rs = ps.executeQuery();
+        			//rs = getStatement().executeQuery(selectQuery);
         			while(rs.next())
         				{
         				group_id =rs.getString("GROUP_ID");
@@ -5242,10 +5143,7 @@ catch (Exception r) {
         		} catch (Exception er) {
         			System.out.println("INFO: Error fetching groupid >>" + er);
         			//id = "";
-        		} finally {
-        //			freeResource();
-        			dbConnection.closeConnection(con, ps, rs);
-        		}
+        		} 
 
         		//return id;
         	}
@@ -5253,18 +5151,16 @@ catch (Exception r) {
 
         	public String getCreatedDisposalGroupId(String category, String description) {
             	dbConnection = new MagmaDBConnection();
-            	Connection con = null;
-            	PreparedStatement ps = null;
-            	ResultSet rs = null;
+            	
         		String id = "";
         		String selectQuery = "SELECT ASSET_ID FROM AM_GROUP_DISPOSAL "
         				+ "WHERE CATEGORY_ID = " + category + " AND DESCRIPTION = '"
         				+ description + "'";
 
         		try {
-        			con = dbConnection.getConnection("legendPlus");
-        			ps = con.prepareStatement(selectQuery);
-        			rs = ps.executeQuery();
+        			Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(selectQuery);
+        			ResultSet rs = ps.executeQuery();
         			if (rs.next())
         			 {
         				id = rs.getString(1);
@@ -5273,10 +5169,7 @@ catch (Exception r) {
         		} catch (Exception er) {
         			System.out.println("INFO: Error fetching groupid in getCreatedDisposalGroupId >>" + er);
         			id = "";
-        		} finally {
-//        			freeResource();
-        			dbConnection.closeConnection(con, ps, rs);
-        		}
+        		} 
 
         		return id;
         	}
@@ -5284,9 +5177,7 @@ catch (Exception r) {
         	
         	public void getCreatedDisposalGroup(long id) {
             	dbConnection = new MagmaDBConnection();
-            	Connection con = null;
-            	PreparedStatement ps = null;
-            	ResultSet rs = null;
+            	
 
                 String selectQuery =
               			"SELECT disposal_ID,asset_id,disposalCost,disposal_reason,Disposal_Date,"+
@@ -5302,10 +5193,9 @@ catch (Exception r) {
         		//System.out.println("========================================");
         	//	System.out.println("getCreatedGroup selectQuery  "+selectQuery);
         		try {
-        			con = dbConnection.getConnection("legendPlus");
-//        			rs = getStatement().executeQuery(selectQuery);
-        			ps = con.prepareStatement(selectQuery);
-        			rs = ps.executeQuery();
+        			Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(selectQuery);
+        			ResultSet rs = ps.executeQuery();
         			while(rs.next())
         				{
           				asset_id = rs.getString("ASSET_ID");
@@ -5338,10 +5228,7 @@ catch (Exception r) {
         		} catch (Exception er) {
         			System.out.println("INFO: Error fetching groupid in getCreatedDisposalGroup >>" + er);
         			//id = "";
-        		} finally {
-        	//		freeResource();
-        			dbConnection.closeConnection(con, ps, rs);
-        		}
+        		} 
 
         		//return id;
         	}
@@ -5349,10 +5236,7 @@ catch (Exception r) {
 
 public boolean saveGroupToAsset(String GroupId,String catRate) {
     boolean done = false;
-    Connection con = null;
-    PreparedStatement ps = null;
-    PreparedStatement ps1 = null;
-    ResultSet rs = null;
+   
     int rate = 100*12;
     int state = 1;
     int Dep_Rate = 0;   
@@ -5405,17 +5289,15 @@ public boolean saveGroupToAsset(String GroupId,String catRate) {
  
 //    System.out.println("saveGroupToAsset FINDER_QUERY === "+FINDER_QUERY);   
     try { 
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(FINDER_QUERY);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(FINDER_QUERY);
         done = (ps.executeUpdate() != -1);
-        ps1 = con.prepareStatement(FINDER_QUERY2);
+        PreparedStatement ps1 = con.prepareStatement(FINDER_QUERY2);
         done = (ps1.executeUpdate() != -1);
     } catch (Exception ex) {
         System.out.println("WARNING: cannot Post Group Asset records into  AM_ASSET 1--->"
                 + ex.getMessage());
-    } finally {
- 	     dbConnection.closeConnection(con, ps);
-    }
+    } 
 
     return done;
 
@@ -5423,10 +5305,7 @@ public boolean saveGroupToAsset(String GroupId,String catRate) {
 
 public boolean saveGroupToUncapAsset(String GroupId) {
     boolean done = false;
-    Connection con = null;
-    PreparedStatement ps = null;
-    PreparedStatement ps1 = null;
-    ResultSet rs = null;
+    
     int rate = 100*12;
     int state = 1;
     int Dep_Rate = 0;   
@@ -5479,38 +5358,34 @@ public boolean saveGroupToUncapAsset(String GroupId) {
  
 //    System.out.println("saveGroupToUncapAsset FINDER_QUERY === "+FINDER_QUERY);   
     try { 
-        con = dbConnection.getConnection("legendPlus");
-        ps = con.prepareStatement(FINDER_QUERY);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(FINDER_QUERY);
         done = (ps.executeUpdate() != -1);
-        ps1 = con.prepareStatement(FINDER_QUERY2);
+        PreparedStatement ps1 = con.prepareStatement(FINDER_QUERY2);
         done = (ps1.executeUpdate() != -1);
     } catch (Exception ex) {
         System.out.println("WARNING: cannot Post Group Asset records into  AM_ASSET--->"
                 + ex.getMessage());
-    } finally {
- 	     dbConnection.closeConnection(con, ps);
-    }
+    } 
 
     return done;
 
 }
 
 
-public java.util.ArrayList getAsstCategoryId(String GroupId)
+public java.util.ArrayList getAsstCategoryIdOld(String GroupId)
 { 
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String finacleTransId= null;
 		String query = "SELECT a.Category_ID,c.dep_rate FROM AM_GROUP_ASSET a, am_ad_category c "+ 
 	    "WHERE a.Category_ID = c.Category_ID and a.Group_id = '"+GroupId+"' GROUP BY a.Category_ID,c.Dep_rate";
 
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
+	 
 
 	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		Connection c = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = c.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 			while (rs.next())
 			   {				
 				int strid = rs.getInt("Category_ID");
@@ -5525,13 +5400,44 @@ public java.util.ArrayList getAsstCategoryId(String GroupId)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-//						closeConnection(c, s, rs);
-						 dbConnection.closeConnection(con, ps);
-					}
+					
 	return _list;
 } 
+
+public java.util.ArrayList getAsstCategoryId(String groupId) {
+
+	java.util.ArrayList list = new java.util.ArrayList();
+
+    String query =
+        "SELECT a.Category_ID, c.dep_rate " +
+        "FROM AM_GROUP_ASSET a " +
+        "JOIN am_ad_category c ON a.Category_ID = c.Category_ID " +
+        "WHERE a.Group_id = ? " +
+        "GROUP BY a.Category_ID, c.dep_rate";
+
+    try (Connection c = dbConnection.getConnection("legendPlus");
+         PreparedStatement ps = c.prepareStatement(query)) {
+
+        ps.setString(1, groupId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                ViewAssetDetails asset = new ViewAssetDetails();
+                asset.setId(rs.getInt("Category_ID"));
+                asset.setDepRate(rs.getDouble("dep_rate"));
+
+                list.add(asset);
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
 
 public java.util.ArrayList getUncapAsstCategoryId(String GroupId)
 { 
@@ -5540,14 +5446,12 @@ public java.util.ArrayList getUncapAsstCategoryId(String GroupId)
 		String query = "SELECT a.Category_ID,c.dep_rate FROM AM_GROUP_ASSET_UNCAPITALIZED a, am_ad_category c "+ 
 	    "WHERE a.Category_ID = c.Category_ID and a.Group_id = '"+GroupId+"' GROUP BY a.Category_ID,c.Dep_rate";
 
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
+	
 
 	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		Connection c = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = c.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 			while (rs.next())
 			   {				
 				int strid = rs.getInt("Category_ID");
@@ -5562,11 +5466,7 @@ public java.util.ArrayList getUncapAsstCategoryId(String GroupId)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-//						closeConnection(c, s, rs);
-						 dbConnection.closeConnection(con, ps);
-					}
+					
 	return _list;
 } 
 	   	
@@ -5577,14 +5477,12 @@ public java.util.ArrayList getAsstIdGeneration(String GroupId)
 	String finacleTransId= null;
 		String query = "SELECT Category_ID,ID,Branch_ID,Dept_ID,section_id,user_ID FROM AM_GROUP_ASSET WHERE Group_id = '"+GroupId+"' ";
 
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
+
 
 	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		Connection c = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = c.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 			while (rs.next())
 			   {				
 				String strid = rs.getString("ID");
@@ -5608,11 +5506,7 @@ public java.util.ArrayList getAsstIdGeneration(String GroupId)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-//						closeConnection(c, s, rs);
-						 dbConnection.closeConnection(con, ps);
-					}
+					
 	return _list;
 } 
 
@@ -5622,14 +5516,12 @@ public java.util.ArrayList getUncapAsstIdGeneration(String GroupId)
 	String finacleTransId= null;
 		String query = "SELECT Category_ID,ID,Branch_ID,Dept_ID,section_id,user_ID FROM AM_GROUP_ASSET_UNCAPITALIZED WHERE Group_id = '"+GroupId+"' ";
 
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
+	
 
 	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		Connection c = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = c.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 			while (rs.next())
 			   {				
 				String strid = rs.getString("ID");
@@ -5653,22 +5545,17 @@ public java.util.ArrayList getUncapAsstIdGeneration(String GroupId)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-//						closeConnection(c, s, rs);
-						 dbConnection.closeConnection(con, ps);
-					}
+					
 	return _list;
 } 
 
 public void groupAssetRateGen(String groupId, int catId, double depRate) {
-       Connection con = null;
-       PreparedStatement ps = null;
+      
        String NOTIFY_QUERY ="UPDATE AM_GROUP_ASSET SET dep_rate = ? WHERE Group_id = ? and Category_ID = ? ";
 
        try {
-           con = dbConnection.getConnection("legendPlus");
-           ps = con.prepareStatement(NOTIFY_QUERY);
+    	   Connection con = dbConnection.getConnection("legendPlus");
+           PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY);
            ps.setDouble(1, depRate);
            ps.setString(2, groupId);
            ps.setInt(3, catId);
@@ -5676,20 +5563,17 @@ public void groupAssetRateGen(String groupId, int catId, double depRate) {
 
        } catch (Exception ex) {
            System.out.println("WARNING: cannot update am_group_asset : "+ex.getMessage());
-       } finally {
-    	   dbConnection.closeConnection(con, ps);
-       }
+       } 
 
    }
 
 public void groupUncpAssetRateGen(String groupId, int catId, double depRate) {
-       Connection con = null;
-       PreparedStatement ps = null;
+       
        String NOTIFY_QUERY ="UPDATE AM_GROUP_ASSET_UNCAPITALIZED SET dep_rate = ? WHERE Group_id = ? and Category_ID = ? ";
 
        try {
-           con = dbConnection.getConnection("legendPlus");
-           ps = con.prepareStatement(NOTIFY_QUERY);
+    	   Connection con = dbConnection.getConnection("legendPlus");
+           PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY);
            ps.setDouble(1, depRate);
            ps.setString(2, groupId);
            ps.setInt(3, catId);
@@ -5697,20 +5581,17 @@ public void groupUncpAssetRateGen(String groupId, int catId, double depRate) {
 
        } catch (Exception ex) {
            System.out.println("WARNING: cannot update AM_GROUP_ASSET_UNCAPITALIZED : "+ex.getMessage());
-       } finally {
-    	   dbConnection.closeConnection(con, ps);
-       }
+       } 
 
    }
 
 public void assetIdandCodeGen(String groupId, int Id, String assetId,int assetCode) {
-       Connection con = null;
-       PreparedStatement ps = null;
+       
        String NOTIFY_QUERY ="UPDATE AM_GROUP_ASSET SET Asset_Id = ?, asset_code = ? WHERE Group_id = ? and Id = ? ";
 //       System.out.println("<<<<<<<<<<<<groupId in assetIdandCodeGen: "+groupId+"    <<<<Id: "+Id+"    <<<<assetId: "+assetId+"    <<<<assetCode: "+assetCode);
        try {
-           con = dbConnection.getConnection("legendPlus");
-           ps = con.prepareStatement(NOTIFY_QUERY);
+    	   Connection con = dbConnection.getConnection("legendPlus");
+           PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY);
            ps.setString(1, assetId);
            ps.setInt(2, assetCode); 
            ps.setString(3, groupId);
@@ -5719,20 +5600,17 @@ public void assetIdandCodeGen(String groupId, int Id, String assetId,int assetCo
 
        } catch (Exception ex) {
            System.out.println("WARNING: cannot update am_group_asset in assetIdandCodeGen: "+ex.getMessage());
-       } finally {
-    	   dbConnection.closeConnection(con, ps);
-       }
+       } 
 
    }
 
 public void UncapAssetIdandCodeGen(String groupId, int Id, String assetId,int assetCode) {
-       Connection con = null;
-       PreparedStatement ps = null;
+       
        String NOTIFY_QUERY ="UPDATE AM_GROUP_ASSET_UNCAPITALIZED SET Asset_Id = ?, asset_code = ? WHERE Group_id = ? and Id = ? ";
 //       System.out.println("<<<<<<<<<<<<groupId in uncapAssetIdandCodeGen: "+groupId+"    <<<<Id: "+Id+"    <<<<assetId: "+assetId+"    <<<<assetCode: "+assetCode);
        try {
-           con = dbConnection.getConnection("legendPlus");
-           ps = con.prepareStatement(NOTIFY_QUERY);
+    	   Connection con = dbConnection.getConnection("legendPlus");
+           PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY);
            ps.setString(1, assetId);
            ps.setInt(2, assetCode);
            ps.setString(3, groupId);
@@ -5741,17 +5619,14 @@ public void UncapAssetIdandCodeGen(String groupId, int Id, String assetId,int as
 
        } catch (Exception ex) {
            System.out.println("WARNING: cannot update AM_GROUP_ASSET_UNCAPITALIZED in UncapAssetIdandCodeGen: "+ex.getMessage());
-       } finally {
-    	   dbConnection.closeConnection(con, ps);
-       }
+       } 
 
    } 
 
 public void changeGroupAssetStatus(String id,String status) 
 {
 	// TODO Auto-generated method stub
-	Connection con = null;
-    PreparedStatement ps = null;
+	
     String query_r ="update am_group_asset set asset_status=? " +
 	" where Group_id = '"+id+"'";
 
@@ -5759,14 +5634,14 @@ public void changeGroupAssetStatus(String id,String status)
 	" where Group_id = '"+id+"'";
     try 
     	{
-    	con = dbConnection.getConnection("legendPlus");
-    	ps = con.prepareStatement(query_r);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query_r);
     	ps.setString(1,status);
        	int i =ps.executeUpdate();
 
-            ps = con.prepareStatement(query_archive);
-    	ps.setString(1,status);
-       	i =ps.executeUpdate();
+        PreparedStatement ps2 = con.prepareStatement(query_archive);
+    	ps2.setString(1,status);
+       	i =ps2.executeUpdate();
 
         changeGroupAssetMainStatus(id,status);
         } 
@@ -5774,10 +5649,7 @@ public void changeGroupAssetStatus(String id,String status)
 	    {
 	        System.out.println("changeGroupAssetStatus in GroupAssetToAssetBean: Error Updating am_group_asset " + ex);
 	    } 
-	finally 
-		{
-            dbConnection.closeConnection(con, ps);
-        }
+	
 }
 
 
@@ -5790,28 +5662,24 @@ public void changeGroupAssetMainStatus(String id, String status2)
             String query_archive ="update am_group_asset_main_archive set asset_status=? " +
 	"where Group_id = '"+id+"'";
             
-	Connection con = null;
-    PreparedStatement ps = null;
+	
     try 
 	{
-	con = dbConnection.getConnection("legendPlus");
-	ps = con.prepareStatement(query_r);
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query_r);
 	ps.setString(1,status2);
     int i =ps.executeUpdate();
 
-        ps = con.prepareStatement(query_archive);
-	ps.setString(1,status2);
-     i =ps.executeUpdate();
+       PreparedStatement ps2 = con.prepareStatement(query_archive);
+	ps2.setString(1,status2);
+     i =ps2.executeUpdate();
 
     } 
     catch (Exception ex)
     {
         System.out.println("changeGroupAssetMainStatus in GroupAssetToAssetBean: Error Updating am_group_asset_main : " + ex);
     } 
-    finally 
-	{
-        dbConnection.closeConnection(con, ps);
-    }
+   
 }
 
 private boolean checkApprovalStatus(String code)
@@ -5819,15 +5687,13 @@ private boolean checkApprovalStatus(String code)
 	// TODO Auto-generated method stub
 	boolean status = false;
 	String approval_status_qry = "select level from approval_level_setup where code ='"+code+"'";
-	Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+	
     int level = 0;
     try
     {
-    	con = dbConnection.getConnection("legendPlus");
-    	ps = con.prepareStatement(approval_status_qry);
-    	rs = ps.executeQuery();
+    	Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(approval_status_qry);
+    	ResultSet rs = ps.executeQuery();
     	if(rs.next())
     	{
     		level= rs.getInt(1);
@@ -5841,10 +5707,7 @@ private boolean checkApprovalStatus(String code)
     {
         System.out.println("WARN: Error checkApprovalStatus ->" + ex);
     }
-    finally 
-    {
-        dbConnection.closeConnection(con, ps);
-    }   
+      
     return status;
 }
 
@@ -5852,23 +5715,19 @@ public String setGroupPendingMultipleTrans(String[] a, String code,int assetCode
 
 int transaction_level=0;
 String transaction_type = "";
-Connection con;
-PreparedStatement ps;
-ResultSet rs;
+
 String pq =
 "insert into am_asset_approval(asset_id,user_id,super_id,amount,posting_date,description," +
 "effective_date,branchCode,asset_status,tran_type, process_status,tran_sent_time," +
 "transaction_id,batch_id,transaction_level,asset_code) " +
 "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 String tranLevelQuery = "select level,Transaction_type from approval_level_setup where code ='"+code+"'";
-con = null;
-ps = null;
-rs = null;
+
 try
 { 
-con = dbConnection.getConnection("legendPlus");
- ps = con.prepareStatement(tranLevelQuery);
-  rs = ps.executeQuery();
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(tranLevelQuery);
+  ResultSet rs = ps.executeQuery();
 while(rs.next()){
 transaction_level = rs.getInt(1);
 transaction_type = rs.getString(2);
@@ -5908,9 +5767,6 @@ catch(Exception er)
 {
 System.out.println(">>>GroupAssetBean:setGroupPendingTrans(>>>>>>" + er);
 
-}finally{
-dbConnection.closeConnection(con, ps);
-
 }
 return mtid;
 }
@@ -5919,23 +5775,20 @@ return mtid;
 public void deleteOtherSupervisors(String batchId, String supervisorId){
 	String query_del ="DELETE FROM am_asset_approval WHERE Asset_Id = '"+batchId+"' and super_id != '"+supervisorId+"' and Asset_Status = 'PENDING' ";
 //	System.out.println("query_r deleteOtherSupervisors>>>> "+query_del);
-	Connection con = null;
-	        PreparedStatement ps = null; 
+	
 	try {
-	    con = dbConnection.getConnection("legendPlus");
-	       	ps = con.prepareStatement(query_del);
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query_del);
 	           int j =ps.executeUpdate();	           
 	        } catch (Exception ex) {
 
 	            System.out.println("AssetRecordBean: deleteOtherSupervisors()>>>>>" + ex);
-	        } finally {
-	            dbConnection.closeConnection(con, ps);
-	        }
+	        } 
 
 
 	}
 
-public Connection getConnection(String jndi) {
+public Connection getConnectionOld(String jndi) {
     Connection con = null;
     try {  
         Context initContext = new InitialContext();
@@ -5953,6 +5806,18 @@ public Connection getConnection(String jndi) {
     return con;
 }
 
+
+public Connection getConnection(String jndi) {
+    try {
+        Context ctx = new InitialContext();
+        String dsJndi = "java:/legendPlus";
+        DataSource ds = (DataSource) ctx.lookup(dsJndi);
+        return ds.getConnection();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
 
 public void closeConnection(Connection con, PreparedStatement ps,
         ResultSet rs) {

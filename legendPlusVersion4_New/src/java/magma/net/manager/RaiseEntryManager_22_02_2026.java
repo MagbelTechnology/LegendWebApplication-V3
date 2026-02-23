@@ -4,8 +4,8 @@ import java.sql.*;
 
 import magma.net.dao.MagmaDBConnection;
 
-public class RaiseEntryManager extends MagmaDBConnection {
-	public RaiseEntryManager() {
+public class RaiseEntryManager_22_02_2026 extends MagmaDBConnection {
+	public RaiseEntryManager_22_02_2026() {
 	}
  
 	// get disposal account
@@ -25,13 +25,13 @@ public class RaiseEntryManager extends MagmaDBConnection {
 				+ ",sbu_level,pl_disposal_account,suspense_acct"
 				+ " FROM am_gb_company ";
 
-		
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		try {
-			
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(query);
-			ResultSet rs = ps.executeQuery();
-		
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				result[0] = rs.getString("vat_rate");
 				result[1] = rs.getString("wht_rate");
@@ -46,7 +46,9 @@ public class RaiseEntryManager extends MagmaDBConnection {
 			String warning = "WARNING:Error Fetching Company Details" + " ->"
 					+ e.getMessage();
 			System.out.println(warning);
-		} 
+		} finally {
+			closeConnection(con, ps, rs);
+		}
 
 		return result;
 	}
@@ -55,11 +57,14 @@ public class RaiseEntryManager extends MagmaDBConnection {
 	private String getGLPrefix(String query, String prefixType) {
 		String result = "";
 
-		try {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(query);
-			ResultSet rs = ps.executeQuery();			
+		try {
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				result = rs.getString("GL_PREFIX");
 			}
@@ -67,7 +72,10 @@ public class RaiseEntryManager extends MagmaDBConnection {
 			String warning = "WARNING:Error Fetching " + prefixType
 					+ " GL Prefix" + " ->" + e.getMessage();
 			System.out.println(warning);
-		} 
+		} finally {
+			closeConnection(con, ps, rs);
+		}
+
 		return result;
 	}
 
@@ -79,16 +87,16 @@ public class RaiseEntryManager extends MagmaDBConnection {
 				+ categoryId
 				+ "'";
 
-
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		String[] result = new String[7];
 		String acctNo = "";
 
 		try {
-
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(query);
-			ResultSet rs = ps.executeQuery();
-			
+			con = getConnection("legendPlus"); // connect.getConnection("jdbc:sqlserver://localhost:1433;database=legend","legend","legend");
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				result[0] = rs.getString(1); // insurLegger
 				result[1] = rs.getString(2); // fuelLedger
@@ -102,7 +110,9 @@ public class RaiseEntryManager extends MagmaDBConnection {
 			String warning = "WARNING:Error Fetching GL Account" + " ->"
 					+ e.getMessage();
 			System.out.println(warning);
-		} 
+		} finally {
+			closeConnection(con, ps, rs);
+		}
 		if (acctType.equalsIgnoreCase("INSURANCE")) {
 			acctNo = result[0];
 		} else if (acctType.equalsIgnoreCase("FUEL")) {
@@ -189,14 +199,14 @@ public class RaiseEntryManager extends MagmaDBConnection {
 		String SELECT_QUERY = "SELECT app_name,version,client_name,req_accttype,req_trancode,process_date FROM AM_AD_LEGACY_SYS_CONFIG ";
 		String[] result = new String[6];
 
-		try {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(SELECT_QUERY);
-			ResultSet rs = ps.executeQuery();
-			
-			
-			
+		try {
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(SELECT_QUERY);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				result[0] = rs.getString("app_name");
 				result[1] = rs.getString("version");
@@ -207,23 +217,26 @@ public class RaiseEntryManager extends MagmaDBConnection {
 			}
 		} catch (Exception e) {
 			e.getMessage();
-		} 
+		} finally {
+			closeConnection(con, ps, rs);
+		}
 		return result;
 	}
 
 	// for generating batch ID for AM_ENTRY_TABLE
 	public int getMaxNum(String userId) {
 		int maxNum = 0;
-
+		Connection con = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		PreparedStatement ps = null;
 		String qry = "SELECT MAX(TRANSACTION_ID) FROM AM_ENTRY_TABLE WHERE USER_ID = '"
 				+ userId + "'";
 
 		try {
-			
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(qry);
-			ResultSet rs = ps.executeQuery();
-			
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(qry);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				maxNum = rs.getInt(1) + 1;
 			}
@@ -233,22 +246,34 @@ public class RaiseEntryManager extends MagmaDBConnection {
 					.println("WARNING::ERROR FETCHING MAX FROM AM_ENTRY_TABLE "
 							+ e);
 			e.printStackTrace();
-		} 
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+				if (con != null) {
+					con.close();
+				}
+			} catch (Exception e) {
+				System.out.println("WARNING::Error Closing Connection " + e);
+			}
+		}
 		return maxNum;
 	}
 
 	private String getAccountCode(String code) {
 		String result = "";
-
+		Connection con = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		PreparedStatement ps = null;
 		String qry = "SELECT ACCT_TYPE FROM AM_AD_ACCOUNT_TYPE WHERE ACCT_SERIAL  = '"
 				+ code + "'";
 
 		try {
-
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(qry);
-			ResultSet rs = ps.executeQuery();
-			
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(qry);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				result = rs.getString(1);
 			}
@@ -258,7 +283,9 @@ public class RaiseEntryManager extends MagmaDBConnection {
 					+ e.getMessage();
 			System.out.println(warning);
 			e.printStackTrace();
-		} 
+		} finally {
+			closeConnection(con, ps);
+		}
 		return result;
 	}
 
@@ -286,12 +313,12 @@ public class RaiseEntryManager extends MagmaDBConnection {
 		String query = "INSERT INTO am_entry_table(dr_acct,cr_acct,dr_narration,cr_narration,amount,user_id,"
 				+ "super_id,legacy_id,dr_tran_code,cr_tran_code,posting_date,effective_date,process_status,supervisor,reject_reason,batch_id,dr_acct_type,cr_acct_type,tran_sent_time)"
 				+ " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
+		Connection con = null;
+		PreparedStatement ps = null;
 		try {
-			
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(querylegacy);
-			ResultSet rs = ps.executeQuery();
+			con = getConnection("legendPlus");
+			Statement s = con.createStatement();
+			ResultSet rs = s.executeQuery(querylegacy);
 			rs.next();
 			ps = con.prepareStatement(query);
 			ps.setString(1, drAcct);
@@ -321,7 +348,9 @@ public class RaiseEntryManager extends MagmaDBConnection {
 					+ e.getMessage();
 			System.out.println(warning);
 			e.printStackTrace();
-		} 
+		} finally {
+			closeConnection(con, ps);
+		}
 		return i;
 	}
 
@@ -331,30 +360,30 @@ public class RaiseEntryManager extends MagmaDBConnection {
 			String userId, String batchId, String entryDate, String superId,
 			String assetId, String tranType) {
 		int i = 0;
-		// String superId = "0"; 
-		System.out.println("############the value of batchId is "+ batchId);
+		// String superId = "0";
 		String legacyId = getLegacyID(Integer.parseInt(userId));
 		String tranCode = "";
-		System.out.println("############the value of entryDate is "+ entryDate);
+		//System.out.println("############the value of entryDate is "+ entryDate);
         String postDate = entryDate.substring(0, 10); // dateConvert(new
-        System.out.println("############the value of postDate is "+ postDate);							// java.util.Date()).toString();
+       // System.out.println("############the value of postDate is "+ postDate);							// java.util.Date()).toString();
 		String effDate = dateConvert(new java.util.Date()).toString();
-		System.out.println("############the value of effDate is "+ effDate);
 		String status = "U";
 		String supervisor = "";
 		String rejectReason = "";
 		// String batchId = assetId;
 		String legacySysDate = getLegacySystemDetail()[5].substring(0, 10);
-          System.out.println("@@@@@@@@@@the value of legacySysDate is "+ legacySysDate);
+         // System.out.println("@@@@@@@@@@the value of legacySysDate is "+ legacySysDate);
 		String query = "INSERT INTO am_entry_table(dr_acct,cr_acct,dr_narration,cr_narration,amount,user_id,"
 				+ "super_id,legacy_id,dr_tran_code,cr_tran_code,posting_date,effective_date,process_status,supervisor,"
 				+ "reject_reason,batch_id,dr_acct_type,cr_acct_type,asset_ID,tran_type,tran_sent_time)"
 				+ " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
+		Connection con = null;
+		PreparedStatement ps = null;
+
 		try {
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(query);
-			ResultSet rs = ps.executeQuery();
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(query);
 			ps.setString(1, drAcct);
 			ps.setString(2, crAcct);
 			ps.setString(3, drNarration);
@@ -385,10 +414,12 @@ public class RaiseEntryManager extends MagmaDBConnection {
 					+ e.getMessage();
 			System.out.println(warning);
 			e.printStackTrace();
-		} 
+		} finally {
+			closeConnection(con, ps);
+		}
 		return i;
 	}
-/*
+
 	public boolean isEntryRaised(String query) {
 		boolean result = false;
 		Connection con = null;
@@ -416,58 +447,37 @@ public class RaiseEntryManager extends MagmaDBConnection {
 		}
 		return result;
 	}
-*/
 
-	public boolean isEntryRaised(String query) {
-		boolean result = false;
-		
-		String x = "";
-		// DataConnect connect = new DataConnect();
-		try {
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(query);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				x = rs.getString(1);
-			}
-			if (x.equalsIgnoreCase("R")) {
-				result = true;
-			}
-
-		} catch (Exception e) {
-			System.out.println("Error Retrieving " + query + e);
-			// e.printStackTrace();
-		} 
-		return result;
-	}
-	
-	
 	public void setRaiseEntryStatus(String query) {
 		excuteSQLCode(query);
 	}
 
 	private void excuteSQLCode(String sqlCode) {
-
+		Connection con = null;
+		PreparedStatement ps = null;
 		try {
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(sqlCode);
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(sqlCode);
 			ps.execute();
-			
 		} catch (Exception ex) {
 			System.out.println("Error executing SQL Code ->\n" + sqlCode + "\n"
 					+ ex);
-		} 
+		} finally {
+			closeConnection(con, ps);
+		}
 	}
 
 	public String getLegacySystemDate() {
 		String query = "SELECT PROCESS_DATE FROM LEGACY_SYSTEM_CONFIG";
 
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		String result = "";
 		try {
-
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(query);
-			ResultSet rs = ps.executeQuery();
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				result = formatDate(rs.getDate(1));
 			}
@@ -475,23 +485,26 @@ public class RaiseEntryManager extends MagmaDBConnection {
 			String warning = "WARNING:Error Fetching Legacy System Date"
 					+ " ->" + e.getMessage();
 			System.out.println(warning);
-		} 
+		} finally {
+			closeConnection(con, ps, rs);
+		}
 
 		return result;
 	}
 
 	private String getLegacyID(int userId) {
 		String result = "";
-
+		Connection con = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		PreparedStatement ps = null;
 		String qry = "SELECT LEGACY_SYS_ID FROM AM_GB_USER WHERE USER_ID  = "
 				+ userId;
 
 		try {
-			
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(qry);
-			ResultSet rs = ps.executeQuery();
-			
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(qry);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				result = rs.getString(1);
 			}
@@ -501,7 +514,9 @@ public class RaiseEntryManager extends MagmaDBConnection {
 					+ e.getMessage();
 			System.out.println(warning);
 			e.printStackTrace();
-		} 
+		} finally {
+			closeConnection(con, ps, rs);
+		}
 		return result;
 	}
 
@@ -516,15 +531,17 @@ public class RaiseEntryManager extends MagmaDBConnection {
 
 	private boolean isEntryExists(String id) {
 		boolean result = false;
-
+		Connection con = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		PreparedStatement ps = null;
 		String query = "SELECT * FROM AM_ENTRY_TABLE WHERE ASSET_ID ='" + id
 				+ "'";
 
 		try {
-			
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(query);
-			ResultSet rs = ps.executeQuery();
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(query);
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				result = true;
 			}
@@ -532,25 +549,29 @@ public class RaiseEntryManager extends MagmaDBConnection {
 		} catch (Exception e) {
 			System.out.println("Error isEntryExist(?) " + e);
 			// e.printStackTrace();
-		} 
+		} finally {
+			closeConnection(con, ps, rs);
+		}
 		return result;
 	}
 
 	public boolean isEntryRaise(String assetId) {
 		boolean result = false;
-
+		Connection con = null;
+		Statement stmt = null;
+		ResultSet rs = null;
 //		String query = "SELECT {?} FROM {?} WHERE ASSET_ID = '"+assetId+"'";
 		String query = "SELECT RAISE_ENTRY FROM AM_ASSET_DEP_ADJUSTMENT WHERE ASSET_ID = ?";
 //		System.out.println("====query in isEntryRaise: "+query);
 //		System.out.println("====parameter in isEntryRaise: "+tableName+"   selectField: "+selectField+"   assetId: "+assetId);
+		PreparedStatement ps = null;
 		String x = "";
 		// DataConnect connect = new DataConnect();
 		try {
-			Connection con = getConnection("legendPlus");
-			PreparedStatement ps = con.prepareStatement(query);
-								
+			con = getConnection("legendPlus");
+			ps = con.prepareStatement(query);
 			ps.setString(1, assetId);
-			ResultSet rs = ps.executeQuery();
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				x = rs.getString(1);
 			}
@@ -562,7 +583,9 @@ public class RaiseEntryManager extends MagmaDBConnection {
 		} catch (Exception e) {
 			System.out.println("Error Retrieving " + query + e);
 			// e.printStackTrace();
-		} 
+		} finally {
+			closeConnection(con, ps);
+		}
 		return result;
 	}
 	

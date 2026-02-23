@@ -10665,11 +10665,9 @@ catch (Exception r) {
     		}
 
 
-public java.util.ArrayList getUsernotSignOutRecordsOld(String sessionTimeOut)
+public java.util.ArrayList getUsernotSignOutRecords(String sessionTimeOut)
  {
-	Connection c = null;
-	ResultSet rs = null;
-	PreparedStatement s = null;
+	
  	java.util.ArrayList list = new java.util.ArrayList();
 	try {
 		//String notSignOutquery = "select  user_id from gb_user_login  where time_out is null and datediff(minute, time_in, '"+df.getDateTime().substring(10)+"') / 60.0 > ("+sessionTimeOut+"/60.0)";
@@ -10678,9 +10676,8 @@ public java.util.ArrayList getUsernotSignOutRecordsOld(String sessionTimeOut)
 		String notSignOutquery = "SELECT user_id,session_time,create_date,DATEDIFF(second, session_time, (SELECT CONVERT(VARCHAR, getdate(), 108))) AS difference"
 				+ " from gb_user_login where time_out is null and DATEDIFF(second, session_time, (SELECT CONVERT(VARCHAR, getdate(), 108))) > 60 * ?";
 //	 	System.out.println("<<<<<<notSignOutquery in getUsernotSignOutRecords: "+notSignOutquery+"   <<<<<<sessionTimeOut is : "+sessionTimeOut);	
-		    c = getConnection();  
-			//s = c.createStatement();
-		    s = c.prepareStatement(notSignOutquery);
+		Connection c = dbConnection.getConnection("legendPlus");
+        PreparedStatement s = c.prepareStatement(notSignOutquery);
 		   // System.out.println("<<<<<<statement is : "+s);
 	        s.setString(1, sessionTimeOut);
 			//rs = s.executeQuery(notSignOutquery);
@@ -10701,10 +10698,7 @@ public java.util.ArrayList getUsernotSignOutRecordsOld(String sessionTimeOut)
 					{
 						e.getMessage();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
  	return list;
  }
 
@@ -10712,30 +10706,7 @@ public java.util.ArrayList getUsernotSignOutRecordsOld(String sessionTimeOut)
 
 
 
-public List<String> getUsernotSignOutRecords(String sessionTimeOut) {
 
-    List<String> list = new ArrayList<>();
-
-    String query = "SELECT user_id,session_time,create_date,DATEDIFF(second, session_time, (SELECT CONVERT(VARCHAR, getdate(), 108))) AS difference"
-			+ " from gb_user_login where time_out is null and DATEDIFF(second, session_time, (SELECT CONVERT(VARCHAR, getdate(), 108))) > 60 * ?";
-
-    try (Connection c = getConnection();
-         PreparedStatement ps = c.prepareStatement(query)) {
-
-        ps.setString(1, sessionTimeOut);
-
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(rs.getString("user_id"));
-            }
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-
-    return list;
-}
 
 
 

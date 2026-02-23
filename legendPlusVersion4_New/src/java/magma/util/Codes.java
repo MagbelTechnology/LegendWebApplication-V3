@@ -70,16 +70,15 @@ public class Codes {
     {
         String query =
                "SELECT BRANCH_CODE  FROM am_ad_branch  " +
-               "WHERE BRANCH_ID = '" + BranchId + "' ";
+               "WHERE BRANCH_ID = ? ";
       //  System.out.println("<<<<<query: "+query);
-          Connection con = null;
-          ResultSet rs = null;
-          Statement stmt = null;
+          
        String branchcode = "0";
        try {
-           con=dbConnection.getConnection("legendPlus");
-           stmt = con.createStatement();
-           rs = stmt.executeQuery(query);
+    	   Connection con = dbConnection.getConnection("legendPlus");
+           PreparedStatement stmt = con.prepareStatement(query);
+           stmt.setString(1, BranchId);
+           ResultSet rs = stmt.executeQuery();
            while (rs.next()) {
 
                branchcode = rs.getString(1);
@@ -88,9 +87,7 @@ public class Codes {
 
        } catch (Exception ex) {
            ex.printStackTrace();
-       } finally {
-           dbConnection.closeConnection(con,stmt,rs);
-       }
+       } 
 
        return branchcode;
 
@@ -99,16 +96,15 @@ public class Codes {
    {
        String query =
               "SELECT DEPT_CODE  FROM am_ad_department  " +
-              "WHERE DEPT_ID = '" + DeptId + "' ";
+              "WHERE DEPT_ID = ? ";
 //       System.out.println("<<<<<query: "+query);
-         Connection con = null;
-         ResultSet rs = null;
-         Statement stmt = null;
+        
       String deptcode = "0";
       try {
-          con=dbConnection.getConnection("legendPlus");
-          stmt = con.createStatement();
-          rs = stmt.executeQuery(query);
+    	  Connection con = dbConnection.getConnection("legendPlus");
+          PreparedStatement stmt = con.prepareStatement(query);
+          stmt.setString(1, DeptId);
+          ResultSet rs = stmt.executeQuery();
           while (rs.next()) {
 
               deptcode = rs.getString(1);
@@ -117,8 +113,6 @@ public class Codes {
 
       } catch (Exception ex) {
           ex.printStackTrace();
-      } finally {
-          dbConnection.closeConnection(con,stmt,rs);
       }
 
       return deptcode;
@@ -128,16 +122,15 @@ public class Codes {
      {
          String query =
                 "SELECT SECTION_CODE  FROM am_ad_section  " +
-                "WHERE SECTION_ID = '" + SectionId + "' ";
+                "WHERE SECTION_ID = ? ";
  //        System.out.println("<<<<<query: "+query);
-           Connection con = null;
-           ResultSet rs = null;
-           Statement stmt = null;
+           
         String sectioncode = "0";
         try {
-            con=dbConnection.getConnection("legendPlus");
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(query);
+        	 Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement stmt = con.prepareStatement(query);
+             stmt.setString(1, SectionId);
+             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
 
                 sectioncode = rs.getString(1);
@@ -146,9 +139,7 @@ public class Codes {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            dbConnection.closeConnection(con,stmt,rs);
-        }
+        } 
 
         return sectioncode;
 
@@ -157,16 +148,15 @@ public class Codes {
          {
              String query =
                  "SELECT CATEGORY_CODE  FROM am_ad_category  " +
-                "WHERE category_id = '" + categoryId + "' ";
+                "WHERE category_id = ? ";
 //             System.out.println("<<<<<query: "+query);
-               Connection con = null;
-               ResultSet rs = null;
-               Statement stmt = null;
+             
             String categorycode = "0";
             try {
-                con=dbConnection.getConnection("legendPlus");
-                stmt = con.createStatement();
-                rs = stmt.executeQuery(query);
+            	 Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement stmt = con.prepareStatement(query);
+                 stmt.setString(1, categoryId);
+                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
 
                     categorycode = rs.getString(1);
@@ -175,10 +165,7 @@ public class Codes {
 
             } catch (Exception ex) {
                 ex.printStackTrace();
-            } finally {
-                dbConnection.closeConnection(con,stmt,rs);
-            }
-
+            } 
             return categorycode;
 
      }
@@ -188,15 +175,15 @@ public class Codes {
      public String MailMessage(String Mail_Code,String Transaction_Type)
  	{
  		String message="";
- 		String query="SELECT Mail_Description FROM am_mail_statement where Mail_Code='"+Mail_Code+"' and Transaction_Type='"+Transaction_Type+"'";
+ 		String query="SELECT Mail_Description FROM am_mail_statement where Mail_Code=? and Transaction_Type=? ";
  		
- 		Connection con = null;
- 		PreparedStatement ps = null;
- 		ResultSet rs = null;
+ 		
  		try {
- 			con = dbConnection.getConnection("legendPlus");	
- 			ps = con.prepareStatement(query);
- 			rs = ps.executeQuery();
+ 			 Connection con = dbConnection.getConnection("legendPlus");
+ 	           PreparedStatement stmt = con.prepareStatement(query);
+ 	          stmt.setString(1, Mail_Code);
+ 	         stmt.setString(2, Transaction_Type);
+ 	           ResultSet rs = stmt.executeQuery();
 
  			while (rs.next()) 
  			 {
@@ -211,24 +198,21 @@ public class Codes {
  			 er.printStackTrace();	
  				
  			} 
- 			finally 
- 			{
- 				dbConnection.closeConnection(con, ps);
- 			}
+ 			
  	return 	message;
  	}
      public String MailTo(String Mail_Code,String Transaction_Type)
   	{
   		String to="";
-  		String query="SELECT mail_address FROM am_mail_statement where Mail_Code='"+Mail_Code+"' and Transaction_Type='"+Transaction_Type+"'";
+  		String query="SELECT mail_address FROM am_mail_statement where Mail_Code=? and Transaction_Type=? ";
   		
-  		Connection con = null;
-  		PreparedStatement ps = null;  
-  		ResultSet rs = null;
+  		
   		try {
-  			con = dbConnection.getConnection("legendPlus");	
-  			ps = con.prepareStatement(query);
-  			rs = ps.executeQuery();
+  			 Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement stmt = con.prepareStatement(query);
+             stmt.setString(1, Mail_Code);
+ 	         stmt.setString(2, Transaction_Type);
+             ResultSet rs = stmt.executeQuery();
 
   			while (rs.next()) 
   			 {
@@ -243,10 +227,7 @@ public class Codes {
   			 er.printStackTrace();	
   				
   			} 
-  			finally 
-  			{
-  				dbConnection.closeConnection(con, ps);
-  			}
+  			
   	return 	to;
   	}
 
@@ -263,16 +244,15 @@ public class Codes {
    { 
        String query =
            "SELECT SUB_CATEGORY_CODE  FROM am_ad_sub_category  " +
-          "WHERE sub_category_ID = '" + sub_categoryId + "' ";
+          "WHERE sub_category_ID = ? ";
  
-         Connection con = null;
-         ResultSet rs = null;
-         Statement stmt = null;
+       
       String sub_categorycode = "0";
       try {
-          con=dbConnection.getConnection("legendPlus");
-          stmt = con.createStatement();
-          rs = stmt.executeQuery(query);
+    	  Connection con = dbConnection.getConnection("legendPlus");
+          PreparedStatement stmt = con.prepareStatement(query);
+          stmt.setString(1, sub_categoryId);
+          ResultSet rs = stmt.executeQuery();
           while (rs.next()) {
 
               sub_categorycode = rs.getString(1);
@@ -281,8 +261,6 @@ public class Codes {
 
       } catch (Exception ex) {
           ex.printStackTrace();
-      } finally {
-          dbConnection.closeConnection(con,stmt,rs);
       }
 
       return sub_categorycode;
@@ -292,16 +270,14 @@ public class Codes {
    public String ProofMailTo(String Mail_Code,String Transaction_Type)
 	{
 		String to="";
-		String query="SELECT EMAIL_ADDRESS FROM am_branch_Manager where Branch_Code='"+Mail_Code+"' and Status='ACTIVE'";
+		String query="SELECT EMAIL_ADDRESS FROM am_branch_Manager where Branch_Code=? and Status='ACTIVE'";
 		
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		try {
-			con = dbConnection.getConnection("legendPlus");	
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
-
+			 Connection con = dbConnection.getConnection("legendPlus");
+	           PreparedStatement stmt = con.prepareStatement(query);
+	           stmt.setString(1, Mail_Code);
+	           ResultSet rs = stmt.executeQuery();
 			while (rs.next()) 
 			 {
 
@@ -315,10 +291,7 @@ public class Codes {
 			 er.printStackTrace();	
 				
 			} 
-			finally 
-			{
-				dbConnection.closeConnection(con, ps);
-			}
+			
 	return 	to;
 	}
 
