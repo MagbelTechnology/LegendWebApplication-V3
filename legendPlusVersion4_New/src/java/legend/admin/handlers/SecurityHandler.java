@@ -93,34 +93,37 @@ public class SecurityHandler
     //    System.out.println((new StringBuilder()).append("USING_ ").append(getClass().getName()).toString());
     }
 
-    public java.util.List getAllPrivileges() {
-        java.util.List _list = new java.util.ArrayList();
-        legend.admin.objects.Privilege privilege = null;
-        String query = "SELECT role_uuid,role_name,role_wurl"
-                + " ,menu_type,priority" + "  FROM am_ad_privileges order by role_name  ";
+    public List<Privilege> getAllPrivileges() {
 
-        double averageWeight = 0;
-        try {
-        	Connection con = dbConnection.getConnection("legendPlus");
-            PreparedStatement ps = con.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String role_uuid = rs.getString("role_uuid");
-                String role_name = rs.getString("role_name");
-                String role_wurl = rs.getString("role_wurl");
-                String menu_type = rs.getString("menu_type");
-                String priority = rs.getString("priority");
-                privilege = new legend.admin.objects.Privilege(role_uuid,
-                        role_name, role_wurl, menu_type, priority);
-                _list.add(privilege);
+        String query =
+                "SELECT role_uuid, role_name, role_wurl, menu_type, priority " +
+                        "FROM am_ad_privileges ORDER BY role_name";
 
+        List<Privilege> list = new ArrayList<>();
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setQueryTimeout(30);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    list.add(new Privilege(
+                            rs.getString("role_uuid"),
+                            rs.getString("role_name"),
+                            rs.getString("role_wurl"),
+                            rs.getString("menu_type"),
+                            rs.getString("priority")
+                    ));
+                }
             }
- //           closeConnection(con, ps);
-        } catch (Exception ex) {
-            System.out.println("WARN: Error fetching all asset ->" + ex);
-        } 
-        return _list;
 
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch privileges", e);
+        }
+
+        return list;
     }
     public int tokenLogin(String userName, String token, String name) throws IOException, JSONException, KeyManagementException, NoSuchAlgorithmException
     {
@@ -6079,318 +6082,271 @@ public class SecurityHandler
         };
         return display;
     }
+    public List<User> getUserByQueryTech(
+            String username,
+            String role,
+            String status) {
 
-    public java.util.ArrayList getUserByQueryTech(String filter) {
-        java.util.ArrayList _list = new java.util.ArrayList();
-        legend.admin.objects.User user = null;
-        String query = "SELECT User_Id, User_Name, Full_Name" + ", Legacy_Sys_Id, Class, Branch, Password" + ", Phone_No, is_Supervisor, Must_Change_Pwd" + ", Login_Status, User_Status, UserId, Create_Date"
-                + ", Password_Expiry, Login_Date, Login_System, Fleet_Admin"
-                + ", email, Branch, password_changed,Expiry_Date,branch_restriction"
-                + ", approval_limit,approval_level,dept_code,section_code,Organization" + " FROM AM_GB_USER WHERE User_Id IS NOT NULL ";
-        query += filter;
-        Connection c = null;
-        ResultSet rs = null;
-        Statement s = null;
+        List<User> users = new ArrayList<>();
 
-        try {
-            c = getConnection();
-            s = c.createStatement();
-            rs = s.executeQuery(query);
-            while (rs.next()) {
-                String userId = rs.getString("User_Id");
-                String userName = rs.getString("User_Name");
-                String fullName = rs.getString("Full_Name");
-                String legacySysId = rs.getString("Legacy_Sys_Id");
-                String Class = rs.getString("Class");
-                String branch = rs.getString("Branch");
-                String password = rs.getString("Password");
-                String phoneNo = rs.getString("Phone_No");
-                String isSupervisor = rs.getString("Is_Supervisor");
-                String mustChangePwd = rs.getString("Must_Change_Pwd");
-                String loginStatus = rs.getString("Login_Status");
-                String userStatus = rs.getString("User_Status");
-                String user_Id = rs.getString("UserId");
-                String createDate = rs.getString("Create_Date");
-                String passwordExpiry = rs.getString("Password_Expiry");
-                String loginDate = rs.getString("Login_Date");
-                String loginSystem = rs.getString("Login_System");
-                String fleetAdmin = rs.getString("Fleet_Admin");
-                String email = rs.getString("email");
-                String branchCode = rs.getString("Branch");
-                String pwdChanged = rs.getString("password_changed");
-                Date expiry_date = rs.getDate("Expiry_Date");
-                String branch_restriction = rs.getString("branch_restriction");
-                String apprvLimit = rs.getString("approval_limit");
-                String apprvLevel = rs.getString("approval_level");
-                String deptCode = rs.getString("dept_code");
-                String sectionCode = rs.getString("section_code");
-                String organization = rs.getString("Organization");
-                user = new legend.admin.objects.User();
-                user.setUserId(userId);
-                user.setUserName(userName);
-                user.setUserFullName(fullName);
-                user.setLegacySystemId(legacySysId);
-                user.setUserClass(Class);
-                user.setBranch(branch);
-                user.setPassword(password);
-                user.setPhoneNo(phoneNo);
-                user.setIsSupervisor(isSupervisor);
-                user.setMustChangePwd(mustChangePwd);
-                user.setLoginStatus(loginStatus);
-                user.setUserStatus(userStatus);
-                user.setCreatedBy(user_Id);
-                user.setCreateDate(createDate);
+        StringBuilder query = new StringBuilder(
+                "SELECT User_Id, User_Name, Full_Name, User_Status, User_Class " +
+                        "FROM AM_GB_USER WHERE 1=1 "
+        );
 
-                user.setPwdExpiry(passwordExpiry);
-                user.setLastLogindate(loginDate);
-                user.setLoginSystem(loginSystem);
-                user.setFleetAdmin(fleetAdmin);
-                user.setEmail(email);
-                user.setBranch(branchCode);
-                user.setPwdChanged(pwdChanged);
-                user.setApprvLimit(apprvLimit);
-                user.setBranchRestrict(branch_restriction);
-                user.setApprvLevel(apprvLevel);
-                user.setExpDate(expiry_date);
-                user.setDeptCode(deptCode);
-//                user.setSection(sectionCode);
-//                user.setOrganization(organization);
-                _list.add(user);
+        List<Object> parameters = new ArrayList<>();
+
+        if (username != null && !username.trim().isEmpty()) {
+            query.append(" AND UPPER(User_Name) LIKE ? ");
+            parameters.add("%" + username.trim().toUpperCase() + "%");
+        }
+
+        if (role != null && !role.trim().isEmpty()) {
+            query.append(" AND User_Class = ? ");
+            parameters.add(role.trim());
+        }
+
+        if (status != null && !status.trim().isEmpty()) {
+            query.append(" AND User_Status = ? ");
+            parameters.add(status.trim());
+        }
+
+        query.append(" ORDER BY Full_Name");
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+            ps.setQueryTimeout(30);
+
+            // Bind parameters safely
+            for (int i = 0; i < parameters.size(); i++) {
+                ps.setObject(i + 1, parameters.get(i));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
-        return _list;
+            try (ResultSet rs = ps.executeQuery()) {
 
+                while (rs.next()) {
+
+                    User user = new User();
+                    user.setUserId(rs.getString("User_Id"));
+                    user.setUserName(rs.getString("User_Name"));
+                    user.setFullName(rs.getString("Full_Name"));
+                    user.setUserStatus(rs.getString("User_Status"));
+                    user.setUserClass(rs.getString("User_Class"));
+
+                    users.add(user);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching users", e);
+        }
+
+        return users;
     }
-    public java.util.ArrayList getAssigneeByQueryTech(String filter) {
-        java.util.ArrayList _list = new java.util.ArrayList();
-        legend.admin.objects.User user = null;
-        String query = "SELECT User_Id, User_Name, Full_Name" + ", Legacy_Sys_Id, Class, Branch, Password" + ", Phone_No, is_Supervisor, Must_Change_Pwd" + ", Login_Status, User_Status, UserId, Create_Date"
-                + ", Password_Expiry, Login_Date, Login_System, Fleet_Admin"
-                + ", email, Branch, password_changed,Expiry_Date,branch_restriction"
-                + ", approval_limit,approval_level,dept_code,dept_code AS section_code, '' AS Organization " + " FROM AM_GB_USER WHERE User_Id IS NOT NULL ";
-        query += filter;
-        Connection c = null;
-        ResultSet rs = null;
-        Statement s = null;
-        System.out.println("getAssigneeByQueryTech query: "+query);
-        try {
-            c = getConnection();
-            s = c.createStatement();
-            rs = s.executeQuery(query);
-            while (rs.next()) {
-                String userId = rs.getString("User_Id");
-                String userName = rs.getString("User_Name");
-                String fullName = rs.getString("Full_Name");
-                String legacySysId = rs.getString("Legacy_Sys_Id");
-                String Class = rs.getString("Class");
-                String branch = rs.getString("Branch");
-                String password = rs.getString("Password");
-                String phoneNo = rs.getString("Phone_No");
-                String isSupervisor = rs.getString("Is_Supervisor");
-                String mustChangePwd = rs.getString("Must_Change_Pwd");
-                String loginStatus = rs.getString("Login_Status");
-                String userStatus = rs.getString("User_Status");
-                String user_Id = rs.getString("UserId");
-                String createDate = rs.getString("Create_Date");
-                String passwordExpiry = rs.getString("Password_Expiry");
-                String loginDate = rs.getString("Login_Date");
-                String loginSystem = rs.getString("Login_System");
-                String fleetAdmin = rs.getString("Fleet_Admin");
-                String email = rs.getString("email");
-                String branchCode = rs.getString("Branch");
-                String pwdChanged = rs.getString("password_changed");
-                Date expiry_date = rs.getDate("Expiry_Date");
-                String branch_restriction = rs.getString("branch_restriction");
-                String apprvLimit = rs.getString("approval_limit");
-                String apprvLevel = rs.getString("approval_level");
-                String deptCode = rs.getString("dept_code");
-                String sectionCode = rs.getString("section_code");
-                String organization = rs.getString("Organization");
-                user = new legend.admin.objects.User();
-                user.setUserId(userId);
-                user.setUserName(userName);
-                user.setUserFullName(fullName);
-                user.setLegacySystemId(legacySysId);
-                user.setUserClass(Class);
-                user.setBranch(branch);
-                user.setPassword(password);
-                user.setPhoneNo(phoneNo);
-                user.setIsSupervisor(isSupervisor);
-                user.setMustChangePwd(mustChangePwd);
-                user.setLoginStatus(loginStatus);
-                user.setUserStatus(userStatus);
-                user.setCreatedBy(user_Id);
-                user.setCreateDate(createDate);
+    public List<Assignee> getAssigneeByQueryTech(String name, String status) {
 
-                user.setPwdExpiry(passwordExpiry);
-                user.setLastLogindate(loginDate);
-                user.setLoginSystem(loginSystem);
-                user.setFleetAdmin(fleetAdmin);
-                user.setEmail(email);
-                user.setBranch(branchCode);
-                user.setPwdChanged(pwdChanged);
-                user.setApprvLimit(apprvLimit);
-                user.setBranchRestrict(branch_restriction);
-                user.setApprvLevel(apprvLevel);
-                user.setExpDate(expiry_date);
-                user.setDeptCode(deptCode);
-//                user.setSection(sectionCode);
-//                user.setorganization(organization);
-                _list.add(user);
+        List<Assignee> assignees = new ArrayList<>();
+
+        StringBuilder query = new StringBuilder(
+                "SELECT Staff_Id, Full_Name, Staff_Status " +
+                        "FROM am_gb_staff WHERE 1=1 "
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (name != null && !name.trim().isEmpty()) {
+            query.append(" AND UPPER(Full_Name) LIKE ? ");
+            params.add("%" + name.trim().toUpperCase() + "%");
+        }
+
+        if (status != null && !status.trim().isEmpty()) {
+            query.append(" AND Staff_Status = ? ");
+            params.add(status.trim());
+        }
+
+        query.append(" ORDER BY Full_Name");
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+            ps.setQueryTimeout(30);
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
-        return _list;
+            try (ResultSet rs = ps.executeQuery()) {
 
+                while (rs.next()) {
+
+                    Assignee assignee = new Assignee();
+                    assignee.setId(rs.getString("Staff_Id"));
+                    assignee.setName(rs.getString("Full_Name"));
+                    assignee.setStatus(rs.getString("Staff_Status"));
+
+                    assignees.add(assignee);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching assignees", e);
+        }
+
+        return assignees;
     }
 
-    public java.util.ArrayList getServicesByQueryTech(String filter) {
-        java.util.ArrayList _list = new java.util.ArrayList();
-        legend.admin.objects.User user = null;
-        String query = "SELECT Service_code, Service_name FROM HD_SERVICE WHERE Status = 'Active'";
-        query += filter;
-        Connection c = null;
-        ResultSet rs = null;
-        Statement s = null;
+    public List<Service> getServicesByQueryTech(String serviceName, String status) {
 
-       try {
-            c = getConnection();
-            s = c.createStatement();
-            rs = s.executeQuery(query);
-            while (rs.next()) {
-                String userId = rs.getString("Service_code");
-                String userName = rs.getString("Service_code");
-                String fullName = rs.getString("Service_name");
-              //  System.out.print("====fullName==== "+fullName);
-                user = new legend.admin.objects.User();
-                user.setUserId(userId);
-                user.setUserName(userName);
-                user.setUserFullName(fullName);
-                _list.add(user);
+        List<Service> services = new ArrayList<>();
+
+        StringBuilder query = new StringBuilder(
+                "SELECT Service_Id, Service_Name, Service_Status " +
+                        "FROM am_ad_services WHERE 1=1 "
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (serviceName != null && !serviceName.trim().isEmpty()) {
+            query.append(" AND UPPER(Service_Name) LIKE ? ");
+            params.add("%" + serviceName.trim().toUpperCase() + "%");
+        }
+
+        if (status != null && !status.trim().isEmpty()) {
+            query.append(" AND Service_Status = ? ");
+            params.add(status.trim());
+        }
+
+        query.append(" ORDER BY Service_Name");
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+            ps.setQueryTimeout(30);
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
-        return _list;
+            try (ResultSet rs = ps.executeQuery()) {
 
+                while (rs.next()) {
+
+                    Service service = new Service();
+                    service.setServiceId(rs.getString("Service_Id"));
+                    service.setServiceName(rs.getString("Service_Name"));
+                    service.setServiceStatus(rs.getString("Service_Status"));
+
+                    services.add(service);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching services", e);
+        }
+
+        return services;
     }
 
+    public List<Priority> getPriorityByQuery(String priorityName, String status) {
 
-    public java.util.ArrayList getPriorityByQuery(String filter) {
-        java.util.ArrayList _list = new java.util.ArrayList();
-        legend.admin.objects.User user = null;
-        String query = "SELECT Dept_code, Dept_name FROM AM_AD_DEPARTMENT order By Dept_name ";
-        query += filter;
-        Connection c = null;
-        ResultSet rs = null;
-        Statement s = null;
+        List<Priority> priorities = new ArrayList<>();
 
-       try {
-            c = getConnection();
-            s = c.createStatement();
-            rs = s.executeQuery(query);
-            while (rs.next()) {
-                String userId = rs.getString("Dept_code");
-                String userName = rs.getString("Dept_code");
-                String fullName = rs.getString("Dept_name");
-              //  System.out.print("====fullName==== "+fullName);
-                user = new legend.admin.objects.User();
-                user.setUserId(userId);
-                user.setUserName(userName);
-                user.setUserFullName(fullName);
-                _list.add(user);
+        StringBuilder query = new StringBuilder(
+                "SELECT Priority_Id, Priority_Name, Priority_Level, Priority_Status " +
+                        "FROM am_ad_priority WHERE 1=1 "
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (priorityName != null && !priorityName.trim().isEmpty()) {
+            query.append(" AND UPPER(Priority_Name) LIKE ? ");
+            params.add("%" + priorityName.trim().toUpperCase() + "%");
+        }
+
+        if (status != null && !status.trim().isEmpty()) {
+            query.append(" AND Priority_Status = ? ");
+            params.add(status.trim());
+        }
+
+        query.append(" ORDER BY Priority_Level");
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+            ps.setQueryTimeout(30);
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
-        return _list;
+            try (ResultSet rs = ps.executeQuery()) {
 
+                while (rs.next()) {
+
+                    Priority priority = new Priority();
+                    priority.setPriorityId(rs.getString("Priority_Id"));
+                    priority.setPriorityName(rs.getString("Priority_Name"));
+                    priority.setPriorityLevel(rs.getInt("Priority_Level"));
+                    priority.setPriorityStatus(rs.getString("Priority_Status"));
+
+                    priorities.add(priority);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching priorities", e);
+        }
+
+        return priorities;
     }
 
-    public ArrayList<Staffs> getStaffsList(String filter, String extraQuery, String status)
-    {
-    	//System.out.println("filter: " + filter);
-        ArrayList<Staffs> _list =  new ArrayList<Staffs>();
-        HtmlUtility html = new HtmlUtility();
-        Connection c = null;
-        ResultSet rs = null;
-        PreparedStatement s = null;
-        String query = "";
-        
-        try {
-        
-//        if(filter.equals("")) {
-//        	query= "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff \r\n" + 
-//        			extraQuery +
-//        			"union select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff"
-//        			+extraQuery;
-//        	 c = getConnection();
-//           //  System.out.println("query: " + query);
-//             s = c.prepareStatement(query);
-//             s.setString(1, status);
-//             s.setString(2, status);
-//        }
-        	
-        	if(filter.equals("")) {
-            	query= "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff \r\n" + 
-            			"union select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff";
-            	 c = getConnection();
-                 System.out.println("query: " + query);
-                 s = c.prepareStatement(query);
-            }
-        
-        if(!filter.equals("")) {
-            query = "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff where StaffId like ? \r\n" + 
-           		"union\r\n" + 
-           		"select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff where Full_Name like ? ";
-            c = getConnection();
-           System.out.println("query: " + query);
-            s = c.prepareStatement(query);
-            s.setString(1, "%"+filter+"%");
-            s.setString(2,  "%"+filter+"%");
-           }
+    public List<Staff> getStaffsList() {
 
-            rs = s.executeQuery();
-        while(rs.next()){
-        	String staffId = rs.getString("StaffId");
-        	String fullName = rs.getString("Full_Name");
-        	String deptCode = rs.getString("dept_code");
-        	String branchCode = rs.getString("branch_code");
-        	
-        	String deptName = html.findObject("select Dept_name from am_ad_department where dept_code = '"+deptCode+"'");
-        	String branchName = html.findObject("select BRANCH_NAME from am_ad_branch where BRANCH_CODE = '"+branchCode+"'");
-        	
-           // System.out.println("staffId: "+ staffId + " fullName: " + fullName + " deptCode: " + deptCode + " branchCode: " + branchCode);
-            Staffs staffDetails = new Staffs();
-        	staffDetails.setStaffId(staffId);
-        	staffDetails.setFullName(fullName);
-        	staffDetails.setDeptName(deptName);
-        	staffDetails.setBranchName(branchName);
-        	
-        	_list.add(staffDetails);
-        
+        List<Staff> staffList = new ArrayList<>();
+
+        String query =
+                "SELECT s.Staff_Id, s.Full_Name, s.Dept_Code, s.Branch_Code, " +
+                        "       s.Staff_Status, s.Email, s.Phone_No, " +
+                        "       d.Dept_Name, " +
+                        "       b.Branch_Name " +
+                        "FROM am_gb_staff s " +
+                        "LEFT JOIN am_ad_department d ON s.Dept_Code = d.Dept_Code " +
+                        "LEFT JOIN am_ad_branch b ON s.Branch_Code = b.Branch_Code " +
+                        "ORDER BY s.Full_Name";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            // Prevent hanging connections
+            ps.setQueryTimeout(30);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Staff staff = new Staff();
+
+                    staff.setStaffId(rs.getString("Staff_Id"));
+                    staff.setFullName(rs.getString("Full_Name"));
+                    staff.setDeptCode(rs.getString("Dept_Code"));
+                    staff.setBranchCode(rs.getString("Branch_Code"));
+                    staff.setStaffStatus(rs.getString("Staff_Status"));
+                    staff.setEmail(rs.getString("Email"));
+                    staff.setPhoneNo(rs.getString("Phone_No"));
+
+                    // These were previously N+1 queries
+                    staff.setDeptName(rs.getString("Dept_Name"));
+                    staff.setBranchName(rs.getString("Branch_Name"));
+                    staffList.add(staff);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching staff list", e);
         }
-        }catch(Exception e) {
-        	e.getMessage();
-        }
-        
-        
-        return _list;
+
+        return staffList;
     }
 
     public static String decrypt(String strToDecrypt, String secret) {
