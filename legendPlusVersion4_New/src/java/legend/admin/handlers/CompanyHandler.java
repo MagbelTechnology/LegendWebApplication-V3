@@ -15881,152 +15881,127 @@ public boolean InsertNewBranch(String branchCode, String branchName, String bran
 
 
 
-public java.util.ArrayList getLegacyTransactionRecords(String fromDate, String toDate,String bankingApp, String legacySysId)
-{
+	public List<newAssetTransaction> getLegacyTransactionRecords(
+			String fromDate,
+			String toDate,
+			String bankingApp,
+			String legacySysId) {
 
-	java.util.ArrayList _list = new java.util.ArrayList();
-	String date = String.valueOf(dateConvert(new java.util.Date()));
-	date = date.substring(0, 10);
-	String date1 =date.substring(0,2);
-	String date0 = date.substring(2,10);
-//	System.out.println("======date1: "+date1+"    date0: "+date0+"   date: "+date);
-	date = "20"+date.substring(2,10);
-	String iso ="";
-	String query = "";
-	String formattedFromDate="";
-	String formattedToDate="";
+		List<newAssetTransaction> list = new ArrayList<>();
 
+		DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
 
-	if(bankingApp.equalsIgnoreCase("FLEXCUBE")) {
-		 DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-		    DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
-		    try {
-		 LocalDate from_Date = LocalDate.parse(fromDate, inputFormat);
-		 System.out.println("<<<<< from_Date: " + from_Date);
-		 LocalDate to_Date = LocalDate.parse(toDate, inputFormat);
-		 System.out.println("<<<<< to_Date: " + to_Date);
-		 formattedFromDate = from_Date.format(outputFormat);
-		 formattedToDate = to_Date.format(outputFormat);
-		System.out.println("<<<<< fromDate: " + formattedFromDate + " <<<<<<< toDate: " + formattedToDate);
-		    }catch(Exception e) {
-		    	 System.out.println("Parse error: " + e.getMessage());
-		    }
-//		query = " SELECT  * FROM ZENITHUBS.TRANSACTION_DETAILS WHERE POSTING_DATE BETWEEN '"+formattedFromDate+"' AND '"+formattedToDate+"' " ;
-			query = " SELECT  * FROM ZENITHUBS.TRANSACTION_DETAILS WHERE POSTING_DATE BETWEEN '"+formattedFromDate+"' AND '"+formattedToDate+"' AND MAKER_ID = '"+legacySysId+"'" ;
+		String formattedFromDate;
+		String formattedToDate;
 
-	}
-	if(bankingApp.equalsIgnoreCase("FINACLE")) {
-		 DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-		    DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
-		    try {
-		 LocalDate from_Date = LocalDate.parse(fromDate, inputFormat);
-		 System.out.println("<<<<< from_Date: " + from_Date);
-		 LocalDate to_Date = LocalDate.parse(toDate, inputFormat);
-		 System.out.println("<<<<< to_Date: " + to_Date);
-		 formattedFromDate = from_Date.format(outputFormat);
-		 formattedToDate = to_Date.format(outputFormat);
-		System.out.println("<<<<< fromDate: " + formattedFromDate + " <<<<<<< toDate: " + formattedToDate);
-		    }catch(Exception e) {
-		    	 System.out.println("Parse error: " + e.getMessage());
-		    }
-		query = " SELECT  * FROM CUSTOM.BULK_LGD WHERE VALUE_DATE BETWEEN TO_DATE('"+formattedFromDate+"', 'DD-MON-YYYY HH24:MI:SS') AND TO_DATE('"+formattedToDate+"', 'DD-MON-YYYY HH24:MI:SS') " ;
-	}
-//				"where to_char(tran_date,'DD-MM-YYYY') >= ?";
-		System.out.println("<<<<< fromDate: " + formattedFromDate + " <<<<<<< toDate: " + formattedToDate);
-		System.out.println("Query on getFinacleRecords====> "+query);
-	Connection c = null;
-//	ConnectionClass connection = null;
-	ResultSet rs = null;
-	PreparedStatement ps = null;
+		try {
+			LocalDate from = LocalDate.parse(fromDate, inputFormat);
+			LocalDate to = LocalDate.parse(toDate, inputFormat);
 
-	try {
-		if(bankingApp.equalsIgnoreCase("FLEXCUBE")) {
-		   c = getFinacleConnection();
-		   //rs = c.prepareStatement(query).executeQuery();
-			ps = c.prepareStatement(query.toString());
-//			ps.setString(1, getOracleDateFormat(date));
-			rs = ps.executeQuery();
-			while (rs.next())
-			   {
+			formattedFromDate = from.format(outputFormat);
+			formattedToDate = to.format(outputFormat);
 
-				String batchNo = rs.getString("BATCH_NO");
-				String serialNo = rs.getString("SERIAL_NO");
-				String accountNo = rs.getString("ACCOUNT_NO");
-				String branchCode = rs.getString("BRANCH_CODE");
-				String tranType = rs.getString("TRANSACTION_TYPE");
-				String amount = rs.getString("AMOUNT");
-				String transDescription = rs.getString("TRANSACTION_DESCRIPTION");
-				String makerId = rs.getString("MAKER_ID");
-				String checkerId = rs.getString("CHECKER_ID");
-				String postingDate = rs.getString("POSTING_DATE");
-				newAssetTransaction newTransaction = new newAssetTransaction();
-				newTransaction.setAssetId(makerId);
-				newTransaction.setBarCode(serialNo);
-				newTransaction.setSbuCode(checkerId);
-				newTransaction.setDescription(transDescription);
-				newTransaction.setAssetUser(batchNo);
-				newTransaction.setVendorAC(accountNo);
-				newTransaction.setCostPrice(Double.parseDouble(amount));
-				newTransaction.setAssetType(tranType);
-				newTransaction.setBranchCode(branchCode);
-				newTransaction.setPostingDate(postingDate);
-				_list.add(newTransaction);
-			   }
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Invalid date format. Expected dd-MM-yyyy", e);
 		}
-		if(bankingApp.equalsIgnoreCase("FINACLE")) {
-			   c = getFinacleConnection();
-			   rs = c.prepareStatement(query).executeQuery();
-				ps = c.prepareStatement(query.toString());
-//				ps.setString(1, getOracleDateFormat(date));
-				rs = ps.executeQuery();
-				while (rs.next())
-				   {
 
-					String batchId = rs.getString("TRAN_ID");
-					String assetId = rs.getString("ID");
-					String sbuCode = rs.getString("SBU_CODE");
-					String drAccountNo = rs.getString("DR_ACCT");
-					String crAccountNo = rs.getString("CR_ACCT");
-					String amount = rs.getString("AMOUNT");
-					String drDescription = rs.getString("NARRATION");
-					String crDescription = rs.getString("NARRATION2");
-					String transactionDate = rs.getString("VALUE_DATE");
-					String postingDate = rs.getString("RCRE_TIME");
-					String processedflag = rs.getString("PROCESSED_FLG");
-					String finUser = rs.getString("FIN_USER");
-					String remarks = rs.getString("REMARKS");
+		String query;
 
-					newAssetTransaction newTransaction = new newAssetTransaction();
-					newTransaction.setAssetId(assetId);
-					newTransaction.setBarCode(batchId);
-					newTransaction.setSbuCode(sbuCode);
-					newTransaction.setDebitAccount(drAccountNo);
-					newTransaction.setCreditAccount(crAccountNo);
-					newTransaction.setCostPrice(Double.parseDouble(amount));
-					newTransaction.setDebitAccountName(drDescription);
-					newTransaction.setCreditAccountName(crDescription);
-					newTransaction.setTransDate(transactionDate);
-					newTransaction.setPostingDate(postingDate);
-					newTransaction.setAssetStatus(processedflag);
-					newTransaction.setUserID(finUser);
-					newTransaction.setResponse(remarks);
+		if ("FLEXCUBE".equalsIgnoreCase(bankingApp)) {
 
-					_list.add(newTransaction);
-				   }
+			query = "SELECT * FROM ZENITHUBS.TRANSACTION_DETAILS " +
+					"WHERE POSTING_DATE BETWEEN ? AND ? " +
+					"AND MAKER_ID = ?";
+
+			try (Connection con = getFinacleConnection();
+				 PreparedStatement ps = con.prepareStatement(query)) {
+
+				ps.setQueryTimeout(60);
+				ps.setString(1, formattedFromDate);
+				ps.setString(2, formattedToDate);
+				ps.setString(3, legacySysId);
+
+				try (ResultSet rs = ps.executeQuery()) {
+
+					while (rs.next()) {
+
+						newAssetTransaction tx = new newAssetTransaction();
+
+						tx.setAssetId(rs.getString("MAKER_ID"));
+						tx.setBarCode(rs.getString("SERIAL_NO"));
+						tx.setSbuCode(rs.getString("CHECKER_ID"));
+						tx.setDescription(rs.getString("TRANSACTION_DESCRIPTION"));
+						tx.setAssetUser(rs.getString("BATCH_NO"));
+						tx.setVendorAC(rs.getString("ACCOUNT_NO"));
+						tx.setAssetType(rs.getString("TRANSACTION_TYPE"));
+						tx.setBranchCode(rs.getString("BRANCH_CODE"));
+						tx.setPostingDate(rs.getString("POSTING_DATE"));
+
+						String amount = rs.getString("AMOUNT");
+						tx.setCostPrice(parseAmountSafely(amount));
+
+						list.add(tx);
+					}
+				}
+
+			} catch (SQLException e) {
+				throw new RuntimeException("Error fetching FLEXCUBE transactions", e);
 			}
-	 	}
-				 catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-					finally
-					{
-//						connection.freeResource();
-						closeConnection(c, ps, rs);
-					}
-			return _list;
-}
 
+		} else if ("FINACLE".equalsIgnoreCase(bankingApp)) {
+
+			query = "SELECT * FROM CUSTOM.BULK_LGD " +
+					"WHERE VALUE_DATE BETWEEN TO_DATE(?, 'DD-MON-YYYY') " +
+					"AND TO_DATE(?, 'DD-MON-YYYY')";
+
+			try (Connection con = getFinacleConnection();
+				 PreparedStatement ps = con.prepareStatement(query)) {
+
+				ps.setQueryTimeout(60);
+				ps.setString(1, formattedFromDate);
+				ps.setString(2, formattedToDate);
+
+				try (ResultSet rs = ps.executeQuery()) {
+
+					while (rs.next()) {
+
+						newAssetTransaction tx = new newAssetTransaction();
+
+						tx.setAssetId(rs.getString("ID"));
+						tx.setBarCode(rs.getString("TRAN_ID"));
+						tx.setSbuCode(rs.getString("SBU_CODE"));
+						tx.setDebitAccount(rs.getString("DR_ACCT"));
+						tx.setCreditAccount(rs.getString("CR_ACCT"));
+						tx.setDebitAccountName(rs.getString("NARRATION"));
+						tx.setCreditAccountName(rs.getString("NARRATION2"));
+						tx.setTransDate(rs.getString("VALUE_DATE"));
+						tx.setPostingDate(rs.getString("RCRE_TIME"));
+						tx.setAssetStatus(rs.getString("PROCESSED_FLG"));
+						tx.setUserID(rs.getString("FIN_USER"));
+						tx.setResponse(rs.getString("REMARKS"));
+
+						String amount = rs.getString("AMOUNT");
+						tx.setCostPrice(parseAmountSafely(amount));
+
+						list.add(tx);
+					}
+				}
+
+			} catch (SQLException e) {
+				throw new RuntimeException("Error fetching FINACLE transactions", e);
+			}
+		}
+
+		return list;
+	}
+	private double parseAmountSafely(String amount) {
+		try {
+			return amount != null ? Double.parseDouble(amount) : 0.0;
+		} catch (NumberFormatException e) {
+			return 0.0;
+		}
+	}
 
 public boolean InsertLegacyTransactions(String makerId, String serialNo, String checkerId, String transDescription,String batchNo, String accountNo, double amount, String tranType, String branchCode, String postingDate,String bankingApp)
 
@@ -16113,8 +16088,133 @@ public boolean InsertLegacyTransactions(String makerId, String serialNo, String 
 	}
     return done;
 }
+	public boolean InsertLegacyTransactions(
+			String makerId,
+			String serialNo,
+			String checkerId,
+			String transDescription,
+			String batchNo,
+			String accountNo,
+			double amount,
+			String tranType,
+			String branchCode,
+			String postingDate,
+			String bankingApp) {
 
+		if (bankingApp == null) {
+			throw new IllegalArgumentException("bankingApp cannot be null");
+		}
 
+		boolean done = false;
+		String query;
+
+		if ("FLEXCUBE".equalsIgnoreCase(bankingApp)) {
+
+			query = "INSERT INTO LEGACY_TRANSACTION(" +
+					"BATCH_NO,SERIAL_NO,ACCOUNT_NO,BRANCH_CODE," +
+					"TRANSACTION_TYPE,AMOUNT,TRANSACTION_DESCRIPTION," +
+					"MAKER_ID,CHECKER_ID,POSTING_DATE) " +
+					"VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+			try (Connection con = getConnection();
+				 PreparedStatement ps = con.prepareStatement(query)) {
+
+				ps.setQueryTimeout(30);
+
+				ps.setString(1, batchNo);
+				ps.setString(2, serialNo);
+				ps.setString(3, accountNo);
+				ps.setString(4, branchCode);
+				ps.setString(5, tranType);
+				ps.setDouble(6, amount);
+				ps.setString(7, transDescription);
+				ps.setString(8, makerId);
+				ps.setString(9, checkerId);
+				ps.setString(10, postingDate);
+
+				done = ps.executeUpdate() > 0;
+
+			} catch (SQLException e) {
+				throw new RuntimeException("Error inserting FLEXCUBE legacy transaction", e);
+			}
+
+		} else if ("FINACLE".equalsIgnoreCase(bankingApp)) {
+
+			query = "INSERT INTO LEGACY_TRANSACTION(" +
+					"BATCH_ID,SBU_CODE,ASSET_ID,DRACCOUNT_NO,CRACCOUNT_NO," +
+					"AMOUNT,DR_DESCRIPTION,CR_DESCRIPTION,POSTING_DATE," +
+					"TRANSACTION_DATE,FIN_USER,PROCESSED_FLAG,ERROR_MSG) " +
+					"VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+			try (Connection con = getConnection();
+				 PreparedStatement ps = con.prepareStatement(query)) {
+
+				ps.setQueryTimeout(30);
+
+				// --- Safe parsing of tranType ---
+				String actualTranType = null;
+				String processedFlag = null;
+				String remarks = null;
+
+				String[] typeParts = safeSplit(tranType, 3);
+				actualTranType = typeParts[0];
+				processedFlag = typeParts[1];
+				remarks = typeParts[2];
+
+				// --- Safe parsing of postingDate ---
+				String actualPostingDate = null;
+				String transactionDate = null;
+
+				String[] dateParts = safeSplit(postingDate, 2);
+				actualPostingDate = dateParts[0];
+				transactionDate = dateParts[1];
+
+				ps.setString(1, serialNo);
+				ps.setString(2, checkerId);
+				ps.setString(3, makerId);
+				ps.setString(4, accountNo);
+				ps.setString(5, branchCode);
+				ps.setDouble(6, amount);
+				ps.setString(7, transDescription);
+				ps.setString(8, batchNo);
+				ps.setString(9, actualPostingDate);
+				ps.setString(10, transactionDate);
+				ps.setString(11, actualTranType);
+				ps.setString(12, processedFlag);
+				ps.setString(13, remarks);
+
+				done = ps.executeUpdate() > 0;
+
+			} catch (SQLException e) {
+				throw new RuntimeException("Error inserting FINACLE legacy transaction", e);
+			}
+
+		} else {
+			throw new IllegalArgumentException("Unsupported bankingApp: " + bankingApp);
+		}
+
+		return done;
+	}
+	private String[] safeSplit(String input, int expectedParts) {
+
+		String[] result = new String[expectedParts];
+
+		if (input == null) {
+			return result;
+		}
+
+		String[] parts = input.split("&");
+
+		for (int i = 0; i < expectedParts; i++) {
+			if (i < parts.length) {
+				result[i] = parts[i];
+			} else {
+				result[i] = null;
+			}
+		}
+
+		return result;
+	}
 public boolean InsertNewVendorOld(String branchCode, String branchName, String branchAddress,String stateId)
 {
     Connection con;
