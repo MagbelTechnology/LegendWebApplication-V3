@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import legend.ConnectionClass;
 import legend.UniqueBean;
 import magma.net.vao.Category;
 
@@ -46,9 +47,7 @@ public class HtmlUtility{
     }
  
     public String getResources(String selected, String query) {
-        Connection mcon = null;
-        PreparedStatement mps = null;
-        ResultSet mrs = null;
+
         StringBuilder html = new StringBuilder();
         String id = "";
 
@@ -57,9 +56,9 @@ public class HtmlUtility{
         }
 
         try {
-            mcon = (new DataConnect("legendPlus")).getConnection();
-            mps = mcon.prepareStatement(query);
-            mrs = mps.executeQuery();
+        	Connection mcon = (new DataConnect("legendPlus")).getConnection();
+        	PreparedStatement mps = mcon.prepareStatement(query);
+        	ResultSet mrs = mps.executeQuery();
 
             while (mrs.next()) {
                 id = mrs.getString(1);
@@ -78,22 +77,16 @@ public class HtmlUtility{
 
         } catch (Exception ee) {
             System.out.println("WARN HtmlUtil.getResources error: " + ee);
-        } finally {
-            closeConnection(mcon, mps, mrs);
-        }
+        } 
 
         return html.toString();
     }
 
     
     public String getResources(int selected, String query) {
-        Connection mcon;
-        PreparedStatement mps;
-        ResultSet mrs;
+
         String html;
-        mcon = null;
-        mps = null;
-        mrs = null;
+
         html = "";
         String id = "";
  //       System.out.println("getResources Parameter query:->>"+query);
@@ -102,10 +95,10 @@ public class HtmlUtility{
             selected = "0";
         }*/
         try {
-            mcon = (new DataConnect("legendPlus")).getConnection();
-            mps = mcon.prepareStatement(query);
+        	Connection mcon = (new DataConnect("legendPlus")).getConnection();
+            PreparedStatement mps = mcon.prepareStatement(query);
 
-            for (mrs = mps.executeQuery(); mrs.next(); ) {
+            for (ResultSet mrs = mps.executeQuery(); mrs.next(); ) {
 
                 id = mrs.getString(1);
                 html = html + "<option  " +
@@ -116,10 +109,7 @@ public class HtmlUtility{
             }
         } catch (Exception ee) {
             System.out.println("WARN This is the error:HtmlUtil:->>" + ee);
-        } finally {
-            closeConnection(mcon, mps, mrs);
-        }
-
+        } 
         return html;
     }
 
@@ -149,9 +139,7 @@ public class HtmlUtility{
     public String findObject(String query)
     {
     	//System.out.println("====findObject query=====  "+query);
-        Connection Con2 = null;
-        PreparedStatement Stat = null;
-        ResultSet result = null;
+
         String found = null;
 
         String finder = "UNKNOWN";
@@ -159,9 +147,9 @@ public class HtmlUtility{
         double sequence = 0.00d;
         try {
 
-            Con2 = new DataConnect("legendPlus").getConnection();
-            Stat = Con2.prepareStatement(query);
-            result = Stat.executeQuery();
+        	Connection Con2 = new DataConnect("legendPlus").getConnection();
+        	PreparedStatement Stat = Con2.prepareStatement(query);
+        	ResultSet result = Stat.executeQuery();
 
             while (result.next()) {
                 finder = result.getString(1);
@@ -169,8 +157,6 @@ public class HtmlUtility{
         } catch (Exception ee2) {
             System.out.println("WARN:ERROR OBTAINING OBJ --> " + ee2);
             ee2.printStackTrace();
-        } finally {
-            closeConnection(Con2, Stat, result);
         }
 
         return finder;
@@ -179,9 +165,7 @@ public class HtmlUtility{
     public String findObject(String query,String filter)
     {
     	//System.out.println("====findObject query=====  "+query);
-        Connection Con2 = null;
-        PreparedStatement Stat = null;
-        ResultSet result = null;
+
         String found = null;
 
         String finder = "UNKNOWN";
@@ -189,19 +173,17 @@ public class HtmlUtility{
         double sequence = 0.00d;
         try {
 
-            Con2 = new DataConnect("legendPlus").getConnection();
-            Stat = Con2.prepareStatement(query);
+        	Connection Con2 = new DataConnect("legendPlus").getConnection();
+        	PreparedStatement Stat = Con2.prepareStatement(query);
     		Stat.setString(1, filter);
-            result = Stat.executeQuery();
+    		ResultSet result = Stat.executeQuery();
             while (result.next()) {
                 finder = result.getString(1);
             }
         } catch (Exception ee2) {
             System.out.println("WARN:ERROR OBTAINING OBJ ====--> " + ee2);
             ee2.printStackTrace();
-        } finally {
-            closeConnection(Con2, Stat, result);
-        }
+        } 
 
         return finder;
     }
@@ -285,15 +267,13 @@ public class HtmlUtility{
     public String[] getArrayList(){
 //ArrayList al = new ArrayList();
         String[] al=null;
-Connection mcon =null;
-        PreparedStatement mps =null;
-        ResultSet rs =null;
+
 try{
 String query = "SELECT bar_code,lpo FROM am_asset" ;
-mcon = (new DataConnect("legendPlus")).getConnection();
-            mps = mcon.prepareStatement(query);
+Connection mcon = (new DataConnect("legendPlus")).getConnection();
+PreparedStatement mps = mcon.prepareStatement(query);
 
-            rs = mps.executeQuery();
+ResultSet rs = mps.executeQuery();
 
 int i = 0;
 while(rs.next()){
@@ -311,9 +291,6 @@ while(rs.next()){
 catch(Exception e){
 e.printStackTrace();
 }//catch
-finally{
-  closeConnection(mcon, mps, rs);
-}
 // System.out.println("the size of arraylist is ======="+ al.size() );
 return al;
 }//
@@ -321,17 +298,15 @@ return al;
 public void insToAm_Invoice_No(String assetID,String lpo,String invoiceNo,String TransType)
     {
 
-        Connection Con2 = null;
-        PreparedStatement Stat = null;
-        ResultSet result = null;
+
         String found = null;
 
         String query="Insert into Am_Invoice_no (asset_id,lpo,invoice_no,trans_type,create_date) values (?,?,?,?,?)";
  
              try
              {
-            Con2 = new DataConnect("legendPlus").getConnection();
-            Stat = Con2.prepareStatement(query);
+            	 Connection Con2 = new DataConnect("legendPlus").getConnection();
+            	 PreparedStatement Stat = Con2.prepareStatement(query);
             Stat.setString(1, assetID);
             Stat.setString(2, lpo);
             Stat.setString(3, invoiceNo);
@@ -343,26 +318,21 @@ public void insToAm_Invoice_No(String assetID,String lpo,String invoiceNo,String
         } catch (Exception ee2) {
             System.out.println("WARN:ERROR insToAm_Invoice_No  --> " + ee2);
             ee2.printStackTrace();
-        } finally {
-            closeConnection(Con2, Stat, result);
-        }
+        } 
 
         }
 
 public void insGrpToAm_Invoice_No(String assetID,String lpo,String invoiceNo,String TransType,String grpID)
     {
 
-        Connection Con2 = null;
-        PreparedStatement Stat = null;
-        ResultSet result = null;
         String found = null;
 
         String query="Insert into Am_Invoice_no (asset_id,lpo,invoice_no,trans_type,group_id,create_date) values (?,?,?,?,?,?)";
 
              try
              {
-            Con2 = new DataConnect("legendPlus").getConnection();
-            Stat = Con2.prepareStatement(query);
+            	 Connection Con2 = new DataConnect("legendPlus").getConnection();
+            	 PreparedStatement Stat = Con2.prepareStatement(query);
             Stat.setString(1, assetID);
             Stat.setString(2, lpo);
             Stat.setString(3, invoiceNo);
@@ -374,20 +344,14 @@ public void insGrpToAm_Invoice_No(String assetID,String lpo,String invoiceNo,Str
         } catch (Exception ee2) {
             System.out.println("WARN:ERROR insGrpToAm_Invoice_No  --> " + ee2);
             ee2.printStackTrace();
-        } finally {
-            closeConnection(Con2, Stat, result);
-        }
+        } 
 
         }
 
 public String getResources(String selected, String query,int size) {
-        Connection mcon;
-        PreparedStatement mps;
-        ResultSet mrs;
+
         String html;
-        mcon = null;
-        mps = null;
-        mrs = null;
+
         html = "";
         String id = "";
 
@@ -395,10 +359,10 @@ public String getResources(String selected, String query,int size) {
             selected = "0";
         }
         try {
-            mcon = (new DataConnect("legendPlus")).getConnection();
-            mps = mcon.prepareStatement(query);
+        	Connection mcon = (new DataConnect("legendPlus")).getConnection();
+        	PreparedStatement mps = mcon.prepareStatement(query);
 
-            for (mrs = mps.executeQuery(); mrs.next(); ) {
+            for (ResultSet mrs = mps.executeQuery(); mrs.next(); ) {
 
                 id = mrs.getString(1);
                 html = html + "<option  " +
@@ -409,8 +373,6 @@ public String getResources(String selected, String query,int size) {
             }
         } catch (Exception ee) {
             System.out.println("WARN This is the error:HtmlUtil: 2 --->" + ee);
-        } finally {
-            closeConnection(mcon, mps, mrs);
         }
 
         return html;
@@ -430,14 +392,11 @@ return descrip;
 
 public ArrayList findCategoryItems(String category_id, String category_code,String status)
 				{
-					System.out.println("============= Parameters Sent ===========");
-					System.out.println("category_id >>>>>>>>>>> " + category_id);
-					System.out.println("category_code >>>>>>>>>>> " + category_code);
-					System.out.println("status >>>>>>>>>>> " + status);
+//					System.out.println("============= Parameters Sent ===========");
+//					System.out.println("category_id >>>>>>>>>>> " + category_id);
+//					System.out.println("category_code >>>>>>>>>>> " + category_code);
+//					System.out.println("status >>>>>>>>>>> " + status);
 
-				    Connection con = null;
-				    PreparedStatement ps = null;
-				    ResultSet rs = null;
 				    Category category = null;
 				    ArrayList collection = new ArrayList();
 
@@ -445,12 +404,12 @@ public ArrayList findCategoryItems(String category_id, String category_code,Stri
 				    		"  and category_code=? and status=?";
 
 				    try {
-				        con = new DataConnect("legendPlus").getConnection();
-				        ps = con.prepareStatement(FINDER_QUERY);
+				    	Connection con = new DataConnect("legendPlus").getConnection();
+				    	PreparedStatement ps = con.prepareStatement(FINDER_QUERY);
 				        ps.setString(1, category_id);
 				        ps.setString(2, category_code);
 				        ps.setString(3, status);
-				        rs = ps.executeQuery();
+				        ResultSet rs = ps.executeQuery();
 
 				        while (rs.next())
 				        {
@@ -462,22 +421,16 @@ public ArrayList findCategoryItems(String category_id, String category_code,Stri
 				        }
 				    } catch (Exception ex) {
 				        System.out.println("WARNING: cannot fetch [findCategoryItems]->" +  ex.getMessage());
-				    } finally {
-				        closeConnection(con, ps, rs);
-				    }
+				    } 
 
 				    return collection;
 				}
 
 
  public String getResourcesCheckAndDropText(String selectChk, String query) {
-        Connection mcon;
-        PreparedStatement mps;
-        ResultSet mrs;
+
         String html;
-        mcon = null;
-        mps = null;
-        mrs = null;
+
         html = "";
         String id = "";
         String col ="";
@@ -506,11 +459,11 @@ public ArrayList findCategoryItems(String category_id, String category_code,Stri
 
 
         try {
-            mcon = (new DataConnect("legendPlus")).getConnection();
-            mps = mcon.prepareStatement(query);
+        	Connection mcon = (new DataConnect("legendPlus")).getConnection();
+        	PreparedStatement mps = mcon.prepareStatement(query);
 
            // for (mrs = mps.executeQuery(); mrs.next(); ) {
-            mrs = mps.executeQuery();
+        	ResultSet mrs = mps.executeQuery();
             while(mrs.next()){
 
 
@@ -604,8 +557,6 @@ htmlD = "<select name='"+opr+"'>"
  //           System.out.println("See the  html Output:->>>" + html);
         } catch (Exception ee) {
             System.out.println("WARN getResourcesCheckAndDrop error:HtmlUtil:->" + ee.getMessage());
-        } finally {
-            closeConnection(mcon, mps, mrs);
         }
 
         return html;
@@ -613,13 +564,9 @@ htmlD = "<select name='"+opr+"'>"
 
 
   public String getResourcesCheckAndDropText2(String selectChk, String query) {
-        Connection mcon;
-        PreparedStatement mps;
-        ResultSet mrs;
+
         String html;
-        mcon = null;
-        mps = null;
-        mrs = null;
+
         html = "";
         String id = "";
         String col ="";
@@ -648,11 +595,11 @@ htmlD = "<select name='"+opr+"'>"
 
 
         try {
-            mcon = (new DataConnect("legendPlus")).getConnection();
-            mps = mcon.prepareStatement(query);
+        	Connection mcon = (new DataConnect("legendPlus")).getConnection();
+        	PreparedStatement mps = mcon.prepareStatement(query);
 
            // for (mrs = mps.executeQuery(); mrs.next(); ) {
-            mrs = mps.executeQuery();
+        	ResultSet mrs = mps.executeQuery();
             while(mrs.next()){
 
 
@@ -743,9 +690,7 @@ String peg = "To";
             }
         } catch (Exception ee) {
             System.out.println("WARN getResourcesCheckAndDrop error:HtmlUtil:->" + ee.getMessage());
-        } finally {
-            closeConnection(mcon, mps, mrs);
-        }
+        } 
 
         return html;
     }
@@ -754,21 +699,18 @@ String peg = "To";
 
           public String getTaName(String col){
 
-         Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
       String desc = "";
       String filter = "To";
 
        String FINDER_QUERY = "SELECT TABLE_NAMES from COL_FILTER WHERE COLUMN_NAME =? AND PEG=?";
 
         try {
-            con  = (new DataConnect("legendPlus")).getConnection();
-            ps = con.prepareStatement(FINDER_QUERY);
+        	Connection con  = (new DataConnect("legendPlus")).getConnection();
+        	PreparedStatement ps = con.prepareStatement(FINDER_QUERY);
 
             ps.setString(1, col);
              ps.setString(2, filter);
-            rs = ps.executeQuery();
+             ResultSet rs = ps.executeQuery();
 
       while (rs.next()) {
 
@@ -779,31 +721,25 @@ String peg = "To";
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch OPERAND from COL_LOOK_UP->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-
+        } 
 
         return desc;
 }
 
   public String getColDesc(String col){
 
-         Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
       String desc = "";
       String filter = "To";
 
        String FINDER_QUERY = "SELECT COLUMN_DESC from COL_FILTER WHERE COLUMN_NAME =? AND PEG=?";
 
         try {
-            con  = (new DataConnect("legendPlus")).getConnection();
-            ps = con.prepareStatement(FINDER_QUERY);
+        	Connection con  = (new DataConnect("legendPlus")).getConnection();
+        	PreparedStatement ps = con.prepareStatement(FINDER_QUERY);
 
             ps.setString(1, col);
              ps.setString(2, filter);
-            rs = ps.executeQuery();
+             ResultSet rs = ps.executeQuery();
 
       while (rs.next()) {
 
@@ -815,10 +751,7 @@ String peg = "To";
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch OPERAND from COL_LOOK_UP->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
         }
-
 
         return desc;
 }
@@ -826,13 +759,9 @@ String peg = "To";
 
 
   public String getResourcesCheck(String select, String query) {
-        Connection mcon;
-        PreparedStatement mps;
-        ResultSet mrs;
+
         String html;
-        mcon = null;
-        mps = null;
-        mrs = null;
+
         html = "";
         String id = "";
 
@@ -840,12 +769,12 @@ String peg = "To";
             select = "0";
         }
         try {
-            mcon = (new DataConnect("legendPlus")).getConnection();
-            mps = mcon.prepareStatement(query);
+        	Connection mcon = (new DataConnect("legendPlus")).getConnection();
+        	PreparedStatement mps = mcon.prepareStatement(query);
 
-            for (mrs = mps.executeQuery(); mrs.next(); ) {
+            for (ResultSet mrs = mps.executeQuery(); mrs.next(); ) {
 
-
+ 
                 id = mrs.getString(1);
                 /*html = html + "<input name = select" +
                        ((select != null) && !select.equals("") ?
@@ -869,10 +798,8 @@ String peg = "To";
             }
         } catch (Exception ee) {
             System.out.println("WARN Chrck box error:HtmlUtil:->" + ee);
-        } finally {
-            closeConnection(mcon, mps, mrs);
-        }
-
+        } 
+        
         return html;
     }
 
@@ -884,19 +811,16 @@ String peg = "To";
 
 public String getOperand(String col){
 
-         Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
       String op = "";
 
        String FINDER_QUERY = "SELECT DISTINCT operand from COL_FILTER WHERE COLUMN_NAME =?";
 
         try {
-            con  = (new DataConnect("legendPlus")).getConnection();
-            ps = con.prepareStatement(FINDER_QUERY);
+        	Connection con  = (new DataConnect("legendPlus")).getConnection();
+        	PreparedStatement ps = con.prepareStatement(FINDER_QUERY);
 
             ps.setString(1, col);
-            rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
       while (rs.next()) {
 
@@ -906,29 +830,25 @@ public String getOperand(String col){
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch OPERAND from COL_LOOK_UP->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-
+        } 
 
         return op;
 }
 
 public String getCodeName(String query) {
 	String result = "";
-	Connection con = null;
-	ResultSet rs = null;
+
 	int rs1 = 0;
-	PreparedStatement ps = null;
+
 //	System.out.println("query===>> "+query);
 	
 	try {
 		String validate = query.substring(0, 6);
 //		con = getConnection();
-		con = (new DataConnect("legendPlus")).getConnection();
-		ps = con.prepareStatement(query);
+		Connection con = (new DataConnect("legendPlus")).getConnection();
+		PreparedStatement ps = con.prepareStatement(query);
 		if(!validate.equalsIgnoreCase("UPDATE")){	
-		rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 		while (rs.next()) {
 			result = rs.getString(1) == null ? "" : rs.getString(1);
 		}
@@ -953,29 +873,26 @@ public String getCodeName(String query) {
 		System.out.println("Error in " + this.getClass().getName()
 				+ "- getCodeName()... ->" + er.getMessage());
 		er.printStackTrace();
-	}  finally {
-        closeConnection(con, ps, rs);
-    }
+	} 
 	return result;
 }     
 
 
 public String getCodeName(String query,String userId) {
 	String result = "";
-	Connection con = null;
-	ResultSet rs = null;
+
 	int rs1 = 0;
-	PreparedStatement ps = null;
+
 //	System.out.println("query===>> "+query);
 	
 	try {
 		String validate = query.substring(0, 6);
 //		con = getConnection();
-		con = (new DataConnect("legendPlus")).getConnection();
-		ps = con.prepareStatement(query);
+		Connection con = (new DataConnect("legendPlus")).getConnection();
+		PreparedStatement ps = con.prepareStatement(query);
 		ps.setString(1, userId);
 		if(!validate.equalsIgnoreCase("UPDATE")){	
-		rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 		while (rs.next()) {
 			result = rs.getString(1) == null ? "" : rs.getString(1);
 		}
@@ -1000,27 +917,22 @@ public String getCodeName(String query,String userId) {
 		System.out.println("Error in " + this.getClass().getName()
 				+ "- getCodeName()... ->" + er.getMessage());
 		er.printStackTrace();
-	}  finally {
-        closeConnection(con, ps, rs);
-    }
+	}  
 	return result;
 }     
 
 
 public void updateAssetStatusChange(String query_r){
-		Connection con = null;
-        PreparedStatement ps = null;
+
 try {
-	con = (new DataConnect("legendPlus")).getConnection();
-	ps = con.prepareStatement(query_r);
+	Connection con = (new DataConnect("legendPlus")).getConnection();
+	PreparedStatement ps = con.prepareStatement(query_r);
            int i =ps.executeUpdate();
             //ps.execute();
 
         } catch (Exception ex) {
 
             System.out.println("HtmlUtility: updateAssetStatusChange()>>>>>" + ex);
-        } finally {
-        	closeConnection(con, ps);
         }
 
 
@@ -1028,11 +940,10 @@ try {
 
 
 public void updateAssetStatusChange(String query_r,Timestamp date,int tranId){
-		Connection con = null;
-        PreparedStatement ps = null;
+
 try {
-	con = (new DataConnect("legendPlus")).getConnection();
-	ps = con.prepareStatement(query_r.toString());
+	Connection con = (new DataConnect("legendPlus")).getConnection();
+	PreparedStatement ps = con.prepareStatement(query_r.toString());
 	  ps.setTimestamp(1, date);
 	  ps.setInt(2, tranId);
            int i =ps.executeUpdate();
@@ -1041,19 +952,16 @@ try {
         } catch (Exception ex) {
 
             System.out.println("HtmlUtility: updateAssetStatusChange()>>>>>" + ex);
-        } finally {
-        	closeConnection(con, ps);
-        }
+        } 
 
 
 }//updateAssetStatus()
 
 public void updateAssetStatusChange(String query_r,String naration,Timestamp date,int tranId){
-		Connection con = null;
-        PreparedStatement ps = null;
+
 try {
-	con = (new DataConnect("legendPlus")).getConnection();
-	ps = con.prepareStatement(query_r.toString());
+	Connection con = (new DataConnect("legendPlus")).getConnection();
+	PreparedStatement ps = con.prepareStatement(query_r.toString());
 	  ps.setString(1, naration);
 	  ps.setTimestamp(2, date);
 	  ps.setInt(3, tranId);
@@ -1063,21 +971,15 @@ try {
         } catch (Exception ex) {
 
             System.out.println("HtmlUtility: updateAssetStatusChange()>>>>>" + ex);
-        } finally {
-        	closeConnection(con, ps);
-        }
+        } 
 
 
 }//updateAssetStatus()
 
 public String getResources(int selected) {
-    Connection mcon;
-    PreparedStatement mps;
-    ResultSet mrs;
+
     String html;
-    mcon = null;
-    mps = null;
-    mrs = null;
+
     html = "";
     String id = "";
 //       System.out.println("getResources Parameter query:->>"+query);
@@ -1087,10 +989,10 @@ public String getResources(int selected) {
     }*/
     String query = "SELECT BRANCH_ID,BRANCH_NAME FROM am_ad_BRANCH where brnch_id = ? ORDER BY BRANCH_NAME";
     try {
-        mcon = (new DataConnect("legendPlus")).getConnection();
-        mps = mcon.prepareStatement(query);
+    	Connection mcon = (new DataConnect("legendPlus")).getConnection();
+    	PreparedStatement mps = mcon.prepareStatement(query);
 
-        for (mrs = mps.executeQuery(); mrs.next(); ) {
+        for (ResultSet mrs = mps.executeQuery(); mrs.next(); ) {
 
             id = mrs.getString(1);
             html = html + "<option  " +
@@ -1101,10 +1003,7 @@ public String getResources(int selected) {
         }
     } catch (Exception ee) {
         System.out.println("WARN This is the error:HtmlUtil:->>" + ee);
-    } finally {
-        closeConnection(mcon, mps, mrs);
-    }
-
+    } 
     return html;
 }
 
@@ -1112,9 +1011,7 @@ public String getResources(int selected) {
 public String findObjectParam(String id)
 {
 	//System.out.println("====findObject query=====  "+query);
-    Connection Con2 = null;
-    PreparedStatement Stat = null;
-    ResultSet result = null;
+
     String found = null;
 
     String finder = "UNKNOWN";
@@ -1122,10 +1019,10 @@ public String findObjectParam(String id)
     double sequence = 0.00d;
     try {
 
-        Con2 = new DataConnect("legendPlus").getConnection();
-        Stat = Con2.prepareStatement(query);
+    	Connection Con2 = new DataConnect("legendPlus").getConnection();
+    	PreparedStatement Stat = Con2.prepareStatement(query);
         Stat.setString(1, id);
-        result = Stat.executeQuery();
+        ResultSet result = Stat.executeQuery();
 
         while (result.next()) {
             finder = result.getString(1);
@@ -1133,11 +1030,46 @@ public String findObjectParam(String id)
     } catch (Exception ee2) {
         System.out.println("WARN:ERROR OBTAINING OBJ --> " + ee2);
         ee2.printStackTrace();
-    } finally {
-        closeConnection(Con2, Stat, result);
-    }
-
+    } 
     return finder;
 }
+
+public String getUserListResources(String selected, String query) {
+
+    StringBuilder html = new StringBuilder();
+    String id = "";
+
+    if (selected == null || selected.equalsIgnoreCase("null")) {
+        selected = "ALL"; // Change this to match your default <option value="ALL">
+    }
+
+    try {
+    	Connection mcon = (new DataConnect("otherDataSource")).getOtherConnection();
+    	PreparedStatement mps = mcon.prepareStatement(query);
+    	ResultSet mrs = mps.executeQuery();
+//        System.out.println("getUserListResources Parameter query:->>"+query);
+//        System.out.println("getUserListResources Parameter selected:->>"+selected);
+        while (mrs.next()) {
+            id = mrs.getString(1);
+            String label = mrs.getString(2);
+//            System.out.println("getUserListResources Id: "+id+"     label: "+label);
+            String selectedAttr = (id != null && id.trim().equalsIgnoreCase(selected.trim())) ? " selected" : "";
+
+            html.append("<option value='")
+                .append(id)
+                .append("'")
+                .append(selectedAttr)
+                .append(">")
+                .append(label)
+                .append("</option>\n");
+        }
+
+    } catch (Exception ee) {
+        System.out.println("WARN HtmlUtil.getResources error: " + ee);
+    } 
+
+    return html.toString();
+}
+
 
 }

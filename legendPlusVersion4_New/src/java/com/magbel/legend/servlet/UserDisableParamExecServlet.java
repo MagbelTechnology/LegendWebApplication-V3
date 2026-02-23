@@ -3,6 +3,8 @@ package com.magbel.legend.servlet;
 
 import legend.admin.handlers.SecurityHandler;
 import legend.admin.objects.UserDisableClass;
+import magma.net.dao.MagmaDBConnection;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import jakarta.servlet.ServletException;
@@ -32,18 +34,16 @@ public class UserDisableParamExecServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	    response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();
-
-	    Connection con = null;
-	    PreparedStatement ps = null;
-	    PreparedStatement ps1 = null;
-	    PreparedStatement ps2 = null;
+	    MagmaDBConnection dbConnection = new MagmaDBConnection();
+	   
 
 	    try {
-	        con = getConnection();
+	    	
+	    	Connection con = dbConnection.getConnection("legendPlus");
 	        con.setAutoCommit(false); 
 
 	        String deleteQuery = "DELETE FROM am_gb_classEnable";
-	        ps = con.prepareStatement(deleteQuery);
+            PreparedStatement ps = con.prepareStatement(deleteQuery);
 	        ps.executeUpdate();
 
 	        System.out.println("Entering Insertion Script");
@@ -53,7 +53,7 @@ public class UserDisableParamExecServlet extends HttpServlet {
 	                             "INNER JOIN am_gb_user b ON b.Class = a.class_id " +  
 	                             "WHERE a.class_status = 'Y'";
 
-	        ps1 = con.prepareStatement(insertQuery);
+	        PreparedStatement ps1 = con.prepareStatement(insertQuery);
 	        java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
 	        ps1.setDate(1, sqlDate);
 	        int i = ps1.executeUpdate();
@@ -64,7 +64,7 @@ public class UserDisableParamExecServlet extends HttpServlet {
 	            String updateQuery = "UPDATE b SET b.class = a.DefaultClass_Id " +
 	                                 "FROM am_gb_classDisable a, am_gb_user b " +
 	                                 "WHERE a.Class_Id = b.Class AND a.class_status = 'Y'";
-	            ps2 = con.prepareStatement(updateQuery);
+	            PreparedStatement  ps2 = con.prepareStatement(updateQuery);
 	            int x = ps2.executeUpdate();
 	            if(x > 0) {
 	            	// System.out.println("Update Script Done");
@@ -81,21 +81,10 @@ public class UserDisableParamExecServlet extends HttpServlet {
 
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
-	        if (con != null) {
-	            try {
-	                con.rollback(); 
-	            } catch (SQLException rollbackEx) {
-	                rollbackEx.printStackTrace();
-	            }
-	        }
 	        
 	        String errorMsg = ex.getMessage().replace("'", "\\'");
 	        out.println("<script type='text/javascript'>alert('Error occurred: " + errorMsg + "');</script>");
-	    } finally {
-	        closeConnection(null, ps2, null);
-	        closeConnection(null, ps1, null);
-	        closeConnection(con, ps, null); 
-	    }
+	    } 
 	}
 
 	

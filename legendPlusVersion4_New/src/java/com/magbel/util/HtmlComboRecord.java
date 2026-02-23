@@ -1,6 +1,9 @@
 
 package com.magbel.util;
 import com.magbel.dao.PersistenceServiceDAO;
+
+import magma.net.dao.MagmaDBConnection;
+
 import java.sql.ResultSet;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +13,7 @@ import java.util.Date;
 
 
 public class HtmlComboRecord  extends PersistenceServiceDAO {
+	 private MagmaDBConnection dbConnection;
 
 public HtmlComboRecord() {
 }
@@ -199,9 +203,6 @@ public String describeConfirmationStatus(String status){
 
 private String getOptionItems(String selected, String query) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
 		String html;
 		html = "";
 		String id = "";
@@ -210,9 +211,9 @@ private String getOptionItems(String selected, String query) {
 		}
 		try {
 
-			con = getConnection();
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
 
@@ -225,17 +226,13 @@ private String getOptionItems(String selected, String query) {
 
 		} catch (Exception ee) {
 			System.out.println("WARN:HtmlComboRecord.getOptionItems:->" + ee);
-		} finally {
-			closeConnection(con,ps,rs);
-		}
+		} 
 
 		return html;
 	}
 private String getOptionItemsUba(String selected, String query) {
 
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 	String html;
 	html = "";
 	String id = "";
@@ -244,9 +241,9 @@ private String getOptionItemsUba(String selected, String query) {
 	}
 	try {
 
-		con = getConnection("finacleView");
-		ps = con.prepareStatement(query);
-		rs = ps.executeQuery();
+		Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps = con.prepareStatement(query);
+		ResultSet rs = ps.executeQuery();
 
 		while (rs.next()) {
 
@@ -259,25 +256,21 @@ private String getOptionItemsUba(String selected, String query) {
 
 	} catch (Exception ee) {
 		System.out.println("WARN:HtmlComboRecord.getOptionItems:->" + ee);
-	} finally {
-		closeConnection(con,ps,rs);
-	}
+	} 
 
 	return html;
 }
 
 private String describeCode(String query) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		String description = "";
 
 		try {
 
-			con = getConnection();
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
 
@@ -286,9 +279,7 @@ private String describeCode(String query) {
 
 		} catch (Exception ee) {
 			System.out.println("WARN:HtmlComboRecord.describeCode:->" + ee);
-		} finally {
-			closeConnection(con,ps,rs);
-		}
+		} 
 
 		return description;
 	}

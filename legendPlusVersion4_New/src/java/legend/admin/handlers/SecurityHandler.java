@@ -57,6 +57,7 @@ import legend.admin.objects.SupervisorDetailsClass;
 import legend.admin.objects.User;
 import legend.admin.objects.UserDisableClass;
 import legend.admin.objects.UserEnableClass;
+import magma.net.dao.MagmaDBConnection;
 import ng.com.magbel.token.ParallexTokenClass;
 import ng.com.magbel.token.TokenAuthentication;
 import ng.com.magbel.token.TokenAuthenticationSoap;
@@ -67,10 +68,7 @@ import ng.com.magbel.token.ZenithTokenClass;
 public class SecurityHandler
 {
 
-    Connection con;
-    Statement stmt;
-    PreparedStatement ps;
-    ResultSet rs;
+	 private MagmaDBConnection dbConnection;
     DataConnect dc;
     TokenClass tok;
     SimpleDateFormat sdf;
@@ -86,10 +84,7 @@ public class SecurityHandler
     
     public SecurityHandler()
     {
-        con = null;
-        stmt = null;
-        ps = null;
-        rs = null; 
+         
         cm = null;
         sdf = new SimpleDateFormat("dd-MM-yyyy");
         df = new DatetimeFormat();
@@ -104,16 +99,11 @@ public class SecurityHandler
         String query = "SELECT role_uuid,role_name,role_wurl"
                 + " ,menu_type,priority" + "  FROM am_ad_privileges order by role_name  ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        CallableStatement cstmt = null;
         double averageWeight = 0;
         try {
-            con = getConnection();
-            
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String role_uuid = rs.getString("role_uuid");
                 String role_name = rs.getString("role_name");
@@ -128,9 +118,7 @@ public class SecurityHandler
  //           closeConnection(con, ps);
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching all asset ->" + ex);
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return _list;
 
     }

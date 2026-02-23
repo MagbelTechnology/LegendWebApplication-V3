@@ -14,6 +14,7 @@ import com.magbel.util.ApplicationHelper;
 import com.magbel.legend.bus.ApprovalRecords;
 import com.magbel.legend.vao.newAssetTransaction;
 public class UncapitaliseManager extends MagmaDBConnection {
+	 private MagmaDBConnection dbConnection;
     private Codes code;
 
     public UncapitaliseManager() {
@@ -107,16 +108,14 @@ public class UncapitaliseManager extends MagmaDBConnection {
     public ArrayList getAsset() {
         String selectQuery = "SELECT * FROM AM_UNCAPITALIZED_MAIN ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         ArrayList list = new ArrayList();
         Uncapitalized _obj = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {  
                 String assetId = rs.getString("ASSET_ID");
@@ -182,9 +181,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Uncapitalized Asset ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -193,26 +190,26 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
      public Asset getOldAssetDetails(String assetId,String newAssetId)
      {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         Asset assetObj = new Asset();
 
         String selOldDetails_qry =
         "select b.old_dept_id,b.old_branch_id,b.old_asset_user,b.old_section,b.old_branch_code," +
         "b.old_section_code,b.old_dept_code,a.cost_price,a.description,a.registration_no," +
         "a.who_to_rem,a.email1,a.who_to_rem_2,a.email2,"+
-        "a.NBV,a.Accum_Dep,b.old_cat_id from am_wip_reclassification b, am_asset a where b.asset_id='"+assetId+"'" +
-        " and a.asset_id='"+newAssetId+"'";
+        "a.NBV,a.Accum_Dep,b.old_cat_id from am_wip_reclassification b, am_asset a where b.asset_id=?" +
+        " and a.asset_id=?";
 
        // System.out.println("selOldDetails_qry >>>> " + selOldDetails_qry);
 
          try
          {
 
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(selOldDetails_qry);
-            rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(selOldDetails_qry);
+             ps.setString(1, assetId);
+             ps.setString(2, newAssetId);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -237,10 +234,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         {
             System.out.println("INFO:Error fetching OldAssetDetails BY ID ->" +   e.getMessage());
         }
-        finally
-        {
-            closeConnection(con, ps, rs);
-        }
+       
 
         return assetObj;
 
@@ -317,9 +311,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                                    String raiseEntry, int userId) {
         // RaiseEntryManager re = new RaiseEntryManager();
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         int i = 0;
 
         String updateQuery =
@@ -327,8 +319,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
                 "USER_ID = ? WHERE ASSET_ID = ?";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(updateQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(updateQuery);
             ps.setString(1, reason);
             ps.setString(2, buyerAcct);
             //ps.setString(3,raiseEntry);
@@ -339,9 +331,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error Updating Disposal Asset ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return i;
     }
 
@@ -354,9 +344,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                                    int userId) {
         // RaiseEntryManager re = new RaiseEntryManager();
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         int i = 0;
 
         String updateQuery =
@@ -365,8 +353,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
                 "EFFECTIVE_DATE = ? WHERE ASSET_ID = ?";
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(updateQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(updateQuery);
             ps.setInt(1, userId);
             ps.setString(2, reason);
             ps.setString(3, buyerAcct);
@@ -381,9 +369,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error Updating Disposal Uncapitalized ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return i;
     }
 
@@ -393,17 +380,15 @@ public class UncapitaliseManager extends MagmaDBConnection {
                        "PROFIT_LOSS,DISPOSAL_DATE,EFFECTIVE_DATE,USER_ID,DISPOSAL_STATUS " +
                        "FROM am_UncapitalizedDisposal WHERE ASSET_ID = '" + id + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         //declare DTO object
         DisposeUncapitalise dispose = null;
         //DataConnect connect = new DataConnect();
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String disposalId = rs.getString("DISPOSAL_ID");
@@ -429,8 +414,6 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching disposed Asset by ID->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
         }
 
         return dispose;
@@ -442,17 +425,15 @@ public class UncapitaliseManager extends MagmaDBConnection {
                        "PROFIT_LOSS,DISPOSAL_DATE,EFFECTIVE_DATE,USER_ID,DISPOSAL_STATUS " +
                        "FROM am_UncapitalizedDisposal WHERE " + query_;
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         //declare DTO object
         Disposal dispose = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String disposalId = rs.getString("DISPOSAL_ID");
@@ -478,9 +459,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching disposed Asset by query->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return dispose;
     }
@@ -494,18 +473,16 @@ public class UncapitaliseManager extends MagmaDBConnection {
                        " FROM am_UncapitalizedDisposal A,AM_ASSET_MAIN B WHERE A.ASSET_ID = B.ASSET_ID " +
                        query_;
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         ArrayList list = new ArrayList();
         //declare DTO object
         Disposal dispose = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String disposalId = rs.getString("DISPOSAL_ID");
@@ -542,9 +519,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching All disposed Asset ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -560,18 +535,16 @@ public class UncapitaliseManager extends MagmaDBConnection {
                        " WHERE A.OLD_DEPT_ID = B.DEPT_ID AND A.OLD_BRANCH_ID = C.BRANCH_ID AND A.OLD_SECTION = D.SECTION_ID " +
                        " AND A.ASSET_ID = E.ASSET_ID " + query_;
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         ArrayList list = new ArrayList();
         //declare DTO object
         UncapitaliseTransfer transfer = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 int transferId = rs.getInt("TRANSFER_ID");
@@ -612,31 +585,25 @@ public class UncapitaliseManager extends MagmaDBConnection {
             System.out.println(
                     "INFO:Error fetching All transfered Asset by query ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
 
     public String getObjectName(String query) {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+      
         String result = "";
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+           ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 result = rs.getString(1);
             }
         } catch (Exception ex) {
             System.out.println("Error executing SQL Code ->\n" + query + "\n" +
                                ex);
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return result;
     }
@@ -649,21 +616,19 @@ public class UncapitaliseManager extends MagmaDBConnection {
                        " A.USER_ID,A.EFFDATE,E.REGISTRATION_NO,E.CATEGORY_ID,E.CATEGORY_NAME,E.DESCRIPTION,E.COST_PRICE,E.DATE_PURCHASED " +
                        " FROM AM_ASSETTRANSFER A,AM_AD_BRANCH C,AM_AD_DEPARTMENT B,AM_AD_SECTION D,AM_ASSET_MAIN E" +
                        " WHERE A.OLD_DEPT_ID = B.DEPT_ID AND A.OLD_BRANCH_ID = C.BRANCH_ID AND A.OLD_SECTION = D.SECTION_ID " +
-                       " AND A.ASSET_ID = E.OLD_ASSET_ID AND A.ASSET_ID = '" + id +
-                       "'";
+                       " AND A.ASSET_ID = E.OLD_ASSET_ID AND A.ASSET_ID = ? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
 
         ArrayList list = new ArrayList();
         //declare DTO object
         UncapitaliseTransfer transfer = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 int transferId = rs.getInt("TRANSFER_ID");
@@ -703,9 +668,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
             System.out.println(
                     "INFO:Error fetching All transfered Asset in getTransferedAsset by ID ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return transfer;
     }
@@ -756,11 +719,10 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              "OLD_SECTION,NEW_SECTION,RAISE_ENTRY,TRANSFER_DATE,USER_ID,EFFDATE," +
                              "OLD_BRANCH_CODE,OLD_SECTION_CODE,OLD_DEPT_CODE,NEW_BRANCH_CODE" +
                  ",NEW_SECTION_CODE,NEW_DEPT_CODE,TRANSFER_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        Connection con = null;
-        PreparedStatement ps = null;   
+        
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(insertQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
             ps.setInt(3, newDept);
@@ -799,9 +761,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return i;
     }
 
@@ -826,11 +787,10 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              "NEW_CAT_CODE,NEW_WHO_TO_REM,NEW_EMAIL1,NEW_WHO_TO_REM2,NEW_EMAIL2,Approval_Status," +
                              "old_who_to_rem,old_email1,old_who_to_rem2,old_email2)" +
                              " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(insertQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
             ps.setInt(3, newDept);
@@ -881,9 +841,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return i;
     }
 
@@ -898,20 +856,17 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              whoToRem2 + "',EMAIL2 = '" + email2 +
                              "' WHERE ASSET_ID = '" + assetId + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(updateQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(updateQuery);
             i = ps.executeUpdate();
         } catch (Exception e) {
             String warning = "WARNING:Error updating Asset Transfer ->" +
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return i;
     }
 
@@ -922,18 +877,15 @@ public class UncapitaliseManager extends MagmaDBConnection {
     }
 
     private void excuteSQLCode(String sqlCode) {
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(sqlCode);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(sqlCode);
             ps.execute();
         } catch (Exception ex) {
             System.out.println("Error executing SQL Code ->\n" + sqlCode + "\n" +
                                ex);
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
 
     }
 
@@ -955,13 +907,11 @@ public class UncapitaliseManager extends MagmaDBConnection {
         String updateQuery = "UPDATE AM_ASSETREVALUE SET USER_ID = ?," +
                              "REVALUE_REASON = ?, R_VENDOR_AC = ? WHERE ASSET_ID = ?";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
 
         try {
-            con = getConnection("legendPlus");
-
-            ps = con.prepareStatement(updateQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(updateQuery);
             ps.setInt(1, userId);
             ps.setString(2, reason);
             ps.setString(3, vendorAcct);
@@ -975,9 +925,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return i;
     }
 
@@ -989,20 +937,19 @@ public class UncapitaliseManager extends MagmaDBConnection {
                 "USER_ID,RAISE_ENTRY,R_VENDOR_AC,COST_PRICE,VATABLE_COST,VAT_AMOUNT," +
                 "WHT_AMOUNT,NBV,ACCUM_DEP,OLD_COST_PRICE,OLD_VATABLE_COST,OLD_VAT_AMOUNT," +
                 "OLD_WHT_AMOUNT,OLD_NBV,OLD_ACCUM_DEP,EFFDATE FROM AM_ASSETREVALUE " +
-                "WHERE ASSET_ID = '" + id + "'";
+                "WHERE ASSET_ID = ? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         ArrayList list = new ArrayList();
         //declare DTO object
         Revaluation revalue = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 int revalueId = rs.getInt("REVALUE_ID");
@@ -1041,9 +988,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching Revalued Asset by ID ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return revalue;
     }
@@ -1059,18 +1004,16 @@ public class UncapitaliseManager extends MagmaDBConnection {
                        " FROM AM_ASSETREVALUE A,AM_ASSET_MAIN B " +
                        " WHERE A.ASSET_ID = B.ASSET_ID " + query_;
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         ArrayList list = new ArrayList();
         //declare DTO object
         Revaluation revalue = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 int revalueId = rs.getInt("REVALUE_ID");
@@ -1120,9 +1063,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching Revalued Asset by Query ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -1135,9 +1076,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                                  String policeDate, String insuranceCompany,
                                  String insuranceDate, String effDate,
                                  int userId, String raiseEntry, String status) {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         CurrentDateTime cdt = new CurrentDateTime();
         int i = 0;
 
@@ -1152,8 +1091,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
 
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(insertQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setDate(2, dateConvert(stolenDate));
             ps.setString(3, location);
@@ -1186,9 +1125,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error Inserting Stolen Asset ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
+        
         return i;
     }
 
@@ -1217,11 +1155,10 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              " INSURANCE_COMPANY = ?,INSURANCE_NOTICE_DATE = ?,EFFECTIVE_DATE = ?,USER_ID = ?,RAISE_ENTRY = ?," +
                              " RECOVER_DATE = ?, RECOVER_LOCATION = ?, RECOVER_BY = ?,STATUS = ? WHERE ASSET_ID = ?";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(updateQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(updateQuery);
 
             ps.setDate(1, dateConvert(stolenDate));
             ps.setString(2, location);
@@ -1257,9 +1194,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return i;
     }
 
@@ -1269,19 +1205,17 @@ public class UncapitaliseManager extends MagmaDBConnection {
                 "SELECT STOLEN_ID,ASSET_ID,STOLEN_DATE,LOCATION,DETAILS,POLICE_STATION," +
                 "POLICE_NOTICE_DATE,INSURANCE_COMPANY,INSURANCE_NOTICE_DATE,EFFECTIVE_DATE,USER_ID,RAISE_ENTRY," +
                 "RECOVER_DATE,RECOVER_LOCATION,RECOVER_BY,STATUS " +
-                "FROM AM_ASSETSTOLEN WHERE ASSET_ID = '" + id + "'";
+                "FROM AM_ASSETSTOLEN WHERE ASSET_ID = ? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
+       
         //declare DTO object
         Stolen stolen = null;
         //DataConnect connect = new DataConnect();
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String stolenId = rs.getString("STOLEN_ID");
@@ -1314,9 +1248,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching Stolen Asset by ID->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return stolen;
     }
@@ -1330,18 +1262,16 @@ public class UncapitaliseManager extends MagmaDBConnection {
                        "FROM AM_ASSETSTOLEN A,AM_ASSET_MAIN B WHERE A.ASSET_ID = B.ASSET_ID " +
                        query_;
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         ArrayList list = new ArrayList();
         //declare DTO object
         Stolen stolen = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 String stolenId = rs.getString("STOLEN_ID");
@@ -1386,9 +1316,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching All Stolen Asset ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -1406,11 +1334,10 @@ public class UncapitaliseManager extends MagmaDBConnection {
         String UPDATE_QUERY =
                 "UPDATE AM_ASSET SET ASSET_STATUS = ? WHERE ASSET_ID = ?";
         String status = "ACTIVE";
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(UPDATE_QUERY);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(UPDATE_QUERY);
 
             ps.setString(1, status);
             ps.setString(2, tranId);
@@ -1420,9 +1347,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
             String warning = "WARNING:Error Reover Stolen Asset " +
                              " ->" + e.getMessage();
             System.out.println(warning);
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
 
     }
 //  get dep. adjusted asset by ID
@@ -1431,12 +1356,10 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
      String query = "SELECT ID,ASSET_ID,ACCUM_DEP,NEW_ACCUM_DEP,NBV,NEW_NBV,REASON,ADJUST_DATE,"+
                       "USER_ID,RAISE_ENTRY,EFFDATE FROM AM_ASSET_DEP_ADJUSTMENT "+
-                      "WHERE ASSET_ID = '"+id+"'";
+                      "WHERE ASSET_ID = ? ";
 
 
-       Connection con = null;
-       PreparedStatement ps = null;
-       ResultSet rs = null;
+      
 
        ArrayList list = new ArrayList();
        //declare DTO object
@@ -1444,9 +1367,10 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
        try
        {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(query);
-        rs = ps.executeQuery();
+    	   Connection con = dbConnection.getConnection("legendPlus");
+           PreparedStatement ps = con.prepareStatement(query);
+           ps.setString(1, id);
+        ResultSet rs = ps.executeQuery();
 
         while (rs.next())
         {
@@ -1470,9 +1394,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         }catch (Exception e) {
               System.out.println("INFO:Error fetching Depreciation Adjustment Asset by ID ->" +
                                  e.getMessage());
-         } finally {
-              closeConnection(con, ps, rs);
-         }
+         } 
 
          return adjust;
       }
@@ -1557,14 +1479,12 @@ public class UncapitaliseManager extends MagmaDBConnection {
   		String updateQuery = "UPDATE AM_ASSET_DEP_ADJUSTMENT SET USER_ID = ?,"+
   			"REASON = ? WHERE ASSET_ID = ?";
 
-  		Connection con = null;
-  		PreparedStatement ps = null;
+  		
 
   		try
   		{
-  		 con = getConnection("legendPlus");
-
-  		 ps = con.prepareStatement(updateQuery);
+  			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(updateQuery);
   		 ps.setInt(1,userId);
   		 ps.setString(2,reason);
        ps.setString(3,assetId);
@@ -1581,10 +1501,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
   		 System.out.println(warning);
   		 e.printStackTrace();
   		}
-  		finally
-  		{
-  		 closeConnection(con, ps);
-  		}
+  		
+  		
   		return result;
   	}
 
@@ -1598,17 +1516,14 @@ public class UncapitaliseManager extends MagmaDBConnection {
   		String insertQuery = "INSERT INTO AM_ASSET_DEP_ADJUSTMENT(ASSET_ID,ACCUM_DEP,NEW_ACCUM_DEP,NBV,NEW_NBV,REASON,"+
   			                   "ADJUST_DATE,EFFDATE,USER_ID,RAISE_ENTRY,ID) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
-  		Connection con = null;
-  		PreparedStatement ps = null;
+  		
       boolean result = false;
       //boolean autoCommit = false;
 
   		try
   		{
-  		 con = getConnection("legendPlus");
-       //autoCommit = con.getAutoCommit();
-      // con.setAutoCommit(false);
-  		 ps = con.prepareStatement(insertQuery);
+  			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(insertQuery);
   		 ps.setString(1,assetId);
   		 ps.setDouble(2,accumDep);
        ps.setDouble(3,newAccumDep);
@@ -1649,10 +1564,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
   		 System.out.println(warning);
   		 e.printStackTrace();
   		}
-  		finally
-  		{
-  		 closeConnection(con, ps);
-  		}
+  		
 
   		return result;
   	}
@@ -1667,9 +1579,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                         " FROM AM_ASSET_DEP_ADJUSTMENT A,AM_ASSET_MAIN B "+
                         " WHERE A.ASSET_ID = B.ASSET_ID "+query_;
 
-         Connection con = null;
-         PreparedStatement ps = null;
-         ResultSet rs = null;
+        
 
          ArrayList list = new ArrayList();
          //declare DTO object
@@ -1677,9 +1587,9 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
          try
          {
-          con = getConnection("legendPlus");
-          ps = con.prepareStatement(query);
-          rs = ps.executeQuery();
+        	 Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
+          ResultSet rs = ps.executeQuery();
 
           while (rs.next())
           {
@@ -1713,9 +1623,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
           }catch (Exception e) {
                 System.out.println("INFO:Error fetching Depr. Adjustment Asset by Query ->" +
                                    e.getMessage());
-           } finally {
-                closeConnection(con, ps, rs);
-           }
+           } 
 
            return list;
         }
@@ -1746,13 +1654,11 @@ public class UncapitaliseManager extends MagmaDBConnection {
   "OLD_COST_PRICE,OLD_VATABLE_COST,OLD_VAT_AMOUNT,OLD_WHT_AMOUNT,OLD_NBV,OLD_ACCUM_DEP,EFFDATE,REVALUE_ID)" +
   " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-  Connection con = null;
-  PreparedStatement ps = null;
+ 
 
   try {
-  con = getConnection("legendPlus");
-
-  ps = con.prepareStatement(insertQuery);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps = con.prepareStatement(insertQuery);
   ps.setString(1, assetId);
   ps.setDouble(2, costIncrease);
   ps.setString(3, revalueReason);
@@ -1794,9 +1700,8 @@ public class UncapitaliseManager extends MagmaDBConnection {
          e.getMessage();
   System.out.println(warning);
   e.printStackTrace();
-  } finally {
-  closeConnection(con, ps);
-  }
+  } 
+  
   return i;
   }
 
@@ -1810,18 +1715,15 @@ public class UncapitaliseManager extends MagmaDBConnection {
                          " FROM am_asset_improvement A,AM_ASSET_MAIN B " +
                          " WHERE A.ASSET_ID = B.ASSET_ID " + query_;
 
-          Connection con = null;
-          PreparedStatement ps = null;
-          ResultSet rs = null;
-
+         
           ArrayList list = new ArrayList();
           //declare DTO object
           Revaluation revalue = null;
 
           try {
-              con = getConnection("legendPlus");
-              ps = con.prepareStatement(query);
-              rs = ps.executeQuery();
+        	  Connection con = dbConnection.getConnection("legendPlus");
+              PreparedStatement ps = con.prepareStatement(query);
+              ResultSet rs = ps.executeQuery();
 
               while (rs.next()) {
                   int revalueId = rs.getInt("REVALUE_ID");
@@ -1871,9 +1773,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
           } catch (Exception e) {
               System.out.println("INFO:Error fetching am_asset_improvement Asset by Query ->" +
                                  e.getMessage());
-          } finally {
-              closeConnection(con, ps, rs);
-          }
+          } 
 
           return list;
       }
@@ -1894,13 +1794,11 @@ int i = 0;
 String updateQuery = "UPDATE am_asset_improvement SET USER_ID = ?," +
          "REVALUE_REASON = ?, R_VENDOR_AC = ? WHERE ASSET_ID = ?";
 
-Connection con = null;
-PreparedStatement ps = null;
+
 
 try {
-con = getConnection("legendPlus");
-
-ps = con.prepareStatement(updateQuery);
+	Connection con = dbConnection.getConnection("legendPlus");
+    PreparedStatement ps = con.prepareStatement(updateQuery);
 ps.setInt(1, userId);
 ps.setString(2, reason);
 ps.setString(3, vendorAcct);
@@ -1914,9 +1812,7 @@ String warning = "WARNING:Error updating Asset am_asset_improvement ->" +
          e.getMessage();
 System.out.println(warning);
 e.printStackTrace();
-} finally {
-closeConnection(con, ps);
-}
+} 
 return i;
 }
       //get Maintenance asset by ID
@@ -1927,20 +1823,19 @@ return i;
                   "USER_ID,RAISE_ENTRY,R_VENDOR_AC,COST_PRICE,VATABLE_COST,VAT_AMOUNT," +
                   "WHT_AMOUNT,NBV,ACCUM_DEP,OLD_COST_PRICE,OLD_VATABLE_COST,OLD_VAT_AMOUNT," +
                   "OLD_WHT_AMOUNT,OLD_NBV,OLD_ACCUM_DEP,EFFDATE FROM am_Uncapitalized_improvement " +
-                  "WHERE ASSET_ID = '" + id + "'";
+                  "WHERE ASSET_ID = ? ";
 
-          Connection con = null;
-          PreparedStatement ps = null;
-          ResultSet rs = null;
+         
 
           ArrayList list = new ArrayList();
           //declare DTO object
           Revaluation revalue = null;
 
           try {
-              con = getConnection("legendPlus");
-              ps = con.prepareStatement(query);
-              rs = ps.executeQuery();
+        	  Connection con = dbConnection.getConnection("legendPlus");
+              PreparedStatement ps = con.prepareStatement(query);
+              ps.setString(1, id);
+              ResultSet rs = ps.executeQuery();
 
               while (rs.next()) {
                   int revalueId = rs.getInt("REVALUE_ID");
@@ -1980,9 +1875,7 @@ return i;
           } catch (Exception e) {
               System.out.println("INFO:Error fetching am_asset_improvement Asset by ID ->" +
                                  e.getMessage());
-          } finally {
-              closeConnection(con, ps, rs);
-          }
+          } 
 
           return revalue;
       }
@@ -2014,15 +1907,11 @@ public void updateAssetRevalue(String id){
        " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         */
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         try {
-            con = getConnection("legendPlus");
-
-
-            ps = con.prepareStatement(query1);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query1);
+            ResultSet  rs = ps.executeQuery();
 
             while (rs.next()) {
            cost_price= rs.getDouble(1);
@@ -2095,9 +1984,7 @@ public void updateAssetRevalue(String id){
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps,rs);
-        }
+        } 
 
 
 
@@ -2177,15 +2064,11 @@ public void updateAssetTransfer(String id){
 String updateQuery="update am_asset  set DEPT_ID=?, BRANCH_ID=?, section_id=?, asset_user=?, "+
         "BRANCH_CODE=?, DEPT_CODE=?, SECTION_CODE=? where asset_id ='"+id+"'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         try {
-            con = getConnection("legendPlus");
-
-
-            ps = con.prepareStatement(query1);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query1);
+            ResultSet  rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -2277,9 +2160,7 @@ String updateQuery="update am_asset  set DEPT_ID=?, BRANCH_ID=?, section_id=?, a
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps,rs);
-        }
+        } 
 
 
 
@@ -2307,15 +2188,11 @@ public void updateAssetDepreciation(String id){
         String query1= "select new_accum_dep,new_nbv from AM_ASSET_DEP_ADJUSTMENT where asset_id = '"+id+"'";
 
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         try {
-            con = getConnection("legendPlus");
-
-
-            ps = con.prepareStatement(query1);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query1);
+             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
            accum_dep= rs.getDouble(1);
@@ -2341,9 +2218,7 @@ public void updateAssetDepreciation(String id){
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps,rs);
-        }
+        } 
 }
 
     public void updateWIPReclassification(String id)
@@ -2376,14 +2251,12 @@ public void updateAssetDepreciation(String id){
                 //"WHO_TO_REM=?,EMAIL1=?,WHO_TO_REM_2=?,EMAIL2=?" +
                 " where asset_id ='" + id + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         try
         {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query1);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query1);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -2444,10 +2317,7 @@ public void updateAssetDepreciation(String id){
             System.out.println(warning);
             e.printStackTrace();
         }
-        finally
-        {
-            closeConnection(con, ps, rs);
-        }
+        
     }
 
      public void updateWIPReclassification(String id,String otherID)
@@ -2481,14 +2351,12 @@ public void updateAssetDepreciation(String id){
                " where asset_id ='" + otherID + "'";
                // " where asset_id ='" + id + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         try
         {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query1);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query1);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -2549,10 +2417,7 @@ public void updateAssetDepreciation(String id){
             System.out.println(warning);
             e.printStackTrace();
         }
-        finally
-        {
-            closeConnection(con, ps, rs);
-        }
+       
     }
 
 public void updateAssetMaintenance(String id){
@@ -2586,15 +2451,11 @@ public void updateAssetMaintenance(String id){
        " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         */
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         try {
-            con = getConnection("legendPlus");
-
-
-            ps = con.prepareStatement(query1);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query1);
+             ResultSet  rs = ps.executeQuery();
 
             while (rs.next()) {
            cost_price= rs.getDouble(1);
@@ -2667,9 +2528,7 @@ public void updateAssetMaintenance(String id){
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps,rs);
-        }
+        } 
 
 
 
@@ -2694,15 +2553,11 @@ public int[] getUsedSupervisors(int tranid){
         String query1= "select user_id,approval1,approval2,approval3,approval4,approval5 from am_asset_approval where transaction_id = "+tranid;
 
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         try {
-            con = getConnection("legendPlus");
-
-
-            ps = con.prepareStatement(query1);
-              rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query1);
+             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
 
@@ -2729,9 +2584,8 @@ public int[] getUsedSupervisors(int tranid){
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps,rs);
-        }
+        } 
+        
   return supervisors;
 }
 
@@ -2930,11 +2784,10 @@ public int[] getUsedSupervisors(int tranid){
                              "OLD_SECTION,NEW_SECTION,RAISE_ENTRY,TRANSFER_DATE,USER_ID,EFFDATE," +
                              "OLD_BRANCH_CODE,OLD_SECTION_CODE,OLD_DEPT_CODE,NEW_BRANCH_CODE" +
                  ",NEW_SECTION_CODE,NEW_DEPT_CODE,TRANSFER_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        Connection con = null;
-        PreparedStatement ps = null;
+      
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(insertQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
             ps.setInt(3, newDept);
@@ -2973,9 +2826,8 @@ public int[] getUsedSupervisors(int tranid){
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return i;
     }
 
@@ -3033,11 +2885,10 @@ public int[] getUsedSupervisors(int tranid){
                              "NEW_CAT_CODE,NEW_WHO_TO_REM,NEW_EMAIL1,NEW_WHO_TO_REM2,NEW_EMAIL2,Approval_Status," +
                              "old_who_to_rem,old_email1,old_who_to_rem2,old_email2)" +
                              " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        Connection con = null;
-        PreparedStatement ps = null;
+      
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(insertQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
             ps.setInt(3, newDept);
@@ -3087,9 +2938,8 @@ public int[] getUsedSupervisors(int tranid){
                              e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return i;
     }
 
@@ -3104,17 +2954,14 @@ public int[] getUsedSupervisors(int tranid){
   		String insertQuery = "INSERT INTO AM_ASSET_DEP_ADJUSTMENT(ASSET_ID,ACCUM_DEP,NEW_ACCUM_DEP,NBV,NEW_NBV,REASON,"+
   			                   "ADJUST_DATE,EFFDATE,USER_ID,RAISE_ENTRY,ID) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
-  		Connection con = null;
-  		PreparedStatement ps = null;
+  		
       boolean result = false;
       //boolean autoCommit = false;
 
   		try
   		{
-  		 con = getConnection("legendPlus");
-       //autoCommit = con.getAutoCommit();
-      // con.setAutoCommit(false);
-  		 ps = con.prepareStatement(insertQuery);
+  			Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(insertQuery);
   		 ps.setString(1,assetId);
   		 ps.setDouble(2,accumDep);
        ps.setDouble(3,newAccumDep);
@@ -3155,10 +3002,7 @@ public int[] getUsedSupervisors(int tranid){
   		 System.out.println(warning);
   		 e.printStackTrace();
   		}
-  		finally
-  		{
-  		 closeConnection(con, ps);
-  		}
+  		
 
   		return result;
   	}
@@ -3188,13 +3032,10 @@ public int[] getUsedSupervisors(int tranid){
   "OLD_COST_PRICE,OLD_VATABLE_COST,OLD_VAT_AMOUNT,OLD_WHT_AMOUNT,OLD_NBV,OLD_ACCUM_DEP,EFFDATE,REVALUE_ID)" +
   " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-  Connection con = null;
-  PreparedStatement ps = null;
-
+ 
   try {
-  con = getConnection("legendPlus");
-
-  ps = con.prepareStatement(insertQuery);
+	  Connection con = dbConnection.getConnection("legendPlus");
+      PreparedStatement ps = con.prepareStatement(insertQuery);
   ps.setString(1, assetId);
   ps.setDouble(2, costIncrease);
   ps.setString(3, revalueReason);
@@ -3236,9 +3077,7 @@ public int[] getUsedSupervisors(int tranid){
          e.getMessage();
   System.out.println(warning);
   e.printStackTrace();
-  } finally {
-  closeConnection(con, ps);
-  }
+  } 
   return i;
   }
 
@@ -3251,20 +3090,19 @@ public int[] getUsedSupervisors(int tranid){
                        " A.USER_ID,A.EFFDATE,E.REGISTRATION_NO,E.CATEGORY_ID,E.DESCRIPTION,E.COST_PRICE,E.DATE_PURCHASED " +
                        " FROM am_UncapitalizedTransfer A,AM_AD_BRANCH C,AM_AD_DEPARTMENT B,AM_ASSET_UNCAPITALIZED E, AM_AD_SECTION D" +
                        " WHERE A.OLD_DEPT_ID = B.DEPT_ID AND A.OLD_BRANCH_ID = C.BRANCH_ID AND A.OLD_SECTION = D.SECTION_ID" +
-                       " AND A.ASSET_ID = E.ASSET_ID AND A.ASSET_ID = '" + id + "'";
+                       " AND A.ASSET_ID = E.ASSET_ID AND A.ASSET_ID = ? ";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         ArrayList list = new ArrayList();
         //declare DTO object
         UncapitaliseTransfer transfer = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -3312,9 +3150,7 @@ public int[] getUsedSupervisors(int tranid){
             System.out.println(
                     "INFO:Error fetching All transfered Asset in getTransferedAsset2 by ID ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return transfer;
     }
@@ -3329,22 +3165,21 @@ public int[] getUsedSupervisors(int tranid){
                 "E.COST_PRICE,E.DATE_PURCHASED,A.NEW_WHO_TO_REM,A.NEW_EMAIL1,A.NEW_WHO_TO_REM2,A.NEW_EMAIL2,A.NEW_ASSET_USER" +
                 " FROM AM_WIP_RECLASSIFICATION A,AM_AD_BRANCH C,AM_AD_DEPARTMENT B,AM_ASSET_MAIN E," +
                 " AM_AD_SECTION D WHERE A.OLD_DEPT_ID = B.DEPT_ID AND A.OLD_BRANCH_ID = C.BRANCH_ID AND " +
-                "A.OLD_SECTION = D.SECTION_ID AND A.ASSET_ID = E.ASSET_ID AND A.ASSET_ID = '" + id + "'";
+                "A.OLD_SECTION = D.SECTION_ID AND A.ASSET_ID = E.ASSET_ID AND A.ASSET_ID = ? ";
 
         System.out.println("query >>>> " + query);
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         ArrayList list = new ArrayList();
         //declare DTO object
        Transfer transfer = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -3395,9 +3230,7 @@ public int[] getUsedSupervisors(int tranid){
             System.out.println(
                     "INFO:Error fetching All transfered Asset in getWIPReclassificationAsset by ID ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return transfer;
     }
@@ -3413,22 +3246,20 @@ public int[] getUsedSupervisors(int tranid){
                 "E.COST_PRICE,E.DATE_PURCHASED,A.NEW_WHO_TO_REM,A.NEW_EMAIL1,A.NEW_WHO_TO_REM2,A.NEW_EMAIL2,A.NEW_ASSET_USER" +
                 " FROM AM_WIP_RECLASSIFICATION A,AM_AD_BRANCH C,AM_AD_DEPARTMENT B,AM_ASSET_MAIN E," +
                 " AM_AD_SECTION D WHERE A.OLD_DEPT_ID = B.DEPT_ID AND A.OLD_BRANCH_ID = C.BRANCH_ID AND " +
-                "A.OLD_SECTION = D.SECTION_ID AND A.ASSET_ID = E.OLD_ASSET_ID AND A.ASSET_ID = '" + id + "'";
+                "A.OLD_SECTION = D.SECTION_ID AND A.ASSET_ID = E.OLD_ASSET_ID AND A.ASSET_ID = ? ";
 
         System.out.println("query >>>> " + query);
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
+       
         ArrayList list = new ArrayList();
         //declare DTO object
        Transfer transfer = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -3479,9 +3310,7 @@ public int[] getUsedSupervisors(int tranid){
             System.out.println(
                     "INFO:Error fetching All transfered Asset in getWIPReclassificationAsset2 by ID ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return transfer;
     }
@@ -3491,17 +3320,16 @@ public int[] getUsedSupervisors(int tranid){
      int new_section=0;
 
     String query = " SELECT old_section, new_section from AM_ASSETTRANSFER " +
-                       " WHERE asset_id = '"+assetID+"'";
+                       " WHERE asset_id = ? ";
 
     //String updateQuery ="update am_assettransfer set old_section =? where asset_id ='"+assetID+"'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
               try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+            	  Connection con = dbConnection.getConnection("legendPlus");
+                  PreparedStatement ps = con.prepareStatement(query);
+                  ps.setString(1, assetID);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                old_section = rs.getInt("old_section");
@@ -3523,9 +3351,7 @@ public int[] getUsedSupervisors(int tranid){
             System.out.println(
                     "AssetManager: getSectionCodeInfo(int assetID):INFO:Error checking value of old section ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
     }//public int getSectionCodeInfo(int assetID)
 
@@ -3549,18 +3375,16 @@ public int[] getUsedSupervisors(int tranid){
                        " AND A.ASSET_ID = E.OLD_ASSET_ID " + query_;
        // System.out.println("query >>>>>> " + query);
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
 
         ArrayList list = new ArrayList();
         //declare DTO object
         Transfer transfer = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+           ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -3611,9 +3435,7 @@ public int[] getUsedSupervisors(int tranid){
             System.out.println(
                     "INFO:Error fetching All transfered Asset by query ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -3638,18 +3460,16 @@ public ArrayList getTransferedAssetList3(String query_) {
                        " AND A.ASSET_ID = E.OLD_ASSET_ID " + query_;
         System.out.println("query >>>>>> " + query);
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+      
 
         ArrayList list = new ArrayList();
         //declare DTO object
         Transfer transfer = null;
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next())
             {
@@ -3700,9 +3520,7 @@ public ArrayList getTransferedAssetList3(String query_) {
             System.out.println(
                     "INFO:Error fetching All transfered Asset by query ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
     }
@@ -3712,22 +3530,21 @@ public ArrayList getTransferedAssetList3(String query_) {
         //String result = new String();
         String old_asset_id="";
 
-        String oldAssetQuery ="select old_asset_id from am_asset where asset_id='"+newAssetID+"'";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        String oldAssetQuery ="select old_asset_id from am_asset where asset_id=?";
+       
 
         //ArrayList list = new ArrayList();
 
 
         try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(oldAssetQuery);
+        	Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(oldAssetQuery);
+            ps.setString(1, newAssetID);
             //rs = ps.executeQuery();
 
 
 
-            rs=ps.executeQuery();
+            ResultSet rs=ps.executeQuery();
 
              while (rs.next()) {
                old_asset_id = rs.getString("old_asset_id");
@@ -3742,9 +3559,7 @@ public ArrayList getTransferedAssetList3(String query_) {
             System.out.println(
                     "AssetManager class: getTransferedOldAssetDetails() method: Error fetching All transfered Asset by query ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return old_asset_id;
     }
@@ -3756,9 +3571,7 @@ public ArrayList getTransferedAssetList3(String query_) {
         String[] result = new String[4];
         //String old_asset_id="";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
         //ArrayList list = new ArrayList();
 
@@ -3766,11 +3579,12 @@ public ArrayList getTransferedAssetList3(String query_) {
         try {
            //String query = "select old_branch_id, dept_id, section_id, asset_user from am_asset where asset_id ='"+old_asset_id+"'";
             String query = "select old_branch_id, old_dept_id, old_section, old_asset_user " +
-                    "from am_assettransfer where asset_id ='"+old_asset_id+"'";
+                    "from am_assettransfer where asset_id = ? ";
  //          System.out.println("the query @@@@@@@@@@@@@@@@@@@ "+query );
-           con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+            Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.setString(1, old_asset_id);
+            ResultSet rs = ps.executeQuery();
 
 
 
@@ -3796,9 +3610,7 @@ public ArrayList getTransferedAssetList3(String query_) {
             System.out.println(
                     "AssetManager class: getTransferedOldAssetID() method: Error fetching All transfered Asset by query ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return result;
     }
@@ -3809,10 +3621,7 @@ public ArrayList getTransferedAssetList3(String query_) {
         String[] result = new String[4];
         //String old_asset_id="";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
+       
         //ArrayList list = new ArrayList();
 
 
@@ -3821,9 +3630,10 @@ public ArrayList getTransferedAssetList3(String query_) {
            String query = "select old_branch_id, old_dept_id, old_section, old_asset_user " +
                     "from am_wip_reclassification where asset_id ='"+old_asset_id+"'";
            System.out.println("the query >>>> "+query );
-           con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+           Connection con = dbConnection.getConnection("legendPlus");
+           PreparedStatement ps = con.prepareStatement(query);
+           ps.setString(1, old_asset_id);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 result[0] = Integer.toString(rs.getInt("old_branch_id"));
@@ -3843,9 +3653,7 @@ public ArrayList getTransferedAssetList3(String query_) {
                     "AssetManager class: getWIPTransferedOldAssetID() method: " +
                     "Error fetching All transfered Asset by query ->" +
                     e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return result;
     }
