@@ -41,7 +41,7 @@ public class CompanyHandler {
 				company.setPasswordExpiry(rs.getInt("Psw_Expiry"));
 				company.setSessionTimeout(rs.getInt("Session_Timeout"));
 				company.setUserId(rs.getString("User_Id"));
-				company.setTransWaitTime(rs.getDouble("Trans_Wait_Time"));
+				company.setTransWaitTime(rs.getDouble("Trans_Wait_Time"));     
 				company.setLogUserAudit(rs.getString("loguseraudit"));
 				company.setPassword_upper(rs.getString("Psw_upper"));
 				company.setPassword_lower(rs.getString("Psw_lower"));
