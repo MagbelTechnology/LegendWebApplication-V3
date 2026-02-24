@@ -1384,7 +1384,7 @@ public boolean logAuditTrailOld(String TableName,  String BranchCode,  int Login
 	//updateAuditLog  IN  parameters  are  actPerf,  branchcode,  description
     { 
 	   try {
-			con = connect();  	int loginId = 0;
+		   Connection con = dbConnection.getConnection("legendPlus");  	int loginId = 0;
 			String branchcode,   auditindex; 
             branchcode = BranchCode.trim(); loginId = LoginId;
 			Iterator it = this.getContainer().values().iterator();
@@ -1473,7 +1473,7 @@ String insertSQL = "INSERT INTO AM_AD_UPDATE_AUDIT("
 + "LOGIN_ID, BRANCH_CODE, DATE, ACT_PERFMD, MACHINE_NAME, IP_ADDRESS, MAC_ADDRESS) "
 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-try (Connection con = connect()) {
+try (Connection con = dbConnection.getConnection("legendPlus")) {
 
 Iterator<Field> it = this.getContainer().values().iterator();
 
@@ -1519,7 +1519,7 @@ public boolean logAuditTrailActionPerformedOld(String TableName,  String BranchC
 	   DatetimeFormat df = new DatetimeFormat();
 
 	   try {
-			con = connect();  	int loginId = 0;
+		   Connection con = dbConnection.getConnection("legendPlus");  	int loginId = 0;
 			String branchcode,   auditindex;
             branchcode = BranchCode; loginId = LoginId;
 			Iterator it = this.getContainer().values().iterator();                                     // setCheckedChanges(true);
@@ -1602,7 +1602,7 @@ String insertSQL = "INSERT INTO AM_AD_UPDATE_AUDIT("
 + "EFF_DATE, LOGIN_ID, BRANCH_CODE, DATE, ACT_PERFMD) "
 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-try (Connection con = connect()) {
+try (Connection con = dbConnection.getConnection("legendPlus")) {
 
 Iterator<Field> it = this.getContainer().values().iterator();
 

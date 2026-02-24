@@ -11,7 +11,7 @@ public class HtmlUtilily {
     public HtmlUtilily() {
     }
 
-    private Connection getConnection() throws SQLException {
+    private Connection getConnection() throws Exception {
         return new DataConnect("ias").getConnection();
     }
 

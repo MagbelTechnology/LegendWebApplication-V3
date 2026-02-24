@@ -1,6 +1,7 @@
 package legend.admin.handlers;
 
 import audit.AuditTrailGen;
+import jakarta.annotation.Priority;
 
 import com.magbel.legend.vao.PasswordHistory;
 import com.magbel.util.ApplicationHelper;
@@ -90,6 +91,7 @@ public class SecurityHandler
         df = new DatetimeFormat();
         tok = new TokenClass();
         records = new ApprovalRecords();
+        dbConnection = new MagmaDBConnection();
     //    System.out.println((new StringBuilder()).append("USING_ ").append(getClass().getName()).toString());
     }
 
@@ -2364,16 +2366,14 @@ public class SecurityHandler
 
     public boolean updateExpiryDate(int user_id)
     {
-        Connection con;
-        PreparedStatement ps;
+        
         boolean done;
-        con = null;
-        ps = null;
+       
         done = false;
         try {
         String query = "update am_gb_user set expiry_date = null where user_id = ?";
-        con = getConnection();
-        ps = con.prepareStatement(query);
+        Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
         ps.setInt(1, user_id);
         done = ps.executeUpdate() != -1;
 //        closeConnection(con, ps);
@@ -2381,9 +2381,7 @@ public class SecurityHandler
         catch (Exception e) {
             System.out.println("WARNING:Error updateExpiryDate() Query ->"
                     + e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return done;
     }
 
@@ -2897,20 +2895,16 @@ public class SecurityHandler
 
     public String getUserLogonStatus(String userName)
     {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet res;
+       
         String result;
-        con = null;
-        ps = null;
-        res = null;
+        
         result = null;
         try {
-        con = getConnection();
+       Connection con = getConnection();
         String query = "select Login_Status from am_gb_User where user_name = ?";
-        ps = con.prepareStatement("select Login_Status from am_gb_User where user_name = ?");
+        PreparedStatement ps = con.prepareStatement("select Login_Status from am_gb_User where user_name = ?");
         ps.setString(1, userName);
-        res = ps.executeQuery();
+        ResultSet res = ps.executeQuery();
         if(res.next())
         {
             result = res.getString("Login_Status");
@@ -2918,9 +2912,7 @@ public class SecurityHandler
         }
         catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            closeConnection(con, ps, res);
-        }
+        } 
         return result;
     }
 
@@ -3048,9 +3040,7 @@ public class SecurityHandler
         java.util.ArrayList _list = new java.util.ArrayList();
         legend.admin.objects.User user = null;
         String query;
-        Connection c;
-        ResultSet rs;
-        Statement s;
+       
         _list = new ArrayList();
         query = "SELECT User_Id, lower(User_Name) User_Name, Full_Name, Legacy_Sys_Id, Class, Bra" +
 "nch, Password, Phone_No, is_Supervisor, Must_Change_Pwd, Login_Status, User_Stat" +
@@ -3060,13 +3050,11 @@ public class SecurityHandler
 ;
         query = (new StringBuilder()).append(query).append(filter).toString();
        System.out.println("query in getUserByQuery with Three Parameter: "+query);
-        c = null;
-        rs = null;
-        s = null;
+       
         try {
-        c = getConnection();
-        s = c.createStatement();
-        rs = s.executeQuery(query);
+        	Connection c = dbConnection.getConnection("legendPlus");
+            PreparedStatement s = c.prepareStatement(query);
+       ResultSet  rs = s.executeQuery();
         while (rs.next()) {
             String userId = rs.getString("User_Id");
             String userName = rs.getString("User_Name");
@@ -3153,9 +3141,7 @@ public class SecurityHandler
 //        closeConnection(c, s, rs);
     } catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, s, rs);
-    }
+    } 
     return _list;
 
 }
@@ -3913,19 +3899,18 @@ public class SecurityHandler
 
     }
 
-    public boolean updateManageUser2(User user, String limit)
+    public boolean updateManageUser2Old(User user, String limit)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         boolean done;
-        con = null;
-        ps = null;
+        
         done = false;
         String query = "";
         try {
         	System.out.println("=====>user.getExpiryDate(): "+user.getExpiryDate());
-        if(user.getExpiryDate() == "" || user.getExpiryDate().equalsIgnoreCase("null") || user.getExpiryDate().equalsIgnoreCase(""))
-        {
+        	String expiryDate = user.getExpiryDate();
+
+        	if (expiryDate == null || expiryDate.trim().isEmpty() || expiryDate.equalsIgnoreCase("null")) {
 /*             query = "UPDATE AM_GB_USER  SET  User_Name = ?, Full_Name = ? ,Legacy_Sys_Id = ?, Class =" +
 " ?, Branch = ?, Password = ?, Phone_No = ?,Is_Supervisor = ?,Must_Change_Pwd = ?" +
 ", Login_Status = ?, User_Status = ?, Fleet_Admin = ?, Email = ?,branch_restricti" +
@@ -3937,8 +3922,8 @@ public class SecurityHandler
 ", Login_Status = ?, User_Status = ?, Fleet_Admin = ?, Email = ?,branch_restricti" +
 "on =?, Expiry_Days =?,Approval_Limit = ? ,dept_code=?,token_required=?,region_code=?,zone_code=?,region_restriction=?,zone_restriction=?" +
 ",Facility_Admin = ?,Store_Admin = ?, Expiry_Date=? WHERE User_Id = ?";
-            con = getConnection();
-            ps = con.prepareStatement(query);
+            Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, user.getUserName());
             ps.setString(2, user.getUserFullName());
             ps.setString(3, user.getLegacySystemId());
@@ -3975,8 +3960,8 @@ public class SecurityHandler
 ", Login_Status = ?, User_Status = ?, Fleet_Admin = ?, Email = ?,branch_restricti" +
 "on =?, Expiry_Days =?, Approval_Limit = ? ,token_required=?,region_code=?,zone_code=?,region_restriction=?,zone_restriction=?" +
 ",Facility_Admin = ?,Store_Admin = ? ,dept_code=?, Expiry_Date=?  WHERE User_Id = ?";
-            con = getConnection();
-            ps = con.prepareStatement(query);
+             Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, user.getUserName());
             ps.setString(2, user.getUserFullName());
             ps.setString(3, user.getLegacySystemId());
@@ -4016,9 +4001,75 @@ public class SecurityHandler
         catch (Exception e) {
             System.out.println("WARNING:Error executing Query in updateManageUser2 ->"
                     + e.getMessage());
-        } finally {
-            closeConnection(con, ps);
+        } 
+        
+        return done;
+    }
+    
+    public boolean updateManageUser2(User user, String limit) {
+
+        boolean done = false;
+
+        String query =
+            "UPDATE AM_GB_USER SET " +
+            "User_Name = ?, Full_Name = ?, Legacy_Sys_Id = ?, Class = ?, " +
+            "Branch = ?, Phone_No = ?, Is_Supervisor = ?, Must_Change_Pwd = ?, " +
+            "Login_Status = ?, User_Status = ?, Fleet_Admin = ?, Email = ?, " +
+            "branch_restriction = ?, Expiry_Days = ?, Approval_Limit = ?, " +
+            "dept_code = ?, token_required = ?, region_code = ?, zone_code = ?, " +
+            "region_restriction = ?, zone_restriction = ?, " +
+            "Facility_Admin = ?, Store_Admin = ?, Expiry_Date = ? " +
+            "WHERE User_Id = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, user.getUserName());
+            ps.setString(2, user.getUserFullName());
+            ps.setString(3, user.getLegacySystemId());
+            ps.setString(4, user.getUserClass());
+            ps.setString(5, user.getBranch());
+            ps.setString(6, user.getPhoneNo());
+            ps.setString(7, user.getIsSupervisor());
+            ps.setString(8, user.getMustChangePwd());
+            ps.setString(9, user.getLoginStatus());
+            ps.setString(10, user.getUserStatus());
+            ps.setString(11, user.getFleetAdmin());
+            ps.setString(12, user.getEmail());
+            ps.setString(13, user.getBranchRestrict());
+            ps.setInt(14, user.getExpiryDays());
+            ps.setString(15, limit);
+            ps.setString(16, user.getDeptCode());
+            ps.setString(17, user.getTokenRequire());
+            ps.setString(18, user.getRegionCode());
+            ps.setString(19, user.getZoneCode());
+            ps.setString(20, user.getRegionRestrict());
+            ps.setString(21, user.getZoneRestrict());
+            ps.setString(22, user.getIsFacilityAdministrator());
+            ps.setString(23, user.getIsStoreAdministrator());
+
+            String expiryDate = user.getExpiryDate();
+            java.sql.Date sqlDate = null;
+
+            if (expiryDate != null && !expiryDate.trim().isEmpty()
+                    && !expiryDate.equalsIgnoreCase("null")) {
+                sqlDate = df.dateConvert(expiryDate);
+            }
+
+            ps.setDate(24, sqlDate);
+            ps.setString(25, user.getUserId());
+
+            done = ps.executeUpdate() > 0;
         }
+        catch (Exception e) {
+            System.out.println("WARNING: Error in updateManageUser2 -> " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        if (user.getExpiryDays() == 0) {
+            updateExpiryDate(Integer.parseInt(user.getUserId()));
+        }
+
         return done;
     }
     
@@ -4026,9 +4077,7 @@ public class SecurityHandler
     {
         ArrayList _list;
         String query;
-        Connection c;
-        ResultSet rs;
-        Statement s;
+        
         _list = new ArrayList();
         User user = null;
         query = "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, Ph" +
@@ -4038,13 +4087,11 @@ public class SecurityHandler
 "ken_required,dept_restriction,UnderTaker,region_code,zone_code,region_restriction,zone_restriction,Facility_Admin,Store_Admin FROM AM_GB_USER WHERE USER_STATUS = 'ACTIVE' "
 ;
 //        System.out.println("<<<<<<getAllUserByQuery query: "+query);
-        c = null;
-        rs = null;
-        s = null;
+       
         try {
-        c = getConnection();
-        s = c.createStatement();
-        rs = s.executeQuery(query);
+        	Connection c = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = c.prepareStatement(query);
+        ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             String userId = rs.getString("User_Id");
             String userName = rs.getString("User_Name");
@@ -4132,9 +4179,7 @@ public class SecurityHandler
         }
         catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
+        } 
         return _list;
 
     }
@@ -4143,9 +4188,7 @@ public class SecurityHandler
     {
         ArrayList _list;
         String query;
-        Connection c;
-        ResultSet rs;
-        PreparedStatement s;
+       
         _list = new ArrayList();
         User user = null;
         query = "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, Ph" +
@@ -4155,14 +4198,12 @@ public class SecurityHandler
 "ken_required,dept_restriction,UnderTaker,region_code,zone_code,region_restriction,"+
 "zone_restriction,Facility_Admin,Store_Admin FROM AM_GB_USER WHERE USER_STATUS = 'ACTIVE' AND User_Id!= ? ";
         System.out.println("<<<<<<getAllUserByQuery query: "+query);
-        c = null;
-        rs = null;
-        s = null;
+       
         try {
-        c = getConnection();
-        s = c.prepareStatement(query);
+        	Connection c = dbConnection.getConnection("legendPlus");
+            PreparedStatement s = c.prepareStatement(query);
         s.setString(1, loginUserId);
-        rs = s.executeQuery();
+        ResultSet rs = s.executeQuery();
         while (rs.next()) {
             String userId = rs.getString("User_Id");
             String userName = rs.getString("User_Name");
@@ -4250,9 +4291,8 @@ public class SecurityHandler
         }
         catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
+        } 
+        
         return _list;
 
     }
@@ -4338,12 +4378,9 @@ public class SecurityHandler
 			String userid,String branchRestrict,String deptCode,String regionCode,String zoneCode,String limit, String tokenRequired, String regionRestrict,
 			String zoneRestrict)
     {
-        Connection con;
-        PreparedStatement ps;
-        PreparedStatement ps1;
+        
         boolean done;
-        con = null;
-        ps = null;
+       
         done = false;
         String query = "";
         try {
@@ -4359,8 +4396,8 @@ public class SecurityHandler
              
              String query2 = "delete from am_gb_User_Upload  where User_Name = '"+userName+"'";
 
-            con = getConnection();
-            ps = con.prepareStatement(query);
+             Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, userName);
 //            System.out.println("userName: "+userName);
             ps.setString(2, fullname);
@@ -4398,7 +4435,7 @@ public class SecurityHandler
 
         createPasswordHistory(userId, passwords);
 
-    	ps1 = con.prepareStatement(query2);
+    	PreparedStatement ps1 = con.prepareStatement(query2);
     	done = (ps1.executeUpdate() != -1);
   //  	  closeConnection(con, ps);
  //   	closeConnection(con, ps);
@@ -4406,9 +4443,8 @@ public class SecurityHandler
         catch (Exception e) {
             System.out.println("WARNING:Error executing Query in createManageUser2 ->"
                     + e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
 
@@ -4710,7 +4746,7 @@ public class SecurityHandler
 //        	Name = cm.decrypt(Name);
 //            pass = cm.decrypt(pass);
         	 c = getConnection();
-             stmt = c.createStatement();
+             s = c.createStatement();
 //             cstmt = c.prepareCall(		     
 //		         "{call getUserByQuery(" + userNameFilter + ","+passwordfilter+","+tokenfilter+")}");
            	 String nameFilter = userNameFilter;
@@ -4843,16 +4879,16 @@ public class SecurityHandler
     	java.util.ArrayList userList = new java.util.ArrayList();
         CryptManager cm = new CryptManager();
 
-        // Clean input filters
+   
         String cleanedUserName = userNameFilter != null ? userNameFilter.replaceAll("\\s", "") : "";
         String cleanedToken = tokenFilter != null ? tokenFilter.replaceAll("\\s", "") : "";
 
         String sql = "{CALL getUserByQueryNoPassword(?, ?)}";
 
-        try (Connection con = getConnection();
+        try (Connection con =dbConnection.getConnection("legendPlus");
              CallableStatement cstmt = con.prepareCall(sql)) {
 
-            // Set stored procedure parameters
+      
             cstmt.setString(1, cleanedUserName);
             cstmt.setString(2, cleanedToken);
 
@@ -4862,7 +4898,7 @@ public class SecurityHandler
                     String userName = rs.getString(2);
                     String encryptedPassword = rs.getString(7);
 
-                    // Only add user if credentials match
+               
                     if (Name(userName, pass, cm.decrypt(encryptedPassword))) {
 
                         legend.admin.objects.User user = new legend.admin.objects.User();
@@ -4916,7 +4952,7 @@ public class SecurityHandler
 
     
 
-    public java.util.ArrayList getUserByQueryNoPasswordProc(String userNameFilter, String Name,String tokenfilter) throws SQLException
+    public java.util.ArrayList getUserByQueryNoPasswordProcOld(String userNameFilter, String Name,String tokenfilter) throws SQLException
     {  
         java.util.ArrayList _list = new java.util.ArrayList();
         legend.admin.objects.User user = null;
@@ -4933,7 +4969,7 @@ public class SecurityHandler
         s = null;  
         try {
         	 c = getConnection();
-             stmt = c.createStatement();
+             s = c.createStatement();
 //             cstmt = c.prepareCall(		     
 //		         "{call getUserByQuery(" + userNameFilter + ","+passwordfilter+","+tokenfilter+")}");
            	 String nameFilter = userNameFilter;
@@ -5049,6 +5085,83 @@ public class SecurityHandler
 
 }
 
+    public java.util.ArrayList getUserByQueryNoPasswordProc(
+            String userNameFilter,
+            String name,
+            String tokenFilter) {
+
+    	java.util.ArrayList list = new ArrayList();
+
+        String cleanedUser =
+                userNameFilter == null ? "" :
+                userNameFilter.replaceAll("\\s", "");
+
+        String cleanedToken =
+                tokenFilter == null ? "" :
+                tokenFilter.replaceAll("\\s", "");
+
+        String sql = "{CALL getUserByQueryNoPassword(?, ?)}";
+
+        try (Connection c = dbConnection.getConnection("legendPlus");
+             CallableStatement cstmt = c.prepareCall(sql)) {
+
+            cstmt.setString(1, cleanedUser);
+            cstmt.setString(2, cleanedToken);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+
+                while (rs.next()) {
+
+                    User user = new User();
+
+                    user.setUserId(rs.getString("userId"));
+                    user.setUserName(rs.getString("userName"));
+                    user.setUserFullName(rs.getString("fullName"));
+                    user.setLegacySystemId(rs.getString("legacySysId"));
+                    user.setUserClass(rs.getString("class"));
+                    user.setBranch(rs.getString("branch"));
+                    user.setPassword(rs.getString("password"));
+                    user.setPhoneNo(rs.getString("phoneNo"));
+                    user.setIsSupervisor(rs.getString("isSupervisor"));
+                    user.setMustChangePwd(rs.getString("mustChangePwd"));
+                    user.setLoginStatus(rs.getString("loginStatus"));
+                    user.setUserStatus(rs.getString("userStatus"));
+                    user.setCreatedBy(rs.getString("createdBy"));
+                    user.setCreateDate(rs.getString("createDate"));
+                    user.setPwdExpiry(rs.getString("passwordExpiry"));
+                    user.setLastLogindate(rs.getString("loginDate"));
+                    user.setLoginSystem(rs.getString("loginSystem"));
+                    user.setFleetAdmin(rs.getString("fleetAdmin"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPwdChanged(rs.getString("pwdChanged"));
+                    user.setApprvLimit(rs.getString("apprvLimit"));
+                    user.setBranchRestrict(rs.getString("branchRestriction"));
+                    user.setApprvLevel(rs.getString("apprvLevel"));
+                    user.setExpDate(rs.getDate("expiryDate"));
+                    user.setRegionCode(rs.getString("regionCode"));
+                    user.setRegionRestrict(rs.getString("regionRestrict"));
+                    user.setZoneCode(rs.getString("zoneCode"));
+                    user.setZoneRestrict(rs.getString("zoneRestrict"));
+                    user.setIsFacilityAdministrator(
+                            rs.getString("isFacilityAdministrator"));
+                    user.setIsStoreAdministrator(
+                            rs.getString("isStoreAdministrator"));
+
+                    user.setTokenRequired(
+                            "Y".equalsIgnoreCase(
+                                    rs.getString("tokenRequired")));
+
+                    list.add(user);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Error executing getUserByQueryNoPassword", e);
+        }
+
+        return list;
+    }
 
     public String getTokenUserIdOld(String userName) throws SQLException {
         Connection con = null;
@@ -5824,36 +5937,31 @@ public class SecurityHandler
 
     }
     
-    public legend.admin.objects.User getUserByUserTmpID(String UserID)
+    public legend.admin.objects.User getUserByUserTmpIDOld(String UserID)
     {
         User user;
         String expiryDate;
 //        boolean tokenRequired;
         String query;
-        Connection c;
-        ResultSet rs;
-        PreparedStatement s;
+       
         user = null;
         expiryDate = "";
 //        tokenRequired = false;
-        query = "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Ph" +
-"one_No, is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, Creat" +
-"e_Date, Password_Expiry, Login_Date, Login_System, Fleet_Admin, email, Branch,pa" +
-"ssword_changed,branch_restriction, Expiry_Days,Expiry_Date,dept_code,Approval_Level," +
-"is_StockAdministrator,is_Storekeeper,Approval_Limit,dept_restriction,UnderTaker,region_code,zone_code,region_restriction,zone_restriction,Facility_Admin,Store_Admin,token_required FROM AM_GB_USERTMP WHERE TMPID = ?";
+        query = "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Phone_No, is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId,\n"
+        		+ "Create_Date, Password_Expiry, Login_Date, Login_System, Fleet_Admin, email, Branch,password_changed,branch_restriction, Expiry_Days,Expiry_Date,dept_code,Approval_Level,\n"
+        		+ "is_StockAdministrator,is_Storekeeper,Approval_Limit,dept_restriction,UnderTaker,region_code,zone_code,region_restriction,zone_restriction,Facility_Admin,Store_Admin,token_required FROM AM_GB_USERTMP WHERE TMPID = ?";
 //System.out.println("getUserByUserID query: "+query);
-        c = null;
-        rs = null;
-        s = null;
-        try {
-
-        c = getConnection();
-        s = c.prepareStatement(query);
+        System.out.println("<<<<< userId: " + UserID);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement s = con.prepareStatement(query)) {
+        	System.out.println("<<<<< We are here: ");
         s.setString(1, UserID);
-        rs = s.executeQuery();
-      
+        System.out.println("<<<<< We are here 2: ");
+        try(ResultSet rs = s.executeQuery()){
+        	System.out.println("<<<<< We are here 3 : ");
         while (rs.next()) {
             String userId = rs.getString("User_Id");
+            System.out.println("<<<<< db userId: " + userId);
             String userName = rs.getString("User_Name");
             String fullName = rs.getString("Full_Name");
             String legacySysId = rs.getString("Legacy_Sys_Id");
@@ -5948,12 +6056,92 @@ public class SecurityHandler
         }
  //       closeConnection(c, s, rs);
     }
+        }
         catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
+        } 
         return user;
+    }
+    
+    public User getUserByUserTmpID(String userID) {
+
+        String query = "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, " +
+                "Phone_No, is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, " +
+                "Create_Date, Password_Expiry, Login_Date, Login_System, Fleet_Admin, email, " +
+                "password_changed, branch_restriction, Expiry_Days, Expiry_Date, dept_code, " +
+                "Approval_Level, is_StockAdministrator, is_Storekeeper, Approval_Limit, " +
+                "dept_restriction, UnderTaker, region_code, zone_code, region_restriction, " +
+                "zone_restriction, Facility_Admin, Store_Admin, token_required " +
+                "FROM AM_GB_USERTMP WHERE TMPID = ?";
+
+        System.out.println("<<<<< userId: " + userID);
+        
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+        	System.out.println("<<<<< We are here: ");
+        	ps.setInt(1, Integer.parseInt(userID));
+            
+            System.out.println("<<<<< We are here 2: ");
+            try (ResultSet rs = ps.executeQuery()) {
+            	
+            
+            	
+                if (rs.next()) {
+                	System.out.println("<<<<< We are here 4: ");
+                    User user = new User();
+                    System.out.println("<<<<< We are here 5: ");
+                    user.setUserId(rs.getString("User_Id"));
+                    System.out.println("<<<<< db userId: " + user.getUserId());
+                    user.setUserName(rs.getString("User_Name"));
+                    user.setUserFullName(rs.getString("Full_Name"));
+                    user.setLegacySystemId(rs.getString("Legacy_Sys_Id"));
+                    user.setUserClass(rs.getString("Class"));
+                    user.setBranch(rs.getString("Branch"));
+                    user.setPhoneNo(rs.getString("Phone_No"));
+                    user.setIsSupervisor(rs.getString("is_Supervisor"));
+                    user.setMustChangePwd(rs.getString("Must_Change_Pwd"));
+                    user.setLoginStatus(rs.getString("Login_Status"));
+                    user.setUserStatus(rs.getString("User_Status"));
+                    user.setCreatedBy(rs.getString("UserId"));
+                    user.setCreateDate(rs.getString("Create_Date"));
+                    user.setPwdExpiry(rs.getString("Password_Expiry"));
+                    user.setLastLogindate(rs.getString("Login_Date"));
+                    user.setLoginSystem(rs.getString("Login_System"));
+                    user.setFleetAdmin(rs.getString("Fleet_Admin"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPwdChanged(rs.getString("password_changed"));
+                    user.setBranchRestrict(rs.getString("branch_restriction"));
+                    user.setExpiryDays(rs.getInt("Expiry_Days"));
+
+                    Date expiry = rs.getDate("Expiry_Date");
+                    if (expiry != null) {
+                        user.setExpiryDate(expiry.toString());
+                    }
+
+                    user.setDeptCode(rs.getString("dept_code"));
+                    user.setApproveLevel(rs.getString("Approval_Level"));
+                    user.setApprvLimit(rs.getString("Approval_Limit"));
+                    user.setIsStorekeeper(rs.getString("is_Storekeeper"));
+                    user.setIsStockAdministrator(rs.getString("is_StockAdministrator"));
+                    user.setDeptRestrict(rs.getString("dept_restriction"));
+                    user.setUnderTaker(rs.getString("UnderTaker"));
+                    user.setRegionCode(rs.getString("region_code"));
+                    user.setZoneCode(rs.getString("zone_code"));
+                    user.setRegionRestrict(rs.getString("region_restriction"));
+                    user.setZoneRestrict(rs.getString("zone_restriction"));
+                    user.setIsFacilityAdministrator(rs.getString("Facility_Admin"));
+                    user.setIsStoreAdministrator(rs.getString("Store_Admin"));
+                    user.setTokenRequire(rs.getString("token_required"));
+
+                    return user;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 
@@ -6082,262 +6270,168 @@ public class SecurityHandler
         };
         return display;
     }
-    public List<User> getUserByQueryTech(
-            String username,
-            String role,
-            String status) {
+    
+    public java.util.ArrayList getAssigneeByQueryTech(String filter) {
+        java.util.ArrayList _list = new java.util.ArrayList();
+        legend.admin.objects.User user = null;
+        String query = "SELECT User_Id, User_Name, Full_Name" + ", Legacy_Sys_Id, Class, Branch, Password" + ", Phone_No, is_Supervisor, Must_Change_Pwd" + ", Login_Status, User_Status, UserId, Create_Date"
+                + ", Password_Expiry, Login_Date, Login_System, Fleet_Admin"
+                + ", email, Branch, password_changed,Expiry_Date,branch_restriction"
+                + ", approval_limit,approval_level,dept_code,dept_code AS section_code, '' AS Organization " + " FROM AM_GB_USER WHERE User_Id IS NOT NULL ";
+        query += filter;
+       
+        System.out.println("getAssigneeByQueryTech query: "+query);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
+       try(
+           ResultSet rs = ps.executeQuery(query);){
+            while (rs.next()) {
+                String userId = rs.getString("User_Id");
+                String userName = rs.getString("User_Name");
+                String fullName = rs.getString("Full_Name");
+                String legacySysId = rs.getString("Legacy_Sys_Id");
+                String Class = rs.getString("Class");
+                String branch = rs.getString("Branch");
+                String password = rs.getString("Password");
+                String phoneNo = rs.getString("Phone_No");
+                String isSupervisor = rs.getString("Is_Supervisor");
+                String mustChangePwd = rs.getString("Must_Change_Pwd");
+                String loginStatus = rs.getString("Login_Status");
+                String userStatus = rs.getString("User_Status");
+                String user_Id = rs.getString("UserId");
+                String createDate = rs.getString("Create_Date");
+                String passwordExpiry = rs.getString("Password_Expiry");
+                String loginDate = rs.getString("Login_Date");
+                String loginSystem = rs.getString("Login_System");
+                String fleetAdmin = rs.getString("Fleet_Admin");
+                String email = rs.getString("email");
+                String branchCode = rs.getString("Branch");
+                String pwdChanged = rs.getString("password_changed");
+                Date expiry_date = rs.getDate("Expiry_Date");
+                String branch_restriction = rs.getString("branch_restriction");
+                String apprvLimit = rs.getString("approval_limit");
+                String apprvLevel = rs.getString("approval_level");
+                String deptCode = rs.getString("dept_code");
+                String sectionCode = rs.getString("section_code");
+                String organization = rs.getString("Organization");
+                user = new legend.admin.objects.User();
+                user.setUserId(userId);
+                user.setUserName(userName);
+                user.setUserFullName(fullName);
+                user.setLegacySystemId(legacySysId);
+                user.setUserClass(Class);
+                user.setBranch(branch);
+                user.setPassword(password);
+                user.setPhoneNo(phoneNo);
+                user.setIsSupervisor(isSupervisor);
+                user.setMustChangePwd(mustChangePwd);
+                user.setLoginStatus(loginStatus);
+                user.setUserStatus(userStatus);
+                user.setCreatedBy(user_Id);
+                user.setCreateDate(createDate);
 
-        List<User> users = new ArrayList<>();
+                user.setPwdExpiry(passwordExpiry);
+                user.setLastLogindate(loginDate);
+                user.setLoginSystem(loginSystem);
+                user.setFleetAdmin(fleetAdmin);
+                user.setEmail(email);
+                user.setBranch(branchCode);
+                user.setPwdChanged(pwdChanged);
+                user.setApprvLimit(apprvLimit);
+                user.setBranchRestrict(branch_restriction);
+                user.setApprvLevel(apprvLevel);
+                user.setExpDate(expiry_date);
+                user.setDeptCode(deptCode);
+//                user.setSection(sectionCode);
+//                user.setorganization(organization);
+                _list.add(user);
+            }
+       }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        return _list;
+
+    }
+    
+    public java.util.ArrayList getPriorityByQuery(String filter) {
+        java.util.ArrayList _list = new java.util.ArrayList();
+        legend.admin.objects.User user = null;
+        String query = "SELECT Dept_code, Dept_name FROM AM_AD_DEPARTMENT order By Dept_name ";
+        query += filter;
+       
+        try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
+       try(
+           ResultSet rs = ps.executeQuery(query);){
+            while (rs.next()) {
+                String userId = rs.getString("Dept_code");
+                String userName = rs.getString("Dept_code");
+                String fullName = rs.getString("Dept_name");
+              //  System.out.print("====fullName==== "+fullName);
+                user = new legend.admin.objects.User();
+                user.setUserId(userId);
+                user.setUserName(userName);
+                user.setUserFullName(fullName);
+                _list.add(user);
+            }
+       }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+        
+        return _list;
+
+    }
+
+
+    public List<Staffs> getStaffsList(String filter) {
+
+        List<Staffs> staffList = new ArrayList<>();
+        HtmlUtility html = new HtmlUtility();
 
         StringBuilder query = new StringBuilder(
-                "SELECT User_Id, User_Name, Full_Name, User_Status, User_Class " +
-                        "FROM AM_GB_USER WHERE 1=1 "
+            "SELECT StaffId, Full_Name, dept_code, branch_code " +
+            "FROM am_gb_Staff "
         );
 
-        List<Object> parameters = new ArrayList<>();
-
-        if (username != null && !username.trim().isEmpty()) {
-            query.append(" AND UPPER(User_Name) LIKE ? ");
-            parameters.add("%" + username.trim().toUpperCase() + "%");
+        if (filter != null && !filter.trim().isEmpty()) {
+            query.append("WHERE StaffId LIKE ? OR Full_Name LIKE ? ");
         }
-
-        if (role != null && !role.trim().isEmpty()) {
-            query.append(" AND User_Class = ? ");
-            parameters.add(role.trim());
-        }
-
-        if (status != null && !status.trim().isEmpty()) {
-            query.append(" AND User_Status = ? ");
-            parameters.add(status.trim());
-        }
-
-        query.append(" ORDER BY Full_Name");
 
         try (Connection con = getConnection();
              PreparedStatement ps = con.prepareStatement(query.toString())) {
 
             ps.setQueryTimeout(30);
 
-            // Bind parameters safely
-            for (int i = 0; i < parameters.size(); i++) {
-                ps.setObject(i + 1, parameters.get(i));
+            if (filter != null && !filter.trim().isEmpty()) {
+                ps.setString(1, "%" + filter + "%");
+                ps.setString(2, "%" + filter + "%");
             }
 
             try (ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
 
-                    User user = new User();
-                    user.setUserId(rs.getString("User_Id"));
-                    user.setUserName(rs.getString("User_Name"));
-                    user.setFullName(rs.getString("Full_Name"));
-                    user.setUserStatus(rs.getString("User_Status"));
-                    user.setUserClass(rs.getString("User_Class"));
-
-                    users.add(user);
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error fetching users", e);
-        }
-
-        return users;
-    }
-    public List<Assignee> getAssigneeByQueryTech(String name, String status) {
-
-        List<Assignee> assignees = new ArrayList<>();
-
-        StringBuilder query = new StringBuilder(
-                "SELECT Staff_Id, Full_Name, Staff_Status " +
-                        "FROM am_gb_staff WHERE 1=1 "
-        );
-
-        List<Object> params = new ArrayList<>();
-
-        if (name != null && !name.trim().isEmpty()) {
-            query.append(" AND UPPER(Full_Name) LIKE ? ");
-            params.add("%" + name.trim().toUpperCase() + "%");
-        }
-
-        if (status != null && !status.trim().isEmpty()) {
-            query.append(" AND Staff_Status = ? ");
-            params.add(status.trim());
-        }
-
-        query.append(" ORDER BY Full_Name");
-
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(query.toString())) {
-
-            ps.setQueryTimeout(30);
-
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-
-                    Assignee assignee = new Assignee();
-                    assignee.setId(rs.getString("Staff_Id"));
-                    assignee.setName(rs.getString("Full_Name"));
-                    assignee.setStatus(rs.getString("Staff_Status"));
-
-                    assignees.add(assignee);
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error fetching assignees", e);
-        }
-
-        return assignees;
-    }
-
-    public List<Service> getServicesByQueryTech(String serviceName, String status) {
-
-        List<Service> services = new ArrayList<>();
-
-        StringBuilder query = new StringBuilder(
-                "SELECT Service_Id, Service_Name, Service_Status " +
-                        "FROM am_ad_services WHERE 1=1 "
-        );
-
-        List<Object> params = new ArrayList<>();
-
-        if (serviceName != null && !serviceName.trim().isEmpty()) {
-            query.append(" AND UPPER(Service_Name) LIKE ? ");
-            params.add("%" + serviceName.trim().toUpperCase() + "%");
-        }
-
-        if (status != null && !status.trim().isEmpty()) {
-            query.append(" AND Service_Status = ? ");
-            params.add(status.trim());
-        }
-
-        query.append(" ORDER BY Service_Name");
-
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(query.toString())) {
-
-            ps.setQueryTimeout(30);
-
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-
-                    Service service = new Service();
-                    service.setServiceId(rs.getString("Service_Id"));
-                    service.setServiceName(rs.getString("Service_Name"));
-                    service.setServiceStatus(rs.getString("Service_Status"));
-
-                    services.add(service);
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error fetching services", e);
-        }
-
-        return services;
-    }
-
-    public List<Priority> getPriorityByQuery(String priorityName, String status) {
-
-        List<Priority> priorities = new ArrayList<>();
-
-        StringBuilder query = new StringBuilder(
-                "SELECT Priority_Id, Priority_Name, Priority_Level, Priority_Status " +
-                        "FROM am_ad_priority WHERE 1=1 "
-        );
-
-        List<Object> params = new ArrayList<>();
-
-        if (priorityName != null && !priorityName.trim().isEmpty()) {
-            query.append(" AND UPPER(Priority_Name) LIKE ? ");
-            params.add("%" + priorityName.trim().toUpperCase() + "%");
-        }
-
-        if (status != null && !status.trim().isEmpty()) {
-            query.append(" AND Priority_Status = ? ");
-            params.add(status.trim());
-        }
-
-        query.append(" ORDER BY Priority_Level");
-
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(query.toString())) {
-
-            ps.setQueryTimeout(30);
-
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-
-                    Priority priority = new Priority();
-                    priority.setPriorityId(rs.getString("Priority_Id"));
-                    priority.setPriorityName(rs.getString("Priority_Name"));
-                    priority.setPriorityLevel(rs.getInt("Priority_Level"));
-                    priority.setPriorityStatus(rs.getString("Priority_Status"));
-
-                    priorities.add(priority);
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error fetching priorities", e);
-        }
-
-        return priorities;
-    }
-
-    public List<Staff> getStaffsList() {
-
-        List<Staff> staffList = new ArrayList<>();
-
-        String query =
-                "SELECT s.Staff_Id, s.Full_Name, s.Dept_Code, s.Branch_Code, " +
-                        "       s.Staff_Status, s.Email, s.Phone_No, " +
-                        "       d.Dept_Name, " +
-                        "       b.Branch_Name " +
-                        "FROM am_gb_staff s " +
-                        "LEFT JOIN am_ad_department d ON s.Dept_Code = d.Dept_Code " +
-                        "LEFT JOIN am_ad_branch b ON s.Branch_Code = b.Branch_Code " +
-                        "ORDER BY s.Full_Name";
-
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            // Prevent hanging connections
-            ps.setQueryTimeout(30);
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                while (rs.next()) {
-
-                    Staff staff = new Staff();
-
-                    staff.setStaffId(rs.getString("Staff_Id"));
+                    Staffs staff = new Staffs();
+                    staff.setStaffId(rs.getString("StaffId"));
                     staff.setFullName(rs.getString("Full_Name"));
-                    staff.setDeptCode(rs.getString("Dept_Code"));
-                    staff.setBranchCode(rs.getString("Branch_Code"));
-                    staff.setStaffStatus(rs.getString("Staff_Status"));
-                    staff.setEmail(rs.getString("Email"));
-                    staff.setPhoneNo(rs.getString("Phone_No"));
+                    staff.setDeptCode(rs.getString("dept_code"));
+                    staff.setBranchCode(rs.getString("branch_code"));
+                    
+                    String deptName = html.findObject("select Dept_name from am_ad_department where dept_code = ? ", rs.getString("dept_code"));
+                	String branchName = html.findObject("select BRANCH_NAME from am_ad_branch where BRANCH_code = ?", rs.getString("branch_code"));
+                  	
+                  	Staffs staffDetails = new Staffs();
+                	staffDetails.setStaffId(rs.getString("StaffId"));
+                	staffDetails.setFullName(rs.getString("Full_Name"));
+                	staffDetails.setDeptCode(rs.getString("dept_code"));
+                	staffDetails.setBranchCode(rs.getString("branch_code"));
+                	staffDetails.setBranchName(branchName);
+                	staffDetails.setDeptName(deptName);
 
-                    // These were previously N+1 queries
-                    staff.setDeptName(rs.getString("Dept_Name"));
-                    staff.setBranchName(rs.getString("Branch_Name"));
                     staffList.add(staff);
                 }
             }
@@ -6347,6 +6441,47 @@ public class SecurityHandler
         }
 
         return staffList;
+    }
+    
+    public List<Staffs> getStaffListDetails(String staffId) {
+
+        List<Staffs> list = new ArrayList<>();
+
+        String query =
+            "SELECT s.StaffId, s.Full_Name, s.dept_code, s.branch_code, " +
+            "       d.Dept_name, b.BRANCH_NAME " +
+            "FROM am_gb_Staff s " +
+            "LEFT JOIN am_ad_department d ON s.dept_code = d.dept_code " +
+            "LEFT JOIN am_ad_branch b ON s.branch_code = b.BRANCH_code " +
+            "WHERE s.StaffId = ?";
+
+        try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement(query)) {
+
+            ps.setString(1, staffId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Staffs staffDetails = new Staffs();
+
+                    staffDetails.setStaffId(rs.getString("StaffId"));
+                    staffDetails.setFullName(rs.getString("Full_Name"));
+                    staffDetails.setDeptCode(rs.getString("dept_code"));
+                    staffDetails.setBranchCode(rs.getString("branch_code"));
+                    staffDetails.setDeptName(rs.getString("Dept_name"));
+                    staffDetails.setBranchName(rs.getString("BRANCH_NAME"));
+
+                    list.add(staffDetails);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching staff details", e);
+        }
+
+        return list;
     }
 
     public static String decrypt(String strToDecrypt, String secret) {

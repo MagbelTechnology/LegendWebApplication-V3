@@ -234,7 +234,7 @@ public class CompanyHandler {
 //	}
 
 
-	public legend.admin.objects.Company getCompany() {
+	public legend.admin.objects.Company getCompany()  {
 
 		legend.admin.objects.Company company = null;
 
@@ -479,7 +479,7 @@ private legend.admin.objects.Company mapCompanyFromResultSet(ResultSet rs) throw
 
 //Ganiyu's code: the getCompanyFed() method that has both state and federal withholding tax rate
 
-	public legend.admin.objects.Company getCompanyFed() {
+	public legend.admin.objects.Company getCompanyFed()  {
 
 		legend.admin.objects.Company company = null;
 
@@ -554,7 +554,7 @@ private legend.admin.objects.Company mapCompanyFromResultSet(ResultSet rs) throw
 		return company;
 	}
 
-	public legend.admin.objects.Company getCompanyFed1() {
+	public legend.admin.objects.Company getCompanyFed1()  {
 
 		legend.admin.objects.Company company = null;
 
@@ -642,7 +642,7 @@ private legend.admin.objects.Company mapCompanyFromResultSet(ResultSet rs) throw
 		return company;
 	}
 
-	public legend.admin.objects.Company getCompanyFed2() {
+	public legend.admin.objects.Company getCompanyFed2()  {
 
 		legend.admin.objects.Company company = null;
 
@@ -754,7 +754,7 @@ private legend.admin.objects.Company mapCompanyFromResultSet(ResultSet rs) throw
 	}
 
 
-	public legend.admin.objects.AssetManagerInfo getAssetManagerInfo() {
+	public legend.admin.objects.AssetManagerInfo getAssetManagerInfo()  {
 
 		legend.admin.objects.AssetManagerInfo ami = null;
 
@@ -823,7 +823,7 @@ private legend.admin.objects.Company mapCompanyFromResultSet(ResultSet rs) throw
 		return ami;
 	}
 
-	public legend.admin.objects.Company getAllCompanyField(String tempId) {
+	public legend.admin.objects.Company getAllCompanyField(String tempId)  {
 
 		legend.admin.objects.Company company = null;
 
@@ -974,11 +974,15 @@ private legend.admin.objects.Company mapCompanyFromResultSet(ResultSet rs) throw
 //		return con;
 //	}
 
-private Connection getConnection() throws NamingException, SQLException {
-    Context ctx = new InitialContext();
-    DataSource ds = (DataSource) ctx.lookup("java:/legendPlus");
-    return ds.getConnection();
-}
+	private Connection getConnection() throws SQLException {
+	    try {
+	        Context ctx = new InitialContext();
+	        DataSource ds = (DataSource) ctx.lookup("java:/legendPlus");
+	        return ds.getConnection();
+	    } catch (NamingException e) {
+	        throw new RuntimeException("JNDI lookup failed for java:/legendPlus", e);
+	    }
+	}
 
 
 
@@ -16003,7 +16007,7 @@ public boolean InsertNewBranch(String branchCode, String branchName, String bran
 		}
 	}
 
-public boolean InsertLegacyTransactions(String makerId, String serialNo, String checkerId, String transDescription,String batchNo, String accountNo, double amount, String tranType, String branchCode, String postingDate,String bankingApp)
+public boolean InsertLegacyTransactionsOld(String makerId, String serialNo, String checkerId, String transDescription,String batchNo, String accountNo, double amount, String tranType, String branchCode, String postingDate,String bankingApp)
 
 {
     Connection con;
@@ -16099,7 +16103,7 @@ public boolean InsertLegacyTransactions(String makerId, String serialNo, String 
 			String tranType,
 			String branchCode,
 			String postingDate,
-			String bankingApp) {
+			String bankingApp) throws NamingException {
 
 		if (bankingApp == null) {
 			throw new IllegalArgumentException("bankingApp cannot be null");
@@ -16262,7 +16266,7 @@ public boolean InsertNewVendorOld(String branchCode, String branchName, String b
 	public boolean InsertNewVendor(String branchCode,
 								   String branchName,
 								   String branchAddress,
-								   String stateId) {
+								   String stateId) throws NamingException {
 
 		String query = "INSERT INTO am_ad_vendor(" +
 				"Vendor_ID, Vendor_Code, Vendor_Name, Contact_Person, Contact_Address, " +
@@ -16335,7 +16339,7 @@ public boolean InsertNewVendorOld(String branchCode, String branchName, String b
 	public boolean InsertNewBranch2(String branchCode,
 									String branchName,
 									String branchAddress,
-									String stateId) {
+									String stateId) throws NamingException {
 
 		String query =
 				"INSERT INTO AM_AD_BRANCH(" +
@@ -16478,7 +16482,7 @@ public java.util.ArrayList getNewSBURecordsFromFinacleLegacySystem()
 
 		return list;
 	}
-	public boolean InsertNewSbu(String sbuCode, String sbuName, String sbuContact, String status) {
+	public boolean InsertNewSbu(String sbuCode, String sbuName, String sbuContact, String status) throws NamingException {
 
 		String query =
 				"INSERT INTO Sbu_SetUp(sbu_code,sbu_name,sbu_contact,status,contact_email) VALUES (?,?,?,?,?)";
@@ -16505,7 +16509,7 @@ public java.util.ArrayList getNewSBURecordsFromFinacleLegacySystem()
 	public boolean InsertNewSection(String sectionCode,
 									String sectionName,
 									String sbuContact,
-									String status) {
+									String status) throws NamingException {
 
 		String query =
 				"INSERT INTO am_ad_section(Section_Id,Section_Code,Section_Name,section_acronym," +
@@ -16552,7 +16556,7 @@ public java.util.ArrayList getNewSBURecordsFromFinacleLegacySystem()
 
 		try (Connection con = dbConnection.getConnection("legendPlus")) {
 
-			con.setAutoCommit(false); // 🔥 CRITICAL
+			con.setAutoCommit(false); 
 
 			try (
 					PreparedStatement ps = con.prepareStatement(QUERY_FOR_AM_ASSET);
@@ -16585,7 +16589,7 @@ public java.util.ArrayList getNewSBURecordsFromFinacleLegacySystem()
 				done = (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0);
 
 			} catch (Exception e) {
-				con.rollback(); // 🔥 CRITICAL
+				con.rollback(); 
 				throw e;
 			}
 

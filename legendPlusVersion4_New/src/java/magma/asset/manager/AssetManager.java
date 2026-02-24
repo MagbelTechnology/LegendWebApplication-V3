@@ -34,6 +34,7 @@ public class AssetManager extends MagmaDBConnection {
     public AssetManager() {
       //  System.out.println("USING magma.asset.manager.AssetManager");
         code = new Codes();
+        dbConnection = new MagmaDBConnection();
         
     }
 

@@ -35,7 +35,7 @@ import magma.util.Codes;
 // Referenced classes of package com.magbel.legend.bus:
 //            ApprovalManager
 
-public class ApprovalRecords extends MagmaDBConnection
+public class ApprovalRecords_24_02_2025 extends MagmaDBConnection
 {
 
     private CurrencyNumberformat formata;
@@ -48,7 +48,7 @@ public class ApprovalRecords extends MagmaDBConnection
     AssetManager asset_manager;
     CompanyHandler comp;
   
-    public ApprovalRecords()
+    public ApprovalRecords_24_02_2025()
     {
         Alist = new ArrayList(); 
         qryCheck = "";
@@ -108,7 +108,7 @@ public class ApprovalRecords extends MagmaDBConnection
     }
     
     public ArrayList findApproval(String assetId, String filter) {
-    	ArrayList collection = new ArrayList<>();
+    	ArrayList collection = new ArrayList();
 
        
         String FINDER_QUERY = "SELECT Id, Description, Page, Flag, partPay, UserId, Branch, subjectToVat, whTax, operation1, exitPage, url "
@@ -281,7 +281,7 @@ public class ApprovalRecords extends MagmaDBConnection
             ps.setString(2, page);
 
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // true if at least one record exists
+                return rs.next(); 
             }
 
         } catch (SQLException ex) {
@@ -291,6 +291,7 @@ public class ApprovalRecords extends MagmaDBConnection
         }
     }
 
+    
     public boolean isApprovalExistingOld(String assetId)
     {
         boolean done;
@@ -368,7 +369,7 @@ public class ApprovalRecords extends MagmaDBConnection
 
     }
     
-    public boolean updateApproval(String assetId) {
+    public void updateApproval(String assetId) {
         String UPDATE_QUERY = "UPDATE am_raisentry_post SET flag = ? WHERE ID = ?";
 
         try (Connection con = getConnection("legendPlus");
@@ -377,13 +378,12 @@ public class ApprovalRecords extends MagmaDBConnection
             ps.setString(1, "N");
             ps.setString(2, assetId);
 
-            int rowsUpdated = ps.executeUpdate();
-            return rowsUpdated > 0; // true if at least one row was updated
-
+            ps.executeUpdate();
+            
         } catch (SQLException ex) {
             System.out.println("WARNING: Cannot update am_raisentry_post -> " + ex.getMessage());
             ex.printStackTrace();
-            return false;
+          
         }
     }
 
@@ -410,7 +410,7 @@ public class ApprovalRecords extends MagmaDBConnection
         }
     }
     
-    public boolean updateRaiseEntry(String assetId) {
+    public void updateRaiseEntry(String assetId) {
         String UPDATE_QUERY = "UPDATE am_asset SET raise_entry = ? WHERE ASSET_ID = ?";
 
         try (Connection con = getConnection("legendPlus");
@@ -418,14 +418,13 @@ public class ApprovalRecords extends MagmaDBConnection
 
             ps.setString(1, "Y");
             ps.setString(2, assetId);
-
-            int rowsUpdated = ps.executeUpdate();
-            return rowsUpdated > 0; // true if at least one row was updated
+            ps.executeUpdate();
+           
 
         } catch (SQLException ex) {
             System.out.println("WARNING: Cannot update am_asset -> " + ex.getMessage());
             ex.printStackTrace();
-            return false;
+           
         }
     }
 
@@ -452,7 +451,7 @@ public class ApprovalRecords extends MagmaDBConnection
         }
     }
     
-    public boolean updateRaiseAsseg2Entry(String assetId) {
+    public void updateRaiseAsseg2Entry(String assetId) {
         String UPDATE_QUERY = "UPDATE am_asset2 SET raise_entry = ? WHERE ASSET_ID = ?";
 
         try (Connection con = getConnection("legendPlus");
@@ -462,12 +461,12 @@ public class ApprovalRecords extends MagmaDBConnection
             ps.setString(2, assetId);
 
             int rowsUpdated = ps.executeUpdate();
-            return rowsUpdated > 0; // true if at least one row was updated
+           
 
         } catch (SQLException ex) {
             System.out.println("WARNING: Cannot update am_asset2 -> " + ex.getMessage());
             ex.printStackTrace();
-            return false;
+      
         }
     }
 

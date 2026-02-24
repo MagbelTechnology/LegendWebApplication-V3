@@ -21,12 +21,92 @@ public class HtmlUtility {
     /* =========================================================
        SAFE CONNECTION HELPER
        ========================================================= */
-    private Connection getLegendConnection() throws SQLException {
+    private Connection getLegendConnection() throws Exception {
         return new DataConnect("legendPlus").getConnection();
     }
 
-    private Connection getOtherConnection() throws SQLException {
-        return new DataConnect("otherDataSource").getOtherConnection();
+    private Connection getOtherConnection() throws Exception {
+        return new DataConnect("otherDataSource").getConnection();
+    }
+    
+    public String getResources(String selected, String query) throws Exception {
+
+        StringBuilder html = new StringBuilder();
+
+        if (selected == null || selected.equalsIgnoreCase("null")) {
+            selected = "ALL";
+        }
+
+        try (Connection con = new DataConnect("legendPlus").getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                String id = rs.getString(1);
+                String label = rs.getString(2);
+
+                String selectedAttr =
+                        (id != null && selected != null &&
+                         id.trim().equalsIgnoreCase(selected.trim()))
+                        ? " selected"
+                        : "";
+
+                html.append("<option value='")
+                    .append(escapeHtml(id))
+                    .append("'")
+                    .append(selectedAttr)
+                    .append(">")
+                    .append(escapeHtml(label))
+                    .append("</option>\n");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error loading resources", e);
+        }
+
+        return html.toString();
+    }
+    
+    public String getResources(int selected, String query) throws Exception {
+
+        StringBuilder html = new StringBuilder();
+
+        try (Connection con = new DataConnect("legendPlus").getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                int id = rs.getInt(1);
+                String label = rs.getString(2);
+
+                String selectedAttr =
+                        (id == selected) ? " selected" : "";
+
+                html.append("<option value='")
+                    .append(id)
+                    .append("'")
+                    .append(selectedAttr)
+                    .append(">")
+                    .append(escapeHtml(label))
+                    .append("</option>\n");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error loading resources", e);
+        }
+
+        return html.toString();
+    }
+    
+    private String escapeHtml(String input) {
+        if (input == null) return "";
+        return input.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#39;");
     }
 
     /* =========================================================
@@ -77,6 +157,36 @@ public class HtmlUtility {
 
         return result == null ? "" : result;
     }
+    
+    /* =========================================================
+    SAFE getOperand()
+    ========================================================= */
+    
+    public String getOperand(String col){
+
+        String op = "";
+
+         String FINDER_QUERY = "SELECT DISTINCT operand from COL_FILTER WHERE COLUMN_NAME =?";
+
+          try(Connection con  = (new DataConnect("legendPlus")).getConnection();
+          	PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
+          	
+
+              ps.setString(1, col);
+             try( ResultSet rs = ps.executeQuery();) {
+
+        while (rs.next()) {
+                  op = rs.getString(1);
+     }
+             }
+
+          } catch (Exception ex) {
+              System.out.println("WARNING: cannot fetch OPERAND from COL_LOOK_UP->" +
+                      ex.getMessage());
+          } 
+
+          return op;
+  }
 
     /* =========================================================
        SAFE getCodeName()
@@ -267,5 +377,128 @@ public class HtmlUtility {
             System.err.println("ERROR updateAssetStatusChange(): " + e.getMessage());
         }
     }
+    
+    public void updateAssetStatusChange(String query_r,String naration,Timestamp date,int tranId){
+
+    	try(Connection con = (new DataConnect("legendPlus")).getConnection();
+    		PreparedStatement ps = con.prepareStatement(query_r.toString());) {
+    		
+    		  ps.setString(1, naration);
+    		  ps.setTimestamp(2, date);
+    		  ps.setInt(3, tranId);
+    	       int i =ps.executeUpdate();
+    	            //ps.execute();
+
+    	        } catch (Exception ex) {
+
+    	            System.out.println("HtmlUtility: updateAssetStatusChange()>>>>>" + ex);
+    	        } 
+
+
+    	}//updateAssetStatus()
+    
+    public String findObjectParam(String id)
+    {
+    	//System.out.println("====findObject query=====  "+query);
+
+        String found = null;
+
+        String finder = "UNKNOWN";
+        String query = "select dept_code from am_gb_user where user_id = ? ";
+        double sequence = 0.00d;
+        try (Connection Con2 = new DataConnect("legendPlus").getConnection();
+            	PreparedStatement Stat = Con2.prepareStatement(query)){
+
+            Stat.setString(1, id);
+           try( ResultSet result = Stat.executeQuery()){
+
+            while (result.next()) {
+                finder = result.getString(1);
+            }
+           }
+        } catch (Exception ee2) {
+            System.out.println("WARN:ERROR OBTAINING OBJ --> " + ee2);
+            ee2.printStackTrace();
+        } 
+        return finder;
+    }
+    
+    public String getUserListResources(String selected, String query) {
+
+        StringBuilder html = new StringBuilder();
+        String id = "";
+
+        if (selected == null || selected.equalsIgnoreCase("null")) {
+            selected = "ALL"; // Change this to match your default <option value="ALL">
+        }
+
+        try(Connection mcon =  new DataConnect("legendPlus").getConnection();
+            	PreparedStatement mps = mcon.prepareStatement(query)) {
+        	
+        	
+//            System.out.println("getUserListResources Parameter query:->>"+query);
+//            System.out.println("getUserListResources Parameter selected:->>"+selected);
+        	try(ResultSet mrs = mps.executeQuery();) {
+            while (mrs.next()) {
+                id = mrs.getString(1);
+                String label = mrs.getString(2);
+//                System.out.println("getUserListResources Id: "+id+"     label: "+label);
+                String selectedAttr = (id != null && id.trim().equalsIgnoreCase(selected.trim())) ? " selected" : "";
+
+                html.append("<option value='")
+                    .append(id)
+                    .append("'")
+                    .append(selectedAttr)
+                    .append(">")
+                    .append(label)
+                    .append("</option>\n");
+            }
+        	}
+        } catch (Exception ee) {
+            System.out.println("WARN HtmlUtil.getResources error: " + ee);
+        } 
+
+        return html.toString();
+    }
+    
+    public String getResources(int selected) {
+
+        StringBuilder html = new StringBuilder();
+
+        String query = "SELECT BRANCH_ID, BRANCH_NAME " +
+                       "FROM am_ad_BRANCH " +
+                       "WHERE brnch_id = ? " +
+                       "ORDER BY BRANCH_NAME";
+
+        try (Connection mcon = (new DataConnect("legendPlus")).getConnection();
+             PreparedStatement mps = mcon.prepareStatement(query)) {
+
+            mps.setInt(1, selected);   
+
+            try (ResultSet mrs = mps.executeQuery()) {
+
+                while (mrs.next()) {
+
+                    String id = mrs.getString("BRANCH_ID");
+
+                    html.append("<option ")
+                        .append(id != null && id.equals(String.valueOf(selected))
+                                ? " selected='true' "
+                                : "")
+                        .append(" value='")
+                        .append(id)
+                        .append("'>")
+                        .append(mrs.getString("BRANCH_NAME"))
+                        .append("</option>");
+                }
+            }
+
+        } catch (Exception ee) {
+            System.out.println("WARN HtmlUtil getResources -> " + ee);
+        }
+
+        return html.toString();
+    }
+
 
 }

@@ -41,7 +41,7 @@ import magma.AssetRecordsBean;
  * @version 1.0
  */
 
-public class ConnectionClass {    
+public class ConnectionClass_24_02_2026 {    
 
     private Connection conn = null;
     private String jndiName = "legendPlus";
@@ -51,7 +51,7 @@ public class ConnectionClass {
     private int record_count = 2;
     private Context ic = null;
     private ApprovalRecords approv;
-    public ConnectionClass() {
+    public ConnectionClass_24_02_2026() {
         conn = null;
         jndiName = "legendPlus";
         jndiNameOracle = "FinacleDataHouse";

@@ -366,8 +366,15 @@ public class UserAuditApprovalServlet extends HttpServlet {
 					//updtst = audit.logAuditTrailActionPerformed("AM_GB_USER ", branchcode,
 					String actPerformed = "Update user profile"+"$"+userName+"$"+approvedBy;
 					 System.out.println("actPerformed : "+actPerformed);
-					updtst = audit.logAuditTrail("AM_GB_USER ", branchcode,Integer.parseInt(initiatorId), menuId, RecordId,actPerformed,hostName,ipAddress,macAddress);
-					System.out.println("---------------2------------------------isupdt: "+isupdt);
+					 int initiator = 0;
+
+					 if (initiatorId != null && !initiatorId.trim().isEmpty()) {
+					     initiator = Integer.parseInt(initiatorId);
+					 }
+//					updtst = audit.logAuditTrail("AM_GB_USER ", branchcode,Integer.parseInt(initiatorId), menuId, RecordId,actPerformed,hostName,ipAddress,macAddress);
+						updtst = audit.logAuditTrail("AM_GB_USER ", branchcode,initiator, menuId, RecordId,actPerformed,hostName,ipAddress,macAddress);
+
+					 System.out.println("---------------2------------------------isupdt: "+isupdt);
 					if (updtst == true) {
 						arb.deleteOtherSupervisorswithBatchId(String.valueOf(tranId),userid);
 						 String q = "update am_asset_approval set process_status='A', asset_status='ACTIVE', reject_reason='" + rr + "',DATE_APPROVED = '"+approveddate+"' where transaction_id=" + tranId;
