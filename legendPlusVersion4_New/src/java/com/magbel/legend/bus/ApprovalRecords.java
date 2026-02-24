@@ -546,9 +546,6 @@ ex.printStackTrace();
 return false;
 }
 }
-
-
-    
     
     public String getCodeName(String query) {
         String result = "";

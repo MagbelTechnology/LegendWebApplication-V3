@@ -324,6 +324,7 @@ public class ConnectionClass {
     }
 
     
+    
     public String[][] getMaintenanceVendorsForCombo() {
 
         String query =
@@ -520,7 +521,7 @@ public class ConnectionClass {
              ResultSet countRs = countPs.executeQuery()) {
             
             if (!countRs.next()) {
-                return new String[0][0]; // no sections
+                return new String[0][0];
             }
 
             int count = countRs.getInt(1);
@@ -547,7 +548,7 @@ public class ConnectionClass {
         } catch (Exception e) {
             System.out.println("WARN: Error fetching sections -> " + e.getMessage());
             e.printStackTrace();
-            return new String[0][0]; // safe fallback
+            return new String[0][0]; 
         }
     }
     
@@ -590,7 +591,7 @@ public class ConnectionClass {
         } catch (Exception e) {
             System.out.println("WARN: Error fetching sections excluding '" + excludeName + "' -> " + e.getMessage());
             e.printStackTrace();
-            return new String[0][0]; // safe fallback
+            return new String[0][0]; 
         }
     }
 

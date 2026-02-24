@@ -187,7 +187,7 @@ public class AssetRecordsBean extends legend.ConnectionClass
         approvalRec = new ApprovalRecords(); 
         //super();
         try {
-           
+        	
             sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
             dbConnection = new MagmaDBConnection();
             dateFormat = new DatetimeFormat();

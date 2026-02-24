@@ -1,20 +1,19 @@
-/.DS_Store
 /FixedAsset Report/
 /HelpDesk ReportSource/
 /UHFDemo_v3.62_eng_source/
+/asset/
 /audit/
 /barcode/
 /com/
+/exceReport/
+/jdbc/
 /legend/
 /magma/
 /net/
 /ng.rar
 /ng/
-/reports/
-/asset/
-/exceReport/
-/jdbc/
 /org/
+/reports/
 /sukhwinder/
 /token/
 /webservice/
