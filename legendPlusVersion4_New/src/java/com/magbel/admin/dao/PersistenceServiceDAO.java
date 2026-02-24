@@ -1,227 +1,141 @@
 package com.magbel.admin.dao;
+
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.magbel.util.DataConnect;
 import com.magbel.util.DatetimeFormat;
-import java.text.SimpleDateFormat;
 
-/**
- * <p>Title: PersistenceServiceDAO.java</p>
- *
- * <p>Description: </p>
- *
- * <p>Copyright: Copyright (c) 2006</p>
- *
- * <p>Company: MagBel Technology LTD.</p>
- *
- * @author NA
- * @version 1.0
- */
-public class PersistenceServiceDAO implements ConnectionDAO{
+public class PersistenceServiceDAO implements ConnectionDAO {
 
-    DatetimeFormat dateFormat;
-    SimpleDateFormat sdf;
+    private final DatetimeFormat dateFormat = new DatetimeFormat();
 
-    public PersistenceServiceDAO() {
+    // Thread-safe formatter
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("dd-MM-yyyy"));
 
-        dateFormat = new DatetimeFormat();
-        sdf = new SimpleDateFormat("dd-MM-yyyy");
-    }
+    /* =========================================================
+       QUERY EXECUTION
+       ========================================================= */
 
     public void executeQuery(String query) {
+        executeQueryString(query, "helpDesk");
+    }
 
-        PreparedStatement ps = null;
-        Connection con = null;
-        try {
-            con = this.getConnection("helpDesk");
-            ps = con.prepareStatement(query);
-            ps.execute();
-        } catch (Exception error) {
+    public void executeQueryString(String query, String jndiName) {
 
-        } finally {
-            closeConnection(con, ps);
+        try (Connection connection = getConnection(jndiName);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.execute();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(
+                    "Failed executing query on datasource: " + jndiName,
+                    ex
+            );
         }
     }
 
-    public void executeQueryString(String query,String jndiName) {
-
-	        PreparedStatement ps = null;
-	        Connection con = null;
-	        try {
-	            con = this.getConnection(jndiName);
-	            ps = con.prepareStatement(query);
-	            ps.execute();
-	        } catch (Exception error) {
-				System.out.println("WARN:com.magbel.ia.dao.PersistenceService:"+error);
-
-	        } finally {
-	            closeConnection(con, ps);
-	        }
-    }
-
-    public void closeConnection(Connection con, PreparedStatement ps) {
-
-        try {
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        } catch (Exception ex) {
-            System.out.println("WARNING:Error closing Connection ->" + ex);
-        }
-    }
-
-    /**
-     * closeConnection
-     *
-     * @param con Connection
-     * @param rs ResultSet
-     * @param ps PreparedStatement
-     * @todo Implement this com.magbel.ia.dao.ConnectionDAO method
-     */
-    public void closeConnection(Connection con, PreparedStatement ps,
-                                ResultSet rs) {
-        try {
-            if (ps != null) {
-                ps.close();
-            }
-            if (rs != null) {
-                rs.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        } catch (Exception ex) {
-            System.out.println("WARNING:Error closing Connection ->" + ex);
-        }
-    }
-
-    public void closeConnection(Connection con, Statement ps,
-	                                ResultSet rs) {
-	        try {
-	            if (ps != null) {
-	                ps.close();
-	            }
-	            if (rs != null) {
-	                rs.close();
-	            }
-	            if (con != null) {
-	                con.close();
-	            }
-	        } catch (Exception ex) {
-	            System.out.println("WARNING:Error closing Connection ->" + ex);
-	        }
-    }
+    /* =========================================================
+       CONNECTION MANAGEMENT
+       ========================================================= */
 
     public Connection getConnection() {
-	        Connection con = null;
-	        try {
-	            con = new DataConnect("helpDesk").getConnection();
-	        } catch (Exception conError) {
-	            System.out.println("WARNING:Error getting connection - >" +
-	                               conError);
-	        }
-	        return con;
+        return getConnection("helpDesk");
     }
-
 
     public Connection getConnection(String jndiName) {
-        Connection con = null;
         try {
-            con = new DataConnect(jndiName).getConnection();
-        } catch (Exception conError) {
-            System.out.println("WARNING:Error getting connection - >" +
-                               conError);
+            return new DataConnect(jndiName).getConnection();
+        } catch (Exception ex) {
+            throw new RuntimeException(
+                    "Failed to obtain connection for datasource: " + jndiName,
+                    ex
+            );
         }
-        return con;
     }
+
+    @Override
+    public void closeConnection(Connection con, PreparedStatement ps, ResultSet rs) {
+
+    }
+
+    @Override
+    public void closeConnection(Connection con, PreparedStatement ps) {
+
+    }
+
+    /* =========================================================
+       DATE UTILITIES
+       ========================================================= */
 
     public java.sql.Date dateConvert(String strDate) {
 
-      java.text.SimpleDateFormat formata = new java.text.SimpleDateFormat(
-              "dd-MM-yyyy");
-      if (strDate == null) {
-          strDate = formata.format(new java.util.Date());
-      }
-      strDate = strDate.replaceAll("/", "-");
+        try {
+            if (strDate == null) {
+                return new java.sql.Date(System.currentTimeMillis());
+            }
 
-      java.util.Date inputDate = null;
-      try {
-          inputDate = formata.parse(strDate);
-      } catch (Exception e) {
-          System.out.println("WARNING: Error formating Date:" + e.getMessage());
-      }
-      return dateFormat.getSQLFormatedDate(inputDate);
+            strDate = strDate.replace("/", "-");
+            Date parsed = DATE_FORMAT.get().parse(strDate);
 
-  }
+            return dateFormat.getSQLFormatedDate(parsed);
 
-  public java.sql.Date dateConvert(java.util.Date inputDate) {
-      return dateFormat.getSQLFormatedDate(inputDate);
-  }
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid date format (expected dd-MM-yyyy): " + strDate,
+                    ex
+            );
+        }
+    }
 
-  public java.sql.Date dateConvert(long longDate) {
+    public java.sql.Date dateConvert(Date inputDate) {
+        if (inputDate == null) {
+            inputDate = new Date();
+        }
+        return dateFormat.getSQLFormatedDate(inputDate);
+    }
 
-      java.util.Date inputDate = new java.util.Date();
-      inputDate.setTime(longDate);
+    public java.sql.Date dateConvert(long longDate) {
+        return dateConvert(new Date(longDate));
+    }
 
-      return dateFormat.getSQLFormatedDate(inputDate);
+    public String formatDate(Date date) {
+        if (date == null) {
+            date = new Date();
+        }
+        return DATE_FORMAT.get().format(date);
+    }
 
-  }
+    public Timestamp getDateTime(String inputDate) {
 
-  public String formatDate(java.util.Date date) {
-      String formated = "";
+        try {
+            if (inputDate == null) {
+                inputDate = formatDate(new Date());
+            }
 
-      if (date == null) {
-          date = new java.util.Date();
-      }
-      try {
-          sdf = new SimpleDateFormat("dd-MM-yyyy");
-          formated = sdf.format(date);
-      } catch (Exception e) {
-          System.out.println("WARNING:Error formating Date ->" + e.getMessage());
-      }
+            inputDate = inputDate.replace("/", "-");
 
-      return formated;
-  }
+            SimpleDateFormat dateTimeFormat =
+                    new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
 
-  public java.sql.Timestamp getDateTime(String inputDate){
+            String now = dateTimeFormat.format(new Date());
+            String merged = inputDate + now.substring(10);
 
-  		java.sql.Timestamp inputTime = null;
+            return new Timestamp(dateTimeFormat.parse(merged).getTime());
 
-  		try{
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(
+                    "Error generating timestamp from date: " + inputDate,
+                    ex
+            );
+        }
+    }
 
-  			if(inputDate == null){inputDate = sdf.format(new java.util.Date());}
-  			inputDate = inputDate.replaceAll("/","-");
-
-  			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss.SSS");
-  			String strDate = dateFormat.format(new java.util.Date());
-  			String transInputDate = inputDate + strDate.substring(10,strDate.length());
-
-  			inputTime = new java.sql.Timestamp((dateFormat.parse(transInputDate)).getTime());
-
-  		}catch(Exception er){
-  			System.out.println("WARN : Error getting datetime ->"+er);
-  		}
-
-  			return inputTime;
-  		}
-
-  		public java.sql.Timestamp getDateTime(java.util.Date inputDate){
-
-  			String strDate = null;
-  			try{
-  			if(inputDate == null){
-  				strDate = sdf.format(new java.util.Date());
-  				}else{
-  					strDate =  sdf.format(inputDate);
-  				}
-  			}catch(Exception er){
-  				System.out.println("WARN : Error getting datetime ->"+er);
-  			}
-
-  			return getDateTime(strDate);
-  	}
-
-
+    public Timestamp getDateTime(Date inputDate) {
+        return getDateTime(formatDate(inputDate));
+    }
 }
