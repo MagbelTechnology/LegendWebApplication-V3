@@ -547,37 +547,7 @@ return false;
 }
 }
 
-    public String getCodeNameOld(String query)
-    {
-        String result;
-        Connection con;
-        PreparedStatement ps;
-        result = "";
-        con = null;
-        ResultSet rs = null;
-        ps = null;
-        try 
-        { 
-//        	System.out.println("====getCodeName query=====  "+query);
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
 
-            rs = ps.executeQuery();
-
-  //          System.out.println("====getCodeName query=====  "+query);
-            while (rs.next()) {
-                result = rs.getString(1) == null ? "" : rs.getString(1);
-
-            }
-        } catch (Exception er) {
-            System.out.println("Error in Query- getCodeName()... ->" + er);
-            er.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
-  //      System.out.println("====getCodeName result=====  "+result);
-        return result;
-    }
     
     
     public String getCodeName(String query) {

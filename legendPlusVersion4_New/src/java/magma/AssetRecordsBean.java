@@ -187,7 +187,7 @@ public class AssetRecordsBean extends legend.ConnectionClass
         approvalRec = new ApprovalRecords(); 
         //super();
         try {
-            freeResource();
+           
             sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
             dbConnection = new MagmaDBConnection();
             dateFormat = new DatetimeFormat();
@@ -13436,7 +13436,7 @@ done= ps.execute();
 		}
                     finally
                     {
-			freeResource();
+	
 		   }
 
 
@@ -17778,6 +17778,7 @@ public String ENVvatAcctCr (String category,String branch,String vat)
 		
 return 	vatAccount;
 }	
+
 
 public String ENVvatAcctCr2 (String category,String branch,String vat)
 {
