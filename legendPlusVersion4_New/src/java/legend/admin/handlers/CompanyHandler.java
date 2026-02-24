@@ -642,185 +642,172 @@ private legend.admin.objects.Company mapCompanyFromResultSet(ResultSet rs) throw
 		return company;
 	}
 
-	public legend.admin.objects.Company getCompanyFed2() {
+	public Company getCompanyFed2() {
 
-		legend.admin.objects.Company company = null;
+		Company company = null;
 
-		String query =
-				"SELECT Company_Code, Company_Name, Acronym, Company_Address" +
-						", Vat_Rate, Wht_Rate, Financial_Start_Date, Financial_No_OfMonths" +
-						", Financial_End_Date, Minimum_Password, Password_Expiry, Session_Timeout" +
-						", Enforce_Acq_Budget, Enforce_Pm_Budget, Enforce_Fuel_Allocation, Require_Quarterly_Pm" +
-						", Quarterly_Surplus_Cf, User_Id, Processing_Status, Trans_Wait_Time, loguseraudit" +
-						", Fed_Wht_Rate, Attempt_Logon, component_delimiter, password_upper, password_lower, password_numeric" +
-						", Processing_Date, Processing_Frequency, Next_Processing_Date, Default_Branch, Branch_Name" +
-						", Auto_Generate_Id, Depreciation_Method, LPO_Required, Barcode_Fld, THIRDPARTY_REQUIRE, raise_entry, databaseName" +
-						", password_special, password_limit, Proof_Session_timeout, system_date " +
+		final String sql =
+				"SELECT Company_Code, Company_Name, Acronym, Company_Address, " +
+						"       Vat_Rate, Wht_Rate, Financial_Start_Date, Financial_No_OfMonths, " +
+						"       Financial_End_Date, Minimum_Password, Password_Expiry, Session_Timeout, " +
+						"       Enforce_Acq_Budget, Enforce_Pm_Budget, Enforce_Fuel_Allocation, Require_Quarterly_Pm, " +
+						"       Quarterly_Surplus_Cf, User_Id, Processing_Status, Trans_Wait_Time, loguseraudit, " +
+						"       Fed_Wht_Rate, Attempt_Logon, component_delimiter, password_upper, password_lower, password_numeric, " +
+						"       Processing_Date, Processing_Frequency, Next_Processing_Date, Default_Branch, Branch_Name, " +
+						"       Auto_Generate_Id, Depreciation_Method, LPO_Required, Barcode_Fld, THIRDPARTY_REQUIRE, raise_entry, databaseName, " +
+						"       password_special, password_limit, Proof_Session_timeout, system_date " +
 						"FROM AM_GB_COMPANY";
 
-		try (
-				Connection con = getConnection();
-				PreparedStatement ps = con.prepareStatement(query)
-		) {
+		try (Connection connection = getConnection();
+			 PreparedStatement statement = connection.prepareStatement(
+					 sql,
+					 ResultSet.TYPE_FORWARD_ONLY,
+					 ResultSet.CONCUR_READ_ONLY)) {
 
-			ps.setQueryTimeout(30);
+			statement.setQueryTimeout(30);
 
-			try (ResultSet rs = ps.executeQuery()) {
+			try (ResultSet rs = statement.executeQuery()) {
 
-				if (rs.next()) {
-
-					// Null-safe date handling
-					Date startDateObj = rs.getDate("Financial_Start_Date");
-					Date endDateObj   = rs.getDate("Financial_End_Date");
-					Date processingDateObj = rs.getDate("Processing_Date");
-					Date nextProcessingDateObj = rs.getDate("Next_Processing_Date");
-					Date sysDateObj = rs.getDate("system_date");
-
-					String financialStartDate =
-							(startDateObj != null) ? sdf.format(startDateObj) : null;
-
-					String financialEndDate =
-							(endDateObj != null) ? sdf.format(endDateObj) : null;
-
-					String processingDate =
-							(processingDateObj != null) ? sdf.format(processingDateObj) : null;
-
-					String nextProcessingDate =
-							(nextProcessingDateObj != null) ? sdf.format(nextProcessingDateObj) : null;
-
-					String sysDate =
-							(sysDateObj != null) ? sdf.format(sysDateObj) : null;
-
-					String compDelimiter = rs.getString("component_delimiter");
-					if (compDelimiter == null) {
-						compDelimiter = "";
-					}
-
-					String proofSessionTimeout = rs.getString("Proof_Session_timeout");
-					if (proofSessionTimeout == null ||
-							"null".equalsIgnoreCase(proofSessionTimeout)) {
-						proofSessionTimeout = "0";
-					}
-
-					company = new legend.admin.objects.Company(
-							rs.getString("Company_Code"),
-							rs.getString("Company_Name"),
-							rs.getString("Acronym"),
-							rs.getString("Company_Address"),
-							rs.getDouble("Vat_Rate"),
-							rs.getDouble("Wht_Rate"),
-							rs.getDouble("Fed_Wht_Rate"),
-							financialStartDate,
-							rs.getInt("Financial_No_OfMonths"),
-							financialEndDate,
-							rs.getInt("Minimum_Password"),
-							rs.getInt("Password_Expiry"),
-							rs.getInt("Session_Timeout"),
-							rs.getString("Enforce_Acq_Budget"),
-							rs.getString("Enforce_Pm_Budget"),
-							rs.getString("Enforce_Fuel_Allocation"),
-							rs.getString("Require_Quarterly_Pm"),
-							rs.getString("Quarterly_Surplus_Cf"),
-							rs.getString("User_Id"),
-							rs.getString("Processing_Status"),
-							rs.getDouble("Trans_Wait_Time"),
-							rs.getInt("Attempt_Logon")
-					);
-
-					company.setLogUserAudit(rs.getString("loguseraudit"));
-					company.setComp_delimiter(compDelimiter);
-					company.setPassword_lower(rs.getString("password_lower"));
-					company.setPassword_numeric(rs.getString("password_numeric"));
-					company.setPassword_special(rs.getString("password_special"));
-					company.setPassword_upper(rs.getString("password_upper"));
-					company.setPasswordLimit(rs.getInt("password_limit"));
-					company.setProofSessionTimeout(Integer.parseInt(proofSessionTimeout));
-
-					company.setThirdpartytransaction(rs.getString("THIRDPARTY_REQUIRE"));
-					company.setRaiseEntry(rs.getString("RAISE_ENTRY"));
-					company.setDatabaseName(rs.getString("databaseName"));
-					company.setSysDate(sysDate);
-					company.setProcessingDate(processingDate);
-					company.setNextProcessingDate(nextProcessingDate);
-					company.setProcessingFrequency(rs.getString("Processing_Frequency"));
+				if (!rs.next()) {
+					return null;
 				}
+
+				company = new Company(
+						rs.getString("Company_Code"),
+						rs.getString("Company_Name"),
+						rs.getString("Acronym"),
+						rs.getString("Company_Address"),
+						getNullableDouble(rs, "Vat_Rate"),
+						getNullableDouble(rs, "Wht_Rate"),
+						getNullableDouble(rs, "Fed_Wht_Rate"),
+						formatDate(rs.getDate("Financial_Start_Date")),
+						rs.getInt("Financial_No_OfMonths"),
+						formatDate(rs.getDate("Financial_End_Date")),
+						rs.getInt("Minimum_Password"),
+						rs.getInt("Password_Expiry"),
+						rs.getInt("Session_Timeout"),
+						rs.getString("Enforce_Acq_Budget"),
+						rs.getString("Enforce_Pm_Budget"),
+						rs.getString("Enforce_Fuel_Allocation"),
+						rs.getString("Require_Quarterly_Pm"),
+						rs.getString("Quarterly_Surplus_Cf"),
+						rs.getString("User_Id"),
+						rs.getString("Processing_Status"),
+						getNullableDouble(rs, "Trans_Wait_Time"),
+						rs.getInt("Attempt_Logon")
+				);
+
+				// Safe optional setters
+				company.setLogUserAudit(rs.getString("loguseraudit"));
+				company.setComp_delimiter(defaultString(rs.getString("component_delimiter")));
+				company.setPassword_lower(rs.getString("password_lower"));
+				company.setPassword_numeric(rs.getString("password_numeric"));
+				company.setPassword_special(rs.getString("password_special"));
+				company.setPassword_upper(rs.getString("password_upper"));
+				company.setPasswordLimit(rs.getInt("password_limit"));
+
+				company.setProofSessionTimeout(
+						parseSafeInt(rs.getString("Proof_Session_timeout"), 0)
+				);
+
+				company.setThirdpartytransaction(rs.getString("THIRDPARTY_REQUIRE"));
+				company.setRaiseEntry(rs.getString("raise_entry"));
+				company.setDatabaseName(rs.getString("databaseName"));
+				company.setSysDate(formatDate(rs.getDate("system_date")));
+				company.setProcessingDate(formatDate(rs.getDate("Processing_Date")));
+				company.setNextProcessingDate(formatDate(rs.getDate("Next_Processing_Date")));
+				company.setProcessingFrequency(rs.getString("Processing_Frequency"));
 			}
 
-		} catch (SQLException e) {
-			throw new RuntimeException("Error executing getCompanyFed2()", e);
+		} catch (SQLException ex) {
+			throw new RuntimeException(
+					"Failed to load company configuration from AM_GB_COMPANY",
+					ex
+			);
 		}
 
 		return company;
 	}
+	private String defaultString(String value) {
+		return (value == null) ? "" : value;
+	}
+	private int parseSafeInt(String value, int defaultValue) {
+		try {
+			return (value == null || "null".equalsIgnoreCase(value))
+					? defaultValue
+					: Integer.parseInt(value);
+		} catch (NumberFormatException ex) {
+			return defaultValue;
+		}
+	}
 
+	private double getNullableDouble(ResultSet rs, String column) throws SQLException {
+		double value = rs.getDouble(column);
+		return rs.wasNull() ? 0.0 : value;
+	}
+	public AssetManagerInfo getAssetManagerInfo() {
 
-	public legend.admin.objects.AssetManagerInfo getAssetManagerInfo() {
+		AssetManagerInfo assetManagerInfo = null;
 
-		legend.admin.objects.AssetManagerInfo ami = null;
-
-		String query =
-				"SELECT Processing_Date, Processing_Frequency, Next_Processing_Date, Default_Branch" +
-						", Branch_Name, Suspense_Acct, Auto_Generate_Id, Residual_Value" +
-						", Depreciation_Method, Vat_Account, Wht_Account" +
-						", PL_Disposal_Account, PLD_Status, Vat_Acct_Status, Wht_Acct_Status" +
-						", Suspense_Ac_Status, Sbu_Required, Sbu_Level, system_date, asset_acq_ac " +
+		final String sql =
+				"SELECT Processing_Date, Processing_Frequency, Next_Processing_Date, Default_Branch, " +
+						"       Branch_Name, Suspense_Acct, Auto_Generate_Id, Residual_Value, " +
+						"       Depreciation_Method, Vat_Account, Wht_Account, " +
+						"       PL_Disposal_Account, PLD_Status, Vat_Acct_Status, Wht_Acct_Status, " +
+						"       Suspense_Ac_Status, Sbu_Required, Sbu_Level, system_date, asset_acq_ac " +
 						"FROM AM_GB_COMPANY";
 
-		try (
-				Connection con = getConnection();
-				PreparedStatement ps = con.prepareStatement(query)
-		) {
+		try (Connection connection = getConnection();
+			 PreparedStatement statement = connection.prepareStatement(
+					 sql,
+					 ResultSet.TYPE_FORWARD_ONLY,
+					 ResultSet.CONCUR_READ_ONLY)) {
 
-			ps.setQueryTimeout(30);
+			statement.setQueryTimeout(30);
 
-			try (ResultSet rs = ps.executeQuery()) {
+			try (ResultSet resultSet = statement.executeQuery()) {
 
-				if (rs.next()) {
+				if (resultSet.next()) {
 
-					Date processingDateObj = rs.getDate("Processing_Date");
-					Date nextProcessingDateObj = rs.getDate("Next_Processing_Date");
-					Date sysDateObj = rs.getDate("system_date");
-
-					String processingDate =
-							(processingDateObj != null) ? sdf.format(processingDateObj) : null;
-
-					String nextProcessingDate =
-							(nextProcessingDateObj != null) ? sdf.format(nextProcessingDateObj) : null;
-
-					String sysDate =
-							(sysDateObj != null) ? sdf.format(sysDateObj) : null;
-
-					ami = new legend.admin.objects.AssetManagerInfo(
-							processingDate,
-							rs.getString("Processing_Frequency"),
-							nextProcessingDate,
-							rs.getString("Default_Branch"),
-							rs.getString("Branch_Name"),
-							rs.getString("Suspense_Acct"),
-							rs.getString("Auto_Generate_Id"),
-							rs.getString("Residual_Value"),
-							rs.getString("Depreciation_Method"),
-							rs.getString("Vat_Account"),
-							rs.getString("Wht_Account"),
-							rs.getString("PL_Disposal_Account"),
-							rs.getString("PLD_Status"),
-							rs.getString("Vat_Acct_Status"),
-							rs.getString("Wht_Acct_Status"),
-							rs.getString("Suspense_Ac_Status"),
-							rs.getString("Sbu_Required"),
-							rs.getString("Sbu_Level")
+					assetManagerInfo = new AssetManagerInfo(
+							formatDate(resultSet.getDate("Processing_Date")),
+							resultSet.getString("Processing_Frequency"),
+							formatDate(resultSet.getDate("Next_Processing_Date")),
+							resultSet.getString("Default_Branch"),
+							resultSet.getString("Branch_Name"),
+							resultSet.getString("Suspense_Acct"),
+							resultSet.getString("Auto_Generate_Id"),
+							resultSet.getString("Residual_Value"),
+							resultSet.getString("Depreciation_Method"),
+							resultSet.getString("Vat_Account"),
+							resultSet.getString("Wht_Account"),
+							resultSet.getString("PL_Disposal_Account"),
+							resultSet.getString("PLD_Status"),
+							resultSet.getString("Vat_Acct_Status"),
+							resultSet.getString("Wht_Acct_Status"),
+							resultSet.getString("Suspense_Ac_Status"),
+							resultSet.getString("Sbu_Required"),
+							resultSet.getString("Sbu_Level")
 					);
 
-					ami.setSysDate(sysDate);
-					ami.setAssetSuspenseAcct(rs.getString("asset_acq_ac"));
+					assetManagerInfo.setSysDate(
+							formatDate(resultSet.getDate("system_date"))
+					);
+
+					assetManagerInfo.setAssetSuspenseAcct(
+							resultSet.getString("asset_acq_ac")
+					);
 				}
 			}
 
-		} catch (SQLException e) {
-			throw new RuntimeException("Error executing getAssetManagerInfo()", e);
+		} catch (SQLException ex) {
+			throw new RuntimeException(
+					"Failed to retrieve Asset Manager configuration from AM_GB_COMPANY",
+					ex
+			);
 		}
 
-		return ami;
+		return assetManagerInfo;
 	}
 
 	public legend.admin.objects.Company getAllCompanyField(String tempId) {
@@ -15394,50 +15381,57 @@ public legend.admin.objects.AssetDescription getAssetDescriptionsBySubCatCode(
 	return descripts;
 }
 
-public java.util.ArrayList getAssetDescriptionsByQuery(String filter, String status) {
-	java.util.ArrayList _list = new java.util.ArrayList();
-	legend.admin.objects.AssetDescription descripts = null;
+	public java.util.ArrayList getAssetDescriptionsByQuery(String filter, String status) {
 
-	String query = "SELECT ID, SUB_CATEGORY_CODE, DESCRIPTION, STATUS, USER_ID,"
-			+ " CREATE_DATE FROM AM_ASSET_DESCRIPTION WHERE ID IS NOT NULL ";
+		java.util.ArrayList list = new java.util.ArrayList();
 
-	query += filter+"ORDER BY DESCRIPTION";
-//	System.out.println("=======query====: "+query);
-	PreparedStatement s = null;
-	try {
-		con = getConnection();
-//		stmt = con.createStatement();
-//		rs = stmt.executeQuery(query);
-		s = con.prepareStatement(query.toString());
-		s.setString(1, status);
-		rs = s.executeQuery();
+		StringBuilder query = new StringBuilder(
+				"SELECT ID, SUB_CATEGORY_CODE, DESCRIPTION, STATUS, USER_ID, CREATE_DATE " +
+						"FROM AM_ASSET_DESCRIPTION WHERE ID IS NOT NULL "
+		);
 
-		while (rs.next()) {
-			String descriptId = rs.getString("ID");
-			String descriptCode = rs.getString("SUB_CATEGORY_CODE");
-			String description = rs.getString("DESCRIPTION");
-			String descriptStatus = rs.getString("STATUS");
-			String userId = rs.getString("USER_ID");
-			String createDate = sdf.format(rs.getDate("CREATE_DATE"));
-
-			descripts = new legend.admin.objects.AssetDescription();
-			descripts.setDescriptionId(descriptId);
-			descripts.setSubCategoryCode(descriptCode);
-			descripts.setDescription(description);
-			descripts.setDescriptionStatus(descriptStatus);
-			descripts.setUserId(userId);
-			descripts.setCreateDate(createDate);
-
-			_list.add(descripts);
+		if (filter != null && !filter.trim().isEmpty()) {
+			query.append(" ").append(filter).append(" ");
 		}
-	} catch (Exception ex) {
-		ex.printStackTrace();
-	} finally {
-		closeConnection(con, stmt, rs);
-	}
-	return _list;
 
-}
+		query.append(" ORDER BY DESCRIPTION");
+
+		try (Connection con = getConnection();
+			 PreparedStatement ps = con.prepareStatement(query.toString())) {
+
+			// Only bind parameter if placeholder exists
+			if (query.indexOf("?") != -1) {
+				ps.setString(1, status);
+			}
+
+			try (ResultSet rs = ps.executeQuery()) {
+
+				while (rs.next()) {
+
+					legend.admin.objects.AssetDescription descripts =
+							new legend.admin.objects.AssetDescription();
+
+					descripts.setDescriptionId(rs.getString("ID"));
+					descripts.setSubCategoryCode(rs.getString("SUB_CATEGORY_CODE"));
+					descripts.setDescription(rs.getString("DESCRIPTION"));
+					descripts.setDescriptionStatus(rs.getString("STATUS"));
+					descripts.setUserId(rs.getString("USER_ID"));
+
+					java.sql.Date createDate = rs.getDate("CREATE_DATE");
+					if (createDate != null) {
+						descripts.setCreateDate(sdf.format(createDate));
+					}
+
+					list.add(descripts);
+				}
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return list;
+	}
 
 
 
@@ -16396,142 +16390,173 @@ public boolean InsertNewVendorOld(String branchCode, String branchName, String b
 		}
 	}
 
-public java.util.ArrayList getNewSBURecordsFromFinacleLegacySystem()
-{
-	java.util.ArrayList _list = new java.util.ArrayList();
-	String date = String.valueOf(dateConvert(new java.util.Date()));
-	date = date.substring(0, 10);
-	String date1 =date.substring(0,2);
-	String date0 = date.substring(2,10);
-//	System.out.println("======date1: "+date1+"    date0: "+date0+"   date: "+date);
-	date = "20"+date.substring(2,10);
-	String iso ="";
-		String query = " SELECT  * FROM CUSTOM.NEW_SBU_DETAILS " ;
-//				"where to_char(tran_date,'DD-MM-YYYY') >= ?";
-//		System.out.println("Query on getFinacleRecords====> "+query);
-	Connection c = null;
-//	ConnectionClass connection = null;
-	ResultSet rs = null;
-	PreparedStatement ps = null;
+	public List<Sbu_branch> getNewSBURecordsFromFinacleLegacySystem() {
 
-	try {
-		   c = getFinacleConnection();
-		   rs = c.prepareStatement(query).executeQuery();
-			ps = c.prepareStatement(query.toString());
-//			ps.setString(1, getOracleDateFormat(date));
-			rs = ps.executeQuery();
-			while (rs.next())
-			   {
-				String sbuCode = rs.getString("SECTORCODE");
-				String sbuName = rs.getString("SECTORDESC");
-				Sbu_branch sbu = new Sbu_branch();
-				sbu.setSbucode(sbuCode);
-				sbu.setSbuname(sbuName);
-				sbu.setMailcontact("info@fcmb.com");
-				sbu.setSbustatus("ACTIVE");
-				_list.add(sbu);
-			   }
-	 	}
-				 catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-					finally
-					{
-//						connection.freeResource();
-						closeConnection(c, ps, rs);
-					}
-			return _list;
-}
+		final List<Sbu_branch> sbuList = new ArrayList<>();
+
+		final String sql =
+				"SELECT SECTORCODE, SECTORDESC " +
+						"FROM CUSTOM.NEW_SBU_DETAILS";
+
+		try (Connection connection = getFinacleConnection();
+			 PreparedStatement statement = connection.prepareStatement(
+					 sql,
+					 ResultSet.TYPE_FORWARD_ONLY,
+					 ResultSet.CONCUR_READ_ONLY)) {
+
+			statement.setQueryTimeout(60);
+			statement.setFetchSize(500); // important for large legacy datasets
+
+			try (ResultSet resultSet = statement.executeQuery()) {
+
+				while (resultSet.next()) {
+
+					String sbuCode = resultSet.getString("SECTORCODE");
+					String sbuName = resultSet.getString("SECTORDESC");
+
+					Sbu_branch sbu = new Sbu_branch();
+					sbu.setSbucode(sbuCode);
+					sbu.setSbuname(sbuName);
+					sbu.setMailcontact("info@fcmb.com"); // preserved logic
+					sbu.setSbustatus("ACTIVE");          // preserved logic
+
+					sbuList.add(sbu);
+				}
+			}
+
+		} catch (SQLException ex) {
+			throw new RuntimeException(
+					"Failed to fetch SBU records from Finacle legacy system", ex);
+		}
+
+		return sbuList;
+	}
 
 
 	public List<Section> getNewSectionRecordsFromFinacleLegacySystem() {
 
-		List<Section> list = new ArrayList<>();
+		final List<Section> sections = new ArrayList<>();
 
-		String query = "SELECT * FROM CUSTOM.NEW_SECTION_DETAILS";
+		final String sql =
+				"SELECT SECTORCODE, SECTORDESC " +
+						"FROM CUSTOM.NEW_SECTION_DETAILS";
 
-		try (
-				Connection con = getFinacleConnection();
-				PreparedStatement ps = con.prepareStatement(query)
-		) {
+		try (Connection connection = getFinacleConnection();
+			 PreparedStatement statement = connection.prepareStatement(
+					 sql,
+					 ResultSet.TYPE_FORWARD_ONLY,
+					 ResultSet.CONCUR_READ_ONLY)) {
 
-			ps.setQueryTimeout(60); // prevent long blocking
+			statement.setQueryTimeout(60);
 
-			try (ResultSet rs = ps.executeQuery()) {
+			// Important for large legacy datasets (Oracle / Finacle style systems)
+			statement.setFetchSize(500);
 
-				while (rs.next()) {
+			try (ResultSet resultSet = statement.executeQuery()) {
+
+				while (resultSet.next()) {
 
 					Section section = new Section();
-					section.setSection_code(rs.getString("SECTORCODE"));
-					section.setSection_name(rs.getString("SECTORDESC"));
-					section.setSection_status("ACTIVE");
-					section.setSection_acronym(rs.getString("SECTORCODE"));
 
-					list.add(section);
+					String sectorCode = resultSet.getString("SECTORCODE");
+					String sectorDesc = resultSet.getString("SECTORDESC");
+
+					section.setSection_code(sectorCode);
+					section.setSection_name(sectorDesc);
+					section.setSection_status("ACTIVE");
+					section.setSection_acronym(sectorCode);
+
+					sections.add(section);
 				}
 			}
 
-		} catch (SQLException e) {
-			throw new RuntimeException("Error fetching Finacle section records", e);
+		} catch (SQLException ex) {
+			throw new RuntimeException(
+					"Failed to fetch section records from Finacle legacy system", ex);
 		}
 
-		return list;
+		return sections;
 	}
-	public boolean InsertNewSbu(String sbuCode, String sbuName, String sbuContact, String status) {
+	public boolean insertNewSbu(String sbuCode,
+								String sbuName,
+								String sbuContact,
+								String status) {
 
-		String query =
-				"INSERT INTO Sbu_SetUp(sbu_code,sbu_name,sbu_contact,status,contact_email) VALUES (?,?,?,?,?)";
+		final String sql =
+				"INSERT INTO Sbu_SetUp(" +
+						"sbu_code, sbu_name, sbu_contact, status, contact_email) " +
+						"VALUES (?, ?, ?, ?, ?)";
 
-		try (
-				Connection con = getConnection();
-				PreparedStatement ps = con.prepareStatement(query)
-		) {
+		try (Connection connection = getConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
 
-			ps.setQueryTimeout(30);
+			// Ensure predictable transactional behavior
+			if (connection.getAutoCommit()) {
+				connection.setAutoCommit(false);
+			}
 
-			ps.setString(1, sbuCode);
-			ps.setString(2, sbuName);
-			ps.setString(3, sbuName);     // preserved original logic
-			ps.setString(4, status);
-			ps.setString(5, sbuContact);  // preserved original logic
+			statement.setQueryTimeout(30);
 
-			return ps.executeUpdate() > 0;
+			int index = 1;
+			statement.setString(index++, sbuCode);
+			statement.setString(index++, sbuName);
+			statement.setString(index++, sbuName);     // preserved original logic
+			statement.setString(index++, status);
+			statement.setString(index, sbuContact);    // preserved original logic
 
-		} catch (SQLException e) {
-			throw new RuntimeException("Error inserting SBU", e);
+			int rowsAffected = statement.executeUpdate();
+
+			connection.commit();
+
+			return rowsAffected > 0;
+
+		} catch (SQLException ex) {
+			throw new RuntimeException(
+					"Failed to insert SBU with code: " + sbuCode, ex);
 		}
 	}
-	public boolean InsertNewSection(String sectionCode,
+	public boolean insertNewSection(String sectionCode,
 									String sectionName,
 									String sbuContact,
 									String status) {
 
-		String query =
-				"INSERT INTO am_ad_section(Section_Id,Section_Code,Section_Name,section_acronym," +
-						"Section_Status,user_Id,Create_Date) VALUES (?,?,?,?,?,?,?)";
+		final String sql =
+				"INSERT INTO am_ad_section(" +
+						"Section_Id, Section_Code, Section_Name, section_acronym, " +
+						"Section_Status, user_Id, Create_Date) " +
+						"VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-		String generatedId = new ApplicationHelper().getGeneratedId("am_ad_section");
+		// Generate ID once
+		final String generatedId = ApplicationHelper.getGeneratedId("am_ad_section");
 
-		try (
-				Connection con = getConnection();
-				PreparedStatement ps = con.prepareStatement(query)
-		) {
+		try (Connection connection = getConnection();
+			 PreparedStatement statement = connection.prepareStatement(sql)) {
 
-			ps.setQueryTimeout(30);
+			// Optional: ensure predictable transactional behavior
+			if (connection.getAutoCommit()) {
+				connection.setAutoCommit(false);
+			}
 
-			ps.setString(1, generatedId);
-			ps.setString(2, sectionCode);
-			ps.setString(3, sectionName);
-			ps.setString(4, sectionCode);
-			ps.setString(5, status);
-			ps.setString(6, "0");
-			ps.setDate(7, dateConvert(new Date()));
+			statement.setQueryTimeout(30);
 
-			return ps.executeUpdate() > 0;
+			int index = 1;
+			statement.setString(index++, generatedId);
+			statement.setString(index++, sectionCode);
+			statement.setString(index++, sectionName);
+			statement.setString(index++, sectionCode); // acronym defaults to code
+			statement.setString(index++, status);
+			statement.setString(index++, "0"); // default system user
+			statement.setDate(index, dateConvert(new Date()));
 
-		} catch (SQLException e) {
-			throw new RuntimeException("Error inserting Section", e);
+			int rowsAffected = statement.executeUpdate();
+
+			connection.commit();
+
+			return rowsAffected > 0;
+
+		} catch (SQLException ex) {
+			throw new RuntimeException(
+					"Failed to insert new Section with code: " + sectionCode, ex);
 		}
 	}
 	public boolean APIgroupRecordProcess(String groupId, String invoiceNo) {
