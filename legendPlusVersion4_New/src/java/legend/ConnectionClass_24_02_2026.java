@@ -1252,6 +1252,7 @@ public class ConnectionClass_24_02_2026 {
         return a;
     }
 
+    
     public String getVatRateOld() throws Exception {
     	Connection conn = null;
     	ResultSet rs = null;
