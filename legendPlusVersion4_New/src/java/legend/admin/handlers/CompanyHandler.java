@@ -1122,8 +1122,7 @@ private Connection getConnection() throws NamingException, SQLException {
 	 */
 	public boolean createCompany(legend.admin.objects.Company company) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "INSERT INTO AM_GB_COMPANY(Company_Code, Company_Name, Acronym, Company_Address"
 				+ ", Vat_Rate, Wht_Rate,Financial_Start_Date, Financial_No_OfMonths"
@@ -1132,9 +1131,10 @@ private Connection getConnection() throws NamingException, SQLException {
 				+ ", Enforce_Fuel_Allocation, Require_Quarterly_Pm,Quarterly_Surplus_Cf,User_Id,loguseraudit,Attempt_Logon,component_delimiter,password_limit)"
 				+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 			ps.setString(1, company.getCompanyCode());
 			ps.setString(2, company.getCompanyName());
 			ps.setString(3, company.getAcronym());
@@ -1164,9 +1164,7 @@ private Connection getConnection() throws NamingException, SQLException {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
 					e.printStackTrace();
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -1177,8 +1175,7 @@ private Connection getConnection() throws NamingException, SQLException {
 	 */
 	public boolean createDefaultsCompany(legend.admin.objects.Company company) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "INSERT INTO AM_GB_COMPANY(Company_Code, Company_Name, Acronym, Company_Address"
 				+ "Minimum_Password, Password_Expiry, Session_Timeout, Enforce_Acq_Budget, Enforce_Pm_Budget"
@@ -1187,9 +1184,11 @@ private Connection getConnection() throws NamingException, SQLException {
 				+ "system_date,databaseName,sbu_required,next_processing_date,processing_date,Processing_frequency)"
 				+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 			ps.setString(1, company.getCompanyCode());
 			ps.setString(2, company.getCompanyName());
 			ps.setString(3, company.getAcronym());
@@ -1219,9 +1218,7 @@ private Connection getConnection() throws NamingException, SQLException {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -1301,8 +1298,7 @@ private Connection getConnection() throws NamingException, SQLException {
 	 */
 	public String createCompanyTmp(legend.admin.objects.Company company) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		String result = "";
 		boolean done = false;
 		String query = "INSERT INTO AM_GB_COMPANYTEMP(Company_Code, Company_Name, Acronym, Company_Address"
@@ -1313,12 +1309,14 @@ private Connection getConnection() throws NamingException, SQLException {
 				+ "  password_upper,password_lower,password_numeric,password_special,Proof_Session_timeout,Processing_Frequency,"
 				+ " Next_Processing_Date,THIRDPARTY_REQUIRE,RAISE_ENTRY,system_date,databaseName,Sbu_Required,Sbu_Level )"
 				+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String tmpId = (new ApplicationHelper()).getGeneratedId("am_gb_companytemp");
+		tmpId = "CP"+tmpId;
 
-		try {
-			String tmpId = (new ApplicationHelper()).getGeneratedId("am_gb_companytemp");
-			tmpId = "CP"+tmpId;
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
+			
 			ps.setString(1, company.getCompanyCode());
 			ps.setString(2, company.getCompanyName());
 			ps.setString(3, company.getAcronym());
@@ -1370,17 +1368,14 @@ private Connection getConnection() throws NamingException, SQLException {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return result;
 
 	}
 
 	public boolean updateCompany(legend.admin.objects.Company company) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "UPDATE AM_GB_COMPANY "
 				+ " SET Company_Name = ?, Acronym = ?, Company_Address = ?,Vat_Rate = ?, Wht_Rate = ?"
@@ -1391,9 +1386,10 @@ private Connection getConnection() throws NamingException, SQLException {
 				+ ", Quarterly_Surplus_Cf = ?,loguseraudit=?,Attempt_Logon=?,component_delimiter=?,"
                 + " password_upper=?,password_lower=?,password_numeric=?,password_special=?,password_limit=?,Proof_Session_timeout = ?  WHERE Company_Code=? ";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 //			ps = con.prepareStatement(query);
 
 			ps.setString(1, company.getCompanyName());
@@ -1430,17 +1426,14 @@ private Connection getConnection() throws NamingException, SQLException {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
 
 	public boolean updateAssetManagerInfo(legend.admin.objects.AssetManagerInfo ami) {
 
-        Connection con = null;
-		PreparedStatement ps = null;
+       
 		boolean done = false;
 
         String query = "UPDATE AM_GB_COMPANY "
@@ -1460,9 +1453,10 @@ private Connection getConnection() throws NamingException, SQLException {
   //      System.out.println("HERE ##################### " );
 
        // String query = "update am_gb_company set cost_threshold =?";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+        try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 			         //System.out.println("the query is############ " + query);
                      //ps.setDouble(1,ami.getCp_threshold());
 
@@ -1525,9 +1519,7 @@ private Connection getConnection() throws NamingException, SQLException {
             System.out.println("#######ERROR OCCURED IN updateAssetManagerInfo METHOD OF COMPANY HANDLER CLASS");
 			System.out.println("WARNING:Error executing Query in updateAssetManagerInfo ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -1535,8 +1527,7 @@ private Connection getConnection() throws NamingException, SQLException {
 
 	public boolean updateCompanyApprovalOld(legend.admin.objects.Company company) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "UPDATE AM_GB_COMPANY "
 				+ " SET Company_Name = ?, Acronym = ?, Company_Address = ?,Vat_Rate = ?, Wht_Rate = ?"
@@ -1547,9 +1538,10 @@ private Connection getConnection() throws NamingException, SQLException {
 				+ ", Quarterly_Surplus_Cf = ?,loguseraudit=?,Attempt_Logon=?,component_delimiter=?,"
                 + " password_upper=?,password_lower=?,password_numeric=?,password_special=?,password_limit=?,Proof_Session_timeout = ?  WHERE Company_Code=? ";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 //			ps = con.prepareStatement(query);
 
 			ps.setString(1, company.getCompanyName());
@@ -1586,17 +1578,14 @@ private Connection getConnection() throws NamingException, SQLException {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
 
 	public boolean updateCompanyApproval(legend.admin.objects.Company company) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "UPDATE AM_GB_COMPANY "
 				+ " SET Company_Name = ?, Acronym = ?, Company_Address = ?,Proof_Session_timeout = ?, THIRDPARTY_REQUIRE = ?"
@@ -1607,9 +1596,10 @@ private Connection getConnection() throws NamingException, SQLException {
 				+ ", Quarterly_Surplus_Cf = ?,loguseraudit=?,Attempt_Logon=?,component_delimiter=?,"
                 + " password_upper=?,password_lower=?,password_numeric=?,password_special=?,password_limit=?, "
 				+ "sbu_level=?,sbu_required=?,next_processing_date=?,processing_date=?,Processing_frequency=?  WHERE Company_Code=? ";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 //			ps = con.prepareStatement(query);
 
 			ps.setString(1, company.getCompanyName());
@@ -1659,9 +1649,7 @@ private Connection getConnection() throws NamingException, SQLException {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query in updateCompanyApproval ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -1669,8 +1657,7 @@ private Connection getConnection() throws NamingException, SQLException {
 
 	public boolean updateAssetManagerInfoApprovalOld(legend.admin.objects.Company company) {
 
-        Connection con = null;
-		PreparedStatement ps = null;
+      
 		boolean done = false;
 
         String query = "UPDATE AM_GB_COMPANY "
@@ -1693,9 +1680,10 @@ private Connection getConnection() throws NamingException, SQLException {
   //      System.out.println("HERE ##################### " );
 
        // String query = "update am_gb_company set cost_threshold =?";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+        try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 			         //System.out.println("the query is############ " + query);
                      //ps.setDouble(1,ami.getCp_threshold());
 
@@ -1768,17 +1756,14 @@ private Connection getConnection() throws NamingException, SQLException {
             System.out.println("#######ERROR OCCURED IN updateAssetManagerInfo METHOD OF COMPANY HANDLER CLASS");
 			System.out.println("WARNING:Error executing Query in updateAssetManagerInfo ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
 
 	public boolean updateAssetManagerInfoApproval(legend.admin.objects.Company company) {
 
-        Connection con = null;
-		PreparedStatement ps = null;
+       
 		boolean done = false;
 
         String query = "UPDATE AM_GB_COMPANY "
@@ -1800,9 +1785,10 @@ private Connection getConnection() throws NamingException, SQLException {
 //        System.out.println("HERE ##################### " );
 
        // String query = "update am_gb_company set cost_threshold =?";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+        try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 //			         System.out.println("the query is############===> " + query);
                      //ps.setDouble(1,ami.getCp_threshold());
 
@@ -1878,9 +1864,7 @@ private Connection getConnection() throws NamingException, SQLException {
             System.out.println("#######ERROR OCCURED IN updateAssetManagerInfo METHOD OF COMPANY HANDLER CLASS");
 			System.out.println("WARNING:Error executing Query in updateAssetManagerInfo ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -1889,8 +1873,7 @@ private Connection getConnection() throws NamingException, SQLException {
 
 	public boolean updateAllCompanyFields(legend.admin.objects.Company company) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+	
 		boolean done = false;
 		String query = "UPDATE AM_GB_COMPANY "
 				+ " SET Company_Name = ?, Acronym = ?, Company_Address = ?,Vat_Rate = ?, Wht_Rate = ?"
@@ -1909,9 +1892,10 @@ private Connection getConnection() throws NamingException, SQLException {
 				+ " loss_disposal_account=?,lossDisposal_act_status=?, group_asset_account=?,group_asset_act_status=?,selfChargeVAT=?,"
 				+ " selfCharge_Vat_status=?,databaseName=?,Proof_Session_timeout=?  WHERE Company_Code=? ";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 //			ps = con.prepareStatement(query);
 //			System.out.print("update query ...>>>>>>>>>>>"+query);
 //			System.out.print("update getCompanyCode 1...>>>>>>>>>>>"+company.getCompanyCode());
@@ -1987,9 +1971,7 @@ private Connection getConnection() throws NamingException, SQLException {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query in updateAllCompanyFields ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -1999,8 +1981,7 @@ private Connection getConnection() throws NamingException, SQLException {
 	 */
 	public String createCompanyAmiTmp(legend.admin.objects.AssetManagerInfo ami) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		String result = "";
 		boolean done = false;
 		String query = "INSERT INTO AM_GB_COMPANYTEMP(Default_Branch, "
@@ -2013,12 +1994,16 @@ private Connection getConnection() throws NamingException, SQLException {
 				+ "Vat_Rate, Wht_Rate,Financial_Start_Date, Financial_No_OfMonths,Financial_End_Date,component_delimiter, TMPID)"
 				+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-		try {
-			String tmpId = (new ApplicationHelper()).getGeneratedId("am_gb_companytemp");
-			tmpId = "CP"+tmpId;
+		String tmpId = (new ApplicationHelper()).getGeneratedId("am_gb_companytemp");
+		tmpId = "CP"+tmpId;
+		
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
+			
 //			System.out.println("=====tmpId in createCompanyAmiTmp: "+tmpId);
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		
 //			ps.setDate(1, dateConvert(ami.getProcessingDate()));
 //			ps.setString(2, ami.getProcessingFrequency());
 //			ps.setDate(3, dateConvert(ami.getNextProcessingDate()));
@@ -2082,9 +2067,7 @@ private Connection getConnection() throws NamingException, SQLException {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query in createCompanyAmiTmp ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		System.out.println("=====result in createCompanyAmiTmp: "+result);
 		return result;
 
@@ -2200,8 +2183,7 @@ private Connection getConnection() throws NamingException, SQLException {
 //
 public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo ami,String recId) {
 
-    Connection con = null;
-	PreparedStatement ps = null;
+   
 	boolean done = false;
 
     String query = "UPDATE AM_GB_COMPANYTEMP "
@@ -2222,9 +2204,10 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 //      System.out.println("HERE ##################### " );
 
    // String query = "update am_gb_company set cost_threshold =?";
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+    try (
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(query)
+	) {
 		         //System.out.println("the query is############ " + query);
                  //ps.setDouble(1,ami.getCp_threshold());
 
@@ -2298,9 +2281,7 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
         System.out.println("#######ERROR OCCURED IN updateAssetManagerInfo METHOD OF COMPANY HANDLER CLASS");
 		System.out.println("WARNING:Error executing Query ->"
 				+ e.getMessage());
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
 	return done;
 
 }
@@ -2316,14 +2297,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ "Driver_Fax, Driver_email, Driver_Status, driver_province, User_id,"
 				+ "Create_date FROM am_ad_driver";
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+	
 
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
+			try(ResultSet rs = ps.executeQuery(query);){
 			while (rs.next()) {
 				String driverId = rs.getString("Driver_ID");
 				String code = rs.getString("Driver_Code");
@@ -2367,14 +2347,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				driver.setCreateDate(createD);
 				_list.add(driver);
 			}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -2389,18 +2368,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ "Create_date FROM am_ad_driver WHERE Driver_ID IS NOT NULL ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			s = c.prepareStatement(query.toString());
-			s.setString(1, parameter);
-			rs = s.executeQuery();
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
+			
+			ps.setString(1, parameter);
+			try(ResultSet rs = ps.executeQuery(query);){
 			while (rs.next()) {
 				String driverId = rs.getString("Driver_ID");
 				String code = rs.getString("Driver_code");
@@ -2444,14 +2418,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				driver.setCreateDate(createD);
 				_list.add(driver);
 			}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -2465,18 +2438,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ "Driver_Fax, Driver_email, Driver_Status, driver_province, User_id,"
 				+ "Create_date FROM am_ad_driver WHERE Driver_ID=? ";
 
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			s = c.prepareStatement(query.toString());
-			s.setString(1, driverid);
-			rs = s.executeQuery();
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
+			ps.setString(1, driverid);
+			
+		try(ResultSet rs = ps.executeQuery();){
 			while (rs.next()) {
 				String driverId = rs.getString("Driver_ID");
 				String code = rs.getString("Driver_code");
@@ -2518,16 +2486,14 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				driver.setDriverProvince(province);
 				driver.setUserId(userId);
 				driver.setCreateDate(createD);
-
+			}
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+	
 		return driver;
 
 	}
@@ -2541,18 +2507,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ "Driver_Fax, Driver_email, Driver_Status, driver_province, User_id,"
 				+ "Create_date FROM am_ad_driver WHERE Driver_Code=? ";
 
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			s = c.prepareStatement(query.toString());
-			s.setString(1, driverid);
-			rs = s.executeQuery();
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
+			ps.setString(1, driverid);
+			
+		try(ResultSet rs = ps.executeQuery();){
 			while (rs.next()) {
 				String driverId = rs.getString("Driver_ID");
 				String code = rs.getString("Driver_code");
@@ -2596,22 +2557,19 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				driver.setCreateDate(createD);
 
 			}
+		}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return driver;
 
 	}
 
 	public boolean createDriver(legend.admin.objects.Driver ccode) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "INSERT INTO am_ad_driver(Driver_Code, Driver_License, dl_issue_date,"
 				+ "dl_expiry_date, Driver_LastName, Driver_FirstName, Driver_OtherName,"
@@ -2620,9 +2578,10 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ "Create_date) "
 				+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 			ps.setString(1, ccode.getDriverCode());
 			ps.setString(2, ccode.getDriverLicense());
 			ps.setDate(3, dateConvert(ccode.getDlIssueDate()));
@@ -2648,17 +2607,15 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+		
 		return done;
 
 	}
 
 	public boolean updateDriver(legend.admin.objects.Driver ccode) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "UPDATE am_ad_driver"
 				+ " SET Driver_Code = ?,Driver_License=?,dl_issue_date = ?"
@@ -2667,9 +2624,10 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ ",Driver_Phone = ?,Driver_Fax = ?, Driver_email = ?, Driver_Status = ?"
 				+ ",driver_province = ?" + " WHERE Driver_ID = ?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
 			ps.setString(1, ccode.getDriverCode());
 			ps.setString(2, ccode.getDriverLicense());
 			ps.setDate(3, dateConvert(ccode.getDlIssueDate()));
@@ -2692,9 +2650,7 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -2705,14 +2661,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 		String query = "SELECT Location_Id, Location_Code, Location"
 				+ ", Status, User_Id, Create_Date" + " FROM AM_GB_LOCATION";
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+		
 
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(query)
+		) {
+			try (ResultSet rs = ps.executeQuery(query);){
 			while (rs.next()) {
 				String locationId = rs.getString("Location_Id");
 				String locationCode = rs.getString("Location_Code");
@@ -2730,14 +2685,11 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				location.setStatus(status);
 				_list.add(location);
 			}
-
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
 		return _list;
 
 	}
@@ -2750,19 +2702,14 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ ", Status, User_Id, Create_Date"
 				+ " FROM AM_GB_LOCATION WHERE Location_Id IS NOT NULL ";
 
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
+		
 		query = query + filter;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-
-			s = c.prepareStatement(query.toString());
+		try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
 			s.setString(1, statusparameter);
-			rs = s.executeQuery();
+			try(ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String locationId = rs.getString("Location_Id");
 				String locationCode = rs.getString("Location_Code");
@@ -2780,14 +2727,11 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				location.setStatus(status);
 				_list.add(location);
 			}
-
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
 		return _list;
 
 	}
@@ -2798,17 +2742,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ ", Status, User_Id, Create_Date"
 				+ " FROM AM_GB_LOCATION WHERE Location_Id = ? ";
 
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			s = c.prepareStatement(query.toString());
+	
+		try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
 			s.setString(1, LocID);
-			rs = s.executeQuery();
+		try(ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String locationId = rs.getString("Location_Id");
 				String locationCode = rs.getString("Location_Code");
@@ -2825,14 +2765,12 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				location.setCreateDate(createDate);
 				location.setStatus(status);
 			}
-
+		}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return location;
 	}
 
@@ -2871,15 +2809,14 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 
     public boolean updateLocation(legend.admin.objects.Locations location) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
 		boolean done = false;
 		String query = "UPDATE AM_GB_LOCATION" + " SET Location_Code = ?"
 				+ ",Location = ?,Status = ?" + " WHERE Location_Id = ?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
 			ps.setString(1, location.getLocationCode());
 			ps.setString(2, location.getLocation());
 			ps.setString(3, location.getStatus());
@@ -2906,17 +2843,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ ", Status, User_Id, Create_Date"
 				+ " FROM AM_GB_LOCATION WHERE Location_Code = ? ";
 
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			s = c.prepareStatement(query.toString());
+		
+		try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
 			s.setString(1, LocCode);
-			rs = s.executeQuery();
+		try(ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String locationId = rs.getString("Location_Id");
 				String locationCode = rs.getString("Location_Code");
@@ -2934,14 +2867,11 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				location.setCreateDate(createDate);
 
 			}
-
+		}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
 		return location;
 
 	}
@@ -2953,14 +2883,12 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ ", Class_Status, User_Id, Create_Date"
 				+ " FROM AM_AD_CATEGORY_CLASS";
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		
+		try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
+		try(ResultSet rs = s.executeQuery(query);){
 			while (rs.next()) {
 				String classId = rs.getString("Class_Id");
 				String classCode = rs.getString("Class_Code");
@@ -2978,14 +2906,12 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				catclass.setCreateDate(createDate);
 				_list.add(catclass);
 			}
-
+		}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -2998,19 +2924,14 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ ", Class_Status, User_Id, Create_Date"
 				+ " FROM AM_AD_CATEGORY_CLASS WHERE Class_Id IS NOT NULL ";
 
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
+		
 		query += filter;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-
-			s = c.prepareStatement(query.toString());
+		try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
 			s.setString(1, parameter);
-			rs = s.executeQuery();
+		try(ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String classId = rs.getString("Class_Id");
 				String classCode = rs.getString("Class_Code");
@@ -3028,14 +2949,11 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				catclass.setClassStatus(classStatus);
 				_list.add(catclass);
 			}
-
+		}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
 		return _list;
 
 	}
@@ -3047,18 +2965,13 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				+ ", Class_Status, User_Id, Create_Date"
 				+ " FROM AM_AD_CATEGORY_CLASS WHERE Class_ID = ? ";
 
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-
-			s = c.prepareStatement(query.toString());
+		
+		try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
 			s.setString(1, CatClassID);
-			rs = s.executeQuery();
+		try(ResultSet	rs = s.executeQuery();){
 			while (rs.next()) {
 				String classId = rs.getString("Class_Id");
 				String classCode = rs.getString("Class_Code");
@@ -3076,30 +2989,27 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 				catclass.setCreateDate(createDate);
 
 			}
-
+		}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
 		return catclass;
 	}
 
 	public boolean createCategoryClass(
 			legend.admin.objects.CategoryClass catgclass) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "INSERT INTO AM_AD_CATEGORY_CLASS( Class_Code, Class_Name"
 				+ ", Class_Status, User_Id, Create_Date)"
 				+ " VALUES (?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
 
 			ps.setString(1, catgclass.getClassCode());
 			ps.setString(2, catgclass.getClassName());
@@ -3113,9 +3023,7 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -3376,15 +3284,10 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 
 //		query += filter+"ORDER BY DESCRIPTION";
 
-		try {
-//			con = getConnection();
-//			stmt = con.createStatement();
-//			rs = stmt.executeQuery(query);
-
-			con = getConnection();
-			ps = con.prepareStatement(query.toString());
+		 try (Connection c = getConnection();
+		         PreparedStatement ps = c.prepareStatement(query)) {
 			ps.setString(1, parameter);
-			rs = ps.executeQuery();
+		try(ResultSet rs = ps.executeQuery();){
 
 			while (rs.next()) {
 				String reasonId = rs.getString("reason_id");
@@ -3404,6 +3307,7 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 
 				_list.add(dispres);
 			}
+		}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
@@ -3516,43 +3420,28 @@ public boolean updateAssetManagerInfoTmp(legend.admin.objects.AssetManagerInfo a
 	}
 
 
-    public String getEmailStatus(String mailCode){
-String  branch="";
+	public String getEmailStatus(String mailCode) {
+	    String status = "";
+	    String query = "SELECT status FROM am_mail_statement WHERE mail_code = ?";
 
-            String query = "SELECT status FROM am_mail_statement where mail_code = '"+mailCode+"'";
+	    try (Connection c = getConnection();
+	         PreparedStatement ps = c.prepareStatement(query)) {
 
+	        ps.setString(1, mailCode);
 
-            Connection c = null;
-            ResultSet rs = null;
-//            Statement s = null;
-            PreparedStatement s = null;
-            try
-            {
-                c = getConnection();
-//                s = c.createStatement();
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                status = rs.getString("status");
+	            }
+	        }
 
-        		s = c.prepareStatement(query.toString());
-        		s.setString(1, mailCode);
+	    } catch (Exception e) {
+	        System.out.println("CompanyHandler:getEmailStatus: Error getting mail status -> " + e);
+	        e.printStackTrace();
+	    }
 
-                for(rs = s.executeQuery(); rs.next();)
-                {
-                   branch = rs.getString("status");
-
-
-                }
-
-            }
-            catch(Exception e)
-            {
-                System.out.println("CompanyHandler:getEmailStatus:Erorr getting mail status "+ e );
-
-            }
-            finally
-            {
-                closeConnection(c, s, rs);
-            }
-            return branch;
-}//getEmailStatus(String brachCode)
+	    return status;
+	}//getEmailStatus(String brachCode)
 
 //Joshua's update
 //public legend.admin.objects.AssetManagerInfo getAssetManagerInfoFed() {
@@ -3645,14 +3534,10 @@ String  branch="";
 public legend.admin.objects.AssetManagerInfo getAssetManagerInfoFed() {
 	legend.admin.objects.AssetManagerInfo ami = null;
     String query = "SELECT  Processing_Date, Processing_Frequency, Next_Processing_Date, Default_Branch, Branch_Name,Suspense_Acct, Auto_Generate_Id, Residual_Value, Depreciation_Method, Vat_Account, Wht_Account, Fed_Wht_Account, PL_Disposal_Account, PLD_Status, Vat_Acct_Status, Wht_Acct_Status, Fed_wht_acct_status, Suspense_Ac_Status,Sbu_Required, Sbu_Level,system_date,asset_acq_ac, LPO_Required,Barcode_Fld,Cost_Threshold,defer_account,Trans_Threshold, part_pay_acct,THIRDPARTY_REQUIRE, asset_acq_status, asset_defer_status, part_pay_status,raise_entry,loss_disposal_account,lossDisposal_act_status, group_asset_account,group_asset_act_status,selfChargeVAT,selfCharge_Vat_status,databaseName FROM AM_GB_COMPANY";
-    Connection c = null;
-    ResultSet rs = null;
-    Statement s = null;
+    try (Connection c = getConnection();
+            PreparedStatement ps = c.prepareStatement(query)) {
 
-    try {
-       c = this.getConnection();
-       s = c.createStatement();
-       rs = s.executeQuery(query);
+       try(ResultSet rs = ps.executeQuery(query);){
 
        while(rs.next()) {
           String processingDate = this.sdf.format(rs.getDate("Processing_Date"));
@@ -3718,12 +3603,11 @@ public legend.admin.objects.AssetManagerInfo getAssetManagerInfoFed() {
           ami.setSelfChargeStatus(selfCharge_Vat_status);
           ami.setDatabaseName(databaseName);
        }
+       }
     } catch (Exception var51) {
        System.out.println("######ERROR OCCURED IN getAssetManagerInfoFed() OF COMPANYHANDLER CLASS");
        var51.printStackTrace();
-    } finally {
-       this.closeConnection(c, s, rs);
-    }
+    } 
 
     return ami;
  }
@@ -3736,14 +3620,10 @@ public legend.admin.objects.AssetManagerInfo getAssetManagerInfoFed2() {
     		+ "Cost_Threshold,defer_account,Trans_Threshold, part_pay_acct,THIRDPARTY_REQUIRE, asset_acq_status, asset_defer_status, part_pay_status,"
     		+ "raise_entry,loss_disposal_account,lossDisposal_act_status, group_asset_account,group_asset_act_status,selfChargeVAT,selfCharge_Vat_status,"
     		+ "databaseName,Financial_Start_Date,Financial_No_OfMonths,Financial_End_Date,component_delimiter,Vat_Rate,Wht_Rate FROM AM_GB_COMPANY";
-    Connection c = null;
-    ResultSet rs = null;
-    Statement s = null;
+    try (Connection c = getConnection();
+            PreparedStatement ps = c.prepareStatement(query)) {
 
-    try {
-       c = this.getConnection();
-       s = c.createStatement();
-       rs = s.executeQuery(query);
+       try(ResultSet rs = ps.executeQuery(query);){
 
        while(rs.next()) {
           String processingDate = this.sdf.format(rs.getDate("Processing_Date"));
@@ -3828,14 +3708,12 @@ public legend.admin.objects.AssetManagerInfo getAssetManagerInfoFed2() {
           ami.setVatRate(vatRate);
           ami.setWhtRate(whtRate);
           ami.setComp_delimiter(comp_delimiter);
-
+       }
        }
     } catch (Exception var51) {
        System.out.println("######ERROR OCCURED IN getAssetManagerInfoFed() OF COMPANYHANDLER CLASS");
        var51.printStackTrace();
-    } finally {
-       this.closeConnection(c, s, rs);
-    }
+    } 
 
     return ami;
  }
@@ -3846,38 +3724,28 @@ String[]  branch= new String[2];
 
             String query = "SELECT status, mail_code FROM am_mail_statement where transaction_type = ?";
           //  System.out.println("getEmailStatusAndName query: "+query);
-            Connection c = null;
-            ResultSet rs = null;
-//            Statement s = null;
-            PreparedStatement s = null;
-
-            try
-            {
-                c = getConnection();
-//                s = c.createStatement();
-        		s = c.prepareStatement(query.toString());
-        		s.setString(1, tran_type);
-                for(rs = s.executeQuery(); rs.next();)
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(query)) {
+        		ps.setString(1, tran_type);
+        		try(ResultSet rs = ps.executeQuery();){
+                if( rs.next())
                 {
                    branch[0] = rs.getString("status");
                    branch[1] = rs.getString("mail_code");
 
 
                 }
-
+        		}
             }
             catch(Exception e)
             {
                 System.out.println("CompanyHandler:getEmailStatusAndName:Erorr getting mail status "+ e );
 
             }
-            finally
-            {
-                closeConnection(c, s, rs);
-            }
+           
             return branch;
 }//getEmailStatus(String brachCode)
- public  String getGeneratedTransId()
+ public  String getGeneratedTransIdOld()
  {
 
 
@@ -3937,6 +3805,47 @@ String[]  branch= new String[2];
 		return id;
 
 	   }
+ 
+ public String getGeneratedTransId() {
+	    String id = "";
+	    String tableDate = "";
+	    String presentDate = "";
+	    int counter = 0;
+
+	    final String FINDER_QUERY = "SELECT MT_ID + 1 AS NEXT_ID, MT_DATE FROM IA_TRANSID_TABLE";
+	    final String RESET_QUERY = "UPDATE IA_TRANSID_TABLE SET MT_ID = 1, MT_DATE = GETDATE()";
+	    final String INCREMENT_QUERY = "UPDATE IA_TRANSID_TABLE SET MT_ID = MT_ID + 1";
+
+	    presentDate = String.valueOf(dateConvert(new java.util.Date()));
+		presentDate = presentDate.substring(0, 10);
+
+	    try (Connection con = getConnection();
+	         PreparedStatement finderStmt = con.prepareStatement(FINDER_QUERY);
+	         ResultSet rs = finderStmt.executeQuery()) {
+
+	        if (rs.next()) {
+	            tableDate = rs.getString("MT_DATE").substring(0, 10);
+	            counter = rs.getInt("NEXT_ID");
+	        }
+
+	        // Decide whether to reset or increment
+	        String updateQuery = tableDate.equals(presentDate) ? INCREMENT_QUERY : RESET_QUERY;
+	        if (!tableDate.equals(presentDate)) {
+	            counter = 1; // reset counter if date changed
+	        }
+
+	        try (PreparedStatement updateStmt = con.prepareStatement(updateQuery)) {
+	            updateStmt.executeUpdate();
+	        }
+
+	        id = Integer.toString(counter);
+
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
+
+	    return id;
+	}
 
 public java.util.ArrayList getSqlRecords()
  {
@@ -3949,19 +3858,11 @@ public java.util.ArrayList getSqlRecords()
 //		String query = " SELECT  finacle_Trans_Id from am_raisentry_transaction where transaction_date >'"+date+"' and iso<>'000' ";
 		String query = " SELECT  finacle_Trans_Id,Trans_Id from am_raisentry_transaction where transaction_date between ? and ? and iso<>'000' ";
 //		System.out.println("====Server query-----> "+query);
-	Connection c = null;
-	ResultSet rs = null;
-//	Statement s = null;
-	PreparedStatement s = null;
-
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			s = c.prepareStatement(query.toString());
+		 try (Connection con = getConnection();
+		         PreparedStatement s = con.prepareStatement(query)) {
 			s.setString(1, startDate);
 			s.setString(2, date);
-			rs = s.executeQuery();
+			try(ResultSet rs = s.executeQuery()){
 			while (rs.next())
 			   {
 				String finacle_Trans_Id = rs.getString("finacle_Trans_Id");
@@ -3971,16 +3872,14 @@ public java.util.ArrayList getSqlRecords()
 				newTransaction.setTranType(finacle_Trans_Id);
 				_list.add(newTransaction);
 			   }
+			}
 //			closeConnection(c, s, rs);
 	 }
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
  	return _list;
  }
 @SuppressWarnings("null")
@@ -14171,18 +14070,13 @@ public boolean updateExpensesMessageRecord(String integrifyId, String status)
 
 public boolean updateExpensesPostingRecord(String integrifyId, String status,String errorMessage)
 {
-    Connection con;
-    PreparedStatement ps;
+    
     boolean done;
     String query;
-    con = null;
-    ps = null;
     done = false;
     query = "UPDATE PR_EXPENSES_HISTORY SET STATUS = ?, ERROR_MESSAGE = ? WHERE INTEGRIFY_ID = ?";
-    try
-    {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(query);){
         ps.setString(1, status);
         ps.setString(2, errorMessage);
         ps.setString(3, integrifyId);
@@ -14712,20 +14606,16 @@ public ArrayList<ModuleCodes> findModules(String filter) {
 
 	String FIND_QUERY = "SELECT MODULE_NAME, MODULE_ABV, IS_PREFIX, START_NO FROM ST_MODULES_CODES  ";
 
-	Connection con = null;
-	ResultSet rs = null;
-	PreparedStatement ps = null;
+
 
 	ModuleCodes module = null;
 	ArrayList<ModuleCodes> finder = new ArrayList<ModuleCodes>();
 
 	FIND_QUERY += filter;
 
-	try {
-
-		con = getConnection();
-		ps = con.prepareStatement(FIND_QUERY);
-		rs = ps.executeQuery();
+	try (Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(FIND_QUERY);){
+		 try (ResultSet rs = ps.executeQuery()) {
 		while (rs.next()) {
 			String moduleName = rs.getString("MODULE_NAME");
 			String moduleAbv = rs.getString("MODULE_ABV");
@@ -14738,6 +14628,7 @@ public ArrayList<ModuleCodes> findModules(String filter) {
 			finder.add(module);
 
 		}
+		 }
 
 	} catch (Exception ex) {
 		ex.printStackTrace();
@@ -14755,20 +14646,15 @@ public Codes findCodes(String filter) {
 			+ "PRIORITY4, PRIORITY5, PRIORITY6, "
 			+ "DELIMITER FROM ST_CODEGEN_SETUP  ";
 
-	Connection con = null;
-	ResultSet rs = null;
-	PreparedStatement ps = null;
-
+	
 	Codes code = null;
 	// ArrayList<Codes> finder = new ArrayList<Codes>();
 //	System.out.println("<<<<===findCodes======");
 	FIND_QUERY += filter;
 
-	try {
-
-		con = getConnection();
-		ps = con.prepareStatement(FIND_QUERY);
-		rs = ps.executeQuery();
+	try (Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(FIND_QUERY);){
+		 try (ResultSet rs = ps.executeQuery()) {
 		while (rs.next()) {
 
 			String priority1 = rs.getString("PRIORITY1");
@@ -14785,7 +14671,7 @@ public Codes findCodes(String filter) {
 			// finder.add(code);
 
 		}
-
+		 }
 	} catch (Exception ex) {
 		ex.printStackTrace();
 		System.out.println("WARN:Error Saving code setup " + ex);
@@ -14904,11 +14790,11 @@ public boolean updateSlaRecords( String id)
 		done = (ps.executeUpdate() != -1);
 	} catch (Exception e) {
 		e.printStackTrace();
-	} finally {
-    	closeConnection(con, ps);
-    }
+	} 
+	
 	return done;
 }
+
 
 
 public void insertMailRecords(String createdby,String subject, String msgText1){
@@ -14934,7 +14820,7 @@ try(Connection conn = getConnection();
 
 }//updateAssetStatus()
 
-public boolean updateSlaJobRecords( String id,String nextalertDate)
+public boolean updateSlaJobRecordsOld( String id,String nextalertDate)
 {
 	Connection con = null;
 	PreparedStatement ps = null;
@@ -14963,8 +14849,35 @@ public boolean updateSlaJobRecords( String id,String nextalertDate)
 	return done;
 }
 
+public boolean updateSlaJobRecords(String id, String nextAlertDate) {
+    boolean done = false;
 
-public boolean raisentry_postDuplicate() throws SQLException {
+    String query1 = "UPDATE SLA_RESPONSE SET ALERTSTARTDATE = ? WHERE CRITERIA_ID = ?";
+    String query2 = "UPDATE AM_GB_SLA SET STATUS = 'P' WHERE SLA_ID = ? AND STATUS IS NULL";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps1 = con.prepareStatement(query1);
+         PreparedStatement ps2 = con.prepareStatement(query2)) {
+
+        // Update SLA_RESPONSE
+        ps1.setString(1, nextAlertDate);
+        ps1.setString(2, id);
+        int rows1 = ps1.executeUpdate();
+
+        // Update AM_GB_SLA
+        ps2.setString(1, id);
+        int rows2 = ps2.executeUpdate();
+
+        done = (rows1 > 0 || rows2 > 0); // true if any update affected rows
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return done;
+}
+
+public boolean raisentry_postDuplicateOld() throws SQLException {
     Connection con = null;
     //PreparedStatement ps = null;
      Statement stmt = null;
@@ -14995,8 +14908,36 @@ public boolean raisentry_postDuplicate() throws SQLException {
     return gotResults;
 }
 
+public boolean raisentry_postDuplicate() throws Exception {
+    boolean success = false;
 
-public boolean asset_approvalDuplicate() throws SQLException {
+    try (Connection con = getConnection();
+         CallableStatement cstmt = con.prepareCall("{CALL raisentry_postDuplicate()}")) {
+
+        // Execute stored procedure
+        boolean hasResultSet = cstmt.execute();
+
+        // If procedure executed without exception, consider it success
+        success = true;
+
+        // Optionally, handle result set if procedure returns one
+        if (hasResultSet) {
+            try (ResultSet rs = cstmt.getResultSet()) {
+                while (rs.next()) {
+                    // process results if needed
+                }
+            }
+        }
+
+    } catch (SQLException | NamingException ex) {
+        System.err.println("Error in raisentry_postDuplicate(): " + ex.getMessage());
+        throw ex; // propagate for caller to handle if needed
+    }
+
+    return success;
+}
+
+public boolean asset_approvalDuplicateOld() throws SQLException {
     Connection con = null;
     //PreparedStatement ps = null;
      Statement stmt = null;
@@ -15025,6 +14966,24 @@ public boolean asset_approvalDuplicate() throws SQLException {
     }
 
     return gotResults;
+}
+
+public boolean asset_approvalDuplicate() {
+
+    boolean success = false;
+
+    try (Connection con = getConnection();
+         CallableStatement cstmt = con.prepareCall("{CALL asset_approvalDuplicate()}")) {
+
+        cstmt.execute();
+        success = true;
+
+    } catch (Exception ex) {
+        System.out.println("Error in asset_approvalDuplicate(): " + ex.getMessage());
+        ex.printStackTrace();
+    }
+
+    return success;
 }
 
 public void insertSLAProcessingTransaction(String criteriaId,int alertFreq, int alertStart,int remainExecDays,String alertStartDate){

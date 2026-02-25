@@ -30,7 +30,9 @@ public class ConnectionClass {
     private static final String LEGEND_DS = "java:/legendPlus";
     private static final String FINACLE_DS = "java:/FinacleDataHouse";
     private static final String VASCO_DS = "java:/vascoDS";
-
+    private ApprovalRecords approv = new ApprovalRecords();
+    private int record_start = 0;
+    private int record_count = 2;
     /* =========================================================
        CONNECTION PROVIDERS (THREAD SAFE)
        ========================================================= */
@@ -95,6 +97,8 @@ public class ConnectionClass {
         } catch (Exception ignored) {}
     }
 
+    
+    
     /* =========================================================
        UTILITY METHODS (UNCHANGED BEHAVIOR)
        ========================================================= */
@@ -169,6 +173,162 @@ public class ConnectionClass {
     public String getCurrentDate() {
         return new SimpleDateFormat("dd-MM-yyyy").format(new Date());
     }
+    
+    public String getWhRate() {
+	    String rate = "0";
+	    String query = "SELECT WHT_RATE FROM AM_GB_COMPANY";
+
+	    try (Connection conn = getConnection();
+	         PreparedStatement ps = conn.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            rate = rs.getString(1) != null ? rs.getString(1) : "0";
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("WARN: Error fetching WHT_RATE -> " + e.getMessage());
+	        e.printStackTrace();
+	    }
+
+	    return rate;
+	}
+    
+    public String getFedWhRate() {
+	    String rate = "0";
+	    String query = "SELECT FED_WHT_RATE FROM AM_GB_COMPANY";
+
+	    try (Connection conn = getConnection();
+	         PreparedStatement ps = conn.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            rate = rs.getString(1) != null ? rs.getString(1) : "0";
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("WARN: Error fetching FED_WHT_RATE -> " + e.getMessage());
+	        e.printStackTrace();
+	    }
+
+	    return rate;
+	}
+    
+    public String getProcessingStatus() {
+	    String status = "0"; 
+	    String query = "SELECT PROCESSING_STATUS FROM AM_GB_COMPANY";
+
+	    try (Connection conn = getConnection();
+	         PreparedStatement ps = conn.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            status = rs.getString("PROCESSING_STATUS") != null ? rs.getString("PROCESSING_STATUS") : "0";
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("WARN: Error fetching processing status -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    }
+
+	    return status;
+	}
+    
+    public String getLegacyExportStatus() {
+	    String status = "0"; // default value
+	    String query = "SELECT COUNT(*) AS LEGACYEXPORTSTATUS FROM FINACLE_EXT";
+
+	    try (Connection conn = getConnection();
+	         PreparedStatement ps = conn.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            status = rs.getString("LEGACYEXPORTSTATUS") != null ? rs.getString("LEGACYEXPORTSTATUS") : "0";
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("WARN: Error fetching legacy export status -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    }
+
+	    return status;
+	}
+    
+    public boolean populateFinacleTemp(int ps_status, String ThirdPartyLabel) throws Exception {
+        boolean suc = false;
+
+        String current_date = getCurrentDate();
+        Date processing_date = null;
+        String narration;
+
+        // Get processing date from company table
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT processing_date FROM am_gb_company");
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                processing_date = rs.getDate(1);
+            }
+        }
+
+        // Prepare narration
+        String describe = "DEPRECIATION FOR THE MONTH OF ";
+        String monthPart = getMonthPartOfDate(formatDate(processing_date)).toUpperCase();
+        String yearPart = getYearPartOfDate(formatDate(processing_date));
+        narration = describe + monthPart + " " + yearPart;
+
+        // Third-party specific narration
+        if ("ZENITH".equalsIgnoreCase(ThirdPartyLabel)) {
+            describe = "DEPTN ";
+            String transCode = "**FAS";
+            narration = describe + monthPart + " " + yearPart + transCode;
+        }
+
+        if (ps_status == 1) {
+            PersistenceServiceDAO psdao = new PersistenceServiceDAO();
+            AssetRecordsBean arb = new AssetRecordsBean();
+
+            try (Connection conn = getConnection()) {
+
+                // Copy data from finacle_ext to finacle_temp
+                try (PreparedStatement copyStmt = conn.prepareStatement(
+                        "INSERT INTO finacle_temp(dr_acct, cr_acct, amount, value_date, narration, narration2) " +
+                                "SELECT dr_acct, cr_acct, amount, value_date, narration, narration2 FROM finacle_ext")) {
+                    copyStmt.executeUpdate();
+                }
+
+                // Execute the third-party specific script
+                String script = approv.getCodeName("SELECT PREFIX FROM ACCOUNT_GLPREFIX_PARAM " +
+                        "WHERE THIRDPARTY = ? AND type = 'DEPRECIATION'");
+                try (PreparedStatement psScript = conn.prepareStatement(script)) {
+                    psScript.setString(1, ThirdPartyLabel);
+                    psScript.executeUpdate();
+                    arb.updateAssetStatusChange(script);
+                }
+
+                // Update narration and system date in finacle_ext
+                String updateQuery = "UPDATE finacle_ext SET narration = ?, system_date = ?, narration2 = ?";
+                try (PreparedStatement psUpdate = conn.prepareStatement(updateQuery)) {
+                    psUpdate.setString(1, narration);
+                    psUpdate.setDate(2, psdao.dateConvert(current_date));
+                    psUpdate.setString(3, narration);
+                    int updated = psUpdate.executeUpdate();
+                    if (updated != -1) {
+                        System.out.println("THE UPDATE WAS SUCCESSFUL");
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            suc = true;
+        }
+
+        return suc;
+    }
+
 
     /* =========================================================
        SAFE EXAMPLE: VAT RATE (Pattern to follow)
@@ -617,6 +777,196 @@ public class ConnectionClass {
         return a;
     }
     
+  
+  
+
+    /**
+     * getProperties
+     *
+     * @param sele String
+     * @param vals String[][]
+     * @return String
+     */
+    public String getProperties(String sele, String[][] vals) {
+        String html = new String();
+        if (sele == null) {
+            sele = " ";
+        }
+
+        if (vals != null) {
+            for (int i = 0; i < vals.length; i++) {
+                html = html + "<option value='" + vals[i][0] + "' " +
+                       (vals[i][0].equalsIgnoreCase(sele) ? " selected " : "") +
+                       ">" + vals[i][2] + "</option> ";
+            }
+
+        }
+
+        return html;
+    }
+
+    /**
+     * getProperties
+     *
+     * @param sele String
+     * @param vals String[][]
+     * @return String
+     */
+    public String getUserprops(String sele, String[][] vals) {
+        String html = new String();
+        if (sele == null) {
+            sele = " ";
+        }
+        for (int i = 0; i < vals.length; i++) {
+            html = html + "<option value='" + vals[i][0] + "' " +
+                   (vals[i][0].equalsIgnoreCase(sele) ? " selected " : "") +
+                   ">" + vals[i][1] + "</option> ";
+        }
+
+        return html;
+    }
+
+    /**
+     * getProperties
+     *
+     * @param sele String
+     * @param iden String[]
+     * @param vals String[]
+     * @return String
+     */
+    public String getProperties(String sele, String[] iden, String[] vals) {
+        String html = new String();
+        if (sele == null) {
+            sele = " ";
+        }
+        for (int i = 0; i < iden.length; i++) {
+            html = html + "<option value='" + iden[i] + "' " +
+                   (iden[i].equalsIgnoreCase(sele) ? " selected " : "") + ">" +
+                   vals[i] + "</option> ";
+        }
+
+        return html;
+    }
     
+    
+
+    /**
+     * getEncrypted
+     *
+     * @param input String
+     * @throws Throwable
+     * @return String
+     */
+    
+    public void setRecord_start(String record_start) {
+        this.record_start = Integer.parseInt(record_start);
+    }
+
+    public void setRecord_count(String record_count) {
+        this.record_count = Integer.parseInt(record_count);
+    }
+
+    public String getRecord_start() {
+        return String.valueOf(record_start);
+    }
+
+    public String getRecord_count() {
+        return String.valueOf(record_count);
+    }
+    
+    public String[][] getYesNoForCombo() {
+        String[][] a = new String[2][3];
+
+        a[0][0] = "Y";
+        a[0][1] = "";
+        a[0][2] = "Yes";
+
+        a[1][0] = "N";
+        a[1][1] = "";
+        a[1][2] = "No";
+
+        return a;
+    }
+
+
+//Ganiyu's Code
+public String[][] getFederalStateNoneForCombo(){
+String[][] a= new String[3][3];
+a[0][0]="N";
+a[0][1]="";
+a[0][2]="None";
+
+a[1][0]="S";
+a[1][1]="";
+a[1][2]="State";
+
+a[2][0]="F";
+a[2][1]="";
+a[2][2]="Federal";
+
+return a;
+
+
+}
+
+
+public String[][] getApproveRejectPendingForCombo(){
+String[][] a= new String[3][3];
+a[0][0]="P";
+a[0][1]="";
+a[0][2]="Pending";
+
+a[1][0]="R";
+a[1][1]="";
+a[1][2]="Reject";
+
+a[2][0]="A";
+a[2][1]="";
+a[2][2]="Approve";
+
+return a;
+
+
+}
+    
+    
+    public String[][] getBranchesForCombo(String code, String branchRestrict) throws Exception {
+        String[][] result = null;
+
+        String queryAll = "SELECT * FROM AM_AD_BRANCH WHERE BRANCH_STATUS = 'ACTIVE' ORDER BY BRANCH_NAME ASC";
+        String queryRestricted = "SELECT * FROM AM_AD_BRANCH WHERE BRANCH_STATUS = 'ACTIVE' AND BRANCH_ID = ? ORDER BY BRANCH_NAME ASC";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(branchRestrict.equalsIgnoreCase("N") ? queryAll : queryRestricted)) {
+
+            if (!branchRestrict.equalsIgnoreCase("N")) {
+                ps.setString(1, code);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+               
+                rs.last();
+                int rowCount = rs.getRow();
+                rs.beforeFirst(); 
+
+                if (rowCount > 0) {
+                    int columnCount = rs.getMetaData().getColumnCount();
+                    result = new String[rowCount][columnCount];
+                    int i = 0;
+                    while (rs.next()) {
+                        for (int j = 0; j < columnCount; j++) {
+                            result[i][j] = rs.getString(j + 1);
+                        }
+                        i++;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("WARN: Error fetching branches -> " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 
 }

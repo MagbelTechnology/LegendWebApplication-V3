@@ -10333,26 +10333,21 @@ ps = con.prepareStatement(query_r);
         String query =
                 "select max(mt_id) from IA_MTID_TABLE where mt_tablename=?";// +tableName + "' ";
         String mtid = "0";
-        Connection con = null;
-       PreparedStatement ps = null;
-       ResultSet rs = null;
-
-        try {
-            con = dbConnection.getConnection("legendPlus");
-                       ps = con.prepareStatement(query);
+      
+        try (Connection con = dbConnection.getConnection("legendPlus");
+        		PreparedStatement ps = con.prepareStatement(query)) {
                        ps.setString(1, tableName);
-                       rs = ps.executeQuery();
+          try    (ResultSet  rs = ps.executeQuery();){
 
             while (rs.next()) {
 
                 mtid = rs.getString(1);
 
             }
+          }
 
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            dbConnection.closeConnection(con, ps, rs);
         }
 
         return mtid;
@@ -10365,9 +10360,8 @@ ps = con.prepareStatement(query_r);
 
     String query = "INSERT INTO [am_raisentry_transaction](User_id,Description,debitAccount,creditAccount,amount,iso,ASSET_ID,page1,transactionId,transaction_date,system_ip)" +
                    " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    try {
-    	 Connection  con = dbConnection.getConnection("legendPlus");
-    	 PreparedStatement  ps = con.prepareStatement(query);
+    try (Connection con = dbConnection.getConnection("legendPlus");
+    		PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1,id);
         ps.setString(2,Description);
         ps.setString(3, debitAccount);
@@ -10399,9 +10393,8 @@ ps = con.prepareStatement(query_r);
 			 
 		    String query = "update am_raisentry_transaction set iso=?,transaction_date=?,system_ip=? where transactionId=?    and ASSET_ID=? and page1=? " ;
 
-		    try {
-		    	Connection	con = dbConnection.getConnection("legendPlus");
-		    	PreparedStatement ps = con.prepareStatement(query);
+		    try (Connection con = dbConnection.getConnection("legendPlus");
+		    		PreparedStatement ps = con.prepareStatement(query)) {
 		        ps.setString(1,iso);
 		        ps.setTimestamp(2, dbConnection.getDateTime(new java.util.Date()));
 		        ps.setString(3, ip_address);
@@ -10428,10 +10421,8 @@ ps = con.prepareStatement(query_r);
 String query_r ="update am_asset_approval set approval_level_count=?,super_id=?,posting_date=? where transaction_id =?";
 
 
-try {
-	Connection con = dbConnection.getConnection("legendPlus");
-	PreparedStatement ps = con.prepareStatement(query_r);
-
+try (Connection con = dbConnection.getConnection("legendPlus");
+		PreparedStatement ps = con.prepareStatement(query_r)) {
 
 
             ps.setInt(1,count);
@@ -10453,9 +10444,8 @@ try {
  public void incrementApprovalCount2(long tran_id,int count,int nextSupervisor){
 String query_r ="update am_asset_approval set approval_level_count=?,super_id=?,posting_date=? where transaction_id =?";
 
-try {
-	Connection con = dbConnection.getConnection("legendPlus");
-	PreparedStatement ps = con.prepareStatement(query_r);
+try (Connection con = dbConnection.getConnection("legendPlus");
+		PreparedStatement ps = con.prepareStatement(query_r)) {
 
 
 
@@ -10478,9 +10468,8 @@ try {
  public void incrementApprovalCountArchive(int tran_id,int count,int nextSupervisor){
 String query_r ="update am_asset_approval_archive set approval_level_count=?,super_id=?,posting_date=? where transaction_id =?";
 
-try {
-	Connection con = dbConnection.getConnection("legendPlus");
-	PreparedStatement ps = con.prepareStatement(query_r);
+try (Connection con = dbConnection.getConnection("legendPlus");
+		PreparedStatement ps = con.prepareStatement(query_r)) {
 
 
 
@@ -10825,6 +10814,7 @@ try {
             } 
         }
     }
+ 
 
 public void getAssetRecordsForApproval(String assetId, String update_changes) throws Exception {
 
@@ -10980,7 +10970,8 @@ public void getAssetRecordsForApproval(String assetId, String update_changes) th
                 int i =ps2.executeUpdate();
 
 
-                }//if(update_changes.equalsIgnoreCase("YES"))
+                }
+                //if(update_changes.equalsIgnoreCase("YES"))
 
 
             } catch (Exception ex) {
@@ -11010,8 +11001,6 @@ public void getAsset2RecordsForApproval(String assetId, String update_changes) t
                            "AMOUNT_PTD,AMOUNT_REM,PART_PAY,FULLY_PAID, GROUP_ID,A.BAR_CODE,A.SBU_CODE,A.LPO,A.SUPERVISOR,A.defer_pay,A.wht_percent " +
                            "FROM AM_ASSETUPDATE A " +
                            "WHERE A.ASSET_ID = ? ";
-
-           
 
             try {
             	Connection con = dbConnection.getConnection("legendPlus");
