@@ -33,32 +33,26 @@ public class Report extends PersistenceServiceDAO {
 
     public String getCompanyName() {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         String query = "";
         String comp = "";
+        query = "SELECT COMPANY_NAME FROM am_gb_company";
 
-        try {
-            query = "SELECT COMPANY_NAME FROM am_gb_company";
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
+         
+        	try(ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
 
                 comp = rs.getString("COMPANY_NAME");
 
             }
 
-
+        	}
         } catch (Exception e) {
             System.out.println("WARNING: cannot fetch am_gb_company->" +
                     e.getMessage());
 
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-
+        } 
         return comp;
 
     }
@@ -67,9 +61,7 @@ public class Report extends PersistenceServiceDAO {
 
     public ArrayList getReportByColumn(String query, String[] selCol) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         // Approval app = null;
         ArrayList collection = new ArrayList();
         int count = selCol.length;
@@ -88,12 +80,12 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = query;
  //       System.out.println("<<<<<<<FINDER_QUERY in getReportByColumn: "+FINDER_QUERY);
-        try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(FINDER_QUERY);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+           
 
             //ps.setString(1, "Y");
-            rs = ps.executeQuery();
+           
 
             //  String query = "Select +query+ from am_raisentry_post  ";
 
@@ -108,6 +100,7 @@ public class Report extends PersistenceServiceDAO {
             rows.add(row);
             }
              */
+        	try(ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 rowCount++;
                 //ArrayList row = new ArrayList();
@@ -124,15 +117,13 @@ public class Report extends PersistenceServiceDAO {
                 rows.add(temp);
 
             }
-
+        	}
 //System.out.println("TOTAL ROW COUNT<<:::>> " + rowCount);
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch the column for the report  <><>>>:  " +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return rows;
     }
 
@@ -140,9 +131,7 @@ public class Report extends PersistenceServiceDAO {
     public ArrayList getTabletById(
             String query, String[] selCol) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         // Approval app = null;
         ArrayList collection = new ArrayList();
         int count = selCol.length;
@@ -151,17 +140,12 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = query;
 //        System.out.println("<<<<<<<FINDER_QUERY in getTabletById: "+FINDER_QUERY);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
-
-            //ps.setString(1, "Y");
-            rs =
-                    ps.executeQuery();
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
+           
 
             //  String query = "Select +query+ from am_raisentry_post  ";
-
+        	try(ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 for (int i = 0; i < count;
                         i++) {
@@ -174,13 +158,12 @@ public class Report extends PersistenceServiceDAO {
                 collection.add(temp);
 
             }
+        	}
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch the table by id" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return collection;
     }
@@ -201,33 +184,28 @@ public class Report extends PersistenceServiceDAO {
     public String findTabById(
             String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String tab = "";
 
         String FINDER_QUERY = "SELECT TABLE_NAME from COL_LOOK_UP WHERE ID =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in findTabById: "+FINDER_QUERY);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
+            
 
             ps.setString(1, id);
-            rs =
-                    ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
                 tab = rs.getString(1);
             }
+            }
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch COL_LOOK_UP->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return tab;
 
@@ -248,35 +226,29 @@ public class Report extends PersistenceServiceDAO {
 
     public String findByIdQuery(String id, String query) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+      
         String tab = "";
 
         String FINDER_QUERY = query;
 //        System.out.println("<<<<<<<FINDER_QUERY in findByIdQuery: "+FINDER_QUERY);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {   
 
             ps.setString(1, id);
-            rs =
-                    ps.executeQuery();
-
+            try (ResultSet rs = ps.executeQuery()) {
+          
             while (rs.next()) {
 
                 tab = rs.getString(1);
                // System.out.println("Output column by Id Query->" + tab);
 
             }
+            }
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch by Id Query->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return tab;
 
@@ -287,36 +259,27 @@ public class Report extends PersistenceServiceDAO {
 
     public ArrayList findByQuery1(String query, String[] sel) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String tab;
 
         ArrayList list = new ArrayList();
         String FINDER_QUERY = query;
 //        System.out.println("<<<<<<<FINDER_QUERY in findByQuery1: "+FINDER_QUERY);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
-
-
-            rs =
-                    ps.executeQuery();
-
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);){
+           
+        	try(ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
 
 
 
                 list.add(rs.getString(1));
             }
-
+        	}
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch by Query->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -324,34 +287,26 @@ public class Report extends PersistenceServiceDAO {
 
     public ArrayList findByQuery(String query) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String tab;
 
         ArrayList list = new ArrayList();
         String FINDER_QUERY = query;
 //        System.out.println("<<<<<<<FINDER_QUERY in findByQuery: "+FINDER_QUERY);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
-
-
-            rs =
-                    ps.executeQuery();
-
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+           
+        	try(ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
 
                 list.add(rs.getString(1));
             }
+        	}
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch by Query->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -360,67 +315,58 @@ public class Report extends PersistenceServiceDAO {
 
     public boolean isNumeric(String id,String op) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String col = "";
         boolean status = false;
 
         String FINDER_QUERY = "SELECT OPERAND from COL_FILTER WHERE ID =? AND OPERAND =?";
  //       System.out.println("<<<<<<<FINDER_QUERY in findByQuery: "+FINDER_QUERY+"   ID: "+id+"    OP: "+op);
-        try {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(FINDER_QUERY);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
 
             ps.setString(1, id);
              ps.setString(2, op);
-            rs = ps.executeQuery();
-
+          
+             try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
 
                status = true;
             }
+             }
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot get isNumeric->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
-
+        } 
         return status;
     }
 
     public boolean isNumericColumn(String id,String dType) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String col = "";
         boolean status = false;
 
         String FINDER_QUERY = "SELECT DATA_TYPE from COL_LOOK_UP WHERE ID =? AND DATA_TYPE =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in isNumericColumn: "+FINDER_QUERY+"    ID: "+id+"   dType: "+dType);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
+           
 
             ps.setString(1, id);
              ps.setString(2, dType);
-            rs = ps.executeQuery();
+           try(ResultSet rs = ps.executeQuery()){
 
             while (rs.next()) {
 
                status = true;
             }
+           }
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot get isNumeric->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return status;
     }
@@ -441,33 +387,27 @@ public class Report extends PersistenceServiceDAO {
 
     public String findColById(String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String col = "";
 
         String FINDER_QUERY = "SELECT COLUMN_NAME from COL_LOOK_UP WHERE ID =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in findColById: "+FINDER_QUERY+"  ID: "+id);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
+          
 
             ps.setString(1, id);
-            rs =
-                    ps.executeQuery();
-
+            
+            try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
 
                 col = rs.getString(1);
             }
-
+            }
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch COL_LOOK_UP->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return col;
     }
@@ -475,32 +415,27 @@ public class Report extends PersistenceServiceDAO {
     public String findColDescById(
             String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         String col = "";
 
         String FINDER_QUERY = "SELECT DESCRIPTION from COL_LOOK_UP WHERE ID =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in findColDescById: "+FINDER_QUERY+"   ID: "+id);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
-
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
+          
             ps.setString(1, id);
-            rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
                 col = rs.getString(1);
             }
+            }
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch COL_LOOK_UP->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return col;
     }
@@ -508,9 +443,7 @@ public class Report extends PersistenceServiceDAO {
     public ArrayList findApprovalByColumn(
             String query, String[] selCol, String para) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         // Approval app = null;
         ArrayList collection = new ArrayList();
         int count = selCol.length;
@@ -521,16 +454,14 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = "SELECT " + query + " from am_raisentry_post";
 
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
+          
 
             //ps.setString(1, "Y");
-            rs =
-                    ps.executeQuery();
 
             //  String query = "Select +query+ from am_raisentry_post  ";
+        	try(ResultSet rs = ps.executeQuery()){
 
             while (rs.next()) {
                 for (int i = 0; i < count;
@@ -541,13 +472,12 @@ public class Report extends PersistenceServiceDAO {
                 collection.add(temp);
 
             }
+        	}
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch [am_raisentry_post]->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return collection;
     }
@@ -555,99 +485,83 @@ public class Report extends PersistenceServiceDAO {
     public String findAssetWorkbookColDescById(
             String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+      
         String col = "";
 
         String FINDER_QUERY = "SELECT DESCRIPTION from ASSETWORKBOOK_EXPCOL WHERE ID =?";
  //       System.out.println("<<<<<<<FINDER_QUERY in findAssetWorkbookColDescById: "+FINDER_QUERY+"   ID: "+id);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
+          
 
             ps.setString(1, id);
-            rs = ps.executeQuery();
-
+            try (ResultSet rs = ps.executeQuery()) {
+          
             while (rs.next()) {
 
                 col = rs.getString(1);
+            }
             }
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot fetch ASSETWORKBOOK_EXPCOL->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return col;
     }
 
+    
     public String findAssetWorkbookColById(String id) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        String col = "";
+        String query = "SELECT COLUMN_NAME FROM ASSETWORKBOOK_EXPCOL WHERE ID = ?";
 
-        String FINDER_QUERY = "SELECT COLUMN_NAME from ASSETWORKBOOK_EXPCOL WHERE ID =?";
-//        System.out.println("<<<<<<<FINDER_QUERY in findAssetWorkbookColById: "+FINDER_QUERY+"  ID: "+id);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
 
             ps.setString(1, id);
-            rs =
-                    ps.executeQuery();
 
-            while (rs.next()) {
+            try (ResultSet rs = ps.executeQuery()) {
 
-                col = rs.getString(1);
+                if (rs.next()) {
+                    return rs.getString("COLUMN_NAME");
+                }
             }
 
         } catch (Exception ex) {
-            System.out.println("WARNING: cannot fetch ASSETWORKBOOK_EXPCOL->" +
-                    ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
+            System.out.println("WARNING: cannot fetch ASSETWORKBOOK_EXPCOL -> " + ex.getMessage());
         }
-  //      System.out.println("<<<<<======Column in findAssetWorkbookColById: "+col);
-        return col;
+
+        return ""; // safer than null in your current system
     }
 
     public boolean AssetWorkbookColumn(String id,String dType) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        
         String col = "";
         boolean status = false;
 
         String FINDER_QUERY = "SELECT DATA_TYPE from ASSETWORKBOOK_EXPCOL WHERE ID =? AND DATA_TYPE =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in isNumericColumn: "+FINDER_QUERY+"    ID: "+id+"   dType: "+dType);
-        try {
-            con = getConnection("legendPlus");
-            ps =
-                    con.prepareStatement(FINDER_QUERY);
+        try (
+				Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(FINDER_QUERY)
+		) {
 
             ps.setString(1, id);
              ps.setString(2, dType); 
-            rs = ps.executeQuery();
+             try (ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
 
                status = true;
             }
+             }
 
         } catch (Exception ex) {
             System.out.println("WARNING: cannot get isNumeric->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
  //       System.out.println("<<<<<======Column in findAssetWorkbookColById: "+col);
         return status;
     }
@@ -662,14 +576,11 @@ public java.util.ArrayList getWorkBookSqlRecords(String query)
 	//	String query = " SELECT * FROM am_gb_workbookupdate ";
 //	Transaction transaction = null;
 //     System.out.println("====query in getWorkBookSqlRecords-----> "+query);
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
+	
 
-	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+	try(Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(query);) {
+			 try (ResultSet rs = ps.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -747,15 +658,13 @@ public java.util.ArrayList getWorkBookSqlRecords(String query)
 				_list.add(newTransaction);
 //				System.out.println("<<<<<<_list.size(): "+_list.size());
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -769,16 +678,13 @@ public java.util.ArrayList getBulkAssetProofSqlRecords(String query,String branc
 	//	String query = " SELECT * FROM am_gb_workbookupdate ";
 //	Transaction transaction = null;
 //     System.out.println("===query in getBulkAssetProofSqlRec=ords-----> "+query);
-	Connection c = null;
-	ResultSet rs = null;
-	PreparedStatement s = null;
-	try {
+	
+	try (Connection conn = getConnection();
+            PreparedStatement s = conn.prepareStatement(query);){
 //		    c = getConnection();
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
 	          if(query.contains("BRANCH_ID") && query.contains("BATCH_ID")){
 	        	  s.setString(1, branch_Id);
 	        	  s.setString(2, prooftranId);
@@ -786,7 +692,7 @@ public java.util.ArrayList getBulkAssetProofSqlRecords(String query,String branc
 	          if(query.contains("BATCH_ID")){
 	        	  s.setString(1, branch_Id);
 	          }
-			rs = s.executeQuery();
+	          try (ResultSet rs = s.executeQuery()) {
 			
 			while (rs.next())
 			   {		
@@ -878,15 +784,13 @@ public java.util.ArrayList getBulkAssetProofSqlRecords(String query,String branc
 				newTransaction.setState(state);
 				_list.add(newTransaction);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -900,14 +804,11 @@ public java.util.ArrayList getBulkAssetProofforFinconSqlRecords(String query)
 	//	String query = " SELECT * FROM am_gb_workbookupdate ";
 //	Transaction transaction = null;
 //     System.out.println("====query in getBulkAssetProofforFinconSqlRecords-----> "+query);
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
-
-	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+	
+	try (Connection conn = getConnection();
+            PreparedStatement s = conn.prepareStatement(query);){
+		   
+		   try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -963,15 +864,13 @@ public java.util.ArrayList getBulkAssetProofforFinconSqlRecords(String query)
 				newTransaction.setRegistrationNo(registrationNo);
 				_list.add(newTransaction);
 			   }
+		   }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -980,14 +879,13 @@ public java.util.ArrayList getUploadUserSqlRecords(String query,String user_Id)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 //     System.out.println("====query in getUploadUserSqlRecords-----> "+query);
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
+	
 	 legend.admin.objects.User user = null;
-	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+	 try (
+				Connection con = getConnection();
+				PreparedStatement s = con.prepareStatement(query)
+		) {
+			   try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
                 String userId = rs.getString("User_Id");
@@ -1061,15 +959,13 @@ public java.util.ArrayList getUploadUserSqlRecords(String query,String user_Id)
 //                user.setIsStoreAdministrator(storeAdmin);
                 _list.add(user);				
 			   }
+			   }
 	 }    
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -1083,14 +979,13 @@ public java.util.ArrayList getFleetRenewalSqlRecords(String query)
 	//	String query = " SELECT * FROM am_gb_workbookupdate ";
 //	Transaction transaction = null;
 //     System.out.println("====query in getFleetRenewalSqlRecords-----> "+query);
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
+	
 
-	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
+		 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -1116,15 +1011,13 @@ public java.util.ArrayList getFleetRenewalSqlRecords(String query)
 				_list.add(newTransaction);
 //				System.out.println("<<<<<<_list.size(): "+_list.size());
 			   }
+		 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -1139,14 +1032,11 @@ public java.util.ArrayList getexportexcelSqlRecords(String query)
 	//	String query = " SELECT * FROM am_gb_workbookupdate ";
 //	Transaction transaction = null;
 //     System.out.println("====query in getFleetRenewalSqlRecords-----> "+query);
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
-
-	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {	
                 String groupId = rs.getString("group_id");
@@ -1164,15 +1054,13 @@ public java.util.ArrayList getexportexcelSqlRecords(String query)
 				_list.add(newTransaction);
 //				System.out.println("<<<<<<_list.size(): "+_list.size());
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -1182,14 +1070,12 @@ public java.util.ArrayList getDepreciationChargeRecords(String query)
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
 
-	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
+		 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())  
 			   {				
 				String strDescription = rs.getString("Description");
@@ -1248,15 +1134,14 @@ public java.util.ArrayList getDepreciationChargeRecords(String query)
 				newTransaction.setImproveRemainLife(improveRemainLife);
 				_list.add(newTransaction);
 			   }
+		 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
+	
 	return _list;
 }
 
@@ -1266,16 +1151,12 @@ public java.util.ArrayList getAssetManagementRecords(String query,String branch_
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0")) {
@@ -1295,7 +1176,7 @@ public java.util.ArrayList getAssetManagementRecords(String query,String branch_
 	        	  s.setString(2, categoryCode);
 	          }
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -1353,15 +1234,13 @@ public java.util.ArrayList getAssetManagementRecords(String query,String branch_
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+	}
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -1372,16 +1251,10 @@ public java.util.ArrayList getConsolidatedAssetManagementRecords(String query,St
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0")) {
@@ -1405,7 +1278,7 @@ public java.util.ArrayList getConsolidatedAssetManagementRecords(String query,St
 	        	  s.setString(4, categoryCode);
 	          }
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -1463,15 +1336,14 @@ public java.util.ArrayList getConsolidatedAssetManagementRecords(String query,St
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
+	
 	return _list;
 }
 
@@ -1482,13 +1354,10 @@ public java.util.ArrayList getDepreciationChargesExportRecords(String query,Stri
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
 	          if(query.contains("CHARGEYEAR") && query.contains("DEP_DATE") && !query.contains("BRANCH_CODE") && !query.contains("CATEGORY_CODE")){
 	        	  System.out.println("First Query");
 	        	  s.setString(1, chargeYear);
@@ -1513,7 +1382,7 @@ public java.util.ArrayList getDepreciationChargesExportRecords(String query,Stri
 	        	  s.setString(3, branch_Id);
 	        	  s.setString(4, categoryId);
 	          }
-			rs = s.executeQuery();
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -1576,15 +1445,14 @@ public java.util.ArrayList getDepreciationChargesExportRecords(String query,Stri
 				newTransaction.setRemainLife(remainLife);
 				_list.add(newTransaction);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
+	
 	return _list;
 }
 
@@ -1596,16 +1464,10 @@ public java.util.ArrayList getPostedTransactionExportRecords(String query,String
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
-	
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
 	          if(query.contains("a.User_Name") && query.contains("a.transaction_date")){
 	        	  s.setString(1, userName);
 	        	  s.setString(2, startDate);
@@ -1615,7 +1477,7 @@ public java.util.ArrayList getPostedTransactionExportRecords(String query,String
 	        	  s.setString(1, startDate);
 	        	  s.setString(2, endDate);
 	          }
-			rs = s.executeQuery();
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -1653,15 +1515,13 @@ public java.util.ArrayList getPostedTransactionExportRecords(String query,String
 				
 				_list.add(newTransaction);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -1672,14 +1532,11 @@ public java.util.ArrayList getUserListExportRecords(String query)
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null; 
-
-	try {
-		    c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String userId = rs.getString("User_Id");
@@ -1718,15 +1575,13 @@ public java.util.ArrayList getUserListExportRecords(String query)
 				
 				_list.add(users); 
 			   }
+	}
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+//					
 	return _list;
 }
 
@@ -1739,16 +1594,12 @@ public java.util.ArrayList findStockIssuanceDisplayByBatchId(String tranId)
     String selectQuery =
             "select * from am_gb_bulkStocktransfer where batch_id=? ";
 
-    Connection con = null;
-    PreparedStatement ps = null;
-//    System.out.println("=======>selectQuery: "+selectQuery);
-    ResultSet rs = null;
-
-	try {
-        con = getConnection();
-        ps = con.prepareStatement(selectQuery);
+    try (
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(selectQuery)
+	) {
         ps.setInt(1, Integer.parseInt(tranId));
-        rs = ps.executeQuery();
+        try (ResultSet rs = ps.executeQuery()) {
 			StockRecordsBean aset = null;
 			while (rs.next())
 			   {				
@@ -1791,17 +1642,15 @@ public java.util.ArrayList findStockIssuanceDisplayByBatchId(String tranId)
 	            aset.setQtyIssued(qtyIssued);
 	            aset.setIssuanceStatus(issuanceStatus);
 	            list.add(aset);
-
+			   }
 			   }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(con, ps, rs);
-					}
+					
+    
 	return list;
 }
 
@@ -1811,14 +1660,10 @@ public java.util.ArrayList getFinacleAssetUploadExportRecords(String query,Strin
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
-//	System.out.println("query in getFinacleAssetUploadExportRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	try (
+			Connection con = getConnection();
+			PreparedStatement s = con.prepareStatement(query)
+	) {
 	          if(query.contains("AM_ASSET.GROUP_ID") && query.contains("GROUP_ID") && query.contains("d.branch_code")){
 	        	  s.setString(1, groupid);
 	        	  s.setString(2, groupid);
@@ -1826,7 +1671,7 @@ public java.util.ArrayList getFinacleAssetUploadExportRecords(String query,Strin
 	        	  s.setString(4, groupid);
 	          }
 	          
-			rs = s.executeQuery();
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -1854,15 +1699,13 @@ public java.util.ArrayList getFinacleAssetUploadExportRecords(String query,Strin
 				newTransaction.setIntegrifyId(I);
 				_list.add(newTransaction);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -1872,19 +1715,15 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
+	
 	System.out.println("paramCount in getLegacyAssetGrpPostRecords: "+paramCount);
 //	System.out.println("query in getLegacyAssetGrpPostRecords: "+query);
 	System.out.println("subjectTovat in getLegacyAssetGrpPostRecords: "+subjectTovat);
 	System.out.println("subjectTowhTax in getLegacyAssetGrpPostRecords: "+subjectTowhTax);
 //	System.out.println("======>>>query.contains(\"Revalue_ID\")=======: "+query.contains("Revalue_ID"));
 //	System.out.println("======>>>am_asset_improvement_Upload.Revalue_ID=======: "+query.contains("am_asset_improvement_Upload.Revalue_ID"));
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	try (Connection c = getConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 	          if(query.contains("s.GROUP_ID") && query.contains("group_id") && subjectTovat.equalsIgnoreCase("Y") && subjectTowhTax.equalsIgnoreCase("S") && paramCount==22){
 	        	  System.out.println("=====query in getLegacyAssetGrpPostRecords 22A==== ");
 	        	  s.setString(1, groupid);
@@ -2208,7 +2047,7 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 	          }	          
 //Uncapitalised End	          
 	          
-			rs = s.executeQuery();
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -2235,17 +2074,108 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 				_list.add(newTransaction);
 			   }
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
+
+public java.util.ArrayList<newAssetTransaction> getLegacyAssetGrpPostRecords2(
+        String query,
+        String branchCode,
+        String groupid,
+        String subjectTovat,
+        String subjectTowhTax,
+        int paramCount,
+        String tranType,
+        String assetType,
+        String type) {
+
+    java.util.ArrayList<newAssetTransaction> _list = new java.util.ArrayList<>();
+    String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+
+    try (Connection c = getConnection();
+         PreparedStatement s = c.prepareStatement(query)) {
+
+        // ===== Build parameter list dynamically =====
+        java.util.List<String> params = new java.util.ArrayList<>();
+
+        // Default: repeat groupid for paramCount if query contains GROUP_ID
+        if (query.toUpperCase().contains("GROUP_ID") || query.toUpperCase().contains("REVALUE_ID")) {
+            for (int i = 0; i < paramCount; i++) {
+                params.add(groupid);
+            }
+        }
+
+        // Special cases for branchCode
+        if (query.toUpperCase().contains("D.BRANCH_CODE") && branchCode != null && !branchCode.isEmpty()) {
+            for (int i = 0; i < params.size(); i += 2) {
+                if (i < params.size()) params.set(i + 1, branchCode);
+            }
+        }
+
+        // Special cases for transaction type
+        switch (assetType.toUpperCase()) {
+            case "TRANSFERPOSTING":
+                if ("BULK".equalsIgnoreCase(type)) {
+                    for (int i = 0; i < 4 && i < params.size(); i++) params.set(i, tranType);
+                }
+                break;
+            case "ASSETCREATION":
+            case "ASSETCREATIONUNCAP":
+            case "ASSETIMPROVEMENT":
+            case "ASSETACCELERATION":
+                for (int i = 0; i < 2 && i < params.size(); i++) params.set(i, tranType);
+                break;
+            case "ASSETTRANSFER":
+            case "CLOSEDASSET":
+            case "ASSETRECLASS":
+            case "ASSETDISPOSAL":
+            case "CLOSEDUNCAPASSET":
+            case "ASSETDISPOSALUNCAP":
+            case "ASSETTRANSFERUNCAP":
+                for (int i = 0; i < paramCount && i < params.size(); i++) params.set(i, tranType);
+                break;
+            default:
+                // leave params as is
+        }
+
+        // Set parameters in PreparedStatement
+        for (int i = 0; i < params.size(); i++) {
+            s.setString(i + 1, params.get(i));
+        }
+
+        // ===== Execute query and process results =====
+        try (ResultSet rs = s.executeQuery()) {
+            while (rs.next()) {
+                double costPrice = rs.getDouble("costPrice");
+                if (costPrice > 0) {
+                    newAssetTransaction t = new newAssetTransaction();
+                    t.setAssetId(rs.getString("ASSET_ID"));
+                    t.setBarCode(rs.getString("recType"));
+                    t.setSbuCode(rs.getString("transType"));
+                    t.setDescription(rs.getString("Description"));
+                    t.setAssetUser(rs.getString("GROUP_ID"));
+                    t.setVendorAC(rs.getString("accountNo"));
+                    t.setCostPrice(costPrice);
+                    t.setAssetType(rs.getString("transType"));
+                    t.setBranchCode(rs.getString("BRANCH_CODE"));
+                    _list.add(t);
+                }
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return _list;
+}
+
 
 public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String branchCode, String groupid)
 {
@@ -2253,14 +2183,10 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
+	
 //	System.out.println("query in getLegacyAssetGrpPostRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(query.contains("GROUP_ID") && query.contains("d.branch_code")){
 //	        	  System.out.println("=====query in getLegacyAssetGrpPostRecords==== ");
 	        	  s.setString(1, groupid);
@@ -2272,7 +2198,7 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 	        	  s.setString(7, groupid);
 	        	  s.setString(8, groupid);
 //	          }		 
-			rs = s.executeQuery();
+	        	  try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -2298,15 +2224,13 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 				newTransaction.setAssetType(transType);
 				_list.add(newTransaction);
 			   }
+	        	  }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -2318,14 +2242,10 @@ public java.util.ArrayList getFinacleAssetImprovedUploadExportRecords(String que
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
+
 	System.out.println("query in getFinacleAssetUploadExportRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(query.contains("Revalue_ID") && query.contains("Revalue_ID") && query.contains("d.branch_code")){
 			 if(subjectTovat.equals("N")  && subjectTowhTax.equals("N")){ 
 	        	  s.setString(1, groupid);
@@ -2370,7 +2290,7 @@ public java.util.ArrayList getFinacleAssetImprovedUploadExportRecords(String que
 	        	  s.setString(1, groupid);
 	        	  s.setString(2, groupid);
 	          }
-			rs = s.executeQuery();
+			  try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -2398,15 +2318,13 @@ public java.util.ArrayList getFinacleAssetImprovedUploadExportRecords(String que
 				newTransaction.setIntegrifyId(I);
 				_list.add(newTransaction);
 			   }
+			  }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -2418,14 +2336,10 @@ public java.util.ArrayList getFinacleUncapAssetUploadExportRecords(String query,
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
+	
 //	System.out.println("query in getFinacleUncapAssetUploadExportRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 	          if(query.contains("AM_ASSET_UNCAPITALIZED.GROUP_ID") && query.contains("GROUP_ID") && query.contains("d.branch_code")){
 	        	  s.setString(1, groupid);
 	        	  s.setString(2, groupid);
@@ -2435,7 +2349,7 @@ public java.util.ArrayList getFinacleUncapAssetUploadExportRecords(String query,
 	        	  s.setString(6, groupid);
 	          }
 	          
-			rs = s.executeQuery();
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -2463,15 +2377,13 @@ public java.util.ArrayList getFinacleUncapAssetUploadExportRecords(String query,
 				newTransaction.setIntegrifyId(I);
 				_list.add(newTransaction);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
