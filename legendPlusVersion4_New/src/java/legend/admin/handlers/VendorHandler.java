@@ -7,6 +7,7 @@ import java.util.Date;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import legend.ConnectionClass;
@@ -43,14 +44,11 @@ public class VendorHandler {
                        + ",Create_date ,account_type "
                        + " FROM am_ad_vendor";
 
-        Connection c = null;
-        ResultSet rs = null;
-        Statement s = null;
+      
 
-        try {
-            c = getConnection();
-            s = c.createStatement();
-            rs = s.executeQuery(query);
+        try (Connection c = getConnection();
+   	         PreparedStatement s = c.prepareStatement(query)) {
+         try(ResultSet  rs = s.executeQuery(query)){
             while (rs.next()) {
                 String vendorId = rs.getString("Vendor_ID");
                 int vendorBranchId = rs.getInt("VendorBranchId");
@@ -92,14 +90,13 @@ public class VendorHandler {
 
                 _list.add(vendor);
             }
+         }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        finally {
-            closeConnection(c, s, rs);
-        }
+       
         return _list;
 
     }
@@ -119,16 +116,10 @@ public class VendorHandler {
 //        query = query + filter;
 
 //        System.out.println("################the query for getting vendor is " +query );
-        Connection c = null;
-        ResultSet rs = null;
-//        Statement s = null;
-        PreparedStatement s = null;
-        try {
-            c = getConnection();
-//            s = c.createStatement();
-            s = c.prepareStatement(query);
-       //     s.setString(1, filter);
-            rs = s.executeQuery();
+
+        try (Connection c = getConnection();
+   	         PreparedStatement s = c.prepareStatement(query)) {
+         try(ResultSet  rs = s.executeQuery(query)){
             while (rs.next()) {
                 String vendorId = rs.getString("Vendor_ID");
                 int vendorBranchId = rs.getInt("VendorBranchId");
@@ -169,14 +160,13 @@ public class VendorHandler {
 				vendor.setVendorBranchId(vendorBranchId);
                 _list.add(vendor);
             }
+         }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        finally {
-            closeConnection(c, s, rs);
-        }
+       
        // System.out.println("the size of the array list is ================== "+_list.size());
         return _list;
 
@@ -194,17 +184,12 @@ public class VendorHandler {
                        + ",Create_date ,account_type, VENDOR_CATEGORY,SERVICE_TYPE,RCNo,TIN "
                        + " FROM am_ad_vendor WHERE Vendor_ID= ?";
 
-        Connection c = null;
-        ResultSet rs = null;
-//        Statement s = null;
-        PreparedStatement s = null;
+     
 //		System.out.println("query in getVendorByVendorID: "+query); 
-        try {
-            c = getConnection();
-//            s = c.createStatement();
-            s = c.prepareStatement(query);
+        try (Connection c = getConnection();
+      	         PreparedStatement s = c.prepareStatement(query)) {
             s.setString(1, vendid);
-            rs = s.executeQuery();  
+         try(ResultSet   rs = s.executeQuery()){
             while (rs.next()) {
                 String vendorId = rs.getString("Vendor_ID");
                 int vendorBranchId = rs.getInt("VendorBranchId");
@@ -251,14 +236,12 @@ public class VendorHandler {
 				vendor.setTin(tin);
 
             }
-
+         }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        finally {
-            closeConnection(c, s, rs);
-        }
+       
         return vendor;
 
     }
@@ -275,16 +258,10 @@ public class VendorHandler {
                        + " FROM am_ad_vendor WHERE Vendor_Code= ? ";
 
 
-        Connection c = null;
-        ResultSet rs = null;
-//        Statement s = null;
-        PreparedStatement s = null;
-        try {
-            c = getConnection();
-//            s = c.createStatement();
-            s = c.prepareStatement(query);
+        try (Connection c = getConnection();
+      	         PreparedStatement s = c.prepareStatement(query)) {
             s.setString(1, vendcode);
-            rs = s.executeQuery();
+         try(ResultSet  rs = s.executeQuery()){
             while (rs.next()) {
                 String vendorId = rs.getString("Vendor_ID");
                 int vendorBranchId = rs.getInt("VendorBranchId");
@@ -327,31 +304,22 @@ public class VendorHandler {
 				vendor.setVendorCategory(vendorCategory);
                 
             }
+         }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        finally {
-            closeConnection(c, s, rs);
-        }
+       
         return vendor;
 
     }
 
 
-    private Connection getConnection() {
-        Connection con = null;
-        dc = new DataConnect("legendPlus");
-        try {
-            con = dc.getConnection();
-        } catch (Exception e) {
-            System.out.println("WARNING: Error getting connection ->" +
-                               e.getMessage());
-        }
-        return con;
+    private Connection getConnection() throws Exception {
+        DataConnect dc = new DataConnect("legendPlus");
+        return dc.getConnection();
     }
-
     private void closeConnection(Connection con, Statement s) {
         try {
             if (s != null) {
@@ -430,28 +398,23 @@ public class VendorHandler {
     }
 
     private boolean executeQuery(String query) {
-        Connection con = null;
-        PreparedStatement ps = null;
+        
         boolean done = false;
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
+        try (Connection c = getConnection();
+   	         PreparedStatement ps = c.prepareStatement(query)) {
             done = ps.execute();
 
         } catch (Exception e) {
             System.out.println("WARNING:Error executing Query ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return done;
     }
 
 
     public String createVendorTmp(legend.admin.objects.Vendor vendor) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = false;
         String result = "";
 /*        String query = "INSERT INTO am_ad_vendorTmp"
@@ -470,9 +433,9 @@ public class VendorHandler {
                 + ",account_number ,Vendor_Status,User_ID"
                 + ",Create_date ,account_type,VendorBranchId,VENDOR_CATEGORY,SERVICE_TYPE,RECORD_TYPE,vendor_date,RCNo,TIN)"
                 + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
+        
+        try (Connection c = getConnection();
+   	         PreparedStatement ps = c.prepareStatement(query)) {
           ApplicationHelper helper = new ApplicationHelper();
           String vendorID = helper.getGeneratedId("am_ad_vendorTmp");
 
@@ -508,9 +471,7 @@ public class VendorHandler {
         } catch (Exception e) {
             System.out.println("WARNING:Error executing Query in createVendorTmp ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }  
+        } 
         return result;
 
     } 
@@ -536,8 +497,7 @@ public class VendorHandler {
     
     public boolean updateVendor(legend.admin.objects.Vendor vendor) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
+
         boolean done = false;
 
         String query = "UPDATE am_ad_vendor"
@@ -549,9 +509,8 @@ public class VendorHandler {
                        +" , account_type = ?,VendorBranchId = ?,VENDOR_CATEGORY = ?,SERVICE_TYPE = ?,RCNo = ?,TIN = ? "
                        +" WHERE Vendor_ID =?";
 
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
+        try (Connection c = getConnection();
+   	         PreparedStatement ps = c.prepareStatement(query)) {
 
 			
             ps.setString(1, vendor.getVendorCode());
@@ -580,30 +539,26 @@ public class VendorHandler {
         } catch (Exception e) {
             System.out.println("WARNING:Error executing Query in getVendorByStatus->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return done;
 
     }
 
     public boolean requireAccttype()  {
     	
-    	
+    	String query = "select req_accttype from am_ad_legacy_sys_config";
     	boolean flag = false;
-    	try{
-    		con = getConnection();
-    		stmt = con.createStatement();
-    	rs = stmt.executeQuery("select req_accttype from am_ad_legacy_sys_config");
+    	 try (Connection c = getConnection();
+    	         PreparedStatement stmt = c.prepareStatement(query)) {
+    	try(ResultSet rs = stmt.executeQuery()){
         rs.next();
         flag = rs.getString(1).trim().equalsIgnoreCase("Y");
     	} 
+    	 }
     	catch(Exception ex){
     		System.out.println("Exception occurred while trying to retrieve requireAccttype ... " + ex.getMessage());    		
     	}
-    	finally{
-    		closeConnection(con,stmt,rs);
-    	}
+    	
         return flag;
     }
 
@@ -613,65 +568,50 @@ public class VendorHandler {
 
     	boolean flag = false;
         String query = "select oldacct from custom.acctmap where oldacct = '"+accountNumber+"' ";
-        ResultSet rs = null;
-        con = getConnectionOracle();
+        //ResultSet rs = null;
+        //con = getConnectionOracle();
         System.out.println(query);
-    	try{
-         stmt = con.createStatement();
-         rs = stmt.executeQuery(query);
+        try (Connection c = getConnectionOracle();
+   	         PreparedStatement stmt = c.prepareStatement(query)) {
+        try(ResultSet rs = stmt.executeQuery()){
             if (rs.next()) {
                  flag = true;
             }
+        }
     	}
     	catch(Exception ex){
     		ex.printStackTrace();
     	}
-    	finally{
-    		closeConnection(con,stmt,rs);
-    	}
+    	
         return flag;
     }
      public String accountValidNew(String accountNumber)  
      {
-
+    	 
     	String account = "Invalid";
-    	try{
-    		con = getConnectionOracle();
-    		stmt = con.createStatement();
-    	rs = stmt.executeQuery("select newacct from custom.acctmap where newacct = '"+accountNumber+"' ");
+    	String query = "select newacct from custom.acctmap where newacct = '"+accountNumber+"' ";
+    	  try (Connection c = getConnectionOracle();
+    	   	         PreparedStatement stmt = c.prepareStatement(query)) {
+    	        try(ResultSet rs = stmt.executeQuery()){
          while (rs.next())
 	{
         account=rs.getString("newacct");
          }
     	}
+    	  }
     	catch(Exception ex){
     		ex.printStackTrace();
     	}
-    	finally{
-    		closeConnection(con,stmt,rs);
-    	}
+    	
         return account ;
     }
 
 
-    private Connection getConnectionOracle() {
-        Connection con = null;
-  
-        try {
-            Context initContext = new InitialContext();
-            String dsJndi = "java:/FinacleDataHouse";
-            DataSource ds = (DataSource) initContext.lookup(
-            		dsJndi);
-            con = ds.getConnection();
-
-        } catch (Exception e) {
-            System.out.println("WARNING:Error closing Connection ->" +
-                               e.getMessage());
-        }
-
-        return con;
-    }
-
+     private Connection getConnectionOracle() throws SQLException, NamingException {
+    	    Context ctx = new InitialContext();
+    	    DataSource ds = (DataSource) ctx.lookup("java:/FinacleDataHouse");
+    	    return ds.getConnection();
+    	}
       public String accountValid(String accountNumber)
      {
     	String account="Invalid";
@@ -713,34 +653,30 @@ public class VendorHandler {
 
         return account;
     }
-      public String accountNew(String accountNumber)
+      public String accountNew(String accountNumber) throws SQLException, NamingException
      {
-    		Connection con = null;
-    	    PreparedStatement ps = null;
-    	    ResultSet rs = null;
+    		
     	  System.out.println("<<<<<<<<<accountNumber in accountNew: "+accountNumber);
         String account  = "Invalid";
         String query = "select newacct from custom.acctmap where oldacct='"+accountNumber+"' ";
         System.out.println("<<<<<<<<<query in accountNew: "+query);
-        con = getConnectionOracle();
-        System.out.println(query);
-    	try{
-         stmt = con.createStatement();
-    	rs = stmt.executeQuery(query);
+//        con = getConnectionOracle();
+
+        try (Connection c = getConnectionOracle();
+	   	         PreparedStatement stmt = c.prepareStatement(query)) {
+	        try(ResultSet rs = stmt.executeQuery()){
             if (rs.next()) {    
                  account = rs.getString("newacct");
                  if(account==null || account.equalsIgnoreCase("")){account="Invalid";}
             }
-            closeConnection(con,ps,rs);
+           
     	}
+        }
     	
     	catch(Exception ex){
     		ex.printStackTrace();
     	}
-    	finally{
-    		closeConnection(con,ps,rs);
-
-    	}
+    	
         return account;
       }
 
@@ -753,38 +689,32 @@ public class VendorHandler {
 //			     String query = " SELECT FORACID||'#'||ACCT_NAME FROM tbaadm.GAM  WHERE FORACID = '"+acctNo+"' ";
 			     String query = " SELECT FORACID FROM tbaadm.GAM  WHERE FORACID = '"+acctNo+"' ";
 //					System.out.println("<<<<<<<<<query in AccountCheck: "+query);
-					Connection c = null;
-					ConnectionClass connection = null; 
-					ResultSet rs = null;
+//					Connection c = null;
+//					ConnectionClass connection = null; 
+//					ResultSet rs = null;
 //					PreparedStatement ps = null;
-				try {
-//					 c = getConnectionOracle();// We will connect to finacle database here
-//					ps = c.prepareStatement(query);
-			        connection = new ConnectionClass();
-			        PreparedStatement ps = connection.getPreparedStatementOracle(query);
+					 try (Connection c = getConnectionOracle();
+				   	         PreparedStatement ps = c.prepareStatement(query)) {
 			        ps.setString(1, acctNo);
-					rs = ps.executeQuery();
+					try(ResultSet rs = ps.executeQuery()){
 					if (rs.next()) {
 						accountNumber = rs.getString("FORACID");
 					}else accountNumber="Invalid";
 					System.out.println("<<<<<<<<<accountNumber in AccountCheck: "+accountNumber);
 					
+					}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 
-					finally {
-				//		closeConnection(c, ps, rs);
-						connection.freeResource();
-					}
+					
 					return accountNumber;
 					
 				}
 
        public boolean updateVendorTmp(legend.admin.objects.Vendor vendor) {
 
-           Connection con = null;
-           PreparedStatement ps = null;
+         
            boolean done = false;
            String result = "";
            String query = "INSERT INTO am_ad_vendorTmp"
@@ -796,9 +726,8 @@ public class VendorHandler {
                           + ",Create_date ,account_type,VendorBranchId,VENDOR_CATEGORY,SERVICE_TYPE,RECORD_TYPE,vendor_date)"
                           + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-           try {  
-               con = getConnection();
-               ps = con.prepareStatement(query);
+           try (Connection c = getConnection();
+      	         PreparedStatement ps = c.prepareStatement(query)) {
              ApplicationHelper helper = new ApplicationHelper();
              String vendorID = helper.getGeneratedId("am_ad_vendorTmp");
 //             System.out.println("=====Create Date in updateVendorTmp: "+vendor.getCreatedate());
@@ -831,9 +760,8 @@ public class VendorHandler {
            } catch (Exception e) {
                System.out.println("WARNING:Error executing Query in updateVendortmp ->" +
                                   e.getMessage());
-           } finally {
-               closeConnection(con, ps);
-           }
+           } 
+           
            return done;
 
        }
@@ -845,12 +773,9 @@ public class VendorHandler {
 
 	public String createVendor(legend.admin.objects.Vendor vendor)
        {
-           Connection con;
-           PreparedStatement ps;
+          
            String result;
            String query;
-           con = null;
-           ps = null;
            boolean done = false;
            result = "";
            query = "INSERT INTO am_ad_vendor(Vendor_Id,Vendor_Code,Vendor_Name,Contact_Person,Contact_Address," +
@@ -859,10 +784,8 @@ public class VendorHandler {
    "VendorBranchId,VENDOR_CATEGORY,SERVICE_TYPE,RCNo,TIN) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?" +
    ",?,?,?,?,?,?,?,?)"
    ;
-           try
-           {
-               con = getConnection();
-               ps = con.prepareStatement(query);
+           try (Connection c = getConnection();
+      	         PreparedStatement ps = c.prepareStatement(query)) {
                ApplicationHelper helper = new ApplicationHelper();
                String vendorID = helper.getGeneratedId("am_ad_vendor");
                String createDate = vendor.getCreatedate();
@@ -900,9 +823,7 @@ public class VendorHandler {
        } catch (Exception e) {
            System.out.println("WARNING:Error executing Query in createVendor ->" +
                               e.getMessage());
-       } finally {
-           closeConnection(con, ps);
-       }
+       } 
        return result;
        }
 
@@ -916,17 +837,14 @@ public class VendorHandler {
                           + ",Create_date ,account_type, VENDOR_CATEGORY,SERVICE_TYPE,RCNo,TIN "
                           + " FROM am_ad_vendorTMP WHERE Vendor_ID= ?";
 
-           Connection c = null;
-           ResultSet rs = null;
+        
 //           Statement s = null;
-           PreparedStatement s = null;
+       
 //   System.out.println("query in getVendorByVendorTmpID: "+query); 
-           try {
-               c = getConnection();
-//               s = c.createStatement();
-               s = c.prepareStatement(query);
+           try (Connection c = getConnection();
+      	         PreparedStatement s = c.prepareStatement(query)) {
                s.setString(1, vendid);
-               rs = s.executeQuery();
+            try(ResultSet  rs = s.executeQuery()){
                while (rs.next()) {
                    String vendorId = rs.getString("Vendor_ID");
                    int vendorBranchId = rs.getInt("VendorBranchId");
@@ -973,14 +891,13 @@ public class VendorHandler {
    				vendor.setTin(tin);
 
                }
+            }
 
            } catch (Exception e) {
                e.printStackTrace();
            }
 
-           finally {
-               closeConnection(c, s, rs);
-           }
+          
            return vendor;
 
        }
@@ -995,17 +912,12 @@ public class VendorHandler {
                           + ",Create_date ,account_type, VENDOR_CATEGORY,SERVICE_TYPE,RCNo,TIN "
                           + " FROM am_ad_vendorTmp WHERE Vendor_Id= ?";
 
-           Connection c = null;
-           ResultSet rs = null;
-//           Statement s = null;
-           PreparedStatement s = null;
+     
 //   		System.out.println("query in getVendorByVendorID: "+query); 
-           try {
-               c = getConnection();
-//               s = c.createStatement();
-               s = c.prepareStatement(query);
+           try (Connection c = getConnection();
+      	         PreparedStatement s = c.prepareStatement(query)) {
                s.setString(1, vendid);
-               rs = s.executeQuery();  
+            try(ResultSet rs = s.executeQuery()){
                while (rs.next()) {
                    String vendorId = rs.getString("Vendor_ID");
                    int vendorBranchId = rs.getInt("VendorBranchId");
@@ -1052,77 +964,60 @@ public class VendorHandler {
    				vendor.setTin(tin);
 
                }
+            }
 
            } catch (Exception e) {
                e.printStackTrace();
            }
 
-           finally {
-               closeConnection(c, s, rs);
-           }
+           
            return vendor;
 
        }
 
        public boolean deleteVendorRec(String vendorCode)
        {
-           Connection con;
-           PreparedStatement ps;
+          
            String NOTIFY_QUERY;
-           con = null;
-           ps = null;
            NOTIFY_QUERY = "delete from  am_ad_vendor  WHERE Vendor_Code = ? ";
            boolean done;
            System.out.println("==NOTIFY_QUERY in deleteVendorRec: "+NOTIFY_QUERY);
-           try
-           {
-               con = getConnection();
-               ps = con.prepareStatement(NOTIFY_QUERY);
-               ps.setString(1, vendorCode);
+           try (Connection c = getConnection();
+      	         PreparedStatement ps = c.prepareStatement(NOTIFY_QUERY)) {
                ps.executeUpdate();
                done = true;
            } catch (Exception ex) {
                done = false;
                System.out.println("WARNING: cannot delete deleteVendorRec+" + ex.getMessage());
-           } finally {
-               closeConnection(con, ps);
-           }
+           } 
+           
            return done;
        }
 
        public boolean VendorRecApproval(String vendorCode)
        {
-           Connection con;
-           PreparedStatement ps;
+          
            String NOTIFY_QUERY;
-           con = null;
-           ps = null;
            NOTIFY_QUERY = "Update am_asset_approval set process_status = 'A' WHERE Asset_Id = ? ";
            boolean done;
-           try
-           {
-               con = getConnection();
-               ps = con.prepareStatement(NOTIFY_QUERY);
+           try (Connection c = getConnection();
+        	         PreparedStatement ps = c.prepareStatement(NOTIFY_QUERY)) {
                ps.setString(1, vendorCode);
                ps.executeUpdate();
                done = true;
            } catch (Exception ex) {
                done = false;
                System.out.println("WARNING: cannot VendorRecApproval+" + ex.getMessage());
-           } finally {
-               closeConnection(con, ps);
-           }
+           } 
+           
            return done;
        }
 
        public String createVendorFromTmp(legend.admin.objects.Vendor vendor)
        {
-           Connection con;
-           PreparedStatement ps;
+          
            String result;
            String query;
-           con = null;
-           ps = null;
            boolean done = false;
            result = "";
            query = "INSERT INTO am_ad_vendor(Vendor_Id,Vendor_Code,Vendor_Name,Contact_Person,Contact_Address," +
@@ -1131,10 +1026,8 @@ public class VendorHandler {
    "VendorBranchId,VENDOR_CATEGORY,SERVICE_TYPE,RCNo,TIN) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
    ",?,?,?,?,?,?,?)"
    ;
-           try
-           {
-               con = getConnection();
-               ps = con.prepareStatement(query);
+           try (Connection c = getConnection();
+      	         PreparedStatement ps = c.prepareStatement(query)) {
                ApplicationHelper helper = new ApplicationHelper();
                String vendorID = helper.getGeneratedId("am_ad_vendor");
                String createDate = vendor.getCreatedate();
@@ -1170,17 +1063,15 @@ public class VendorHandler {
        } catch (Exception e) {
            System.out.println("WARNING:Error executing Query in createVendorFromTmp ->" +
                               e.getMessage());
-       } finally {
-           closeConnection(con, ps);
-       }
+       } 
+           
        return result;
        }
 
        
        public boolean updateVendorFromVendorTMP(legend.admin.objects.Vendor vendor) {
 
-           Connection con = null;
-           PreparedStatement ps = null;
+          
            boolean done = false;
 
            String query = "UPDATE am_ad_vendor"
@@ -1192,9 +1083,8 @@ public class VendorHandler {
                           +" , account_type = ?,VendorBranchId = ?,VENDOR_CATEGORY = ?,SERVICE_TYPE = ?,RCNo = ?,TIN = ? "
                           +" WHERE Vendor_Code =?";
 
-           try {
-               con = getConnection();
-               ps = con.prepareStatement(query);
+           try (Connection c = getConnection();
+      	         PreparedStatement ps = c.prepareStatement(query)) {
 
 //               ps.setString(1, vendor.getVendorCode());
                ps.setString(1, vendor.getVendorName());
@@ -1222,9 +1112,8 @@ public class VendorHandler {
            } catch (Exception e) {
                System.out.println("WARNING:Error executing Query in updateVendorFromVendorTMP->" +
                                   e.getMessage());
-           } finally {
-               closeConnection(con, ps);
-           }
+           } 
+           
            return done;
 
        }

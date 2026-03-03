@@ -9,6 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,15 @@ import magma.net.vao.FleetManatainanceRecord;
  */
 public class Report extends PersistenceServiceDAO {
 
+	 private static final String DS = "legendPlus";
+
+	    /* =========================================================
+	       INTERNAL SAFE CONNECTION WRAPPER
+	       ========================================================= */
+	    private Connection getLegendConnection() throws Exception {
+	        return getConnection(DS);
+	    }
+
 
 
     public String getCompanyName() {
@@ -37,7 +49,7 @@ public class Report extends PersistenceServiceDAO {
         String comp = "";
         query = "SELECT COMPANY_NAME FROM am_gb_company";
 
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(query)) {
          
         	try(ResultSet rs = ps.executeQuery()) {
@@ -80,7 +92,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = query;
  //       System.out.println("<<<<<<<FINDER_QUERY in getReportByColumn: "+FINDER_QUERY);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
            
 
@@ -140,7 +152,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = query;
 //        System.out.println("<<<<<<<FINDER_QUERY in getTabletById: "+FINDER_QUERY);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
            
 
@@ -189,7 +201,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = "SELECT TABLE_NAME from COL_LOOK_UP WHERE ID =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in findTabById: "+FINDER_QUERY);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
             
 
@@ -231,7 +243,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = query;
 //        System.out.println("<<<<<<<FINDER_QUERY in findByIdQuery: "+FINDER_QUERY);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {   
 
             ps.setString(1, id);
@@ -265,7 +277,7 @@ public class Report extends PersistenceServiceDAO {
         ArrayList list = new ArrayList();
         String FINDER_QUERY = query;
 //        System.out.println("<<<<<<<FINDER_QUERY in findByQuery1: "+FINDER_QUERY);
-        try (Connection con = getConnection();
+        try (Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);){
            
         	try(ResultSet rs = ps.executeQuery()) {
@@ -293,7 +305,7 @@ public class Report extends PersistenceServiceDAO {
         ArrayList list = new ArrayList();
         String FINDER_QUERY = query;
 //        System.out.println("<<<<<<<FINDER_QUERY in findByQuery: "+FINDER_QUERY);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
            
         	try(ResultSet rs = ps.executeQuery()) {
@@ -321,7 +333,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = "SELECT OPERAND from COL_FILTER WHERE ID =? AND OPERAND =?";
  //       System.out.println("<<<<<<<FINDER_QUERY in findByQuery: "+FINDER_QUERY+"   ID: "+id+"    OP: "+op);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
 
             ps.setString(1, id);
@@ -349,7 +361,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = "SELECT DATA_TYPE from COL_LOOK_UP WHERE ID =? AND DATA_TYPE =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in isNumericColumn: "+FINDER_QUERY+"    ID: "+id+"   dType: "+dType);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
            
 
@@ -392,7 +404,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = "SELECT COLUMN_NAME from COL_LOOK_UP WHERE ID =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in findColById: "+FINDER_QUERY+"  ID: "+id);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
           
 
@@ -420,7 +432,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = "SELECT DESCRIPTION from COL_LOOK_UP WHERE ID =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in findColDescById: "+FINDER_QUERY+"   ID: "+id);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
           
             ps.setString(1, id);
@@ -454,7 +466,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = "SELECT " + query + " from am_raisentry_post";
 
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
           
 
@@ -490,7 +502,7 @@ public class Report extends PersistenceServiceDAO {
 
         String FINDER_QUERY = "SELECT DESCRIPTION from ASSETWORKBOOK_EXPCOL WHERE ID =?";
  //       System.out.println("<<<<<<<FINDER_QUERY in findAssetWorkbookColDescById: "+FINDER_QUERY+"   ID: "+id);
-        try(Connection con = getConnection();
+        try(Connection con = getLegendConnection();
                 PreparedStatement ps = con.prepareStatement(FINDER_QUERY);) {
           
 
@@ -516,7 +528,7 @@ public class Report extends PersistenceServiceDAO {
 
         String query = "SELECT COLUMN_NAME FROM ASSETWORKBOOK_EXPCOL WHERE ID = ?";
 
-        try (Connection con = getConnection();
+        try (Connection con = getLegendConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
 
             ps.setString(1, id);
@@ -544,7 +556,7 @@ public class Report extends PersistenceServiceDAO {
         String FINDER_QUERY = "SELECT DATA_TYPE from ASSETWORKBOOK_EXPCOL WHERE ID =? AND DATA_TYPE =?";
 //        System.out.println("<<<<<<<FINDER_QUERY in isNumericColumn: "+FINDER_QUERY+"    ID: "+id+"   dType: "+dType);
         try (
-				Connection con = getConnection();
+				Connection con = getLegendConnection();
 				PreparedStatement ps = con.prepareStatement(FINDER_QUERY)
 		) {
 
@@ -578,7 +590,7 @@ public java.util.ArrayList getWorkBookSqlRecords(String query)
 //     System.out.println("====query in getWorkBookSqlRecords-----> "+query);
 	
 
-	try(Connection conn = getConnection();
+	try(Connection conn = getLegendConnection();
              PreparedStatement ps = conn.prepareStatement(query);) {
 			 try (ResultSet rs = ps.executeQuery()) {
 			while (rs.next())
@@ -679,9 +691,9 @@ public java.util.ArrayList getBulkAssetProofSqlRecords(String query,String branc
 //	Transaction transaction = null;
 //     System.out.println("===query in getBulkAssetProofSqlRec=ords-----> "+query);
 	
-	try (Connection conn = getConnection();
+	try (Connection conn = getLegendConnection();
             PreparedStatement s = conn.prepareStatement(query);){
-//		    c = getConnection();
+//		    c = getLegendConnection();
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			
@@ -805,7 +817,7 @@ public java.util.ArrayList getBulkAssetProofforFinconSqlRecords(String query)
 //	Transaction transaction = null;
 //     System.out.println("====query in getBulkAssetProofforFinconSqlRecords-----> "+query);
 	
-	try (Connection conn = getConnection();
+	try (Connection conn = getLegendConnection();
             PreparedStatement s = conn.prepareStatement(query);){
 		   
 		   try (ResultSet rs = s.executeQuery()) {
@@ -882,7 +894,7 @@ public java.util.ArrayList getUploadUserSqlRecords(String query,String user_Id)
 	
 	 legend.admin.objects.User user = null;
 	 try (
-				Connection con = getConnection();
+				Connection con = getLegendConnection();
 				PreparedStatement s = con.prepareStatement(query)
 		) {
 			   try (ResultSet rs = s.executeQuery()) {
@@ -982,7 +994,7 @@ public java.util.ArrayList getFleetRenewalSqlRecords(String query)
 	
 
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 		 try (ResultSet rs = s.executeQuery()) {
@@ -1033,7 +1045,7 @@ public java.util.ArrayList getexportexcelSqlRecords(String query)
 //	Transaction transaction = null;
 //     System.out.println("====query in getFleetRenewalSqlRecords-----> "+query);
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 			 try (ResultSet rs = s.executeQuery()) {
@@ -1072,7 +1084,7 @@ public java.util.ArrayList getDepreciationChargeRecords(String query)
 	String finacleTransId= null;
 
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 		 try (ResultSet rs = s.executeQuery()) {
@@ -1154,7 +1166,7 @@ public java.util.ArrayList getAssetManagementRecords(String query,String branch_
 	
 //System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
@@ -1252,7 +1264,7 @@ public java.util.ArrayList getConsolidatedAssetManagementRecords(String query,St
 	date = date.substring(0, 10);
 	String finacleTransId= null;
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
@@ -1355,7 +1367,7 @@ public java.util.ArrayList getDepreciationChargesExportRecords(String query,Stri
 	date = date.substring(0, 10);
 	String finacleTransId= null;
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 	          if(query.contains("CHARGEYEAR") && query.contains("DEP_DATE") && !query.contains("BRANCH_CODE") && !query.contains("CATEGORY_CODE")){
@@ -1465,7 +1477,7 @@ public java.util.ArrayList getPostedTransactionExportRecords(String query,String
 	date = date.substring(0, 10);
 	String finacleTransId= null;
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 	          if(query.contains("a.User_Name") && query.contains("a.transaction_date")){
@@ -1533,7 +1545,7 @@ public java.util.ArrayList getUserListExportRecords(String query)
 	date = date.substring(0, 10);
 	String finacleTransId= null;
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 			 try (ResultSet rs = s.executeQuery()) {
@@ -1595,7 +1607,7 @@ public java.util.ArrayList findStockIssuanceDisplayByBatchId(String tranId)
             "select * from am_gb_bulkStocktransfer where batch_id=? ";
 
     try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement ps = con.prepareStatement(selectQuery)
 	) {
         ps.setInt(1, Integer.parseInt(tranId));
@@ -1661,7 +1673,7 @@ public java.util.ArrayList getFinacleAssetUploadExportRecords(String query,Strin
 	date = date.substring(0, 10);
 	String finacleTransId= null;
 	try (
-			Connection con = getConnection();
+			Connection con = getLegendConnection();
 			PreparedStatement s = con.prepareStatement(query)
 	) {
 	          if(query.contains("AM_ASSET.GROUP_ID") && query.contains("GROUP_ID") && query.contains("d.branch_code")){
@@ -1722,7 +1734,7 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 	System.out.println("subjectTowhTax in getLegacyAssetGrpPostRecords: "+subjectTowhTax);
 //	System.out.println("======>>>query.contains(\"Revalue_ID\")=======: "+query.contains("Revalue_ID"));
 //	System.out.println("======>>>am_asset_improvement_Upload.Revalue_ID=======: "+query.contains("am_asset_improvement_Upload.Revalue_ID"));
-	try (Connection c = getConnection();
+	try (Connection c = getLegendConnection();
 	         PreparedStatement s = c.prepareStatement(query)) {
 	          if(query.contains("s.GROUP_ID") && query.contains("group_id") && subjectTovat.equalsIgnoreCase("Y") && subjectTowhTax.equalsIgnoreCase("S") && paramCount==22){
 	        	  System.out.println("=====query in getLegacyAssetGrpPostRecords 22A==== ");
@@ -2098,7 +2110,7 @@ public java.util.ArrayList<newAssetTransaction> getLegacyAssetGrpPostRecords2(
     java.util.ArrayList<newAssetTransaction> _list = new java.util.ArrayList<>();
     String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
 
-    try (Connection c = getConnection();
+    try (Connection c = getLegendConnection();
          PreparedStatement s = c.prepareStatement(query)) {
 
         // ===== Build parameter list dynamically =====
@@ -2185,7 +2197,7 @@ public java.util.ArrayList getLegacyAssetGrpPostRecords(String query,String bran
 	String finacleTransId= null;
 	
 //	System.out.println("query in getLegacyAssetGrpPostRecords: "+query);
-	 try (Connection c = getConnection();
+	 try (Connection c = getLegendConnection();
 	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(query.contains("GROUP_ID") && query.contains("d.branch_code")){
 //	        	  System.out.println("=====query in getLegacyAssetGrpPostRecords==== ");
@@ -2244,7 +2256,7 @@ public java.util.ArrayList getFinacleAssetImprovedUploadExportRecords(String que
 	String finacleTransId= null;
 
 	System.out.println("query in getFinacleAssetUploadExportRecords: "+query);
-	 try (Connection c = getConnection();
+	 try (Connection c = getLegendConnection();
 	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(query.contains("Revalue_ID") && query.contains("Revalue_ID") && query.contains("d.branch_code")){
 			 if(subjectTovat.equals("N")  && subjectTowhTax.equals("N")){ 
@@ -2338,7 +2350,7 @@ public java.util.ArrayList getFinacleUncapAssetUploadExportRecords(String query,
 	String finacleTransId= null;
 	
 //	System.out.println("query in getFinacleUncapAssetUploadExportRecords: "+query);
-	 try (Connection c = getConnection();
+	 try (Connection c = getLegendConnection();
 	         PreparedStatement s = c.prepareStatement(query)) {
 	          if(query.contains("AM_ASSET_UNCAPITALIZED.GROUP_ID") && query.contains("GROUP_ID") && query.contains("d.branch_code")){
 	        	  s.setString(1, groupid);
@@ -2393,16 +2405,10 @@ public java.util.ArrayList getAssetListVerificationRecords(String query,String b
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //	System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0")) {
@@ -2423,7 +2429,7 @@ public java.util.ArrayList getAssetListVerificationRecords(String query,String b
 	        	  s.setString(2, categoryCode);
 	          }
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -2480,15 +2486,13 @@ public java.util.ArrayList getAssetListVerificationRecords(String query,String b
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 /*
@@ -2504,7 +2508,7 @@ public java.util.ArrayList getAssetRegisterRecords(String query,String branch_Id
 	PreparedStatement s = null;
 System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
 	try {
-		    c = getConnection();
+		    c = getLegendConnection();
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			 s = c.prepareStatement(query.toString());
@@ -2690,16 +2694,10 @@ public java.util.ArrayList getAssetRegisterRecords(String query,String branch_Id
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -2749,7 +2747,7 @@ public java.util.ArrayList getAssetRegisterRecords(String query,String branch_Id
 	        	  s.setString(3, ToDate);
 				 } 
 			 }
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -2873,15 +2871,13 @@ public java.util.ArrayList getAssetRegisterRecords(String query,String branch_Id
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 /*public java.util.ArrayList getAssetDepreciationComparismRecords(String query)
@@ -2896,7 +2892,7 @@ public java.util.ArrayList getAssetRegisterRecords(String query,String branch_Id
 	PreparedStatement s = null;
 System.out.println("query in getAssetDepreciationComparismRecords: "+query);
 	try {
-		    c = getConnection();
+		    c = getLegendConnection();
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
 			 s = c.prepareStatement(query.toString());
@@ -2974,17 +2970,11 @@ public java.util.ArrayList getAssetDepreciationComparismRecords(String query)
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //System.out.println("query in getAssetDepreciationComparismRecords: "+query);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
-	          rs = s.executeQuery();  
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
+		 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String StrassetId = rs.getString("ASSET_ID");
@@ -3039,15 +3029,13 @@ public java.util.ArrayList getAssetDepreciationComparismRecords(String query)
 
 				_list.add(newTransaction);
 			   }
+		 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3057,14 +3045,10 @@ public java.util.ArrayList getFinacleDisposalUploadExportRecords(String query,St
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
+	
 //	System.out.println("query in getFinacleAssetUploadExportRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 	          if(query.contains("am_asset_disposal_Upload.disposal_ID")){
 	        	  s.setString(1, groupid);
 	        	  s.setString(2, groupid);
@@ -3076,7 +3060,7 @@ public java.util.ArrayList getFinacleDisposalUploadExportRecords(String query,St
 	        	  s.setString(8, groupid); 
 	          }
 	          
-			rs = s.executeQuery();
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -3104,15 +3088,13 @@ public java.util.ArrayList getFinacleDisposalUploadExportRecords(String query,St
 				newTransaction.setIntegrifyId(I);
 				_list.add(newTransaction);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3122,16 +3104,10 @@ public java.util.ArrayList getAssetAdditionRecords(String query,String branch_Id
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 			 s.setQueryTimeout(180);
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
@@ -3232,7 +3208,7 @@ public java.util.ArrayList getAssetAdditionRecords(String query,String branch_Id
 //	        	  s.setString(15, ToDate);
 				 } 
 			 }
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -3277,15 +3253,13 @@ public java.util.ArrayList getAssetAdditionRecords(String query,String branch_Id
 				newTransaction.setAmount(amount);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3295,13 +3269,10 @@ public java.util.ArrayList getFleetMaintenanceRecords(String query,String FromDa
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-	PreparedStatement s = null;
+	
 //System.out.println("query in getFleetMaintenanceRecords: "+query+"  assetId: "+assetId+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 
 			 if(assetId.equals("0") && FromDate.equals("") && ToDate.equals("")) {
 				 System.out.println("NO Selection in getFleetMaintenanceRecords: ");
@@ -3323,7 +3294,8 @@ public java.util.ArrayList getFleetMaintenanceRecords(String query,String FromDa
 	        	  s.setString(2, ToDate);
 				 } 
 			 }
-	          rs = s.executeQuery();  
+
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {	
 							
@@ -3355,15 +3327,13 @@ public java.util.ArrayList getFleetMaintenanceRecords(String query,String FromDa
 				
 				_list.add(fleetTrans);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3373,13 +3343,10 @@ public java.util.ArrayList getFacilityMaintenanceRecords(String query,String Fro
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-	PreparedStatement s = null;
+	
 //System.out.println("query in getFacilityMaintenanceRecords: "+query+"  assetId: "+assetId+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 
 			 if(assetId.equals("0") && FromDate.equals("") && ToDate.equals("")) {
 				 System.out.println("NO Selection in getFleetMaintenanceRecords: ");
@@ -3401,7 +3368,7 @@ public java.util.ArrayList getFacilityMaintenanceRecords(String query,String Fro
 	        	  s.setString(2, ToDate);
 				 } 
 			 }
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {	
 							
@@ -3433,15 +3400,13 @@ public java.util.ArrayList getFacilityMaintenanceRecords(String query,String Fro
 				
 				_list.add(fleetTrans);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3455,15 +3420,11 @@ public java.util.ArrayList getFacilityPPMRecords(String query)
 	 FMppmAllocation scheduleList = null;
      ArrayList ppmList = new ArrayList();
      
-	Connection c = null;
-	ResultSet rs = null; 
-	PreparedStatement s = null;
-//	System.out.println("query in getFacilityPPMRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
 
-	          rs = s.executeQuery();  
+//	System.out.println("query in getFacilityPPMRecords: "+query);
+     try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {	
 							
@@ -3498,15 +3459,13 @@ public java.util.ArrayList getFacilityPPMRecords(String query)
 
 				_list.add(scheduleList);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3516,18 +3475,12 @@ public java.util.ArrayList getReportDisposalBulkUploadExportRecords(String query
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetDepreciationComparismRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 	          if(query.contains("convert(varchar,am_asset_disposal_Upload.DISPOSAL_ID)")){
 	        	  s.setString(1, groupid);
 	          }
-	          rs = s.executeQuery();  
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String StrassetId = rs.getString("AM_ASSET_Asset_id");
@@ -3555,15 +3508,13 @@ public java.util.ArrayList getReportDisposalBulkUploadExportRecords(String query
 
 				_list.add(newTransaction);
 			   }
+	          }	
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3573,16 +3524,8 @@ public java.util.ArrayList getScriptExecutionRecords(String query,String branch_
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(fromDate.equals("0") && toDate.equals("0")) {
@@ -3599,7 +3542,7 @@ public java.util.ArrayList getScriptExecutionRecords(String query,String branch_
 	        	  s.setString(2, categoryCode);
 	          }
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -3653,15 +3596,14 @@ public java.util.ArrayList getScriptExecutionRecords(String query,String branch_
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
+	 
 	return _list;
 }
 
@@ -3672,16 +3614,8 @@ public java.util.ArrayList getAssetMgtSummaryRecords(String query,String branch_
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0")) {
@@ -3701,7 +3635,7 @@ public java.util.ArrayList getAssetMgtSummaryRecords(String query,String branch_
 	        	  s.setString(2, categoryCode);
 	          }
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {		
 //				String strDescription = rs.getString("Description");
@@ -3759,15 +3693,13 @@ public java.util.ArrayList getAssetMgtSummaryRecords(String query,String branch_
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3777,16 +3709,8 @@ public java.util.ArrayList getConsolidatedAssetMgtSummaryRecords(String query,St
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0")) {
@@ -3810,7 +3734,7 @@ public java.util.ArrayList getConsolidatedAssetMgtSummaryRecords(String query,St
 	        	  s.setString(4, categoryCode);
 	          }
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {		
 //				String strDescription = rs.getString("Description");
@@ -3868,15 +3792,13 @@ public java.util.ArrayList getConsolidatedAssetMgtSummaryRecords(String query,St
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3886,16 +3808,10 @@ public java.util.ArrayList getDepreciationPostingRecords(String query,String nar
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
-//	System.out.println("query in getDepreciationPostingRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 
-			rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 //				String strDescription = rs.getString("NARRATION");
@@ -3921,15 +3837,13 @@ public java.util.ArrayList getDepreciationPostingRecords(String query,String nar
 				newTransaction.setAssetType(transType);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -3940,17 +3854,11 @@ public java.util.ArrayList getBatchExceptionPostingRecords(String query,String b
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
-
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 			 s.setString(1, batchId);
 			 s.setString(2, userId);
-			rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {		
 				
@@ -3990,15 +3898,13 @@ public java.util.ArrayList getBatchExceptionPostingRecords(String query,String b
 				newTransaction.setInitiatorId(StrGroupId);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -4008,15 +3914,9 @@ public java.util.ArrayList getLegacyExceptionpPostRecords(String query)
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
-//	System.out.println("query in getLegacyAssetGrpPostRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query); 
-			rs = s.executeQuery();
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("DECRIPTION");
@@ -4044,15 +3944,13 @@ public java.util.ArrayList getLegacyExceptionpPostRecords(String query)
 				newTransaction.setAssetType(transType);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -4063,17 +3961,11 @@ public java.util.ArrayList getAssetDisposalReportRecords(String query,String bra
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //	System.out.println("Query: " + query);
 System.out.println("query in getAssetDisposalReportRecords: "+" branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  fromDate: "+fromDate+"   endDate: "+endDate+"   disposalReason: "+disposalReason);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+try (Connection c = getLegendConnection();
+        PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && fromDate.equals("") && endDate.equals("") && disposalReason.equals("0")) {
@@ -4149,7 +4041,7 @@ System.out.println("query in getAssetDisposalReportRecords: "+" branch_Id: "+bra
 		          }	
 				 
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 			     		
@@ -4193,15 +4085,13 @@ System.out.println("query in getAssetDisposalReportRecords: "+" branch_Id: "+bra
 			//	System.out.println("StrassetId in getAssetDisposalReportRecords: "+StrassetId+"  branchName: "+branchName+"   categoryName: "+categoryName+"  strDescription: "+strDescription+"   costPrice: "+costPrice+"   accumDepr: "+accumDepr);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -4212,16 +4102,8 @@ public java.util.ArrayList getAuditLogRecords(String query,String branch_Id,Stri
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   User: "+user+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && user.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -4267,7 +4149,7 @@ public java.util.ArrayList getAuditLogRecords(String query,String branch_Id,Stri
 	        	  s.setString(3, ToDate);
 				 } 
 			 }
-	          rs = s.executeQuery();  
+	         try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strmtid = rs.getString("MTID");
@@ -4316,15 +4198,13 @@ public java.util.ArrayList getAuditLogRecords(String query,String branch_Id,Stri
 
 				_list.add(log);
 			   }
+	         }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -4335,16 +4215,8 @@ public java.util.ArrayList getAssetImprovementReportRecords(String query,String 
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetDisposalReportRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  fromDate: "+fromDate+"   endDate: "+endDate+"   disposalReason: "+disposalReason);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && !fromDate.equals("") && !endDate.equals("")) {
@@ -4402,7 +4274,7 @@ public java.util.ArrayList getAssetImprovementReportRecords(String query,String 
 //		        	  System.out.println("Branch, Category and Date Selection in getAssetImprovementReportRecords: ");
 	          }				 
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 			     		
@@ -4441,15 +4313,13 @@ public java.util.ArrayList getAssetImprovementReportRecords(String query,String 
 //				System.out.println("StrassetId in getAssetImprovementReportRecords: "+StrassetId+"  branchName: "+branchName+"   categoryName: "+categoryName+"  strDescription: "+strDescription+"   costPrice: "+costPrice+"   accumDepr: "+accumDepr);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -4460,14 +4330,8 @@ public java.util.ArrayList getAssetBidListRecords(String query,String StaffId,St
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//	System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 			 if(StaffId.equals("") && FromDate.equals("") && ToDate.equals("")) {
 //				 System.out.println("NO Selection in getAssetManagementRecords: ");
 			 }else{
@@ -4488,7 +4352,7 @@ public java.util.ArrayList getAssetBidListRecords(String query,String StaffId,St
 	        	  s.setString(3, ToDate);
 	          }
 			 }
-	          rs = s.executeQuery();
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String assetId = rs.getString("ASSET_ID");
@@ -4513,15 +4377,13 @@ public java.util.ArrayList getAssetBidListRecords(String query,String StaffId,St
 	             aset.setFirstname(bidderName);
 				_list.add(aset);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -4531,16 +4393,8 @@ public java.util.ArrayList getAssetListRecords(String query,String branch_Id,Str
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 			 s.setQueryTimeout(180);
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
@@ -4565,7 +4419,7 @@ public java.util.ArrayList getAssetListRecords(String query,String branch_Id,Str
 	          }
 
 			 }
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -4689,15 +4543,13 @@ public java.util.ArrayList getAssetListRecords(String query,String branch_Id,Str
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -4713,7 +4565,7 @@ public java.util.ArrayList getAssetListRecords(String query,String branch_Id,Str
 //	PreparedStatement s = null;
 ////System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
 //	try {
-//		    c = getConnection();
+//		    c = getLegendConnection();
 ////			s = c.createStatement();
 ////			rs = s.executeQuery(query);
 //			 s = c.prepareStatement(query.toString());
@@ -4907,16 +4759,10 @@ public java.util.ArrayList getAssetRegisterConcolidatedRecords(String query,Stri
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 			 s.setQueryTimeout(180);
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
@@ -4978,7 +4824,7 @@ public java.util.ArrayList getAssetRegisterConcolidatedRecords(String query,Stri
 	        	  s.setString(6, ToDate);
 				 } 
 			 }
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -5054,15 +4900,13 @@ public java.util.ArrayList getAssetRegisterConcolidatedRecords(String query,Stri
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -5072,16 +4916,8 @@ public java.util.ArrayList getAssetTransactionListRecords(String query,String br
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 			 s.setQueryTimeout(180);
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
@@ -5153,7 +4989,7 @@ public java.util.ArrayList getAssetTransactionListRecords(String query,String br
 	          }
 
 			 }
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String StrassetId = rs.getString("ASSET_ID");
@@ -5212,15 +5048,13 @@ public java.util.ArrayList getAssetTransactionListRecords(String query,String br
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -5230,16 +5064,10 @@ public java.util.ArrayList getAssetTransferRecords(String query,String branch_Id
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 System.out.println("query in getAssetTransferRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+try (Connection c = getLegendConnection();
+        PreparedStatement s = c.prepareStatement(query)) {
 			 s.setQueryTimeout(180);
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
@@ -5299,7 +5127,7 @@ System.out.println("query in getAssetTransferRecords: "+query+"  branch_Id: "+br
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -5366,15 +5194,13 @@ System.out.println("query in getAssetTransferRecords: "+query+"  branch_Id: "+br
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -5391,7 +5217,7 @@ System.out.println("query in getAssetTransferRecords: "+query+"  branch_Id: "+br
 //	PreparedStatement s = null;
 //System.out.println("query in getAssetTransferRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
 //	try {
-//		    c = getConnection();
+//		    c = getLegendConnection();
 ////			s = c.createStatement();
 ////			rs = s.executeQuery(query);
 //			 s = c.prepareStatement(query.toString());
@@ -5527,16 +5353,10 @@ public java.util.ArrayList getAssetConsolidatedChargesRecords(String query,Strin
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -5597,7 +5417,7 @@ public java.util.ArrayList getAssetConsolidatedChargesRecords(String query,Strin
 //	        	  s.setString(6, ToDate);
 				 } 
 			 }
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -5645,15 +5465,13 @@ public java.util.ArrayList getAssetConsolidatedChargesRecords(String query,Strin
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -5663,16 +5481,11 @@ public java.util.ArrayList getAuditLogRecords(String query,String branch_Id,Stri
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //System.out.println("query in getAssetRegisterRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
+
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && user.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -5741,7 +5554,7 @@ public java.util.ArrayList getAuditLogRecords(String query,String branch_Id,Stri
 	        	  s.setString(1, user);
 	          }					 
 			 }
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("FULL_NAME");
@@ -5776,15 +5589,13 @@ public java.util.ArrayList getAuditLogRecords(String query,String branch_Id,Stri
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -5794,16 +5605,9 @@ public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String q
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//	System.out.println("query in getConsolidatedFixedAssetVerificationRecords: "+query+"  region: "+region+"  FromDate: "+FromDate+"  ToDate: "+ToDate+"  ThirdPartyLabel: "+ThirdPartyLabel);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
+
 //	          if(!query.contains("b.region") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(region.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -5829,7 +5633,7 @@ public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String q
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {	
 
@@ -5960,15 +5764,13 @@ public java.util.ArrayList getConsolidatedFixedAssetVerificationRecords(String q
 				_list.add(newTransaction);
 			   }
 			   }
+	 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -5978,16 +5780,8 @@ public java.util.ArrayList getUncapitalisedAsseRecords(String query,String branc
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -6040,7 +5834,7 @@ public java.util.ArrayList getUncapitalisedAsseRecords(String query,String branc
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -6099,15 +5893,13 @@ public java.util.ArrayList getUncapitalisedAsseRecords(String query,String branc
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -6117,16 +5909,8 @@ public java.util.ArrayList getAssetReclassificationRecords(String query,String b
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -6179,7 +5963,7 @@ public java.util.ArrayList getAssetReclassificationRecords(String query,String b
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -6250,15 +6034,13 @@ public java.util.ArrayList getAssetReclassificationRecords(String query,String b
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -6268,16 +6050,8 @@ public java.util.ArrayList getFullyDepreciatedAssetRecords(String query,String b
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -6330,7 +6104,7 @@ public java.util.ArrayList getFullyDepreciatedAssetRecords(String query,String b
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -6386,15 +6160,13 @@ public java.util.ArrayList getFullyDepreciatedAssetRecords(String query,String b
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -6404,16 +6176,8 @@ public java.util.ArrayList getDepreciationValidationReportRecords(String query,S
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetDisposalReportRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  fromDate: "+fromDate+"   endDate: "+endDate+"   disposalReason: "+disposalReason);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			
@@ -6431,7 +6195,7 @@ public java.util.ArrayList getDepreciationValidationReportRecords(String query,S
 				 }
 				
 			 
-	          rs = s.executeQuery();
+				 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String asset_Id = rs.getString("ASSET_ID");
@@ -6462,15 +6226,13 @@ public java.util.ArrayList getDepreciationValidationReportRecords(String query,S
 			//	System.out.println("StrassetId in getAssetDisposalReportRecords: "+StrassetId+"  branchName: "+branchName+"   categoryName: "+categoryName+"  strDescription: "+strDescription+"   costPrice: "+costPrice+"   accumDepr: "+accumDepr);
 				_list.add(newTransaction);
 			   }
+				 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -6480,16 +6242,8 @@ public java.util.ArrayList getAssetGroupRecords(String query,String branch_Id,St
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getAssetGroupRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -6542,7 +6296,7 @@ public java.util.ArrayList getAssetGroupRecords(String query,String branch_Id,St
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -6609,15 +6363,13 @@ public java.util.ArrayList getAssetGroupRecords(String query,String branch_Id,St
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+				
 	return _list;
 }
 
@@ -6628,16 +6380,8 @@ public java.util.ArrayList getBulkTransferListRecords(String query,String branch
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && batch_Id.equals("") && FromDate.equals("") && ToDate.equals("")) {
@@ -6677,7 +6421,7 @@ public java.util.ArrayList getBulkTransferListRecords(String query,String branch
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -6747,15 +6491,13 @@ public java.util.ArrayList getBulkTransferListRecords(String query,String branch
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -6767,16 +6509,8 @@ public java.util.ArrayList getBranchSummaryVerificationRecords(String query,Stri
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   departmentCode: "+departmentCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 		
@@ -6830,7 +6564,7 @@ public java.util.ArrayList getBranchSummaryVerificationRecords(String query,Stri
 
 			 }
 	
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -6952,15 +6686,13 @@ public java.util.ArrayList getBranchSummaryVerificationRecords(String query,Stri
 				_list.add(newTransaction);
 			   }				
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -6971,16 +6703,10 @@ public java.util.ArrayList getUncapitalizedTransferRecords(String query,String b
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+
 //System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -7033,7 +6759,7 @@ public java.util.ArrayList getUncapitalizedTransferRecords(String query,String b
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -7102,15 +6828,13 @@ public java.util.ArrayList getUncapitalizedTransferRecords(String query,String b
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+				
 	return _list;
 }
 
@@ -7121,16 +6845,8 @@ public java.util.ArrayList getWipReclassificationRecords(String query,String bra
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -7183,7 +6899,7 @@ public java.util.ArrayList getWipReclassificationRecords(String query,String bra
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -7227,15 +6943,13 @@ public java.util.ArrayList getWipReclassificationRecords(String query,String bra
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -7245,16 +6959,8 @@ public java.util.ArrayList getUncapitalizedDisposalRecords(String query,String b
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -7307,7 +7013,7 @@ public java.util.ArrayList getUncapitalizedDisposalRecords(String query,String b
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -7370,15 +7076,13 @@ public java.util.ArrayList getUncapitalizedDisposalRecords(String query,String b
 
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -7388,16 +7092,8 @@ public java.util.ArrayList getAssetTransactionApprovalRecords(String query,Strin
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -7458,7 +7154,7 @@ public java.util.ArrayList getAssetTransactionApprovalRecords(String query,Strin
 				 } 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -7485,25 +7181,26 @@ public java.util.ArrayList getAssetTransactionApprovalRecords(String query,Strin
 				newTransaction.setDatepurchased(date_approved);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
-public java.util.ArrayList getFixedAssetMovementScheduleRecords(String query,String FromDate, String ToDate, String bankingApp)
+public java.util.ArrayList getFixedAssetMovementScheduleRecordsOld(String query,String FromDate, String ToDate, String bankingApp)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String endmonth = "";
 	String endyear = "";
+	Connection c = null;
+	PreparedStatement s=null;
+	ResultSet rs = null;
     if(!FromDate.equals("")){
 	String yyyy = FromDate.substring(6, 10);
 //	System.out.println("======>yyyy: "+yyyy);
@@ -7522,14 +7219,11 @@ public java.util.ArrayList getFixedAssetMovementScheduleRecords(String query,Str
 	ToDate = endyear+"-"+endmonth+"-"+Tdd;
     }	
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //	System.out.println("query in getFixedAssetMovementScheduleRecords: "+query+"  FromDate: "+FromDate+"  ToDate: "+ToDate+"  bankingApp: "+bankingApp);
 	try {
 		if(bankingApp.equalsIgnoreCase("FLEXCUBE")) {
-		    c = getConnection();
+		    c = getLegendConnection();
 			 s = c.prepareStatement(query.toString());
 			 if(FromDate.equals("") && ToDate.equals("")) {
 				 System.out.println("NO Selection in getFixedAssetMovementScheduleRecords: ");
@@ -7566,7 +7260,7 @@ public java.util.ArrayList getFixedAssetMovementScheduleRecords(String query,Str
 		}
 
 		if(bankingApp.equalsIgnoreCase("FINACLE")) {
-		    c = getConnection();
+		    c = getLegendConnection();
 			 s = c.prepareStatement(query.toString());
 			 if(FromDate.equals("") && ToDate.equals("")) {
 				 System.out.println("NO Selection in getFixedAssetMovementScheduleRecords: ");
@@ -7612,6 +7306,70 @@ public java.util.ArrayList getFixedAssetMovementScheduleRecords(String query,Str
 	return _list;
 }
 
+public List<newAssetTransaction> getFixedAssetMovementScheduleRecords(
+        String query, String fromDateStr, String toDateStr, String bankingApp) throws Exception {
+
+    List<newAssetTransaction> transactions = new ArrayList<>();
+
+    // Convert dates to yyyy-MM-dd format
+    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    DateTimeFormatter sqlFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    String fromDate = "";
+    String toDate = "";
+
+    try {
+        if (fromDateStr != null && !fromDateStr.isEmpty()) {
+            LocalDate fd = LocalDate.parse(fromDateStr, inputFormatter);
+            fromDate = fd.format(sqlFormatter);
+        }
+        if (toDateStr != null && !toDateStr.isEmpty()) {
+            LocalDate td = LocalDate.parse(toDateStr, inputFormatter);
+            toDate = td.format(sqlFormatter);
+        }
+    } catch (DateTimeParseException e) {
+        System.out.println("Invalid date format: " + e.getMessage());
+    }
+
+    try (Connection con = getLegendConnection();
+         PreparedStatement ps = con.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            newAssetTransaction txn = new newAssetTransaction();
+
+            if ("FLEXCUBE".equalsIgnoreCase(bankingApp)) {
+                txn.setBarCode(rs.getString("NARRATION"));
+                txn.setSpare2(rs.getString("BUILDING"));
+                txn.setAssetUser(rs.getString("LAND"));
+                txn.setDescription(rs.getString("LEASEHOLD IMPROVEMENT"));
+                txn.setAssetMaintenance(rs.getString("FURNITURE FITTINGS & EQUIPMENT"));
+                txn.setAssetType(rs.getString("COMPUTER EQUIPMENT"));
+                txn.setEngineNo(rs.getString("MOTOR VEHICLES"));
+                txn.setCategoryName(
+                        rs.getString("AIRCRAFT") == null ? "0" : rs.getString("AIRCRAFT"));
+                txn.setLocation(
+                        rs.getString("COMPUTER SOFTWARE") == null ? "0" : rs.getString("COMPUTER SOFTWARE"));
+            } else if ("FINACLE".equalsIgnoreCase(bankingApp)) {
+                txn.setBarCode(rs.getString("NARRATION"));
+                txn.setSpare2(rs.getString("LAND & LEASEHOLD"));
+                txn.setAssetUser(rs.getString("WORK IN PROGRESS"));
+                txn.setDescription(rs.getString("MACHINE & EQUIPMENT"));
+                txn.setAssetMaintenance(rs.getString("[FURNITURE & FITTINGS]"));
+                txn.setAssetType(rs.getString("COMPUTER"));
+                txn.setEngineNo(rs.getString("MOTOR VEHCILE"));
+                txn.setCategoryName(rs.getString("AIRCRAFT")); // confirm column name
+                txn.setLocation(rs.getString("INTANGIBLE ASSETS"));
+            }
+
+            transactions.add(txn);
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return transactions;
+}
 
 public java.util.ArrayList getVendorDetails(String query)
 {
@@ -7619,20 +7377,10 @@ public java.util.ArrayList getVendorDetails(String query)
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 
-
-	          rs = s.executeQuery();  
+		 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -7676,15 +7424,13 @@ public java.util.ArrayList getVendorDetails(String query)
 
 				_list.add(newTransaction);
 			   }
+		 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -7694,16 +7440,8 @@ public java.util.ArrayList getCloseAssetRecords(String query,String assetId,Stri
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
-//System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(assetId.equals("") && FromDate.equals("") && ToDate.equals("")) {
@@ -7738,7 +7476,7 @@ public java.util.ArrayList getCloseAssetRecords(String query,String assetId,Stri
 				 } 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -7767,15 +7505,13 @@ public java.util.ArrayList getCloseAssetRecords(String query,String assetId,Stri
 				
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -7785,16 +7521,8 @@ public java.util.ArrayList getPostedBatchTransactionExportRecords(String query,S
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
-	
-	try {
-		    c = getConnection();
-//			s = c.createStatement();
-//			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 	          if(query.contains("a.User_Name") && query.contains("a.transaction_date")){
 	        	  s.setString(1, userName);
 	        	  s.setString(2, startDate);
@@ -7804,7 +7532,7 @@ public java.util.ArrayList getPostedBatchTransactionExportRecords(String query,S
 	        	  s.setString(1, startDate);
 	        	  s.setString(2, endDate);
 	          }
-			rs = s.executeQuery();
+	          try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strgroupId = rs.getString("GROUP_ID");
@@ -7840,15 +7568,13 @@ public java.util.ArrayList getPostedBatchTransactionExportRecords(String query,S
 				
 				_list.add(newTransaction);
 			   }
+	          }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -7859,16 +7585,8 @@ public java.util.ArrayList getLegacyPostedTransactionRecords(String query,String
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 //	String finacleTransId= null;
-	ResultSet rs = null; 
-	Connection conn = null;
-	PreparedStatement ps = null;
-//	System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-        	
-        	
-        ConnectionClass connection = new ConnectionClass();
-        	conn = connection.getConnection();
-        	ps = conn.prepareStatement(query.toString());        	
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement ps = c.prepareStatement(query)) {
         	
 			 if(branch_Id.equals("0") && FromDate.equals("") && ToDate.equals("")) {
 //				 System.out.println("NO Selection in getAssetManagementRecords: ");
@@ -7890,7 +7608,7 @@ public java.util.ArrayList getLegacyPostedTransactionRecords(String query,String
 	        	  ps.setString(1, branch_Id);
 	          }	  				 
 			 }
-	          rs = ps.executeQuery();
+			 try (ResultSet rs = ps.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -7947,37 +7665,32 @@ public java.util.ArrayList getLegacyPostedTransactionRecords(String query,String
 //				newTransaction.setCalcLifeSpan(calclifeSpan);
 				_list.add(newTransaction);
 			   }
+			 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(conn, ps, rs);
-					}
+					
 	return _list;
 }
 
 
 public ArrayList<newAssetTransaction> getBidBasePriceRecords(String baseQuery, String branch_Id, String categoryCode) {
     ArrayList<newAssetTransaction> list = new ArrayList<>();
-    Connection c = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+   
+    StringBuilder query = new StringBuilder(baseQuery);
+    try (Connection c = getLegendConnection();
+	         PreparedStatement ps = c.prepareStatement(query.toString())) {
+        
 
-    try {
-        c = getConnection();
-
-        StringBuilder query = new StringBuilder(baseQuery);
-
-        System.out.println("<<<<< getBidBasePriceRecords: " + query);
+        System.out.println("<<<<< getBidBasePriceRecords: " + baseQuery);
         
         System.out.println("NO Selection in getBidBasePriceRecords: ");
 
-        ps = c.prepareStatement(query.toString());
+   
 
-        rs = ps.executeQuery();
+        try (ResultSet rs = ps.executeQuery()) {
 
         while (rs.next()) {
             newAssetTransaction newTransaction = new newAssetTransaction();
@@ -7990,12 +7703,11 @@ public ArrayList<newAssetTransaction> getBidBasePriceRecords(String baseQuery, S
 
             list.add(newTransaction);
         }
+        }
 
     } catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, ps, rs);
-    }
+    } 
 
     return list;
 }
@@ -8006,37 +7718,34 @@ public ArrayList<newAssetTransaction> getBranchVisitListRecords(String baseQuery
     StringBuilder sqlQuery = new StringBuilder(baseQuery);
     List<Object> params = new ArrayList<>();
     ArrayList<newAssetTransaction> list = new ArrayList<>();
+    if (!branch_Id.equals("0")) {
+        sqlQuery.append(" AND A.BRANCH_CODE = ?");
+        params.add(branch_Id);
+        System.out.println("Branch selected");
+    }
 
-    Connection c = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+    if (!fromDate.isEmpty() && !toDate.isEmpty()) {
+        sqlQuery.append(" AND a.TRANS_DATE BETWEEN ? AND ?");
+        params.add(fromDate);
+        params.add(toDate);
+        System.out.println("Date selected");
+    }
 
-    try {
-        c = getConnection();
+    try (Connection c = getLegendConnection();
+	         PreparedStatement ps = c.prepareStatement(sqlQuery.toString())) {
 
-        if (!branch_Id.equals("0")) {
-            sqlQuery.append(" AND A.BRANCH_CODE = ?");
-            params.add(branch_Id);
-            System.out.println("Branch selected");
-        }
-
-        if (!fromDate.isEmpty() && !toDate.isEmpty()) {
-            sqlQuery.append(" AND a.TRANS_DATE BETWEEN ? AND ?");
-            params.add(fromDate);
-            params.add(toDate);
-            System.out.println("Date selected");
-        }
+       
 
         sqlQuery.append(" ORDER BY a.GROUP_ID");
         System.out.println("<<<<<<<<< SqlQuery: " + sqlQuery);
 
-        ps = c.prepareStatement(sqlQuery.toString());
+       
 
         for (int i = 0; i < params.size(); i++) {
             ps.setObject(i + 1, params.get(i));
         }
 
-        rs = ps.executeQuery();
+        try (ResultSet rs = ps.executeQuery()) {
 
         // Process result
         while (rs.next()) {
@@ -8052,12 +7761,11 @@ public ArrayList<newAssetTransaction> getBranchVisitListRecords(String baseQuery
 
             list.add(newTransaction);
         }
+        }
 
     } catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, ps, rs);
-    }
+    } 
 
     return list;
 }
@@ -8065,37 +7773,35 @@ public ArrayList<newAssetTransaction> getBranchVisitListRecords(String baseQuery
 
 
 
+
+
 public ArrayList<newAssetTransaction> getLedgerExtracts(String baseQuery, String branch_Id, String categoryCode) {
     ArrayList<newAssetTransaction> list = new ArrayList<>();
     List<String> params = new ArrayList<>();
-    Connection c = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    try {
-        c = getConnection();
-
-        StringBuilder query = new StringBuilder(baseQuery);
+    
+    StringBuilder query = new StringBuilder(baseQuery);
 
 
-        if (!branch_Id.equals("0")) {
-        	query.append(" AND am_ad_branch.branch_id = ?");
-            params.add(branch_Id);
-            System.out.println("Branch selected");
-        }
-        
-        if (!categoryCode.equals("0")) {
-        	query.append(" AND am_ad_category.category_id =?");
-            params.add(categoryCode);
-            System.out.println("Category selected");
-        }
+    if (!branch_Id.equals("0")) {
+    	query.append(" AND am_ad_branch.branch_id = ?");
+        params.add(branch_Id);
+        System.out.println("Branch selected");
+    }
+    
+    if (!categoryCode.equals("0")) {
+    	query.append(" AND am_ad_category.category_id =?");
+        params.add(categoryCode);
+        System.out.println("Category selected");
+    }
 
-        ps = c.prepareStatement(query.toString());
+    try (Connection c = getLegendConnection();
+	         PreparedStatement ps = c.prepareStatement(query.toString())) {
+
         for (int i = 0; i < params.size(); i++) {
             ps.setString(i + 1, params.get(i));
         }
 
-        rs = ps.executeQuery();
+        try (ResultSet rs = ps.executeQuery()) {
 
         while (rs.next()) {
             newAssetTransaction newTransaction = new newAssetTransaction();
@@ -8111,12 +7817,10 @@ public ArrayList<newAssetTransaction> getLedgerExtracts(String baseQuery, String
 
             list.add(newTransaction);
         }
-
+        }
     } catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, ps, rs);
-    }
+    } 
 
     return list;
 }
@@ -8126,33 +7830,30 @@ public ArrayList<newAssetTransaction> getSocialEnvironmentListRecords(String bas
 	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
 	 List<Object> params = new ArrayList<>();
 	 ArrayList<newAssetTransaction> list = new ArrayList<>();
-    Connection c = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+   
+	  StringBuilder query = new StringBuilder(baseQuery);
 
-    try {
-        c = getConnection();
+      if (!branch_Id.equals("0")) {
+          sqlQuery.append(" AND b.BRANCH_CODE = ?");
+          params.add(branch_Id);
+          System.out.println("Branch selected");
+      }
 
-        StringBuilder query = new StringBuilder(baseQuery);
+      if (!fromDate.isEmpty() && !toDate.isEmpty()) {
+          sqlQuery.append(" AND TRANS_DATE BETWEEN ? AND ?");
+          params.add(fromDate);
+          params.add(toDate);
+          System.out.println("Date selected");
+      }
+      
 
-        if (!branch_Id.equals("0")) {
-            sqlQuery.append(" AND b.BRANCH_CODE = ?");
-            params.add(branch_Id);
-            System.out.println("Branch selected");
-        }
+	  try (Connection c = getLegendConnection();
+		         PreparedStatement ps = c.prepareStatement(query.toString())) {
 
-        if (!fromDate.isEmpty() && !toDate.isEmpty()) {
-            sqlQuery.append(" AND TRANS_DATE BETWEEN ? AND ?");
-            params.add(fromDate);
-            params.add(toDate);
-            System.out.println("Date selected");
-        }
-        
+      
 
-        ps = c.prepareStatement(query.toString());
 
-        rs = ps.executeQuery();
-
+        try (ResultSet rs = ps.executeQuery()) {
         while (rs.next()) {
             newAssetTransaction newTransaction = new newAssetTransaction();
 
@@ -8170,12 +7871,11 @@ public ArrayList<newAssetTransaction> getSocialEnvironmentListRecords(String bas
 
             list.add(newTransaction);
         }
+        }
 
     } catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, ps, rs);
-    }
+    } 
 
     return list;
 }
@@ -8185,12 +7885,10 @@ public ArrayList<newAssetTransaction> getStockIssuancePostedRecords(String baseQ
 	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
 	 List<String> params = new ArrayList<>();
 	 ArrayList<newAssetTransaction> list = new ArrayList<>();
-Connection c = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
 
-try {
-    c = getConnection();
+
+try (Connection c = getLegendConnection();
+        PreparedStatement ps = c.prepareStatement(sqlQuery.toString())) {
 
     //StringBuilder query = new StringBuilder(baseQuery);
 
@@ -8203,11 +7901,10 @@ try {
     }
     
 
-    ps = c.prepareStatement(sqlQuery.toString());
     for (int i = 0; i < params.size(); i++) {
         ps.setString(i + 1, params.get(i));
     }
-    rs = ps.executeQuery();
+    try (ResultSet rs = ps.executeQuery()) {
 
     while (rs.next()) {
         newAssetTransaction newTransaction = new newAssetTransaction();
@@ -8228,13 +7925,11 @@ try {
         
         list.add(newTransaction);
     }
+    }
 
 } catch (Exception e) {
     e.printStackTrace();
-} finally {
-    closeConnection(c, ps, rs);
 }
-
 return list;
 }
 
@@ -8243,41 +7938,42 @@ public ArrayList<newAssetTransaction> getStockIssuanceTransactionsReportRecords(
 	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
 	 List<String> params = new ArrayList<>();
 	 ArrayList<newAssetTransaction> list = new ArrayList<>();
-	 Connection c = null;
-	 PreparedStatement ps = null;
-	 ResultSet rs = null;
 
-try {
-    c = getConnection();
+
+	 if (!branch_Id.equals("0")) {
+	        sqlQuery.append(" AND e.newbranch_id = ?");
+	        params.add(branch_Id);
+	        System.out.println("Branch selected");
+	    }
+	    
+	    if (!categoryCode.equals("0")) {
+	        sqlQuery.append(" AND b.Category_Code =?");
+	        params.add(categoryCode);
+	        System.out.println("Category selected");
+	    }
+	    
+
+	    if (!fromDate.isEmpty() && !toDate.isEmpty()) {
+	        sqlQuery.append(" AND a.CREATE_DATE BETWEEN ? AND ?");
+	        params.add(fromDate);
+	        params.add(toDate);
+	        System.out.println("Date selected");
+	    }
+	    
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement ps = c.prepareStatement(sqlQuery.toString())) {
 
     //StringBuilder query = new StringBuilder(baseQuery);
 
-    if (!branch_Id.equals("0")) {
-        sqlQuery.append(" AND e.newbranch_id = ?");
-        params.add(branch_Id);
-        System.out.println("Branch selected");
-    }
-    
-    if (!categoryCode.equals("0")) {
-        sqlQuery.append(" AND b.Category_Code =?");
-        params.add(categoryCode);
-        System.out.println("Category selected");
-    }
+   
     
 
-    if (!fromDate.isEmpty() && !toDate.isEmpty()) {
-        sqlQuery.append(" AND a.CREATE_DATE BETWEEN ? AND ?");
-        params.add(fromDate);
-        params.add(toDate);
-        System.out.println("Date selected");
-    }
-    
-
-    ps = c.prepareStatement(sqlQuery.toString());
+  //  ps = c.prepareStatement(sqlQuery.toString());
+		 
     for (int i = 0; i < params.size(); i++) {
         ps.setString(i + 1, params.get(i));
     }
-    rs = ps.executeQuery();
+    try (ResultSet rs = ps.executeQuery()) {
 
     while (rs.next()) {
         newAssetTransaction newTransaction = new newAssetTransaction();
@@ -8295,12 +7991,11 @@ try {
 
         list.add(newTransaction);
     }
+    }
 
 } catch (Exception e) {
     e.printStackTrace();
-} finally {
-    closeConnection(c, ps, rs);
-}
+} 
 
 return list;
 }
@@ -8309,17 +8004,12 @@ return list;
 public ArrayList<newAssetTransaction> getStockAtHandRecords(String baseQuery) {
 
 	 ArrayList<newAssetTransaction> list = new ArrayList<>();
-	 Connection c = null;
-	 PreparedStatement ps = null;
-	 ResultSet rs = null;
-
-try {
-   c = getConnection();
+	
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement ps = c.prepareStatement(baseQuery)) {
 
 
-   ps = c.prepareStatement(baseQuery);
-
-   rs = ps.executeQuery();
+		  try (ResultSet rs = ps.executeQuery()) {
 
    while (rs.next()) {
        newAssetTransaction newTransaction = new newAssetTransaction();
@@ -8333,12 +8023,11 @@ try {
 
        list.add(newTransaction);
    }
+		  }
 
 } catch (Exception e) {
    e.printStackTrace();
-} finally {
-   closeConnection(c, ps, rs);
-}
+} 
 
 return list;
 }
@@ -8348,40 +8037,33 @@ public ArrayList<newAssetTransaction> getStockClosingRecords(String baseQuery, S
 	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
 	 List<String> params = new ArrayList<>();
 	 ArrayList<newAssetTransaction> list = new ArrayList<>();
-Connection c = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
 
-try {
-    c = getConnection();
+	    
+	    if (branch_Id != null && !branch_Id.equals("0") && !branch_Id.trim().isEmpty()) {
+	        sqlQuery.append(" AND a.Branch_ID = ?");
+	        params.add(branch_Id.trim());
+	        System.out.println("Branch filter applied: " + branch_Id);
+	    }
 
-    //StringBuilder query = new StringBuilder(baseQuery);
+	    if (categoryCode != null && !categoryCode.equals("0") && !categoryCode.trim().isEmpty()) {
+	        sqlQuery.append(" AND b.Category_Code = ?");
+	        params.add(categoryCode.trim());
+	        System.out.println("Category filter applied: " + categoryCode);
+	    }
 
-    if (!branch_Id.equals("0")) {
-        sqlQuery.append(" AND a.Branch_ID  = ?");
-        params.add(branch_Id);
-        System.out.println("Branch selected");
-    }
-    
-    if (!categoryCode.equals("0")) {
-        sqlQuery.append(" AND b.Category_Code =?");
-        params.add(categoryCode);
-        System.out.println("Category selected");
-    }
-    
-    if (!itemCode.equals("0")) {
-        sqlQuery.append(" AND a.ITEM_CODE =?");
-        params.add(itemCode);
-        System.out.println("itemCode selected");
-    }
+	    if (itemCode != null && !itemCode.equals("0") && !itemCode.trim().isEmpty()) {
+	        sqlQuery.append(" AND a.ITEM_CODE = ?");
+	        params.add(itemCode.trim());
+	        System.out.println("Item filter applied: " + itemCode);
+	    }
 
+	    try (Connection c = getLegendConnection();
+		         PreparedStatement ps = c.prepareStatement(sqlQuery.toString())) {
 
-
-    ps = c.prepareStatement(sqlQuery.toString());
     for (int i = 0; i < params.size(); i++) {
         ps.setString(i + 1, params.get(i));
     }
-    rs = ps.executeQuery();
+    try (ResultSet rs = ps.executeQuery()) {
 
     while (rs.next()) {
         newAssetTransaction newTransaction = new newAssetTransaction();
@@ -8517,15 +8199,15 @@ try {
 
         list.add(newTransaction);
     }
+    }
 
 } catch (Exception e) {
     e.printStackTrace();
-} finally {
-    closeConnection(c, ps, rs);
 }
-
 return list;
 }
+
+
 
 public java.util.ArrayList getLegendLegacyTransactionComparismRecords(String query,String branch_Id,String FromDate, String ToDate,String BankingApp)
 {
@@ -8533,16 +8215,9 @@ public java.util.ArrayList getLegendLegacyTransactionComparismRecords(String que
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 //	String finacleTransId= null;
-	ResultSet rs = null; 
-	Connection conn = null;
-	PreparedStatement ps = null;
-//	System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-        	
-        	
-        ConnectionClass connection = new ConnectionClass();
-        	conn = connection.getConnection();
-        	ps = conn.prepareStatement(query.toString());        	
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
+     	
         	
 //			 if(branch_Id.equals("0") && FromDate.equals("") && ToDate.equals("")) {
 //				 System.out.println("NO Selection in getAssetManagementRecords: ");
@@ -8565,7 +8240,7 @@ public java.util.ArrayList getLegendLegacyTransactionComparismRecords(String que
 //	        	  ps.setString(1, branch_Id);
 //	          }	  				 
 //			 }
-	          rs = ps.executeQuery();
+		 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {	
 			if(BankingApp.equalsIgnoreCase("FLEXCUBE")) { 
@@ -8636,15 +8311,13 @@ public java.util.ArrayList getLegendLegacyTransactionComparismRecords(String que
 				_list.add(newTransaction);
 			   }			
 			   }
+		 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(conn, ps, rs);
-					}
+					
 	return _list;
 }
 
@@ -8654,18 +8327,13 @@ public java.util.ArrayList getLegacyTransactionImportRecords(String query,String
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 //	String finacleTransId= null;
-	ResultSet rs = null; 
-	Connection conn = null;
-	PreparedStatement ps = null;
+	
 	System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   FromDate: "+FromDate);
-	try {
-        	
-        ConnectionClass connection = new ConnectionClass();
-        	conn = connection.getConnection();
-        	ps = conn.prepareStatement(query.toString());        	
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {     	
         	
 
-	          rs = ps.executeQuery();
+		 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {	
 				newAssetTransaction newTransaction = new newAssetTransaction();
@@ -8727,15 +8395,13 @@ public java.util.ArrayList getLegacyTransactionImportRecords(String query,String
 			   }				
 				_list.add(newTransaction);
 			   }
+		 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(conn, ps, rs);
-					}
+					
 	return _list;
 }
 
@@ -8747,42 +8413,36 @@ public ArrayList<newAssetTransaction> getPendingConsolidatedRecords(
 	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
 	 List<String> params = new ArrayList<>();
 	 ArrayList<newAssetTransaction> _list = new ArrayList<>();
-	 Connection c = null;
-	 PreparedStatement ps = null;
-	 ResultSet rs = null;
+	
+	 if (!branch_Id.equals("0")) {
+	        sqlQuery.append(" AND branch_code = ?");
+	        params.add(branch_Id);
+	        System.out.println("Branch selected");
+	    }
+	    
 
-try {
-    c = getConnection();
+	    if (!FromDate.isEmpty() && !ToDate.isEmpty()) {
+	        sqlQuery.append(" AND transaction_date BETWEEN ? AND ?");
+	        params.add(FromDate);
+	        params.add(ToDate);
+	        System.out.println("Date selected");
+	    }
+	    
+	    try (Connection c = getLegendConnection();
+		         PreparedStatement ps = c.prepareStatement(sqlQuery.toString())) {
 
-    if (!branch_Id.equals("0")) {
-        sqlQuery.append(" AND branch_code = ?");
-        params.add(branch_Id);
-        System.out.println("Branch selected");
-    }
-    
-
-    if (!FromDate.isEmpty() && !ToDate.isEmpty()) {
-        sqlQuery.append(" AND transaction_date BETWEEN ? AND ?");
-        params.add(FromDate);
-        params.add(ToDate);
-        System.out.println("Date selected");
-    }
-    
-
-    ps = c.prepareStatement(sqlQuery.toString());
+   
     for (int i = 0; i < params.size(); i++) {
         ps.setString(i + 1, params.get(i));
     }
-    rs = ps.executeQuery();
+    try (ResultSet rs = ps.executeQuery()) {
 	        while (rs.next()) {
 	            _list.add(mapResultSetToTransaction(rs));
 	        }
-
+    }
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	    } finally {
-	        closeConnection(c, ps, rs);
-	    }
+	    } 
 
 	    return _list;
 	}
@@ -8808,14 +8468,10 @@ public java.util.ArrayList getAssetDisposedUploadExportRecords(String query,Stri
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null; 
-	ResultSet rs = null;
-//	Statement s = null; 
-	PreparedStatement s = null;
+	
 //	System.out.println("query in getFinacleAssetUploadExportRecords: "+query);
-	try {
-		    c = getConnection();
-			 s = c.prepareStatement(query.toString());
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //	          if(query.contains("disposal_ID") && query.contains("disposal_ID") && query.contains("d.branch_code")){
 	        	  s.setString(1, groupid);
 	        	  s.setString(2, groupid);
@@ -8827,7 +8483,7 @@ public java.util.ArrayList getAssetDisposedUploadExportRecords(String query,Stri
 	        	  s.setString(8, groupid);
 //	          }
 	          
-			rs = s.executeQuery();
+	        	  try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {				
 				String strDescription = rs.getString("Description");
@@ -8855,15 +8511,13 @@ public java.util.ArrayList getAssetDisposedUploadExportRecords(String query,Stri
 				newTransaction.setIntegrifyId(I);
 				_list.add(newTransaction);
 			   }
+	        	  }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 
@@ -8871,32 +8525,27 @@ public ArrayList<newAssetTransaction> getSocialEnvironmentListRecords(String bas
 	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
 	 List<Object> params = new ArrayList<>();
 	 ArrayList<newAssetTransaction> list = new ArrayList<>();
-    Connection c = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+	 StringBuilder query = new StringBuilder(baseQuery);
 
-    try {
-        c = getConnection();
+     if (!branch_Id.equals("0")) {
+         sqlQuery.append(" AND b.BRANCH_CODE = ?");
+         params.add(branch_Id);
+         System.out.println("Branch selected");
+     }
 
-        StringBuilder query = new StringBuilder(baseQuery);
+     if (!fromDate.isEmpty() && !toDate.isEmpty()) {
+         sqlQuery.append(" AND TRANS_DATE BETWEEN ? AND ?");
+         params.add(fromDate);
+         params.add(toDate);
+         System.out.println("Date selected");
+     }
+   
 
-        if (!branch_Id.equals("0")) {
-            sqlQuery.append(" AND b.BRANCH_CODE = ?");
-            params.add(branch_Id);
-            System.out.println("Branch selected");
-        }
+     try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query.toString())) {
 
-        if (!fromDate.isEmpty() && !toDate.isEmpty()) {
-            sqlQuery.append(" AND TRANS_DATE BETWEEN ? AND ?");
-            params.add(fromDate);
-            params.add(toDate);
-            System.out.println("Date selected");
-        }
-        
 
-        ps = c.prepareStatement(query.toString());
-
-        rs = ps.executeQuery();
+        try (ResultSet rs = s.executeQuery()) {
 
         while (rs.next()) {
             newAssetTransaction newTransaction = new newAssetTransaction();
@@ -8915,12 +8564,11 @@ public ArrayList<newAssetTransaction> getSocialEnvironmentListRecords(String bas
 
             list.add(newTransaction);
         }
+        }
 
     } catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, ps, rs);
-    }
+    } 
 
     return list;
 }
@@ -8929,36 +8577,37 @@ public ArrayList<newAssetTransaction> getFixedTagUpdateReportRecords(String base
 	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
 	 List<String> params = new ArrayList<>();
 	 ArrayList<newAssetTransaction> list = new ArrayList<>();
-	 Connection c = null;
-	 PreparedStatement ps = null;
-	 ResultSet rs = null;
+	 
+	 if (!branch_Id.equals("0")) {
+		   System.out.println("BRANCH OWN");
+	      sqlQuery.append(" AND a.branch_id =?");
+	      params.add(branch_Id);
+	      System.out.println("Branch selected");
+	  }
+	  
+	  if (!categoryCode.equals("0")) {
+		   System.out.println("catEGORY OWN");
+	      sqlQuery.append(" AND a.Category_ID =?");
+	      params.add(categoryCode);
+	      System.out.println("Category selected");
+	  }
+	  sqlQuery.append(" GROUP BY a.ASSET_ID,DESCRIPTION,BAR_CODE,a.BRANCH_CODE,a.CATEGORY_CODE,b.BRANCH_NAME,c.CATEGORY_NAME");
+	  
+	  try (Connection c = getLegendConnection();
+		         PreparedStatement ps = c.prepareStatement(sqlQuery.toString())) {
 
-try {
-  c = getConnection();
 
   //StringBuilder query = new StringBuilder(baseQuery);
 
-  if (!branch_Id.equals("0")) {
-	   System.out.println("BRANCH OWN");
-      sqlQuery.append(" AND a.branch_id =?");
-      params.add(branch_Id);
-      System.out.println("Branch selected");
-  }
   
-  if (!categoryCode.equals("0")) {
-	   System.out.println("catEGORY OWN");
-      sqlQuery.append(" AND a.Category_ID =?");
-      params.add(categoryCode);
-      System.out.println("Category selected");
-  }
   
-  sqlQuery.append(" GROUP BY a.ASSET_ID,DESCRIPTION,BAR_CODE,a.BRANCH_CODE,a.CATEGORY_CODE,b.BRANCH_NAME,c.CATEGORY_NAME");
 
-  ps = c.prepareStatement(sqlQuery.toString());
+
+ 
   for (int i = 0; i < params.size(); i++) {
       ps.setString(i + 1, params.get(i));
   }
-  rs = ps.executeQuery();
+  try (ResultSet rs = ps.executeQuery()) {
 
   while (rs.next()) {
       newAssetTransaction newTransaction = new newAssetTransaction();
@@ -8977,12 +8626,12 @@ try {
 
       list.add(newTransaction);
   }
+  }
 
 } catch (Exception e) {
   e.printStackTrace();
-} finally {
-  closeConnection(c, ps, rs);
-}
+} 
+	  
 
 return list;
 }
@@ -8993,18 +8642,13 @@ public java.util.ArrayList getLegacyBulkPostingTransactionImportRecords(String q
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 //	String finacleTransId= null;
-	ResultSet rs = null; 
-	Connection conn = null;
-	PreparedStatement ps = null;
+	
 //	System.out.println("query in getAssetManagementRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode);
-	try {
-        	
-        ConnectionClass connection = new ConnectionClass();
-        	conn = connection.getConnection();
-        	ps = conn.prepareStatement(query.toString());        	
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) { 	
         	
 
-	          rs = ps.executeQuery();
+		 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {	
 				newAssetTransaction newTransaction = new newAssetTransaction();
@@ -9063,15 +8707,13 @@ public java.util.ArrayList getLegacyBulkPostingTransactionImportRecords(String q
 			   }				
 				_list.add(newTransaction);
 			   }
+		 }
 	 }   
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(conn, ps, rs);
-					}
+				
 	return _list;
 }
 
@@ -9081,50 +8723,47 @@ public ArrayList<newAssetTransaction> getFullyDepreciatedAssetImprovementRecords
 	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
 	 List<String> params = new ArrayList<>();
 	 ArrayList<newAssetTransaction> _list = new ArrayList<>();
-	 Connection c = null;
-	 PreparedStatement ps = null;
-	 ResultSet rs = null;
+	 
+	 if (!baseQuery.toLowerCase().contains("where")) {
+	        sqlQuery.append(" WHERE 1=1");
+	    }
 
-try {
-    c = getConnection();
-    
-    if (!baseQuery.toLowerCase().contains("where")) {
-        sqlQuery.append(" WHERE 1=1");
-    }
+	    if (!branch_Id.equals("0")) {
+	        sqlQuery.append(" AND branch_code = ?");
+	        params.add(branch_Id);
+	       // System.out.println("Branch selected");
+	    }
+	    
 
-    if (!branch_Id.equals("0")) {
-        sqlQuery.append(" AND branch_code = ?");
-        params.add(branch_Id);
-       // System.out.println("Branch selected");
-    }
-    
+	    if (!FromDate.isEmpty() && !ToDate.isEmpty()) {
+	        sqlQuery.append(" AND Posting_Date BETWEEN ? AND ?");
+	        params.add(FromDate);
+	        params.add(ToDate);
+	       // System.out.println("Date selected");
+	    }
+	    
+	    if (!categoryCode.equals("0")) {
+	        sqlQuery.append(" AND CATEGORY_CODE =?");
+	        params.add(categoryCode);
+	      //  System.out.println("Category selected");
+	    }
+	    
+	    if (assetID != null && !assetID.trim().isEmpty()) {
+	        sqlQuery.append(" AND Asset_id =?");
+	        params.add(assetID);
+	       // System.out.println("asset selected");
+	    }
+	    
+	
 
-    if (!FromDate.isEmpty() && !ToDate.isEmpty()) {
-        sqlQuery.append(" AND Posting_Date BETWEEN ? AND ?");
-        params.add(FromDate);
-        params.add(ToDate);
-       // System.out.println("Date selected");
-    }
-    
-    if (!categoryCode.equals("0")) {
-        sqlQuery.append(" AND CATEGORY_CODE =?");
-        params.add(categoryCode);
-      //  System.out.println("Category selected");
-    }
-    
-    if (assetID != null && !assetID.trim().isEmpty()) {
-        sqlQuery.append(" AND Asset_id =?");
-        params.add(assetID);
-       // System.out.println("asset selected");
-    }
-    
-    
+	    try (Connection c = getLegendConnection();
+		         PreparedStatement ps = c.prepareStatement(sqlQuery.toString())) {
 
-    ps = c.prepareStatement(sqlQuery.toString());
+  
     for (int i = 0; i < params.size(); i++) {
         ps.setString(i + 1, params.get(i));
     }
-    rs = ps.executeQuery();
+    try (ResultSet rs = ps.executeQuery()) {
 	        while (rs.next()) {
 	        	
 	        	   newAssetTransaction newTransaction = new newAssetTransaction();
@@ -9146,13 +8785,12 @@ try {
 	        	   
 	            _list.add(newTransaction);
 	        }
+    }
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	    } finally {
-	        closeConnection(c, ps, rs);
-	    }
-
+	    } 
+	    
 	    return _list;
 	}
 
@@ -9162,16 +8800,13 @@ public java.util.ArrayList getUnDepreciatedAssetRecords(String query,String bran
 	String date = String.valueOf(dateConvert(new java.util.Date()));
 	date = date.substring(0, 10);
 	String finacleTransId= null;
-	Connection c = null;
-	ResultSet rs = null; 
-//	Statement s = null;
-	PreparedStatement s = null;
+	
 //System.out.println("query in getUncapitalisedAsseRecords: "+query+"  branch_Id: "+branch_Id+"   categoryCode: "+categoryCode+"  FromDate: "+FromDate+"  ToDate: "+ToDate);
-	try {
-		    c = getConnection();
+	 try (Connection c = getLegendConnection();
+	         PreparedStatement s = c.prepareStatement(query)) {
 //			s = c.createStatement();
 //			rs = s.executeQuery(query);
-			 s = c.prepareStatement(query.toString());
+			
 //	          if(!query.contains("b.branch_id") && !query.contains("a.CATEGORY_CODE")){
 //	          }
 			 if(branch_Id.equals("0") && categoryCode.equals("0") && FromDate.equals("") && ToDate.equals("")) {
@@ -9224,7 +8859,7 @@ public java.util.ArrayList getUnDepreciatedAssetRecords(String query,String bran
 
 			 }
 
-	          rs = s.executeQuery();  
+			 try (ResultSet rs = s.executeQuery()) {
 			while (rs.next())
 			   {			
 
@@ -9275,14 +8910,12 @@ public java.util.ArrayList getUnDepreciatedAssetRecords(String query,String bran
 				_list.add(newTransaction);
 			   }
 	 }   
+	 }
 				 catch (Exception e)
 					{
 						e.printStackTrace();
 					}
-					finally
-					{
-						closeConnection(c, s, rs);
-					}
+					
 	return _list;
 }
 

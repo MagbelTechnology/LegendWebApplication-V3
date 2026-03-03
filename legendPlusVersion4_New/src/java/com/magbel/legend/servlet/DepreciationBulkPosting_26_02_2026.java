@@ -56,7 +56,7 @@ import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
    
-public class DepreciationBulkPosting extends HttpServlet
+public class DepreciationBulkPosting_26_02_2026 extends HttpServlet
 {
 	private EmailSmsServiceBus mail ;
 	private AssetRecordsBean ad;

@@ -96,16 +96,14 @@ public class InventoryManager extends MagmaDBConnection {
         "AND BRANCH_ID = '"+branchCode+"' "+
         queryFilter;
 //        System.out.println("the value of selectQuery in findAssetByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
-        Connection con = null;
-        PreparedStatement ps = null;
 
-        ResultSet rs = null;
         ArrayList list = new ArrayList();
  
-        try {
-            con = getConnection(JNDI);
-            ps = con.prepareStatement(selectQuery);
-            rs = ps.executeQuery();
+        try(Connection con = getConnection(JNDI);
+        	PreparedStatement ps = con.prepareStatement(selectQuery);
+        	ResultSet rs = ps.executeQuery()) 
+        {
+        	
 
             while (rs.next()) {
             	String batchId = rs.getString("ReqnID");
@@ -185,9 +183,7 @@ public class InventoryManager extends MagmaDBConnection {
         } catch (Exception e) {
             System.out.println("INFO:Error fetching ALL Asset ->" +
                                e.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
         return list;
 
@@ -207,16 +203,14 @@ public class InventoryManager extends MagmaDBConnection {
      String selectQuery = "select *from ST_STOCK where asset_status = 'ACTIVE' AND BRANCH_CODE = '"+branchCode+"' " +
     		 queryFilter2;
 //     System.out.println("the value of selectQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);     		
-     Connection con = null;
-     PreparedStatement ps = null;
  
-     ResultSet rs = null;
      ArrayList list = new ArrayList();
 
-     try {
-         con = getConnection(JNDI);
-         ps = con.prepareStatement(selectQuery);
-         rs = ps.executeQuery();
+     try(Connection con = getConnection(JNDI);
+    	PreparedStatement ps = con.prepareStatement(selectQuery);
+        ResultSet rs = ps.executeQuery();) 
+     {
+         
 
          while (rs.next()) {
 
@@ -292,8 +286,6 @@ public class InventoryManager extends MagmaDBConnection {
      } catch (Exception e) {
          System.out.println("INFO:Error fetching ALL ST_STOCK ->" +
                             e.getMessage());
-     } finally {
-         closeConnection(con, ps, rs);
      }
 
      return list;
@@ -305,17 +297,15 @@ public class InventoryManager extends MagmaDBConnection {
                    String SELECT_QUERY = "SELECT DISTINCT a.item_code,b.DESCRIPTION,a.balance,a.warehouse_code,a.userid,a.balance_ltd," +
                    		"a.balance_ytd ,b.comp_code FROM ST_INVENTORY_TOTALS a,ST_INVENTORY_ITEMS b " +
                    		"WHERE b.comp_code='"+filter2+"' and a.item_code=b.item_code" +filter;
-                   Connection con = null;
-                   //Statement stmt = null;
-                   PreparedStatement ps = null;
-                   ResultSet rs = null;
+         
 
                    java.util.ArrayList records = new java.util.ArrayList();
                    InventoryTotal inventoryTotals = null;
-                   try{
-                         con = getConnection(JNDI);
-                         ps = con.prepareStatement(SELECT_QUERY);
-                         rs  = ps.executeQuery();
+                   try(Connection con = getConnection(JNDI);
+                	   PreparedStatement ps = con.prepareStatement(SELECT_QUERY);
+                	   ResultSet rs  = ps.executeQuery();)
+                   {
+                	   
 
                             while(rs.next())
                               {
@@ -336,8 +326,6 @@ public class InventoryManager extends MagmaDBConnection {
                                     
                    }catch(Exception er){
                            System.out.println("Error RETRIEVING All findAllInventoryTotalByQuery ... ->"+er.getMessage());
-                   }finally{
-                           closeConnection(con,ps,rs);
                    }
 
 
@@ -352,16 +340,13 @@ public class InventoryManager extends MagmaDBConnection {
      String selectQuery = "select *from AM_ASSET where asset_status = 'DISPOSED' and Asset_id !=''  AND BRANCH_CODE = '"+branchCode+"' " +
      					queryFilter;
 //     System.out.println("the value of selectQuery in findAssetDisposedByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);
-     Connection con = null;
-     PreparedStatement ps = null;
-
-     ResultSet rs = null;
+ 
      ArrayList list = new ArrayList();
 
-     try {
-         con = getConnection(JNDI);
-         ps = con.prepareStatement(selectQuery);
-         rs = ps.executeQuery();
+     try(Connection con = getConnection(JNDI);
+      	   PreparedStatement ps = con.prepareStatement(selectQuery);
+      	   ResultSet rs  = ps.executeQuery()) 
+     {
 
          while (rs.next()) {
 
@@ -437,9 +422,7 @@ public class InventoryManager extends MagmaDBConnection {
      } catch (Exception e) {
          System.out.println("INFO:Error fetching ALL Disposed ST_STOCK ->" +
                             e.getMessage());
-     } finally {
-         closeConnection(con, ps, rs);
-     }
+     } 
 
      return list;
 
@@ -454,23 +437,22 @@ public ArrayList findAssetDisposedByQuery(String branchCode,String fromDate,Stri
   String selectQuery = "select *from AM_ASSET where asset_status = 'DISPOSED' and Asset_id !=''  "
   		+ "AND BRANCH_CODE = ?  AND Date_Disposed BETWEEN  ? AND ?";
 //  System.out.println("the value of selectQuery in findAssetDisposedByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);
-  Connection con = null;
-  PreparedStatement ps = null;
+
   
-  ResultSet rs = null;
   ArrayList list = new ArrayList();
 
-  try {
+  try(Connection con = getConnection(JNDI);
+     	   PreparedStatement ps = con.prepareStatement(selectQuery))  
+  {
 //      con = getConnection(JNDI);
 //      ps = con.prepareStatement(selectQuery);
 //      rs = ps.executeQuery();
       
-      con = getConnection(JNDI);
-      ps = con.prepareStatement(selectQuery);
+
       ps.setString(1, branchCode);
       ps.setString(2, fromDate);
       ps.setString(3, toDate);
-      rs = ps.executeQuery();
+      try(ResultSet rs = ps.executeQuery()){
 
       while (rs.next()) {
 
@@ -542,13 +524,12 @@ public ArrayList findAssetDisposedByQuery(String branchCode,String fromDate,Stri
       //    setMinCost(minCost);
        //   setMaxCost(maxCost);
       }
+      }
 
   } catch (Exception e) {
       System.out.println("INFO:Error fetching ALL Disposed ST_STOCK ->" +
                          e.getMessage());
-  } finally {
-      closeConnection(con, ps, rs);
-  }
+  } 
 
   return list;
 
@@ -568,16 +549,15 @@ public ArrayList findAllStockWaitingCreationByQuery(String compCode,String filte
        String scannstatus="";
    String query =
            "select MTID,RFID_TAG,LOCATION,SCANN_TYPE,SCANN_STATUS,USER_ID,CREATE_DATE,CREATE_DATETIME from ST_INVENTORY_RFID where MTID IS NOT NULL AND SCANN_STATUS = 'N' "+ filter;
-   Connection con = null;
-  PreparedStatement ps = null;
-  ResultSet rs = null;
+ 
 
 
-   try {
-       con = dbConnection.getConnection("fixedasset");
-                  ps = con.prepareStatement(query);
+   try(Connection con = dbConnection.getConnection("fixedasset");
+	   PreparedStatement ps = con.prepareStatement(query)) 
+   {
+	   
 //                  ps.setInt(1, tranId);
-                  rs = ps.executeQuery();
+	   try(ResultSet rs = ps.executeQuery()){
 
        while (rs.next()) {
            mtid = rs.getInt(1); 
@@ -594,13 +574,12 @@ public ArrayList findAllStockWaitingCreationByQuery(String compCode,String filte
        list.add(ar);
 
        }
+	   }
 
    } catch (Exception ex) {
        System.out.println("Error occurred in getPostingTime --> ");
        ex.printStackTrace();
-   } finally {
-       dbConnection.closeConnection(con, ps, rs);
-   }
+   } 
 
    return list;
 
@@ -616,16 +595,14 @@ public ArrayList findAcceptanceQry(String compCode,String branchCode,String filt
 query += filter;
 //System.out.println("<<<<findDistributionOrdersList query: "+query);
 	ArrayList list = new ArrayList();
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
 	
-	try {
+	try(Connection con = getConnection(JNDI);
+		PreparedStatement ps = con.prepareStatement(query)) 
+	{
 
-		con = getConnection(JNDI);
-		ps = con.prepareStatement(query);
+		
 
-		rs = ps.executeQuery();
+		try(ResultSet rs = ps.executeQuery()){
 
 		while (rs.next()) {
 
@@ -653,13 +630,12 @@ query += filter;
             list.add(Dorder);
 
 		}
+		}
 
 	} catch (Exception e) {
 		String warning = "WARNING:Error Fetching Transaction for Approval"
 				+ " ->" + e.getMessage();
 		System.out.println(warning);
-	} finally {
-		closeConnection(con, ps, rs);
 	}
 	      //System.out.println("the size of the arrayy list is>>>>" +list.size());
     return list;
@@ -669,21 +645,18 @@ query += filter;
 public ArrayList findAdminRequisitionListByQry(String branchCode,String filterQry)
 	{
 		ArrayList _list = new ArrayList();
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
 		
 		String rmarkQry="select distinct b.user_id AS ReqnUserID,a.Description AS itemRequested,CONVERT(VARCHAR(10),a.TRANSFER_DATE,101) AS ReqnDate,a.Batch_id AS ReqnID, "+
 						"b.transaction_id,a.PROCESS_STATUS AS status from am_ad_TransferRequisition a,am_asset_approval b "+ 
 						"where (a.Batch_id = b.asset_id) and a.process_status='A'";
 //		System.out.println("rmarkQry >>> " + rmarkQry);
 		 
-		try 
+		try(Connection con = getConnection(JNDI);
+			PreparedStatement ps = con.prepareStatement(rmarkQry);
+			ResultSet rs = ps.executeQuery()) 
 		{  
 			
-			con = getConnection(JNDI);
-			ps = con.prepareStatement(rmarkQry);
-			rs = ps.executeQuery();
+			
 			while(rs.next())
 			{
 				reqn = new Requisition();
@@ -702,10 +675,7 @@ public ArrayList findAdminRequisitionListByQry(String branchCode,String filterQr
 			System.out.println(this.getClass().getName()+ " Error  findAdminRequisitionListByQry ->" + e.getMessage());
 		}
 		
-		finally 
-		{
-			closeConnection(con, ps, rs);
-		}
+		
 		
 		return _list;
 	} 
@@ -719,9 +689,6 @@ query += filter;
 //System.out.println("<<<<findDistributionOrdersList query: "+query);
 	RFID ar = null;
 	ArrayList list = new ArrayList();
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
     String rfidTag = "";
     int mtid =0;
     int userId =0; 
@@ -731,12 +698,13 @@ query += filter;
     String scannType = "";
     String scannstatus="";
     String stockDescription = "";	
-	try {  
+	try (Connection con = getConnection(JNDI);
+		PreparedStatement ps = con.prepareStatement(query);
 
-		con = getConnection(JNDI);
-		ps = con.prepareStatement(query);
+		ResultSet rs = ps.executeQuery())
+	{  
 
-		rs = ps.executeQuery();
+		
 
 	       while (rs.next()) {
 	           mtid = rs.getInt(1); 
@@ -758,9 +726,7 @@ query += filter;
 		String warning = "WARNING:Error Fetching Transaction for Approval"
 				+ " ->" + e.getMessage();
 		System.out.println(warning);
-	} finally {
-		closeConnection(con, ps, rs);
-	}
+	} 
 	      //System.out.println("the size of the arrayy list is>>>>" +list.size());
     return list;
 }
@@ -786,15 +752,13 @@ public ArrayList findAllInventoryUnusedTagByQuery(String filter)
    String query =
     "select MTID,RFID_TAG,LOCATION,SCANN_TYPE,SCANN_STATUS,USER_ID,CREATE_DATE,CREATE_DATETIME,PROCESSED  "
     + " from ST_INVENTORY_NEW_RFID   where PROCESSED = 'N'   AND SCANN_STATUS='I'  "+ filter;
-   Connection con = null;
-  PreparedStatement ps = null;
-  ResultSet rs = null;
  // System.out.println("<<<<query in findAllInventoryUnusedTagByQuery: "+query);
-   try {
-	   con = getConnection(JNDI);
-                  ps = con.prepareStatement(query);
+   try(Connection con = getConnection(JNDI);
+	   PreparedStatement ps = con.prepareStatement(query);
 //                  ps.setInt(1, tranId);
-                  rs = ps.executeQuery();
+	   ResultSet rs = ps.executeQuery()) 
+   {
+	   
 
        while (rs.next()) {
            mtid = rs.getInt(1); 
@@ -817,10 +781,7 @@ public ArrayList findAllInventoryUnusedTagByQuery(String filter)
    } catch (Exception ex) {
        System.out.println("Error occurred in getPostingTime --> ");
        ex.printStackTrace();
-   } finally {
-       closeConnection(con, ps, rs);
-   }
-
+   } 
    return list;
 
 }
@@ -833,16 +794,14 @@ public ArrayList findStockByQuery(String branchCode,String queryFilter) {
 	 String selectQuery = "select *from ST_STOCK  where asset_status = 'ACTIVE'  AND BRANCH_ID = '"+branchCode+"' " +
 	 					queryFilter;
 //	 System.out.println("the value of selectQuery in findAssetByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
-	 Connection con = null;
-	 PreparedStatement ps = null;
 
-	 ResultSet rs = null;
 	 ArrayList list = new ArrayList();
 
-	 try {
-	     con = getConnection(JNDI);
-	     ps = con.prepareStatement(selectQuery);
-	     rs = ps.executeQuery();
+	 try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery);
+		 ResultSet rs = ps.executeQuery()) 
+	 {
+		 
 
 	     while (rs.next()) {
 
@@ -918,9 +877,7 @@ public ArrayList findStockByQuery(String branchCode,String queryFilter) {
 	 } catch (Exception e) {
 	     System.out.println("INFO:Error fetching ALL Asset ->" +
 	                        e.getMessage());
-	 } finally {
-	     closeConnection(con, ps, rs);
-	 }
+	 } 
 
 	 return list;
 
@@ -959,17 +916,14 @@ if(branchCode ==""){
         "FROM ST_STOCK a, am_ad_Requisition c WHERE a.item_code = c.ItemRequested and distributedstatus = 'pending' AND a.QUANTITY > 0 "+	
 		queryFilter;}
 // System.out.println("the value of selectQuery in findAssetByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
 
- ResultSet rs = null;
  ArrayList list = new ArrayList();
 
- try {
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
-     rs = ps.executeQuery();
-
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery);
+	 ResultSet rs = ps.executeQuery()) 
+ {
+	 
      while (rs.next()) {
     	 String batchId = rs.getString("ReqnID");
          String id = rs.getString("ASSET_ID");
@@ -1046,9 +1000,7 @@ if(branchCode ==""){
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Stock ->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -1057,21 +1009,19 @@ if(branchCode ==""){
 public ArrayList findStockRequestedListByQry(String branchCode,String filterQry)
 	{
 		ArrayList _list = new ArrayList();
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+
 		
 		String rmarkQry="select distinct b.user_id AS ReqnUserID,a.Description AS itemRequested,CONVERT(VARCHAR(10),a.TRANSFER_DATE,101) AS ReqnDate,a.Batch_id AS ReqnID, "+
 						"b.transaction_id,a.PROCESS_STATUS AS status from am_ad_TransferRequisition a,am_asset_approval b "+ 
 						"where (a.Batch_id = b.asset_id) and a.process_status='P'";
 //		System.out.println("rmarkQry >>> " + rmarkQry);
 		 
-		try 
+		try(Connection con = getConnection(JNDI);
+			PreparedStatement ps = con.prepareStatement(rmarkQry);
+			ResultSet rs = ps.executeQuery()) 
 		{  
 			
-			con = getConnection(JNDI);
-			ps = con.prepareStatement(rmarkQry);
-			rs = ps.executeQuery();
+			
 			while(rs.next())
 			{
 				reqn = new Requisition();
@@ -1090,10 +1040,7 @@ public ArrayList findStockRequestedListByQry(String branchCode,String filterQry)
 			System.out.println(this.getClass().getName()+ " Error  findAdminRequisitionListByQry ->" + e.getMessage());
 		}
 		
-		finally 
-		{
-			closeConnection(con, ps, rs);
-		}
+		
 		
 		return _list;
 	} 
@@ -1105,21 +1052,19 @@ public ArrayList findAssetTotalByQuery(String branchCode,String queryFilter) {
  String selectQuery = "select *from AM_ASSET where asset_status = 'ACTIVE' AND BRANCH_CODE = ? " +
  queryFilter;
 // System.out.println("the value of selectQuery in findAssetTotalByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
-   
- ResultSet rs = null;
+
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery)) 
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
 
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+	 
      ps.setString(1, branchCode);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
      while (rs.next()) {
      	String batchId = rs.getString("GROUP_ID");
          String id = rs.getString("ASSET_ID");
@@ -1194,13 +1139,12 @@ public ArrayList findAssetTotalByQuery(String branchCode,String queryFilter) {
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset in findAssetTotalByQuery ->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -1214,16 +1158,14 @@ public ArrayList findAssetAdditionByQuery(String branchCode,String queryFilter) 
  String selectQuery = "select *from AM_ASSET where asset_status = 'ACTIVE' AND BRANCH_CODE = '"+branchCode+"' " +
  queryFilter;
 // System.out.println("the value of selectQuery in findAssetAdditionByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
 
- ResultSet rs = null;     
  ArrayList list = new ArrayList();
 
- try {
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
-     rs = ps.executeQuery();
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery);
+	 ResultSet rs = ps.executeQuery()) 
+ {
+	 
 
      while (rs.next()) {
      	String batchId = rs.getString("GROUP_ID");
@@ -1298,13 +1240,12 @@ public ArrayList findAssetAdditionByQuery(String branchCode,String queryFilter) 
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Addition in findAssetAdditionByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -1317,23 +1258,21 @@ public ArrayList findAssetAdditionByQuery(String branchCode,String fromDate, Str
  String selectQuery = "select *from AM_ASSET where asset_status = 'ACTIVE' AND BRANCH_CODE = ? "+
  	 "AND POSTING_DATE BETWEEN ? AND ? ";
 // System.out.println("the value of selectQuery in findAssetAdditionByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
-
- ResultSet rs = null;     
+    
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery)) 
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
      
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+	 
      ps.setString(1, branchCode);
      ps.setString(2, fromDate);
      ps.setString(3, toDate);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 
      while (rs.next()) {
      	String batchId = rs.getString("GROUP_ID");
@@ -1408,13 +1347,12 @@ public ArrayList findAssetAdditionByQuery(String branchCode,String fromDate, Str
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Addition in findAssetAdditionByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -1437,16 +1375,14 @@ public ArrayList findAssetTransferdByQuery(String branchCode,String queryFilter)
  +"AND a.OLDBRANCH_ID = "+branchCode+" "
  +queryFilter;
 // System.out.println("the value of selectQuery in findAssetTransferdByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
 
- ResultSet rs = null;     
  ArrayList list = new ArrayList();
 
- try {
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
-     rs = ps.executeQuery();
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery);
+	 ResultSet rs = ps.executeQuery()) 
+ {
+	 
 
      while (rs.next()) {
  //    	String batchId = rs.getString("GROUP_ID");
@@ -1507,9 +1443,7 @@ public ArrayList findAssetTransferdByQuery(String branchCode,String queryFilter)
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Transfer 1 in findAssetTransferdByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
   
  return list;
 
@@ -1529,25 +1463,24 @@ public ArrayList findAssetTransferdByQuery(String branchCode,String fromDate, St
  +"where CONVERT(varchar, a.Batch_id) = CONVERT(varchar, b.Id) and b.entryPostFlag = 'Y' and b.GroupIdStatus = 'Y' "
  +"AND a.BRANCH_CODE = ? AND a.TRANSFER_DATE BETWEEN ? AND ? ";
 // System.out.println("the value of selectQuery in findAssetTransferdByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
 
- ResultSet rs = null;     
+   
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery)) 
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+	 
      ps.setString(1, branchCode);
      ps.setString(2, fromDate);
      ps.setString(3, toDate);
      ps.setString(4, branchCode);
      ps.setString(5, fromDate);
      ps.setString(6, toDate);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 	 
      while (rs.next()) {
  //    	String batchId = rs.getString("GROUP_ID");
@@ -1604,13 +1537,12 @@ public ArrayList findAssetTransferdByQuery(String branchCode,String fromDate, St
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Transfer 2 in findAssetTransferdByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
   
  return list;
 
@@ -1632,16 +1564,14 @@ public ArrayList findAssetImprovebbByQuery(String branchCode,String queryFilter)
  +"AND a.BRANCH_CODE = '"+branchCode+"' "
  +queryFilter;
 // System.out.println("the value of selectQuery in findAssetImproveddByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
-
- ResultSet rs = null;     
+   
  ArrayList list = new ArrayList();
 
- try {
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
-     rs = ps.executeQuery();
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery);
+	 ResultSet rs = ps.executeQuery()) 
+ {
+	 
 
      while (rs.next()) {
  //    	String batchId = rs.getString("GROUP_ID");
@@ -1702,9 +1632,7 @@ public ArrayList findAssetImprovebbByQuery(String branchCode,String queryFilter)
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Improvement  in findAssetImprovebbByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -1727,26 +1655,24 @@ public ArrayList findAssetImproveddByQuery(String branchCode,String fromDate, St
  +"AND a.BRANCH_CODE = ? AND a.revalue_Date BETWEEN ? AND ?";
 // +queryFilter;
 // System.out.println("the value of selectQuery in findAssetImproveddByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;  
 
- ResultSet rs = null;     
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery)) 
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
 	 
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+	 
      ps.setString(1, branchCode);
      ps.setString(2, fromDate);
      ps.setString(3, toDate);
      ps.setString(4, branchCode);
      ps.setString(5, fromDate);
      ps.setString(6, toDate);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 	 
      while (rs.next()) {
  //    	String batchId = rs.getString("GROUP_ID");
@@ -1803,13 +1729,12 @@ public ArrayList findAssetImproveddByQuery(String branchCode,String fromDate, St
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Improvement 2 in findAssetImproveddByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -1833,24 +1758,22 @@ public ArrayList findAssetImproveddByQuery(String fromDate, String toDate) {
  +"AND a.revalue_Date BETWEEN ? AND ?";
 // +queryFilter;
 // System.out.println("the value of selectQuery in findAssetImproveddByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;  
-
- ResultSet rs = null;     
+     
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+	 PreparedStatement ps = con.prepareStatement(selectQuery)) 
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
 	 
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+	 
      ps.setString(1, fromDate);
      ps.setString(2, toDate);
      ps.setString(3, fromDate);
      ps.setString(4, toDate);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 	 
      while (rs.next()) {
  //    	String batchId = rs.getString("GROUP_ID");
@@ -1907,13 +1830,12 @@ public ArrayList findAssetImproveddByQuery(String fromDate, String toDate) {
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Improvement 3 in findAssetImproveddByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -1930,16 +1852,14 @@ public ArrayList findTotalSingleStockByQuery(String branchCode,String queryFilte
 			 "where a.ITEM_CODE = b.ITEM_CODE and b.MEASURING_CODE = c.UNIT_CODE and c.PACK_QUANTITY IS NULL "+
 			 queryFilter;
 //	 System.out.println("the value of selectQuery in findTotalSingleStockByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
-	 Connection con = null;
-	 PreparedStatement ps = null;
 
-	 ResultSet rs = null;
 	 ArrayList list = new ArrayList();
 
-	 try {
-	     con = getConnection(JNDI);
-	     ps = con.prepareStatement(selectQuery);
-	     rs = ps.executeQuery();
+	 try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery);
+		 ResultSet rs = ps.executeQuery()) 
+	 {
+		 
 
 	     while (rs.next()) {
 
@@ -2015,9 +1935,7 @@ public ArrayList findTotalSingleStockByQuery(String branchCode,String queryFilte
 	 } catch (Exception e) {
 	     System.out.println("INFO:Error fetching ALL Stock in findTotalSingleStockByQuery ->" +
 	                        e.getMessage());
-	 } finally {
-	     closeConnection(con, ps, rs);
-	 }
+	 } 
 
 	 return list;
 
@@ -2032,16 +1950,14 @@ public ArrayList findTotalPackStockByQuery(String branchCode,String queryFilter)
 			 "where a.ITEM_CODE = b.ITEM_CODE and b.MEASURING_CODE = c.UNIT_CODE and c.PACK_QUANTITY IS NOT NULL "+
 			 queryFilter;
 //	 System.out.println("the value of selectQuery in findTotalPackStockByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
-	 Connection con = null;
-	 PreparedStatement ps = null;
 
-	 ResultSet rs = null;
 	 ArrayList list = new ArrayList();
 
-	 try {
-	     con = getConnection(JNDI);
-	     ps = con.prepareStatement(selectQuery);
-	     rs = ps.executeQuery();
+	 try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery);
+		 ResultSet rs = ps.executeQuery()) 
+	 {
+		 
 
 	     while (rs.next()) {
 
@@ -2117,9 +2033,7 @@ public ArrayList findTotalPackStockByQuery(String branchCode,String queryFilter)
 	 } catch (Exception e) {
 	     System.out.println("INFO:Error fetching ALL Stock in findTotalPackStockByQuery ->" +
 	                        e.getMessage());
-	 } finally {
-	     closeConnection(con, ps, rs);
-	 }
+	 } 
 
 	 return list;
 
@@ -2132,16 +2046,14 @@ public ArrayList findStockAlreadyIssueByQuery(String branchCode,String queryFilt
  String selectQuery = "select *from ST_DISTRIBUTION_ITEM " 
  +queryFilter;
 // System.out.println("the value of selectQuery in findStockAlreadyIssueByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
 
- ResultSet rs = null;     
  ArrayList list = new ArrayList();
 
- try {
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
-     rs = ps.executeQuery();
+ try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery);
+		 ResultSet rs = ps.executeQuery())  
+ {
+     
 
      while (rs.next()) {
          String id = rs.getString("STOCK_CODE");
@@ -2173,9 +2085,7 @@ public ArrayList findStockAlreadyIssueByQuery(String branchCode,String queryFilt
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Stock Issued in findStockAlreadyIssueByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -2188,16 +2098,14 @@ public ArrayList findTotalStockByQuery(String branchCode,String queryFilter) {
  String selectQuery = "select *from ST_STOCK " 
  +queryFilter;
 // System.out.println("the value of selectQuery in findStockAlreadyIssueByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
 
- ResultSet rs = null;     
  ArrayList list = new ArrayList();
 
- try {
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
-     rs = ps.executeQuery();
+ try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery);
+		 ResultSet rs = ps.executeQuery())  
+ {
+
 
      while (rs.next()) {
          String id = rs.getString("STOCK_CODE");
@@ -2229,9 +2137,7 @@ public ArrayList findTotalStockByQuery(String branchCode,String queryFilter) {
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Stock Issued in findStockAlreadyIssueByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -2245,16 +2151,14 @@ public ArrayList findStocktByQuery(String branchCode,String queryFilter) {
  String selectQuery = "select *from ST_STOCK " +
 		 queryFilter;
 // System.out.println("the value of selectQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);     		
- Connection con = null;
- PreparedStatement ps = null;
 
- ResultSet rs = null;
  ArrayList list = new ArrayList();
   
- try {
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
-     rs = ps.executeQuery();
+ try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery);
+		 ResultSet rs = ps.executeQuery())  
+ {
+
 
      while (rs.next()) {
 
@@ -2322,9 +2226,7 @@ public ArrayList findStocktByQuery(String branchCode,String queryFilter) {
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL ST_STOCK in findStocktByQuery ->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -2337,21 +2239,20 @@ public ArrayList findAssetTotalByQuery(String queryFilter) {
  String selectQuery = "select *from AM_ASSET where asset_status = 'ACTIVE' " +
  queryFilter;
 // System.out.println("the value of selectQuery in findAssetTotalByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
-   
- ResultSet rs = null;
+
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery);
+		 ResultSet rs = ps.executeQuery())  
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
 
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+    
 //     ps.setString(1, branchCode);
-     rs = ps.executeQuery();
+ 
      while (rs.next()) {
      	String batchId = rs.getString("GROUP_ID");
          String id = rs.getString("ASSET_ID");
@@ -2430,9 +2331,7 @@ public ArrayList findAssetTotalByQuery(String queryFilter) {
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset in findAssetTotalByQuery ->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -2456,26 +2355,24 @@ public ArrayList findAssetImprovedByQuery(String fromDate, String toDate) {
  +"AND a.revalue_Date BETWEEN ? AND ?";
 // +queryFilter;
 // System.out.println("the value of selectQuery in findAssetImproveddByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;  
 
- ResultSet rs = null;     
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery))  
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
 	 
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+
 //     ps.setString(1, branchCode);
      ps.setString(1, fromDate);
      ps.setString(2, toDate);
 //     ps.setString(4, branchCode);
      ps.setString(3, fromDate);
      ps.setString(4, toDate);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 	 
      while (rs.next()) {
  //    	String batchId = rs.getString("GROUP_ID");
@@ -2532,13 +2429,12 @@ public ArrayList findAssetImprovedByQuery(String fromDate, String toDate) {
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Transfer in findAssetImprovedByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 
@@ -2559,25 +2455,23 @@ public ArrayList findAssetTransferddByQuery(String fromDate, String toDate) {
  +"where CONVERT(varchar, a.Batch_id) = CONVERT(varchar, b.Id) and b.entryPostFlag = 'Y' and b.GroupIdStatus = 'Y' "
  +"AND a.TRANSFER_DATE BETWEEN ? AND ? ";
 // System.out.println("the value of selectQuery in findAssetTransferddByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
 
- ResultSet rs = null;     
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery)) 
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+
 //     ps.setString(1, branchCode);
      ps.setString(1, fromDate);
      ps.setString(2, toDate);
 //     ps.setString(4, branchCode);
      ps.setString(3, fromDate);
      ps.setString(4, toDate);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 	 
      while (rs.next()) {
  //    	String batchId = rs.getString("GROUP_ID");
@@ -2634,13 +2528,12 @@ public ArrayList findAssetTransferddByQuery(String fromDate, String toDate) {
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Transfer 5 in findAssetTransferddByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
   
  return list;
 
@@ -2653,23 +2546,21 @@ public ArrayList findAssetDisposeddByQuery(String fromDate,String toDate) {
 
  String selectQuery = "select *from AM_ASSET where asset_status = 'DISPOSED' AND Date_Disposed BETWEEN  ? AND ?";
 // System.out.println("the value of selectQuery in findAssetDisposeddByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);
- Connection con = null;
- PreparedStatement ps = null;
- 
- ResultSet rs = null;
+
+
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery))  
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
      
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
 //     ps.setString(1, branchCode);
      ps.setString(1, fromDate);
      ps.setString(2, toDate);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 
      while (rs.next()) {
 
@@ -2741,12 +2632,11 @@ public ArrayList findAssetDisposeddByQuery(String fromDate,String toDate) {
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Disposed ST_STOCK in findAssetDisposeddByQuery ->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
  }
 
  return list;
@@ -2760,23 +2650,21 @@ public ArrayList findAssetAdditionedByQuery(String fromDate, String toDate) {
  String selectQuery = "select *from AM_ASSET where asset_status = 'ACTIVE' "+
  	 "AND POSTING_DATE BETWEEN ? AND ? ";
 // System.out.println("the value of selectQuery in findAssetAdditionedByQuery is ]]]]]]]]]]]]]]]]]]" +selectQuery);      		
- Connection con = null;
- PreparedStatement ps = null;
-
- ResultSet rs = null;     
+  
  ArrayList list = new ArrayList();
 
- try {
+ try(Connection con = getConnection(JNDI);
+		 PreparedStatement ps = con.prepareStatement(selectQuery))  
+ {
 //     con = getConnection(JNDI);
 //     ps = con.prepareStatement(selectQuery);
 //     rs = ps.executeQuery();
      
-     con = getConnection(JNDI);
-     ps = con.prepareStatement(selectQuery);
+
 //     ps.setString(1, branchCode);
      ps.setString(1, fromDate);
      ps.setString(2, toDate);
-     rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 
      while (rs.next()) {
      	String batchId = rs.getString("GROUP_ID");
@@ -2851,13 +2739,12 @@ public ArrayList findAssetAdditionedByQuery(String fromDate, String toDate) {
      //    setMinCost(minCost);
       //   setMaxCost(maxCost);
      }
+     }
 
  } catch (Exception e) {
      System.out.println("INFO:Error fetching ALL Asset Addition in findAssetAdditionedByQuery->" +
                         e.getMessage());
- } finally {
-     closeConnection(con, ps, rs);
- }
+ } 
 
  return list;
 

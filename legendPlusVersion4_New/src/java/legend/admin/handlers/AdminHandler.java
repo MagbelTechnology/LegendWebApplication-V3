@@ -24,9 +24,12 @@ import com.magbel.util.DatetimeFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import legend.admin.objects.Branch;
@@ -121,8 +124,7 @@ public class AdminHandler {
 */
 	public boolean createCategory(legend.admin.objects.Category category) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+	
 		boolean done = false;
 		String query = "INSERT INTO am_ad_category"
 				+ "(category_code,category_name"
@@ -136,9 +138,9 @@ public class AdminHandler {
 				+ ",acct_type ,currency_Id, category_id,enforceBarcode,category_Type)"
 		+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 			//ps.setLong(1, System.currentTimeMillis());
 			ps.setString(1, category.getCategoryCode());
 			ps.setString(2, category.getCategoryName()); 
@@ -173,25 +175,23 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error creating category ->" + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+		 
 		return done;
 
 	}
 
 	public boolean createDepartment(legend.admin.objects.Department dept) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "INSERT INTO am_ad_department(Dept_code,Dept_name"
 				+ " ,Dept_acronym,Dept_Status,user_id ,CREATE_DATE,Dept_ID)"
 				+ " VALUES (?,?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 			ps.setString(1, dept.getDept_code());
 			ps.setString(2, dept.getDept_name());
 			ps.setString(3, dept.getDept_acronym());
@@ -204,25 +204,23 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error creating Department ->" + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+		 
 		return done;
 
 	}
 
 	public boolean createSection(legend.admin.objects.Section section) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "INSERT INTO am_ad_section(Section_ID,Section_Code,Section_Name"
 				+ "  ,section_acronym,Section_Status,User_ID,Create_Date)"
 				+ "  VALUES (?,?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 			ps.setLong(1, Integer.parseInt(new ApplicationHelper().getGeneratedId("am_ad_section")));
 			ps.setString(2, section.getSection_code());
 			ps.setString(3, section.getSection_name());
@@ -236,9 +234,7 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error creating Section ->" + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -277,17 +273,16 @@ public class AdminHandler {
 */
 	public boolean createRegion(legend.admin.objects.Region region) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "INSERT INTO AM_AD_REGION( Region_Code, Region_Name"
 				+ ", Region_Acronym, Region_Address"
 				+ ",Region_Phone , Region_Fax, Region_Status, User_Id,Create_Date,Region_iD) "
 				+ " VALUES (?,?,?,?,?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 			//ps.setLong(1, System.currentTimeMillis());
 			ps.setString(1, region.getRegionCode());
 			ps.setString(2, region.getRegionName());
@@ -304,26 +299,24 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error creating Region ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+		 
 		return done;
 
 	}
 
 	public boolean createProvince(legend.admin.objects.Province ccode) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "INSERT INTO am_gb_Province"
 				+ "(Province_Code, Province"
 				+ ",Status, User_id, create_date,Province_ID)"
 				+ " VALUES (?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 			ps.setString(1, ccode.getProvinceCode());
 			ps.setString(2, ccode.getProvince());
 			ps.setString(3, ccode.getStatus());
@@ -384,8 +377,7 @@ public class AdminHandler {
 */
 	public boolean updateCategory(legend.admin.objects.Category category) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+	
 		boolean done = false;
 
 		String query = "UPDATE am_ad_category"
@@ -399,9 +391,9 @@ public class AdminHandler {
 				+ " , create_date = ?,acct_type = ?,currency_Id = ?,enforceBarcode=?,category_Type=?,maxNo_Dep_Improve=?"
 				+ " WHERE category_ID =?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 
 			ps.setString(1, category.getCategoryCode());
 			ps.setString(2, category.getCategoryName());
@@ -440,9 +432,7 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -450,16 +440,15 @@ public class AdminHandler {
 
 	public boolean updateDepartment(legend.admin.objects.Department dept) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "UPDATE am_ad_department SET Dept_code = ?,Dept_name = ?"
 				+ " ,Dept_acronym = ?,Dept_Status = ?"
 				+ "  WHERE Dept_ID=?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 			ps.setString(1, dept.getDept_code());
 			ps.setString(2, dept.getDept_name());
 			ps.setString(3, dept.getDept_acronym());
@@ -471,25 +460,22 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error Updating Query ->" + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+		 
 		return done;
 
 	}
 
 	public boolean updateSection(legend.admin.objects.Section section) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "UPDATE am_ad_section SET Section_Code = ?,Section_Name = ?"
 				+ "  ,section_acronym = ?,Section_Status = ?"
 				+ "  WHERE Section_ID = ?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
 			ps.setString(1, section.getSection_code());
 			ps.setString(2, section.getSection_name());
 			ps.setString(3, section.getSection_acronym());
@@ -501,24 +487,21 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error Updating Section ->" + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+		 
 		return done;
 
 	}
 
 	public boolean updateState(legend.admin.objects.State state) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "UPDATE am_gb_states SET state_code = ?,state_name = ?"
 				+ "   ,state_status = ?" + "   WHERE state_ID=?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
 			ps.setString(1, state.getStateCode());
 			ps.setString(2, state.getStateName());
 			ps.setString(3, state.getStateStatus());
@@ -529,17 +512,15 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error Updating State ->" + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+		 
 		return done;
 
 	}
 
 	public boolean updateRegion(legend.admin.objects.Region region) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+	
 		boolean done = false;
                 /*
 		String query = "UPDATE AM_AD_REGION"
@@ -551,9 +532,8 @@ public class AdminHandler {
 */
                 String query = "Update AM_AD_REGION SET Region_Name=?,Region_Acronym=?,Region_Address=?," +
                         "Region_Phone=?,Region_Fax=?,Region_Status=? WHERE Region_Code=?";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+                try (Connection c = getConnection();
+                        PreparedStatement ps = c.prepareStatement(query)) {
 			ps.setString(1, region.getRegionName());
 			ps.setString(2, region.getRegionAcronym());
 			ps.setString(3, region.getRegionAddress());
@@ -578,14 +558,12 @@ public class AdminHandler {
 
 	public boolean updateZone(legend.admin.objects.Zone zone) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
                 String query = "Update AM_AD_ZONE SET Zone_Name=?,Zone_Acronym=?,Zone_Address=?," +
                         "Zone_Phone=?,Zone_Fax=?,Zone_Status=? WHERE Zone_Code=?";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+                try (Connection c = getConnection();
+                        PreparedStatement ps = c.prepareStatement(query)) {
 			ps.setString(1, zone.getZoneName());
 			ps.setString(2, zone.getZoneAcronym());
 			ps.setString(3, zone.getZoneAddress());
@@ -600,9 +578,8 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error executing Query for updateZone ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+                
 		return done;
 
 	}
@@ -611,15 +588,13 @@ public class AdminHandler {
 
 	public boolean updateProvince(legend.admin.objects.Province ccode) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String query = "UPDATE am_gb_Province" + " SET Province_Code = ?"
 				+ ",Province = ?,Status = ?" + "  WHERE Province_ID = ?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
 			// ps.setString(1, ccode.getProvinceId());
 			ps.setString(1, ccode.getProvinceCode());
 			ps.setString(2, ccode.getProvince());
@@ -630,9 +605,8 @@ public class AdminHandler {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error Updating Province ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
+		 
 		return done;
 
 	}
@@ -648,18 +622,14 @@ public class AdminHandler {
 				+ ",CREATE_DATE  FROM am_ad_branch";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
+		
 //		System.out.println("query in getBranchesByQuery: " + query);
 //		System.out.println("Status in getBranchesByQuery: " + status);
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-			 s = c.prepareStatement(query.toString());
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query)) {
+
 			s.setString(1, status);
-			rs = s.executeQuery();
+			try(ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String branchId = rs.getString("BRANCH_ID");
 				String branchCode = rs.getString("BRANCH_CODE");
@@ -684,15 +654,14 @@ public class AdminHandler {
 
 				_list.add(branch);
 			}
+			}
 
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error Selecting branches ->" + e.getMessage());
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+	
 		return _list;
 
 	}
@@ -777,18 +746,14 @@ public class AdminHandler {
 
 		query = query + filter;
 //		System.out.println("query in getDeparmentsByQuery "+query);
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-			s = c.prepareStatement(query.toString());
+		
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query)) {
+
 	          if(query.contains("DEPT_STATUS")){
 	        	  s.setString(1, status);
 	          }	  
-			rs = s.executeQuery();
+			try(ResultSet rs = s.executeQuery()){
 			while (rs.next()) {
 				String dept_id = rs.getString("Dept_ID");
 				String dept_code = rs.getString("Dept_code");
@@ -801,14 +766,13 @@ public class AdminHandler {
 
 				_list.add(dept);
 			}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -822,15 +786,10 @@ public class AdminHandler {
 
 		query = query + filter;
 //		System.out.println("query in getDeparmentsByQuery "+query);
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-			s = c.prepareStatement(query.toString());
-			rs = s.executeQuery();
+	
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query)) {
+			 try(ResultSet rs = s.executeQuery()){
 			while (rs.next()) {
 				String dept_id = rs.getString("Dept_ID");
 				String dept_code = rs.getString("Dept_code");
@@ -843,14 +802,14 @@ public class AdminHandler {
 
 				_list.add(dept);
 			}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
+		 
 		return _list;
 
 	}
@@ -865,14 +824,8 @@ public class AdminHandler {
 
 		query = query + filter;
 //		System.out.println("query in getDeparmentsByQuery "+query);
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-			s = c.prepareStatement(query.toString());
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query)) {
 //			System.out.println("query.contains DEPT_STATUS in getDeparmentsByQuery "+query.contains("DEPT_STATUS"));
 //			System.out.println("query.contains Dept_Name in getDeparmentsByQuery "+query.contains("Dept_Name"));
 	          if(query.contains("DEPT_STATUS") && !query.contains("Dept_Name")){
@@ -883,7 +836,7 @@ public class AdminHandler {
 	        	  s.setString(1, status);
 	        	  s.setString(2, deptName);
 	          }	  
-			rs = s.executeQuery();
+		try(ResultSet rs = s.executeQuery()){
 			while (rs.next()) {
 				String dept_id = rs.getString("Dept_ID");
 				String dept_code = rs.getString("Dept_code");
@@ -896,14 +849,13 @@ public class AdminHandler {
 
 				_list.add(dept);
 			}
+		}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -915,16 +867,11 @@ public class AdminHandler {
 				+ " ,user_id,CREATE_DATE" + " FROM am_ad_department ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-			s = c.prepareStatement(query.toString());
+		
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query)) {
 			s.setString(1, deptCode);
-			rs = s.executeQuery();
+			try(ResultSet rs = s.executeQuery()){
 			while (rs.next()) {
 				String dept_id = rs.getString("Dept_ID");
 				String dept_code = rs.getString("Dept_code");
@@ -935,14 +882,13 @@ public class AdminHandler {
 				dept = new legend.admin.objects.Department(dept_id, dept_code,
 						dept_name, dept_acronym, dept_status, user_id);
 			}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+	
 		return dept;
 
 	}
@@ -970,17 +916,12 @@ public class AdminHandler {
 
 		query = query + filter;
 //		System.out.println(">>>>query in getSectionByQuery: "+query);
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
+		
 
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-			s = c.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query)) {
 //			s.setString(1, filter);
-			rs = s.executeQuery();
+		try(ResultSet rs = s.executeQuery()){
 			
 			while (rs.next()) {
 				String section_id = rs.getString("Section_ID");
@@ -995,14 +936,12 @@ public class AdminHandler {
 
 				_list.add(section);
 			}
-
+		}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -1015,16 +954,11 @@ public class AdminHandler {
 
 		query = query + filter+" AND Section_Status = 'ACTIVE'";
 //		System.out.println(">>>>query in getASection: "+query);
-		Connection c = null;
-		ResultSet rs = null;
-//		Statement s = null;
-		PreparedStatement s = null;
-		try {
-			c = getConnection();
-//			s = c.createStatement();
-			s = c.prepareStatement(query);
+		
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query)) {
 //			s.setString(1, filter);
-			rs = s.executeQuery();
+		try(ResultSet	rs = s.executeQuery()){
 			while (rs.next()) {
 				String section_id = rs.getString("Section_ID");
 				String section_code = rs.getString("Section_Code");
@@ -1037,14 +971,13 @@ public class AdminHandler {
 						section_status, userid);
 
 			}
+		}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return section;
 
 	}
@@ -1071,14 +1004,11 @@ public class AdminHandler {
 				+ " FROM am_gb_states ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+		
 
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String stateId = rs.getString("state_ID");
 				String stateCode = rs.getString("state_code");
@@ -1096,9 +1026,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -1111,14 +1039,11 @@ public class AdminHandler {
 				+ " FROM am_gb_states ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+	
 
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery(query);){
 			while (rs.next()) {
 				String stateId = rs.getString("state_ID");
 				String stateCode = rs.getString("state_code");
@@ -1135,9 +1060,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return state;
 
 	}
@@ -1239,14 +1162,10 @@ public class AdminHandler {
 				+ " FROM AM_AD_REGION";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String regionId = rs.getString("Region_Id");
 				String regionCode = rs.getString("Region_Code");
@@ -1277,9 +1196,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return region;
 
 	}
@@ -1344,14 +1261,11 @@ public class AdminHandler {
 				+ ",acct_type ,currency_Id,enforceBarcode" + " FROM am_ad_category  ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+	
 
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String categoryId = rs.getString("category_ID");
 				String categoryCode = rs.getString("category_code");
@@ -1396,9 +1310,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -1417,14 +1329,9 @@ public class AdminHandler {
 
 		query = query + filter+" AND Category_Status = 'ACTIVE'";
 	//	System.out.println("<<<<getACategory query: "+query);
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String categoryId = rs.getString("category_ID");
 				String categoryCode = rs.getString("category_code");
@@ -1468,9 +1375,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+	
 		return category;
 
 	}
@@ -1484,14 +1389,9 @@ public class AdminHandler {
 
 		query = query + filter+" AND sub_Category_Status = 'ACTIVE'";
 		//System.out.println("getASubCategory query: "+query);
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {  
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String subcategoryId = rs.getString("sub_category_ID");
 //				System.out.println("<<<<getASubCategory subcategoryId: "+subcategoryId);
@@ -1511,9 +1411,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return subcategory;
 
 	}
@@ -1548,14 +1446,9 @@ public class AdminHandler {
 				+ " FROM AM_AD_REGION ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String regionId = rs.getString("Region_Id");
 				String regionCode = rs.getString("Region_Code");
@@ -1578,9 +1471,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -1593,14 +1484,9 @@ public class AdminHandler {
 				+ ",gl_suffix,branchId,deptId,mtid"
 				+ " FROM sbu_branch_dept WHERE branchId='" + branchid + "'";
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String branchcode = rs.getString("branchCode");
 				String deptcode = rs.getString("deptCode");
@@ -1639,14 +1525,9 @@ public class AdminHandler {
 				+ branchid
 				+ "' AND deptId='" + deptId + "'";
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String branchcode = rs.getString("branchCode");
 				String deptcode = rs.getString("deptCode");
@@ -1687,14 +1568,9 @@ public class AdminHandler {
 				+ " FROM am_gb_Province ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String provinceid = rs.getString("Province_ID");
 				String provincecode = rs.getString("Province_Code");
@@ -1717,9 +1593,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
                 
 		return _list;
 
@@ -1732,14 +1606,9 @@ public class AdminHandler {
 				+ " FROM am_gb_Province ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String provinceid = rs.getString("Province_ID");
 				String provincecode = rs.getString("Province_Code");
@@ -1762,9 +1631,7 @@ public class AdminHandler {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return province;
 
 	}
@@ -1781,7 +1648,7 @@ public class AdminHandler {
 
 	}
 	
-	public boolean removeDeptFromBranch(java.util.ArrayList list) {
+	public boolean removeDeptFromBranchOld(java.util.ArrayList list) {
 		String query = "DELETE FROM sbu_branch_dept" + " WHERE branchId=?"
 				+ " AND deptId=?";
 		String query2 = "DELETE FROM sbu_dept_section"
@@ -1820,6 +1687,48 @@ public class AdminHandler {
 
 		return (d.length > 0);
 	}
+	
+	public boolean removeDeptFromBranch(ArrayList list) {
+	    String query1 = "DELETE FROM sbu_branch_dept WHERE branchId=? AND deptId=?";
+	    String query2 = "DELETE FROM sbu_dept_section WHERE branchId=? AND deptId=?";
+
+	    boolean success = false;
+
+	    try (Connection con = getConnection();
+	         PreparedStatement ps1 = con.prepareStatement(query1);
+	         PreparedStatement ps2 = con.prepareStatement(query2)) {
+
+	        con.setAutoCommit(false); // start transaction
+
+	        for (Object obj : list) {
+	            legend.admin.objects.BranchDept bd =
+	                    (legend.admin.objects.BranchDept) obj;
+
+	            // First delete
+	            ps1.setString(1, bd.getBranchId());
+	            ps1.setString(2, bd.getDeptId());
+	            ps1.addBatch();
+
+	            // Second delete
+	            ps2.setString(1, bd.getBranchId());
+	            ps2.setString(2, bd.getDeptId());
+	            ps2.addBatch();
+	        }
+
+	        int[] result1 = ps1.executeBatch();
+	        int[] result2 = ps2.executeBatch();
+
+	        con.commit(); // commit only if both succeed
+	        success = (result1.length > 0 || result2.length > 0);
+
+	    } catch (Exception ex) {
+	        System.out.println("WARN: Error removing department from branch -> " + ex.getMessage());
+	        ex.printStackTrace();
+	        success = false;
+	    }
+
+	    return success;
+	}
 
 	public legend.admin.objects.BranchDept getDeptInBranch(String branchid,
 			String deptId) {
@@ -1830,14 +1739,9 @@ public class AdminHandler {
 				+ " FROM sbu_branch_dept WHERE branchId='" + branchid
 				+ "' AND deptId='" + deptId + "'";
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
-			rs = ps.executeQuery();
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery();){
 			while (rs.next()) {
 				String branchcode = rs.getString("branchCode");
 				String deptcode = rs.getString("deptCode");
@@ -1860,9 +1764,7 @@ public class AdminHandler {
 			}
 		} catch (Exception ex) {
 			System.out.println("WARN: Error fetching all asset ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return dept;
 
 	}
@@ -1875,17 +1777,14 @@ public class AdminHandler {
 				+ ",gl_suffix,branchId,deptId,sectionId,mtid"
 				+ " FROM sbu_dept_section WHERE branchId=? AND deptId=? AND sectionId=?";
 		//System.out.println("<<<<query in getSectionInDept: "+query);
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+	
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
       	  	ps.setString(1, branchid);
       	  	ps.setString(2, deptId);
       	  	ps.setString(3, sectionId);
-			rs = ps.executeQuery();
+		try(ResultSet	rs = ps.executeQuery()){
 			while (rs.next()) {
 				String branchcode = rs.getString("branchCode");
 				String deptcode = rs.getString("deptCode");
@@ -1909,11 +1808,10 @@ public class AdminHandler {
 				dept.setSectionId(sectiondi);
 				// _list.add(dept);
 			}
+		}
 		} catch (Exception ex) {
 			System.out.println("WARN: Error fetching all Section ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return dept;
 
 	}
@@ -1921,14 +1819,12 @@ public class AdminHandler {
 	public boolean removeSectionsFromDept(java.util.ArrayList list) {
 		String query = "DELETE FROM sbu_dept_section" + " WHERE branchId=?"
 				+ " AND deptId=?" + " AND sectionId=?";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+	
 		legend.admin.objects.DeptSection bd = null;
 		int[] d = null;
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 			for (int i = 0; i < list.size(); i++) {
 				bd = (legend.admin.objects.DeptSection) list.get(i);
 
@@ -1939,14 +1835,19 @@ public class AdminHandler {
 				ps.addBatch();
 			}
 			d = ps.executeBatch();
+			  for (int result : d) {
+		            if (result == Statement.EXECUTE_FAILED) {
+		                return false;
+		            }
+		        }
+			  return true;
 
 		} catch (Exception ex) {
 			System.out.println("WARN: Error removing Section From Department ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+			return false;
+		} 
 
-		return (d.length > 0);
+		
 	}
 
     /*
@@ -1988,14 +1889,11 @@ public class AdminHandler {
 		String query = "UPDATE sbu_branch_dept SET branchCode = ?"
 				+ ",deptCode = ?,gl_prefix = ?,gl_suffix = ?"
 				+ " WHERE branchId=?" + " AND deptId=?";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		legend.admin.objects.BranchDept bd = null;
 		int[] d = null;
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
 
 			for (int i = 0; i < list.size(); i++) {
 				bd = (legend.admin.objects.BranchDept) list.get(i);
@@ -2009,29 +1907,36 @@ public class AdminHandler {
 				ps.addBatch();
 			}
 			d = ps.executeBatch();
+			  for (int result : d) {
+		            if (result == Statement.EXECUTE_FAILED) {
+		                return false;
+		            }
+		        }
+			  return true;
 
 		} catch (Exception ex) {
 			System.out.println("WARN: Error fetching all asset ->" + ex);
+			return false;
 		} finally {
 			closeConnection(con, ps);
 		}
 
-		return (d.length > 0);
+		
 	}
+	
+	
 
 	public boolean insertSectionForDept(java.util.ArrayList list) {
 		String query = "INSERT INTO sbu_dept_section(branchCode"
 				+ ",deptCode,sectionCode,branchId"
 				+ ",deptId,sectionId,gl_prefix" + ",gl_suffix)"
 				+ " VALUES(?,?,?,?,?,?,?,?) ";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		legend.admin.objects.DeptSection bd = null;
 		int[] d = null;
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
+
 
 			for (int i = 0; i < list.size(); i++) {
 				bd = (legend.admin.objects.DeptSection) list.get(i);
@@ -2046,17 +1951,23 @@ public class AdminHandler {
 //				System.out.println("<<<<getBranchCode: "+bd.getBranchCode()+"  getDeptCode: "+bd.getDeptCode()+"  getSectionCode: "+bd.getSectionCode());
 //				System.out.println("<<<<<currentTimeMillis: "+System.currentTimeMillis());
 //				ps.setLong(9, System.currentTimeMillis());
-				ps.addBatch();
+				 ps.addBatch();
 			}
 			d = ps.executeBatch();
+			  for (int result : d) {
+		            if (result == Statement.EXECUTE_FAILED) {
+		                return false;
+		            }
+		        }
+			  return true;
+
 //			System.out.println("<<<<d: "+d);
 		} catch (Exception ex) {
 			System.out.println("WARN: Error fetching all asset ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+			return false;
+		} 
 
-		return (d.length > 0);
+		
 	}
 
 	public boolean updateSectionForDept(java.util.ArrayList list) {
@@ -2064,14 +1975,11 @@ public class AdminHandler {
 				+ ",deptCode = ?,sectionCode=?,gl_prefix = ?"
 				+ ",gl_suffix = ?" + " WHERE branchId=?"
 				+ " AND deptId=?" + " AND sectionId=?";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		legend.admin.objects.DeptSection bd = null;
 		int[] d = null;
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement ps = c.prepareStatement(query)) {
 			for (int i = 0; i < list.size(); i++) {
 				bd = (legend.admin.objects.DeptSection) list.get(i);
 
@@ -2087,14 +1995,18 @@ public class AdminHandler {
 				ps.addBatch();
 			}
 			d = ps.executeBatch();
+			  for (int result : d) {
+		            if (result == Statement.EXECUTE_FAILED) {
+		                return false;
+		            }
+		        }
+			  return true;
 
 		} catch (Exception ex) {
 			System.out.println("WARN: Error updating SectionFOrDept ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+			return false;
+		} 
 
-		return (d.length > 0);
 	}
 
 //	private Connection getConnection() {
@@ -2110,26 +2022,22 @@ public class AdminHandler {
 //		return con;
 //	}
 	
-	private Connection getConnection() {
-		Connection con = null;
-		try {
-//        	if(con==null){
-                Context initContext = new InitialContext();
-                String dsJndi = "java:/legendPlus";
-                DataSource ds = (DataSource) initContext.lookup(
-                		dsJndi);
-                con = ds.getConnection();
-//        	}
-		} catch (Exception e) {
-			System.out.println("WARNING: Error 1 getting connection in AdminHandler ->"
-					+ e.getMessage());
-		}
-		//finally {
-//			closeConnection(con);
-//		}
-		return con;
-	}
+	private Connection getConnection() throws SQLException {
 
+	    try {
+	        Context initContext = new InitialContext();
+	        DataSource ds = (DataSource) initContext.lookup("java:/legendPlus");
+
+	        if (ds == null) {
+	            throw new SQLException("DataSource java:/legendPlus not found.");
+	        }
+
+	        return ds.getConnection();
+
+	    } catch (NamingException ne) {
+	        throw new SQLException("JNDI Lookup failed for java:/legendPlus", ne);
+	    }
+	}
 	
 //
 //	public Connection getConnection() {
@@ -2337,20 +2245,14 @@ public String createsave2(String sbcode, String sbname, String sbcontact, String
 
 
 						}catch(Exception ex){ex.printStackTrace();}
-						finally
-						{
-							closeConnection(con, s,r);
-						}
+						
 						return message;
 	}
 
 public boolean SaveSbuSetup(String sbcode, String sbname, String sbcontact, String sbstatus, String contactmail)
 	{
 					boolean done = false;
-					 Connection con = null;
-					 Statement s = null;
-					 ResultSet  r = null;
-					 PreparedStatement ps = null;
+					
 					 String query = "INSERT INTO Sbu_SetUp"
 							+ "(Sbu_code, Sbu_name"
 							+ ",Sbu_contact, Status,Contact_email)"
@@ -2358,11 +2260,8 @@ public boolean SaveSbuSetup(String sbcode, String sbname, String sbcontact, Stri
 
 					//int rowcount;
 					//String message = "";
-						try
-						{
-									con = getConnection();
-//									System.out.println("established connection...");
-									ps = con.prepareStatement(query);
+					 try (Connection c = getConnection();
+				             PreparedStatement ps = c.prepareStatement(query)){
 									ps.setString(1, sbcode);
 									ps.setString(2, sbname);
 									ps.setString(3, sbcontact);
@@ -2372,10 +2271,7 @@ public boolean SaveSbuSetup(String sbcode, String sbname, String sbcontact, Stri
 //									System.out.println("output "+done);
 
 						}catch(Exception ex){ex.printStackTrace();}
-						finally
-						{
-							closeConnection(con, ps);
-						}
+					
 						return done;
 	}
 
@@ -2389,18 +2285,13 @@ public String UpdateSbu(String sbucode,String sbuname, String sbucontact, String
 
 
 					String mess ="";
-					Connection con = null;
-					Statement s = null;
-					PreparedStatement ps = null;
-					ResultSet rs = null;
+				
 
+					   String updatequery = "UPDATE Sbu_SetUp SET Sbu_name =?,Sbu_contact =?,Status = ?,Contact_email= ? WHERE Sbu_code=?";
+					 try (Connection c = getConnection();
+				             PreparedStatement ps = c.prepareStatement(updatequery)){
 
-						try
-						{
-								con = getConnection();
-
-								    String updatequery = "UPDATE Sbu_SetUp SET Sbu_name =?,Sbu_contact =?,Status = ?,Contact_email= ? WHERE Sbu_code=?";
-									ps = con.prepareStatement(updatequery);
+								
 									ps.setString(1,sbuname);
 //									System.out.print("wetin dey happen self"+sbuname);
 									ps.setString(2,sbucontact);
@@ -2426,10 +2317,7 @@ public String UpdateSbu(String sbucode,String sbuname, String sbucontact, String
 						{
 								ex.printStackTrace();
 						}
-						finally
-						{
-							closeConnection(con, ps);
-						}
+						
 
 						return mess;
 
@@ -2444,18 +2332,15 @@ public String UpdateMailStatement(String mailcode,String maildescription, String
                     handler = new AdminHandler();
 
 					String mess ="";
-					Connection con = null;
-					Statement s = null;
-					PreparedStatement ps = null;
-					ResultSet rs = null;
+				
 
 
-						try
-						{
-								con = getConnection();
+						
 
 								    String updatequery = "UPDATE am_mail_statement SET Mail_description=?, Mail_address = ?,Create_date= ? , Transaction_type=?, User_id =?, Status = ? WHERE Mail_code=?";
-									ps = con.prepareStatement(updatequery);
+								    try (Connection c = getConnection();
+								             PreparedStatement ps = c.prepareStatement(updatequery)){
+
 									ps.setString(1,maildescription);
 //									System.out.print("wetin dey happen self"+maildescription);
 									ps.setString(2,mailaddress);
@@ -2502,14 +2387,11 @@ public java.util.List getsbuByQuery(String filter) {
 				+ " ,Contact_email" + " FROM Sbu_SetUp ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+	
 
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection c = getConnection();
+	             PreparedStatement s = c.prepareStatement(query);
+			ResultSet rs = s.executeQuery(query);){
 			while (rs.next()) {
 				String code = rs.getString("Sbu_code");
 				String name = rs.getString("Sbu_name");
@@ -2527,9 +2409,7 @@ public java.util.List getsbuByQuery(String filter) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -2607,16 +2487,12 @@ public legend.admin.objects.AssignSbu getSbuPrivilege(String classid) {
 			+ " FROM AM_SBU_ATTACHEMENT"
 			+ " WHERE SBU_NAME=? ";
 
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
-
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	
+	 try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement(query)){
 		ps.setString(1, classid);
 		//ps.setString(2, roleuuid);
-		rs = ps.executeQuery();
+		try(ResultSet rs = ps.executeQuery()){
 		while (rs.next()) {
 			String clss_uuid = rs.getString("SBU_NAME");
 
@@ -2630,11 +2506,11 @@ public legend.admin.objects.AssignSbu getSbuPrivilege(String classid) {
 			//classprivilege = new legend.admin.objects.AssignSbu(
 					//clss_uuid, role_uuid, role_view);
 		}
+		}
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching Class Privileges ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
+	 
 	return classprivilege;
 }
 
@@ -2651,10 +2527,7 @@ public boolean insertAssignSbuPrivileges2(java.util.ArrayList list) {
 
 
 
-			Connection con = null;
-			PreparedStatement ps = null;
-			ResultSet rs = null;
-
+		
 
 
 	        legend.admin.objects.AssignSbu cp = null;
@@ -2663,9 +2536,8 @@ public boolean insertAssignSbuPrivileges2(java.util.ArrayList list) {
 
 
 			int[] d = null;
-			try {
-				con = getConnection();
-				ps = con.prepareStatement(query);
+			 try (Connection c = getConnection();
+		             PreparedStatement ps = c.prepareStatement(query)){
 	                        String id = help.getGeneratedId("AM_SBU_ATTACHEMENT");
 				for (int i = 0; i < list.size(); i++) {
 					cp = (legend.admin.objects.AssignSbu) list.get(i);
@@ -2697,14 +2569,21 @@ public boolean insertAssignSbuPrivileges2(java.util.ArrayList list) {
                 //int branchID = getBranchIDforSBU(cp.getAttachid());
 
                 }
+				
 				d = ps.executeBatch();
+				  for (int result : d) {
+			            if (result == Statement.EXECUTE_FAILED) {
+			                return false;
+			            }
+			        }
+				  return true;
 //				System.out.println("james bon10");
 			} catch (Exception ex) {
 				System.out.println("WARN: Error fetching all asset ->" + ex);
-			} finally {
-				closeConnection(con, ps);
-			}
-			return (d.length > 0);
+				return false;
+			} 
+			 
+			
 		}
 
 
@@ -2712,15 +2591,11 @@ public boolean updateAvaliableSbu(java.util.ArrayList list) {
 	String query = "UPDATE AM_SBU_ATTACHEMENT SET ATTACH_ID=?"
 		+",SBU_NAME= ?,GL_PREFIX = ?,GL_SUFIX = ?,CREATE_DATE =?,CREATE_USER =?,SBU_CODE=?"
 			+ " WHERE SBU_NAME=?";
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 	legend.admin.objects.AssignSbu bd = null;
 	int[] d = null;
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
-
+	 try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement(query)){
 		for (int i = 0; i < list.size(); i++) {
 			bd = (legend.admin.objects.AssignSbu) list.get(i);
 //			System.out.println("*********b4************");
@@ -2746,27 +2621,28 @@ public boolean updateAvaliableSbu(java.util.ArrayList list) {
 			ps.addBatch();
 		}
 		d = ps.executeBatch();
+		  for (int result : d) {
+	            if (result == Statement.EXECUTE_FAILED) {
+	                return false;
+	            }
+	        }
+		  return true;
 
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching all asset ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
-
-	return (d.length > 0);
+		return false;
+	} 
+	 
 }
 public boolean updateAvaliableSbu(java.util.ArrayList list,int userid, String branchCode,int loginId,String eff_date) {
 	String query = "UPDATE AM_SBU_ATTACHEMENT SET ATTACH_ID=?"
 		+",SBU_NAME= ?,GL_PREFIX = ?,GL_SUFIX = ?,CREATE_DATE =?,CREATE_USER =?,SBU_CODE=?"
 			+ " WHERE SBU_NAME=?";
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 	legend.admin.objects.AssignSbu bd = null;
 	int[] d = null;
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	 try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement(query)){
 
 		for (int i = 0; i < list.size(); i++) {
 			bd = (legend.admin.objects.AssignSbu) list.get(i);
@@ -2794,15 +2670,20 @@ public boolean updateAvaliableSbu(java.util.ArrayList list,int userid, String br
 
 			ps.addBatch();
 		}
-			d = ps.executeBatch();
+		d = ps.executeBatch();
+		  for (int result : d) {
+	            if (result == Statement.EXECUTE_FAILED) {
+	                return false;
+	            }
+	        }
+		  return true;
 
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching all asset ->" + ex);
-	} finally {
-		closeConnection(con, ps);
+		return false;
 	}
 
-	return (d.length > 0);
+	
 }
 
 /*
@@ -2856,14 +2737,9 @@ public String getBranchesByQuery2()
 		String query = "SELECT Sbu_code,Sbu_name,Sbu_contact, Status, Contact_email  FROM Sbu_SetUp" ;
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while(rs.next())
 			{
 
@@ -2877,9 +2753,7 @@ public String getBranchesByQuery2()
 //			System.out.print("i don no waiting dey happenn o!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return cv;
 
 	}
@@ -2892,14 +2766,9 @@ public java.util.ArrayList getBranchesByQuery2(String filter)
 		String query = "SELECT Sbu_code,Sbu_name,Sbu_contact, Status, Contact_email FROM Sbu_SetUp"  + filter;
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while(rs.next())
 			{
 //				System.out.println("i dey here o! 333333333");
@@ -2921,9 +2790,7 @@ public java.util.ArrayList getBranchesByQuery2(String filter)
 		//	System.out.print("i don no waiting dey happenn o!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -2936,14 +2803,9 @@ public java.util.ArrayList getBranchesBysbucode(String filter)
 		String query = "SELECT Sbu_code,Sbu_name,Sbu_code ,Contact_email FROM Sbu_SetUP where Sbu_code ='"+filter+"'";
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while(rs.next())
 			{
 //				System.out.println("i dey here o! 333333333");
@@ -2965,9 +2827,7 @@ public java.util.ArrayList getBranchesBysbucode(String filter)
 //			System.out.print("i don no waiting dey happenn o!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -2979,14 +2839,9 @@ public java.util.ArrayList getApprovalByQuery2(String filter)
 		//System.out.println(""+query);
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while(rs.next())
 			{
 //				System.out.println("i dey here o! 333333333");
@@ -3019,9 +2874,7 @@ public java.util.ArrayList getApprovalByQuery2(String filter)
 			System.out.print("i don no waiting dey happenn o!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -3033,14 +2886,9 @@ public java.util.ArrayList getApprovalByQuery2()
 		//System.out.println(""+query);
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while(rs.next())
 			{
 //				System.out.println("i dey here o! 333333333");
@@ -3073,26 +2921,21 @@ public java.util.ArrayList getApprovalByQuery2()
 //			System.out.print("i don no waiting dey happenn o!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
     public String Approval_Duplicate(String sbcode, double  min, double max, String des)
 		{
-						 Connection c = null;
-						 Statement s = null;
-						 ResultSet  r = null;
+    	
 						 int rowcount;
 						String message ="No Duplicate Found";
-							try
-							{
-										c = getConnection();
-										s = c.createStatement();
-										r = s.executeQuery("select * from Approval_Limit where [Level_Code] = '"+sbcode+"' AND [Min_Amount] ='"+min+"' AND [Max_Amount]='"+max+"' AND [Description]='"+des+"'");
+						String query = "select * from Approval_Limit where [Level_Code] = '"+sbcode+"' AND [Min_Amount] ='"+min+"' AND [Max_Amount]='"+max+"' AND [Description]='"+des+"'";
+						  try (Connection con = getConnection();
+							         PreparedStatement ps = con.prepareStatement(query);
+							         ResultSet rs = ps.executeQuery()) {
 								//		System.out.println("i don't know if it is working parker .....");
-										if(r.next())
+										if(rs.next())
 										{
 								//			System.out.println("i don't know if it is working parker 2 .....");
 											message = "Duplicates Found";
@@ -3104,27 +2947,19 @@ public java.util.ArrayList getApprovalByQuery2()
 										
 								
 							}catch(Exception ex){ex.printStackTrace();}
-							finally
-							{
-								closeConnection(con, s,r);
-							}
+							
 							return message;
 		}
         public String Approval_Level_Duplicate(String code, String trans_type, String level, String date, String userid)
 		{
-						 Connection c = null;
-						 Statement s = null;
-						 ResultSet  r = null;
+						
 						 int rowcount;
 						String message ="No Duplicate Found";
-							try
-							{
-										c = getConnection();
-										s = c.createStatement();
-						//				System.out.println("established connection...");
-
-										r = s.executeQuery("select * from Approval_Level_setup where [Code] = '"+code+"' AND [Transaction_type] ='"+trans_type+"' AND [Level]='"+level+"' AND [Date]='"+date+"' AND [User_id]='"+userid+"'");
-										if(r.next())
+						String query= "select * from Approval_Level_setup where [Code] = '"+code+"' AND [Transaction_type] ='"+trans_type+"' AND [Level]='"+level+"' AND [Date]='"+date+"' AND [User_id]='"+userid+"'";
+						  try (Connection con = getConnection();
+							         PreparedStatement ps = con.prepareStatement(query);
+							         ResultSet rs = ps.executeQuery()) {
+										if(rs.next())
 										{
 											message = "Duplicates Found";
 										//	System.out.println("FOUND >>>>>>>>>>>>>>>>>>>"+message);
@@ -3132,40 +2967,32 @@ public java.util.ArrayList getApprovalByQuery2()
 										
 								
 							}catch(Exception ex){ex.printStackTrace();}
-							finally
-							{
-								closeConnection(con, s,r);
-							}
+							
 							return message;
 		}
         public boolean isApprovalExisting(String code) {
  	boolean done=false;
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
+  
 
     String FINDER_QUERY = "SELECT Level_Code,Min_Amount,Max_Amount,Description from Approval_Limit WHERE Level_Code = ?";
 
-    try {
-        con = getConnection();
-        ps = con.prepareStatement(FINDER_QUERY);
+    try (Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
         ps.setString(1, code);
        // ps.setString(2,page);
-        rs = ps.executeQuery();
+      try(ResultSet  rs = ps.executeQuery()){
    //     System.out.println("Yes o...............!");
 
         while (rs.next())
         {
            done=true;
         }
+      }
 
     } catch (Exception ex) {
         System.out.println("WARNING: cannot fetch [am_raisentry_post_josh]->" +
                 ex.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
-    }
+    } 
 
     return done;
 
@@ -3211,33 +3038,29 @@ public java.util.ArrayList getApprovalByQuery2()
 */
         public boolean isApproval_Level_Existing(String codee) {
  	boolean done=false;
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+   
 
 
     String FINDER_QUERY = "SELECT Code,Transaction_type,Level from Approval_Level_setup where Code = ?";
 
-    try {
-        con = getConnection();
-        ps = con.prepareStatement(FINDER_QUERY);
+    try (Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
         ps.setString(1, codee);
        // ps.setString(2,Transaction_Type);
        // ps.setString(3,Transaction_Type);
-        rs = ps.executeQuery();
+        try(ResultSet  rs = ps.executeQuery()){
  //       System.out.println("Yes o...............!");
 
         while (rs.next())
         {
            done=true;
         }
+        }
 
     } catch (Exception ex) {
         System.out.println("WARNING: cannot fetch [am_raisentry_post_josh]->" +
                 ex.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
-    }
+    } 
 
     return done;
 
@@ -3252,18 +3075,11 @@ public String UpdateApproval_Limit(String code,double min_amount, double max_amo
 
 
 					String mess ="";
-					Connection con = null;
-					Statement s = null;
-					PreparedStatement ps = null;
-					ResultSet rs = null;
+					
+					  String updatequery = "UPDATE Approval_Limit SET Min_Amount=?, Max_Amount=?,Description=? WHERE Level_Code=?";
 
-
-						try
-						{
-								con = getConnection();
-
-								    String updatequery = "UPDATE Approval_Limit SET Min_Amount=?, Max_Amount=?,Description=? WHERE Level_Code=?";
-									ps = con.prepareStatement(updatequery);
+					  try (Connection con = getConnection();
+					             PreparedStatement ps = con.prepareStatement(updatequery)) {
 									ps.setDouble(1, min_amount);
 //									System.out.print("wetin dey happen self"+min_amount);
 									ps.setDouble(2,max_amount);
@@ -3289,10 +3105,7 @@ public String UpdateApproval_Limit(String code,double min_amount, double max_amo
 						{
 								ex.printStackTrace();
 						}
-						finally
-						{
-							closeConnection(con, ps);
-						}
+						
 
 						return mess;
 
@@ -3305,14 +3118,11 @@ public java.util.ArrayList getApprovalLevelByQueryGprifix()
 	//System.out.println(""+query);
 
 
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
 
-	try {
-		c = getConnection();
-		s = c.createStatement();
-		rs = s.executeQuery(query);
+
+	  try (Connection con = getConnection();
+		         PreparedStatement ps = con.prepareStatement(query);
+		         ResultSet rs = ps.executeQuery()) {
 		while(rs.next())
 		{
 			 String id = help.getGeneratedId("AM_SBU_ATTACHEMENT");
@@ -3357,9 +3167,6 @@ public java.util.ArrayList getApprovalLevelByQueryGprifix()
 		System.out.print("i don no waiting dey happenn o!");
 	}
 
-	finally {
-		closeConnection(c, s, rs);
-	}
 	return _list;
 
 }
@@ -3371,14 +3178,9 @@ public java.util.ArrayList getApprovalLevelByQuery(String filter)
 		//System.out.println(""+query);
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while(rs.next())
 			{
 	//			System.out.println("i dey here o! 333333333");
@@ -3413,9 +3215,7 @@ public java.util.ArrayList getApprovalLevelByQuery(String filter)
 			System.out.print("i don no waiting dey happenn o!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -3428,14 +3228,9 @@ public java.util.ArrayList getApprovalLevelByQuery()
 		//System.out.println(""+query);
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while(rs.next())
 			{
 	//			System.out.println("i dey here o! 333333333");
@@ -3470,9 +3265,7 @@ public java.util.ArrayList getApprovalLevelByQuery()
 			//System.out.print("i don no waiting dey happenn o!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -3485,14 +3278,11 @@ public java.util.ArrayList getBranchesByMail(String filter)
                         "User_id,Status FROM am_mail_statement "+ filter;
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+		
 
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while(rs.next())
 			{
 //				System.out.println("i dey here o! jjoshua");
@@ -3517,9 +3307,7 @@ public java.util.ArrayList getBranchesByMail(String filter)
 //			System.out.print("i don no waiting dey happenn o! i want to know");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -3528,21 +3316,16 @@ public java.util.ArrayList getBranchesByMail(String filter)
 
 public String CheckMailSetup(String mailcode, String description, String address, String date, String trans_type, String userid, String status)
 	{
-					 Connection c = null;
-					 Statement s = null;
-					 ResultSet  r = null;
+					
 					 int rowcount;
 					String message ="No Duplicate Found";
-						try
-{
-    c = getConnection();
-    s = c.createStatement();
-    //System.out.println("established connection...");
-
-    r = s.executeQuery("select * from am_mail_statement_view where [Mail_code]='"+mailcode+"' AND [Mail_description]" +
-            "='"+description+"' AND [Mail_address]='"+address+"' AND [Create_date]='"+date+"' AND" +
-            " [Transaction_type]='"+trans_type+"' AND [User_id]='"+userid+"' AND [Status] ='"+status+"'");
-    if(r.next())
+					String query="select * from am_mail_statement_view where [Mail_code]='"+mailcode+"' AND [Mail_description]" +
+				            "='"+description+"' AND [Mail_address]='"+address+"' AND [Create_date]='"+date+"' AND" +
+				            " [Transaction_type]='"+trans_type+"' AND [User_id]='"+userid+"' AND [Status] ='"+status+"'";
+					  try (Connection con = getConnection();
+						         PreparedStatement ps = con.prepareStatement(query);
+						         ResultSet rs = ps.executeQuery()) {
+    if(rs.next())
     {
             message = "Duplicates Found";
             //System.out.println("FOUND >>>>>>>>>>>>>>>>>>>"+message);
@@ -3550,10 +3333,7 @@ public String CheckMailSetup(String mailcode, String description, String address
 
 
                 }catch(Exception ex){ex.printStackTrace();}
-                finally
-                {
-                        closeConnection(con, s,r);
-                }
+             
                 return message;
 	}
 
@@ -3662,20 +3442,17 @@ public String UpdateMailStatement(String mailcode,String maildescription, String
 
 public boolean iscreatesave2(String codee) {
 	 	boolean done=false;
-	    Connection con = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
+	   
 
 
 	    String FINDER_QUERY = "SELECT Sbu_code,Sbu_name,Sbu_contact,Status from Sbu_SetUp where Sbu_code = ?";
 
-	    try {
-	        con = getConnection();
-	        ps = con.prepareStatement(FINDER_QUERY);
+	    try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
 	        ps.setString(1, codee);
 	       // ps.setString(2,Transaction_Type);
 	       // ps.setString(3,Transaction_Type);
-	        rs = ps.executeQuery();
+	      try(ResultSet rs = ps.executeQuery()){
 	//        System.out.println("Yes o...............!");
 
 	        while (rs.next())
@@ -3684,13 +3461,12 @@ public boolean iscreatesave2(String codee) {
 	           //System.out.println("records already exist "+done);
 
 	        }
+	      }
 
 	    } catch (Exception ex) {
 	        System.out.println("WARNING: cannot fetch [am_raisentry_post_josh]->" +
 	                ex.getMessage());
-	    } finally {
-	        closeConnection(con, ps, rs);
-	    }
+	    } 
 
 	    return done;
 
@@ -3698,33 +3474,29 @@ public boolean iscreatesave2(String codee) {
 
 public boolean isCheckMailSetup(String codee) {
 	 	boolean done=false;
-	    Connection con = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
+	   
 
 
 	    String FINDER_QUERY = "SELECT Mail_code,Mail_description,Mail_address, Creation_date,Transaction_type,User_id,Status from am_mail_statement where Mail_code = ?";
 
-	    try {
-	        con = getConnection();
-	        ps = con.prepareStatement(FINDER_QUERY);
+	    try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
 	        ps.setString(1, codee);
 	       // ps.setString(2,Transaction_Type);
 	       // ps.setString(3,Transaction_Type);
-	        rs = ps.executeQuery();
+	      try( ResultSet rs = ps.executeQuery()){
 	//        System.out.println("Yes o...............!");
 
 	        while (rs.next())
 	        {
 	           done=true;
 	        }
+	      }
 
 	    } catch (Exception ex) {
 	        System.out.println("WARNING: cannot fetch [am_raisentry_post_josh]->" +
 	                ex.getMessage());
-	    } finally {
-	        closeConnection(con, ps, rs);
-	    }
+	    } 
 
 	    return done;
 
@@ -3778,18 +3550,11 @@ public String UpdateApproval_Level(String code,String trans_type, String level_i
 
 
 					String mess ="";
-					Connection con = null;
-					Statement s = null;
-					PreparedStatement ps = null;
-					ResultSet rs = null;
-
-
-						try
-						{
-								con = getConnection();
+					
 
 								    String updatequery = "UPDATE Approval_Level_setup SET Transaction_type=?,Level=? WHERE Code=?";
-									ps = con.prepareStatement(updatequery);
+								    try (Connection con = getConnection();
+								             PreparedStatement ps = con.prepareStatement(updatequery)) {
 									ps.setString(1,trans_type);
 //									System.out.print("wetin dey happen self"+trans_type);
 									ps.setString(2, level_id);
@@ -3815,10 +3580,7 @@ public String UpdateApproval_Level(String code,String trans_type, String level_i
 						{
 								ex.printStackTrace();
 						}
-						finally
-						{
-							closeConnection(con, ps);
-						}
+						
 
 						return mess;
 
@@ -3887,14 +3649,11 @@ public String getTransactCode(String Trasn_Id){
            "SELECT DESCRIPTION  FROM Am_Transaction_Type  " +
            "WHERE TRANS_CODE = '" + Trasn_Id + "' ";
 
-      Connection con = null;
-      ResultSet rs = null;
-      Statement stmt = null;
+     
    String branchcode = "0";
-   try {
-       con= getConnection();
-       stmt = con.createStatement();
-       rs = stmt.executeQuery(query);
+   try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
        while (rs.next()) {
 
            branchcode = rs.getString(1);
@@ -3903,9 +3662,7 @@ public String getTransactCode(String Trasn_Id){
 
    } catch (Exception ex) {
        ex.printStackTrace();
-   } finally {
-    closeConnection(con, stmt,rs);
-   }
+   } 
    return branchcode;
 }
 
@@ -3914,10 +3671,7 @@ public boolean SaveMailSetup(String mailcode, String description, String address
 	{
 
 					boolean done = false;
-					 Connection con = null;
-					 Statement s = null;
-					 ResultSet  r = null;
-					 PreparedStatement ps = null;
+					
 
 					 handler = new AdminHandler();
 
@@ -3929,12 +3683,9 @@ public boolean SaveMailSetup(String mailcode, String description, String address
 
 					//int rowcount;
 					//String message = "";
-						try
-						{
-							 String id = help.getGeneratedId("am_mail_statement");
-									con = getConnection();
-									//System.out.println("established connection...");
-									ps = con.prepareStatement(query);
+					 String id = help.getGeneratedId("am_mail_statement");
+					  try (Connection con = getConnection();
+					             PreparedStatement ps = con.prepareStatement(query)) {
 									ps.setString(1, id);
 									ps.setString(2, description.toUpperCase());
 									ps.setString(3, address);
@@ -3946,10 +3697,7 @@ public boolean SaveMailSetup(String mailcode, String description, String address
 									//System.out.println("output "+done);
 
 						}catch(Exception ex){ex.printStackTrace();}
-						finally
-						{
-							closeConnection(con, ps);
-						}
+						
 						return done;
 	}
 
@@ -3957,10 +3705,7 @@ public boolean SaveMailSetup(String mailcode, String description, String address
 public boolean SaveApproval(String code, double min_amount, double max_amount, String des)
 		{
 						boolean done = false;
-						 Connection con = null;
-						 Statement s = null;
-						 ResultSet  r = null;
-						 PreparedStatement ps = null;
+						
 						 String query = "INSERT INTO Approval_Limit"
 								+ "(Level_code, Min_Amount"
 								+ ",Max_Amount,Description)"
@@ -3968,12 +3713,9 @@ public boolean SaveApproval(String code, double min_amount, double max_amount, S
 
 						//int rowcount;
 						//String message = "";
-							try
-							{
-										String id = help.getGeneratedId("Approval_Limit");
-										con = getConnection();
-										//System.out.println("established connection...");
-										ps = con.prepareStatement(query);
+							String id = help.getGeneratedId("Approval_Limit");
+							  try (Connection con = getConnection();
+							             PreparedStatement ps = con.prepareStatement(query)) {
 										ps.setString(1, id);
 										ps.setDouble(2, min_amount);
 										ps.setDouble(3, max_amount);
@@ -3983,10 +3725,7 @@ public boolean SaveApproval(String code, double min_amount, double max_amount, S
 										//System.out.println("output "+done);
 
 							}catch(Exception ex){ex.printStackTrace();}
-							finally
-							{
-								closeConnection(con, ps);
-							}
+							
 							return done;
 		}
 
@@ -3994,10 +3733,7 @@ public boolean SaveApproval(String code, double min_amount, double max_amount, S
 public boolean SaveApproval_level(String code, String trans_type, String  level, String date,String userid)
 {
 				boolean done = false;
-				 Connection con = null;
-				 Statement s = null;
-				 ResultSet  r = null;
-				 PreparedStatement ps = null;
+
 				 String query = "INSERT INTO Approval_Level_setup"
 						+ "(code, Transaction_type"
 						+ ",Level,Date,User_id)"
@@ -4005,12 +3741,9 @@ public boolean SaveApproval_level(String code, String trans_type, String  level,
 
 				//int rowcount;
 				//String message = "";
-					try
-					{
-						 		String id = help.getGeneratedId("Approval_Level_setup");
-								con = getConnection();
-								//System.out.println("established connection...");
-								ps = con.prepareStatement(query);
+				 String id = help.getGeneratedId("Approval_Level_setup");
+				  try (Connection con = getConnection();
+				             PreparedStatement ps = con.prepareStatement(query)) {
 								ps.setString(1, id);
 								ps.setString(2, trans_type);
 								ps.setString(3, level);
@@ -4021,39 +3754,32 @@ public boolean SaveApproval_level(String code, String trans_type, String  level,
 								//System.out.println("output "+done);
 
 					}catch(Exception ex){ex.printStackTrace();}
-					finally
-					{
-						closeConnection(con, ps);
-					}
+					
 					return done;
 }
 
 public String checkBoxCheck(String sbu_code, String attach_id,String sbu_name)
 	{
 	 	String result ="N";
-	    Connection con = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
+	  
 	    String FINDER_QUERY = " select distinct sbu_code from am_sbu_attachement where sbu_code in (select sbu_code from sbu_setup where sbu_code=?  and attach_id=?) and sbu_name in (select sbu_name from sbu_setup where sbu_name=?) ";
-	    try {
-	        con = getConnection();
-	        ps = con.prepareStatement(FINDER_QUERY);
+	    try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
 	        ps.setString(1, sbu_code);
 	        ps.setString(2, attach_id);
 	        ps.setString(3, sbu_name);
 
-	        rs = ps.executeQuery();
+	      try(ResultSet  rs = ps.executeQuery()){
 	        while (rs.next())
 	        {
 	        	result ="Y";
 	        }
+	      }
 
 	    } catch (Exception ex) {
 	        System.out.println("error generated" +
 	                ex.getMessage());
-	    } finally {
-	        closeConnection(con, ps, rs);
-	    }
+	    } 
 
 	    return result;
 
@@ -4076,18 +3802,10 @@ public String UpdateMailStatement(String mailcode,String maildescription, String
 
 
 					String mess ="";
-					Connection con = null;
-					Statement s = null;
-					PreparedStatement ps = null;
-					ResultSet rs = null;
-
-
-						try
-						{
-								con = getConnection();
-
-								    String updatequery = "UPDATE am_mail_statement SET Mail_description=?, Mail_address = ?, Transaction_type=?, Status = ? WHERE Mail_code=?";
-									ps = con.prepareStatement(updatequery);
+				
+				    String updatequery = "UPDATE am_mail_statement SET Mail_description=?, Mail_address = ?, Transaction_type=?, Status = ? WHERE Mail_code=?";
+				    try (Connection con = getConnection();
+				             PreparedStatement ps = con.prepareStatement(updatequery)) {
 									ps.setString(1,maildescription);
 									System.out.print("wetin dey happen self"+maildescription);
 									ps.setString(2,mailaddress);
@@ -4113,10 +3831,7 @@ public String UpdateMailStatement(String mailcode,String maildescription, String
 						{
 								ex.printStackTrace();
 						}
-						finally
-						{
-							closeConnection(con, ps);
-						}
+						
 
 						return mess;
 
@@ -4137,20 +3852,17 @@ public legend.admin.objects.AssignSbu getClassPrivilegeSbu(String attched_id) {
 		+ " FROM AM_SBU_ATTACHEMENT WHERE ATTACH_ID='" + attched_id
 		+ "' AND SBU_CODE='" + sbucode + "'";
 		*/
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+
 
 	//ApplicationHelper help = new ApplicationHelper();
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	  try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(query)) {
 
 		ps.setString(1, attched_id);
 		//ps.setString(2,mtid);
 		//ps.setString(2, sbuname);
 		//ps.setString(2, roleuuid);
-		rs = ps.executeQuery();
+		try(ResultSet rs = ps.executeQuery()){
 		while (rs.next()) {
 		//	 String id = help.getGeneratedId("AM_SBU_ATTACHEMENT");
 
@@ -4190,14 +3902,13 @@ public legend.admin.objects.AssignSbu getClassPrivilegeSbu(String attched_id) {
 			classprivilege.setCreatedate(date);
 			classprivilege.setCreateuser(createuser);
 			classprivilege.setSbucode(sbbb);
-
+		}
 
 		}
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching Class Privileges ->" + ex);
-	} finally {
-		closeConnection(con, ps);
 	}
+	  
 	return classprivilege;
 }
 
@@ -4214,14 +3925,10 @@ public legend.admin.objects.AssignSbu getClassPrivilegeSbu(String attched_id,Str
 		+ " FROM AM_SBU_ATTACHEMENT WHERE ATTACH_ID='" + attched_id
 		+ "' AND SBU_CODE='" + sbucode + "'";
 		*/
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
-	//ApplicationHelper help = new ApplicationHelper();
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	  try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(query)) {
 
 		ps.setString(1, attched_id);
 		ps.setString(2, sbucode);
@@ -4229,7 +3936,7 @@ public legend.admin.objects.AssignSbu getClassPrivilegeSbu(String attched_id,Str
 		//ps.setString(2,mtid);
 		//ps.setString(2, sbuname);
 		//ps.setString(2, roleuuid);
-		rs = ps.executeQuery();
+		try(ResultSet rs = ps.executeQuery()){
 		while (rs.next()) {
 		//	 String id = help.getGeneratedId("AM_SBU_ATTACHEMENT");
 			String id = rs.getString("MTID");
@@ -4272,14 +3979,13 @@ public legend.admin.objects.AssignSbu getClassPrivilegeSbu(String attched_id,Str
 			classprivilege.setSbucode(sbbbcode);
 			classprivilege.setCreateuser(createuser);
 
-
+		}
 
 		}
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching Class Privileges ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
+	  
 	return classprivilege;
 }
 //victorial
@@ -4287,20 +3993,20 @@ public legend.admin.objects.AssignSbu getClassPrivilegeSbu(String attched_id,Str
 public boolean createBranch(Branch branch)
       {
           boolean done;
-          Connection con = null;
-          PreparedStatement ps = null;
+         
           done = false;
           String query = "INSERT INTO am_ad_branch(BRANCH_ID,BRANCH_CODE,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX,BRANCH" +
   "_ADDRESS ,STATE,PHONE_NO,FAX_NO,REGION,PROVINCE ,BRANCH_STATUS,USER_ID,CREATE_DA" +
   "TE,GL_SUFFIX,EMAIL,Uncapitalized_account,REGION_CODE,ZONE_CODE)  VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
   ;
+       
 
-          try
-          {
-             apph = new ApplicationHelper();
-             String stringid = apph.getGeneratedId("am_ad_branch");
-              con = getConnection();
-              ps = con.prepareStatement(query);
+          try (Connection con = getConnection();
+                  PreparedStatement ps = con.prepareStatement(query)) {
+            
+        	   apph = new ApplicationHelper();
+               String stringid = apph.getGeneratedId("am_ad_branch");
+    
               ps.setString(1, stringid);
               ps.setString(2, branch.getBranchCode());
               ps.setString(3, branch.getBranchName());
@@ -4327,10 +4033,7 @@ public boolean createBranch(Branch branch)
               System.out.println(getClass().getName() + " ERROR:Error Creating Branch ->" + e.getMessage());
               e.printStackTrace();
           }
-          finally
-          {
-              closeConnection(con, ps);
-          }
+        
           return done;
     }
 
@@ -4351,15 +4054,12 @@ public boolean createBranch(Branch branch)
     "ATE,EMAIL,ZONE_CODE FROM am_ad_branch WHERE BRANCH_ID=? AND BRANCH_STATUS = 'ACTIVE'" ;
  //           query = query + "WHERE BRANCH_ID=? AND BRANCH_STATUS = 'ACTIVE'";
         //    System.out.println("filter in getABranch: "+query);
-            Connection c = null;
-            ResultSet rs = null;
-            PreparedStatement s = null;
-            try
-            {
-                c = getConnection();
-                s = c.prepareStatement(query);
+         
+            try (Connection con = getConnection();
+                    PreparedStatement s = con.prepareStatement(query)) {
+              
                 s.setString(1, branchid);
-                rs = s.executeQuery();
+               try(ResultSet rs = s.executeQuery()){
                 
                 while (rs.next()) 
                 {
@@ -4383,16 +4083,13 @@ public boolean createBranch(Branch branch)
                     //int location = rs.getInt("LOCATION");
                     branch = new Branch(branchId, branchCode, branchName, branchAcronym, glPrefix, glSuffix, branchAddress, state, phoneNo, faxNo, region,zoneCode, province, branchStatus, username, createDate, emailAddress);
                 }
-
+               }
             }
             catch(Exception e)
             {
                 e.printStackTrace();
             }
-            finally
-            {
-                closeConnection(c, s, rs);
-            }
+            
             return branch;
     }
 
@@ -4413,15 +4110,11 @@ public boolean createBranch(Branch branch)
     "ATE,EMAIL,ZONE_CODE FROM am_ad_branch WHERE BRANCH_CODE=? AND BRANCH_STATUS = 'ACTIVE' " ;
  //           query = query + "WHERE BRANCH_CODE=? AND BRANCH_STATUS = 'ACTIVE'";
 //            System.out.println("filter in getABranch: "+query);
-            Connection c = null;
-            ResultSet rs = null;
-            PreparedStatement s = null;
-            try
-            {
-                c = getConnection();
-                s = c.prepareStatement(query);
+           
+            try (Connection con = getConnection();
+                    PreparedStatement s = con.prepareStatement(query)) {  
                 s.setString(1, branchcode);
-                rs = s.executeQuery();
+              try(ResultSet  rs = s.executeQuery()){
                 
                 while (rs.next()) 
                 {
@@ -4445,16 +4138,13 @@ public boolean createBranch(Branch branch)
                     //int location = rs.getInt("LOCATION");
                     branch = new Branch(branchId, branchCode, branchName, branchAcronym, glPrefix, glSuffix, branchAddress, state, phoneNo, faxNo, region,zoneCode, province, branchStatus, username, createDate, emailAddress);
                 }
-
+              }
             }
             catch(Exception e)
             {
                 e.printStackTrace();
             }
-            finally
-            {
-                closeConnection(c, s, rs);
-            }
+           
             return branch;
     }
 
@@ -4462,17 +4152,15 @@ public boolean createBranch(Branch branch)
 public boolean updateBranch(Branch branch)
         {
             boolean done;
-            Connection con = null;
-            PreparedStatement ps = null;
+           
             done = false;
             String query = "UPDATE am_ad_branch SET BRANCH_CODE =?,BRANCH_NAME = ?,BRANCH_ACRONYM = ? ,GL_PR" +
     "EFIX = ?,BRANCH_ADDRESS = ?,STATE = ? ,PHONE_NO = ?,FAX_NO = ?,REGION_CODE = ?,PROVIN" +
     "CE = ? ,BRANCH_STATUS = ?,GL_SUFFIX = ?, EMAIL = ?,Uncapitalized_account=?,ZONE_CODE = ? WHERE BRANCH_ID =?"
     ;
-            try
-            {
-                con = getConnection();
-                ps = con.prepareStatement(query);
+            try (Connection con = getConnection();
+                    PreparedStatement ps = con.prepareStatement(query)) {
+              
                 ps.setString(1, branch.getBranchCode());
                 ps.setString(2, branch.getBranchName());
                 ps.setString(3, branch.getBranchAcronym());
@@ -4496,10 +4184,7 @@ public boolean updateBranch(Branch branch)
                 System.out.println("WARNING:Error executing Query ->" + e.getMessage());
                 e.printStackTrace();
             }
-            finally
-            {
-                closeConnection(con, ps);
-            }
+           
             return done;
 
     }
@@ -4510,14 +4195,12 @@ public boolean updateBranch(Branch branch)
 		String query = "INSERT INTO sbu_branch_dept(branchCode"
 				+ ",deptCode,branchId" + ",deptId,gl_prefix"
 				+ ",gl_suffix)" + " VALUES(?,?,?,?,?,?)";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		legend.admin.objects.BranchDept bd = null;
 		int[] d = null;
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+                  PreparedStatement ps = con.prepareStatement(query)) {
+            
 
 			for (int i = 0; i < list.size(); i++) {
 				bd = (legend.admin.objects.BranchDept) list.get(i);
@@ -4530,12 +4213,19 @@ public boolean updateBranch(Branch branch)
 				ps.addBatch();
 			}
 			d = ps.executeBatch();
+
+		        // Validate all updates succeeded
+		        for (int result : d) {
+		            if (result == Statement.EXECUTE_FAILED) {
+		                return false;
+		            }
+		        }
+
+		        return true;
 		} catch (Exception ex) {
 			System.out.println("AdminHandler: insertDeptForBranch(): WARN: Error fetching all asset ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
-		return (d.length > 0);
+			return false;
+		} 
 	}
 
     public boolean removeAvaliableSbu(java.util.ArrayList list) {
@@ -4544,42 +4234,39 @@ public boolean updateBranch(Branch branch)
 	String query2 = "DELETE FROM Sbu_SetUp"
 			+ " WHERE Sbu_Code=?" + " AND Sbu_name=? ";
 
-	Connection con = null;
-	PreparedStatement ps = null;
-	PreparedStatement ps2 = null;
-	ResultSet rs = null;
+	
 	legend.admin.objects.AssignSbu bd = null;
 	int[] d = null;
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
-		ps2 = con.prepareStatement(query2);
+    try (Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(query);
+            PreparedStatement ps2 = con.prepareStatement(query2)) {
 		for (int i = 0; i < list.size(); i++) {
 			bd = (legend.admin.objects.AssignSbu) list.get(i);
 
 			ps.setString(1, bd.getSbucode());
 			ps.setString(2, bd.getSbuname());
 			ps.setString(3, bd.getAttachid());
-
 			ps.addBatch();
+			
 			ps2.setString(1, bd.getSbucode());
 			ps2.setString(2, bd.getSbuname());
 			ps2.addBatch();
 
 		}
 
-		d = ps.executeBatch();
-		ps2.addBatch();
+		 int[] result1 = ps.executeBatch();
+         int[] result2 = ps2.executeBatch();
+
+         return result1.length > 0 || result2.length > 0;
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching all asset - from am_sbu_attachement>" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+		return false;
+	} 
 
-	return (d.length > 0);
+	
 }
 
-/*
+   /*
     public int getBranchIDforSBU(String branchCode){
 int  branch=0;
 
@@ -4616,15 +4303,13 @@ int  branch=0;
 
     public String createResignation(Resignation resign) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+	
 		String result = null;
 		String query = "INSERT INTO am_ad_Resignation(Staff_Name,Department"
 				+ "  ,Date_of_Resumption,Section_Unit,Exit_Type,Exit_Reason,User_id,Create_date)"
 				+ "   VALUES (?,?,?,?,?,?,?,?)";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 			ps.setString(1, resign.getStaffname());
 			ps.setString(2, resign.getDepartment());
 			ps.setString(3, resign.getDate_of_resumption());
@@ -4644,9 +4329,7 @@ int  branch=0;
 		} catch (Exception e) {
 			System.out.println("WARNING:Error creating State ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return result;
 
 	}
@@ -4658,14 +4341,10 @@ int  branch=0;
 		//System.out.println(""+query);
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		
+		  try (Connection con = getConnection();
+		       PreparedStatement ps = con.prepareStatement(query);
+			ResultSet rs = ps.executeQuery()){
 			while(rs.next())
 			{
 				int staffid = rs.getInt("Staff_ID");
@@ -4694,9 +4373,7 @@ int  branch=0;
 			System.out.print("Error viewing Resigination!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -4708,14 +4385,9 @@ int  branch=0;
 		//System.out.println(""+query);
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			       PreparedStatement ps = con.prepareStatement(query);
+				ResultSet rs = ps.executeQuery()){
 			while(rs.next())
 			{
 				int staffid = rs.getInt("Staff_ID");
@@ -4744,16 +4416,13 @@ int  branch=0;
 			System.out.print("Error viewing Resigination!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
     public String updateResignation(Resignation resign) {
     	//System.out.println("Resignation  enter 1");
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		String result = null;
 
 		//String query = "UPDATE am_ad_Resignation SET Staff_Name=?,Department=?,Date_of_Resumption=?,Section_Unit=?,Exit_Type=?,Exit_Reason=?,User_id=? WHERE Staff_ID =?";
@@ -4762,9 +4431,8 @@ int  branch=0;
 			+ ",Department = ?,Date_of_Resumption=?,Section_Unit = ?"
 			+ ",Exit_Type = ?,Exit_Reason=?,User_id=?" + " WHERE Staff_ID=?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 			//System.out.println("Resignation  enter 2");
 			ps.setString(1, resign.getStaffname());
 			//System.out.println("Resignation  enter 3"+resign.getStaffname());
@@ -4798,23 +4466,20 @@ int  branch=0;
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error Updating State ->" + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return result;
 
 	}
     public String createLeave(Leave leave) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		String result = null;
 		String query = "INSERT INTO am_ad_leave(Staff_Name,Department"
 				+ "  ,Section_Unit,Last_Leave_Date,Effective_Date,Leave_Days,User_id,Create_date)"
 				+ "   VALUES (?,?,?,?,?,?,?,?)";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 			ps.setString(1, leave.getStaffname());
 			ps.setString(2, leave.getDepartment());
 			ps.setString(3, leave.getSection_unit());
@@ -4834,9 +4499,8 @@ int  branch=0;
 		} catch (Exception e) {
 			System.out.println("WARNING:Error creating State ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
 		}
+		  
 		return result;
 
 	}
@@ -4848,14 +4512,11 @@ int  branch=0;
 		//System.out.println(""+query);
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+	
 
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			       PreparedStatement ps = con.prepareStatement(query);
+				ResultSet rs = ps.executeQuery()){
 			while(rs.next())
 			{
 				int staffid = rs.getInt("Staff_ID");
@@ -4887,9 +4548,7 @@ int  branch=0;
 			System.out.print("Error viewing Resigination!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -4901,14 +4560,9 @@ int  branch=0;
 		//System.out.println(""+query);
 
 
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			       PreparedStatement ps = con.prepareStatement(query);
+				ResultSet rs = ps.executeQuery()){
 			while(rs.next())
 			{
 				int staffid = rs.getInt("Staff_ID");
@@ -4940,16 +4594,13 @@ int  branch=0;
 			System.out.print("Error viewing Resigination!");
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
     public String updateLeave(Leave resign) {
     	//System.out.println("Resignation  enter 1");
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		String result = null;
 
 		//String query = "UPDATE am_ad_Resignation SET Staff_Name=?,Department=?,Date_of_Resumption=?,Section_Unit=?,Exit_Type=?,Exit_Reason=?,User_id=? WHERE Staff_ID =?";
@@ -4958,9 +4609,8 @@ int  branch=0;
 			+ ",Department = ?,Section_Unit=?,Last_Leave_Date = ?"
 			+ ",Effective_Date = ?,Leave_Days=?,User_id=?" + " WHERE Staff_ID=?";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 			//System.out.println("Resignation  enter 2");
 			ps.setString(1, resign.getStaffname());
 			//System.out.println("Resignation  enter 3"+resign.getStaffname());
@@ -4996,9 +4646,7 @@ int  branch=0;
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error Updating State ->" + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return result;
 
 	}
@@ -5029,15 +4677,10 @@ int  branch=0;
 		"SET role_view = ?,role_addn = ?,role_edit = ?"
 	+ " WHERE clss_uuid=? AND Role_uuid=? ";
 
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		int[] d = null;
-		try {
-
-			con = getConnection();
-			ps = con.prepareStatement(query);
-
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 				ps.setString(1, cp.getRole_view());
 				ps.setString(2, cp.getRole_addn());
 				ps.setString(3, cp.getRole_edit());
@@ -5059,9 +4702,7 @@ int  branch=0;
 
 		}catch (Exception ex) {
 			System.out.println("WARN: Error doing updateClassPrivilege ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 	}
 	public void compareAuditValues(String  gl_prefix, String gl_suffix, String branch_id, String dept_code, String user_id, String branchCode,int loginId,String eff_date)
 	{
@@ -5071,19 +4712,16 @@ int  branch=0;
 		//String role_edit1 = "";
 		//String query = "SELECT role_view, role_addn, role_edit FROM am_ad_class_privileges WHERE  clss_uuid = ? AND Role_uuid=?";
 		String query = "SELECT gl_prefix,gl_suffix FROM sbu_branch_dept WHERE  branchId=? AND deptCode=?";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		boolean done = false;
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 			//ps.setInt(1, Integer.parseInt(user_id));
 			ps.setInt(1, Integer.parseInt(branch_id));
 			ps.setInt(2, Integer.parseInt(dept_code));
 			//System.out.println("==============**=====branch_id==============="+branch_id);
 			//System.out.println("==============**=====dept_Code==============="+dept_code);
-			rs = ps.executeQuery();
+		try(ResultSet rs = ps.executeQuery()){
 			//System.out.println("===================ResultSET==============="+rs);
 			while (rs.next())
 			{
@@ -5095,6 +4733,7 @@ int  branch=0;
 				//role_edit1 = rs.getString("role_edit");
 				//System.out.println("===================role_edit1==============="+role_edit1);
 			}
+		}
 			//System.out.println("\n\n old values >> "+ gl_prefix1 + "\n\n new values >>" + gl_prefix);
 			//System.out.println("\n\n old values >> "+ gl_suffix1 + "\n\n new values >>" + gl_suffix);
 			//System.out.println("\n\n old values >> "+ role_edit1 + "\n\n new values >>" + role_edit);
@@ -5112,9 +4751,7 @@ int  branch=0;
 		}catch (Exception e) {
 			System.out.println("WARNING:Error executing Query User Full NamecompareAuditValues: ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps, rs);
-		}
+		} 
 		//return UserFullName;
 	}
 	public void compareAuditValuesSbu(String  gl_prefix, String gl_suffix, String attach_id, String sbu_code, String user_id, String branchCode,int loginId,String eff_date)
@@ -5127,20 +4764,17 @@ int  branch=0;
 		//String role_edit1 = "";
 		//String query = "SELECT role_view, role_addn, role_edit FROM am_ad_class_privileges WHERE  clss_uuid = ? AND Role_uuid=?";
 		String query = "SELECT GL_PREFIX,GL_SUFIX FROM AM_SBU_ATTACHEMENT WHERE  ATTACH_ID=? AND SBU_CODE=?";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		boolean done = false;
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 			//System.out.println("==============**==ps connection============="+ps);
 			//ps.setInt(1, Integer.parseInt(user_id));
 			ps.setInt(1, Integer.parseInt(attach_id));
 			ps.setString(2, sbu_code);
 			//System.out.println("==============**=====attach_id==============="+attach_id);
 			//System.out.println("==============**=====sbu_code==============="+sbu_code);
-			rs = ps.executeQuery();
+			try(ResultSet rs = ps.executeQuery()){
 			//System.out.println("===================ResultSET==============="+rs);
 			while (rs.next())
 			{
@@ -5165,27 +4799,22 @@ int  branch=0;
 			//if(!role_edit1.equalsIgnoreCase(role_edit)){atg.logAuditTrailSecurityComp("am_ad_class_privileges",  branchCode,loginId, eff_date, role_id,role_edit1,role_edit,"role_edit");}
 
 			//System.out.println("===================compareAuditValuesSbu==============");
-
+			}
 		}catch (Exception e) {
 			System.out.println("WARNING:Error executing Query User Full NamecompareAuditValues: ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps, rs);
-		}
+		} 
 		//return UserFullName;
 	}
 	public boolean updateDeptForBranch(java.util.ArrayList list,int userid, String branchCode,int loginId,String eff_date) {
 		String query = "UPDATE sbu_branch_dept SET branchCode = ?"
 				+ ",deptCode = ?,gl_prefix = ?,gl_suffix = ?"
 				+ " WHERE branchId=?" + " AND deptId=?";
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		
 		legend.admin.objects.BranchDept bd = null;
 		int[] d = null;
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 
 			for (int i = 0; i < list.size(); i++) {
 				bd = (legend.admin.objects.BranchDept) list.get(i);
@@ -5202,14 +4831,20 @@ int  branch=0;
 				compareAuditValues(bd.getGl_prefix(),bd.getGl_suffix(),bd.getBranchId(),bd.getDeptCode(),String.valueOf(userid),branchCode,loginId,eff_date);
 			}
 			d = ps.executeBatch();
+			 for (int result : d) {
+		            if (result == Statement.EXECUTE_FAILED) {
+		                return false;
+		            }
+		        }
+
+		        return true;
 
 		} catch (Exception ex) {
 			System.out.println("WARN: Error fetching all asset ->" + ex);
-		} finally {
-			closeConnection(con, ps);
-		}
+			return false;
+		} 
 
-		return (d.length > 0);
+		
 	}
 
  public void SaveLoginAuditOld(String userid, String branchcode, String workstname, String ip, String sessionid)
@@ -5303,8 +4938,7 @@ int  branch=0;
 
 public void updateLoginAudit(String userid) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		boolean done2 = false;
 //	  	String sessionTimeOut = htmlUtil.getCodeName("select session_timeout from am_gb_company");
@@ -5313,9 +4947,8 @@ public void updateLoginAudit(String userid) {
 		
 		String mtid = htmlUtil.getCodeName("SELECT MAX(mtid) FROM  gb_user_login where USER_ID = ? ",userid);
 		String query = "UPDATE gb_user_login SET time_out = ? WHERE user_id =? AND MTID = ?";
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query)) {
 			System.out.print("<<<<<getDateTime(): "+df.getDateTime().substring(10)+"   mtid: "+mtid+"   userid: "+userid);
 			ps.setString(1,df.getDateTime().substring(10));
 			ps.setString(2, userid);
@@ -5327,24 +4960,20 @@ public void updateLoginAudit(String userid) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error Updating gb_user_login timeout ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 }
 
  
 public boolean createState(legend.admin.objects.State state) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+	
 		boolean done = false;
 		String query = "INSERT INTO am_gb_states(state_code,state_name"
 				+ "  ,state_status,user_id,create_date,state_id)"
 				+ "   VALUES (?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query)) {
 			ps.setString(1, state.getStateCode());
 			ps.setString(2, state.getStateName());
 			ps.setString(3, state.getStateStatus());
@@ -5356,9 +4985,7 @@ public boolean createState(legend.admin.objects.State state) {
 		} catch (Exception e) {
 			System.out.println("WARNING:Error creating State ->"
 					+ e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return done;
 
 	}
@@ -5368,25 +4995,22 @@ public String getPrivilegesRole(String role_name) {
 
 
 	String query = "Select role_uuid from  am_ad_privileges where role_name=?";
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 	String role_uuid = null;
 
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	  try (Connection con = getConnection();
+		         PreparedStatement ps = con.prepareStatement(query)) {
 		ps.setString(1,role_name);
-		rs = ps.executeQuery();
+		try(ResultSet rs = ps.executeQuery()){
 
 		while (rs.next()) {
 		role_uuid = rs.getString("role_uuid");
 		}
+		}
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching role_uuid  getPrivilegesRole ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
+	  
 	return role_uuid;
 
 }
@@ -5406,15 +5030,11 @@ private Branch getABranch2(String branchid)
 "S,STATE,PHONE_NO,FAX_NO,REGION_CODE,PROVINCE,BRANCH_STATUS,USER_ID,GL_SUFFIX,CREATE_D" +
 "ATE,EMAIL,Uncapitalized_account,ZONE_CODE FROM am_ad_branch " ;
     query = query+" WHERE BRANCH_ID = ?";
-    Connection c = null;
-    ResultSet rs = null;
-    PreparedStatement s = null;
-    try
-    {
-        c = getConnection();
-        s = c.prepareStatement(query);
+   
+    try (Connection con = getConnection();
+	         PreparedStatement s = con.prepareStatement(query)) {
         s.setString(1, branchid);
-        rs = s.executeQuery();
+       try(ResultSet rs = s.executeQuery()){
         while (rs.next()) 
         {
             String branchId = rs.getString("BRANCH_ID");
@@ -5439,16 +5059,14 @@ private Branch getABranch2(String branchid)
             //int location = rs.getInt("LOCATION");
             branch = new Branch(branchId, branchCode, branchName, branchAcronym, glPrefix, glSuffix, branchAddress, state, phoneNo, faxNo, region, province, branchStatus, username, createDate, emailAddress,unclassified,zoneCode);
         }
-
+       }
     }
     catch(Exception e)
     {
         e.printStackTrace();
     }
-    finally
-    {
-        closeConnection(c, s, rs);
-    }
+    
+    
     return branch;
 }
 
@@ -5471,14 +5089,11 @@ private legend.admin.objects.Category getACategory2(String filter) {
 			+ ",acct_type ,currency_Id,enforceBarcode,category_type,maxNo_Dep_Improve" + " FROM am_ad_category ";
 
 	query = query + filter;
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
+	
 
-	try {
-		c = getConnection();
-		s = c.createStatement();
-		rs = s.executeQuery(query);
+	  try (Connection con = getConnection();
+		         PreparedStatement ps = con.prepareStatement(query);
+		         ResultSet rs = ps.executeQuery()) {
 		while (rs.next()) {
 			String categoryId = rs.getString("category_ID");
 			String categoryCode = rs.getString("category_code");
@@ -5524,9 +5139,7 @@ private legend.admin.objects.Category getACategory2(String filter) {
 		e.printStackTrace();
 	}
 
-	finally {
-		closeConnection(c, s, rs);
-	}
+	
 	return category;
 
 }
@@ -5557,14 +5170,11 @@ private legend.admin.objects.Bank getABank(String filter) {
 	String query = "SELECT bankCode,bankName,address,phone,email,user_id,CREATE_DATE FROM am_ad_bank ";
 
 	query = query + filter;
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
+	
 
-	try {
-		c = getConnection();
-		s = c.createStatement();
-		rs = s.executeQuery(query);
+	  try (Connection con = getConnection();
+		         PreparedStatement ps = con.prepareStatement(query);
+		         ResultSet rs = ps.executeQuery()) {
 		while (rs.next()) {
 			String bankCode = rs.getString("bankCode");
 			String bankName = rs.getString("bankName");
@@ -5581,9 +5191,7 @@ private legend.admin.objects.Bank getABank(String filter) {
 		e.printStackTrace();
 	}
 
-	finally {
-		closeConnection(c, s, rs);
-	}
+	
 	return bank;
 
 }
@@ -5593,14 +5201,10 @@ public java.util.List getBanksByQuery(String filter) {
 	String query = "SELECT bankCode,bankName,address,phone,email,user_id,CREATE_DATE FROM am_ad_bank ";
 
 	query = query + filter;
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
-
-	try {
-		c = getConnection();
-		s = c.createStatement();
-		rs = s.executeQuery(query);
+	
+	  try (Connection con = getConnection();
+		         PreparedStatement ps = con.prepareStatement(query);
+		         ResultSet rs = ps.executeQuery()) {
 		while (rs.next()) {
 			String bankCode = rs.getString("bankCode");
 			String bankName = rs.getString("bankName");
@@ -5618,23 +5222,19 @@ public java.util.List getBanksByQuery(String filter) {
 		e.printStackTrace();
 	}
 
-	finally {
-		closeConnection(c, s, rs);
-	}
+	
 	return _list;
 
 }
 public boolean createBank(legend.admin.objects.Bank bank) {
 
-	Connection con = null;
-	PreparedStatement ps = null;
+	
 	boolean done = false;
 	String query = "INSERT INTO am_ad_Bank(bankCode,bankName,address,phone,email,user_id,CREATE_DATE,mtid)"
 			+ " VALUES (?,?,?,?,?,?,?,?)";
 
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	 try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
 		 
 		ps.setString(1,bank.getBankCode());
 		ps.setString(2,bank.getBankName());
@@ -5650,23 +5250,19 @@ public boolean createBank(legend.admin.objects.Bank bank) {
 		System.out.println(this.getClass().getName()
 				+ " ERROR:Error creating am_ad_bank ->" + e.getMessage());
 		e.printStackTrace();
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
 	return done;
 
 }
 
 public boolean updateBank(legend.admin.objects.Bank bank) {
 
-	Connection con = null;
-	PreparedStatement ps = null;
+	
 	boolean done = false;
 	String query = "UPDATE am_ad_bank SET bankName=?,address=?,phone=?,email=?  WHERE bankCode=?";
 
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	 try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
 		ps.setString(1, bank.getBankName());
 		ps.setString(2, bank.getAddress());
 		ps.setString(3, bank.getPhone());
@@ -5679,9 +5275,8 @@ public boolean updateBank(legend.admin.objects.Bank bank) {
 		System.out.println(this.getClass().getName()
 				+ " ERROR:Error Updating Query ->" + e.getMessage());
 		e.printStackTrace();
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
+	 
 	return done;
 
 }
@@ -5693,14 +5288,9 @@ public java.util.ArrayList getStockApprovalByQuery2(String filter)
 	//System.out.println(""+query);
 
 
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
-
-	try {
-		c = getConnection();
-		s = c.createStatement();
-		rs = s.executeQuery(query);
+	 try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
 		while(rs.next())
 		{
 //			System.out.println("i dey here o! 333333333");
@@ -5733,9 +5323,7 @@ public java.util.ArrayList getStockApprovalByQuery2(String filter)
 	//	System.out.print("i don no waiting dey happenn o!");
 	}
 
-	finally {
-		closeConnection(c, s, rs);
-	}
+	
 	return _list;
 
 }
@@ -5749,14 +5337,10 @@ public java.util.List getBranchManagerByQuery(String filter) {
 			+ ",CREATE_DATE  FROM am_branch_Manager ";
 	query = query + filter;
 //	System.out.println("<<<<<<query: "+query);
-	Connection c = null;
-	ResultSet rs = null;
-	Statement s = null;
-
-	try {
-		c = getConnection();
-		s = c.createStatement();
-		rs = s.executeQuery(query);
+	
+	 try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
 		while (rs.next()) {
 			String mtid = rs.getString("MTID");
 			String branchCode = rs.getString("BRANCH_CODE");
@@ -5776,9 +5360,7 @@ public java.util.List getBranchManagerByQuery(String filter) {
 				+ " ERROR:Error Selecting branches ->" + e.getMessage());
 	}
 
-	finally {
-		closeConnection(c, s, rs);
-	}
+	
 	return _list;
 
 }
@@ -5812,16 +5394,9 @@ private BranchManager getABranchManager(String filter)
         String query = "SELECT MTID,BRANCH_CODE,MANAGER_NAME,EMAIL_ADDRESS,STATUS,USER_ID,CREATE_DATE FROM am_branch_Manager " ;
         query = query + filter+" AND STATUS = 'ACTIVE'";
 //        System.out.println("filter in getABranch: "+query);
-        Connection c = null;
-//        ResultSet rs = null;
-//        Statement s = null;
-	    PreparedStatement s = null;
-	    ResultSet rs = null;
-        try
-        {
-    	    c = getConnection();
-    	    s = c.prepareStatement(query);
-    	    rs = s.executeQuery();  	    
+        try (Connection con = getConnection();
+		         PreparedStatement ps = con.prepareStatement(query);
+		         ResultSet rs = ps.executeQuery()) {   
             while (rs.next()) 
             {
                 String mtid = rs.getString("MTID");
@@ -5840,10 +5415,7 @@ private BranchManager getABranchManager(String filter)
         {
             e.printStackTrace();
         }
-        finally
-        {
-            closeConnection(c, s, rs);
-        }
+        
         return branch;
 }
 
@@ -5854,18 +5426,9 @@ private BranchManager getABranchManager2(String filter)
         String query = "SELECT MTID,BRANCH_CODE,MANAGER_NAME,EMAIL_ADDRESS,STATUS,USER_ID,CREATE_DATE FROM am_branch_Manager " ;
         query = query + filter+" AND STATUS = 'ACTIVE'";
 //        System.out.println("filter in getABranch: "+query);
-        Connection c = null;
-//        ResultSet rs = null;
-//        Statement s = null;
-	    PreparedStatement s = null;
-	    ResultSet rs = null;
-        try
-        {
-//            c = getConnection();
-//            s = c.createStatement();
-    	    c = getConnection();
-    	    s = c.prepareStatement(query);
-    	    rs = s.executeQuery();  
+        try (Connection con = getConnection();
+		         PreparedStatement ps = con.prepareStatement(query);
+		         ResultSet rs = ps.executeQuery()) {
             while (rs.next()) 
             {
                 String mtid = rs.getString("MTID");
@@ -5884,10 +5447,7 @@ private BranchManager getABranchManager2(String filter)
         {
             e.printStackTrace();
         }
-        finally
-        {
-            closeConnection(c, s, rs);
-        }
+      
         return branch;
 }
 
@@ -5896,16 +5456,14 @@ private BranchManager getABranchManager2(String filter)
 public boolean createBranchManager(BranchManager branch)
       {
           boolean done;
-          Connection con = null;
-          PreparedStatement ps = null;
+         
           done = false;
           String query = "INSERT INTO am_branch_Manager(MTID,BRANCH_CODE,MANAGER_NAME,EMAIL_ADDRESS,STATUS,USER_ID,CREATE_DATE)  VALUES(?,?,?,?,?,?,?)" ;
-          try
-          {
-             apph = new ApplicationHelper();
-             String stringid = apph.getGeneratedId("am_branch_Manager");
-              con = getConnection();
-              ps = con.prepareStatement(query);
+         
+          try (Connection con = getConnection();
+                  PreparedStatement ps = con.prepareStatement(query)) {
+              apph = new ApplicationHelper();
+              String stringid = apph.getGeneratedId("am_branch_Manager");
               ps.setString(1, stringid);
               ps.setString(2, branch.getBranchCode());
               ps.setString(3, branch.getManagerName());
@@ -5920,24 +5478,18 @@ public boolean createBranchManager(BranchManager branch)
               System.out.println(getClass().getName() + " ERROR:Error Creating Branch Manager ->" + e.getMessage());
               e.printStackTrace();
           }
-          finally
-          {
-              closeConnection(con, ps);
-          }
+        
           return done;
     }
 
 public boolean updateBranchManager(BranchManager branch)
         {
             boolean done;
-            Connection con = null;
-            PreparedStatement ps = null;
+           
             done = false;
             String query = "UPDATE am_branch_Manager SET BRANCH_CODE =?,MANAGER_NAME = ? ,STATUS = ?, EMAIL_ADDRESS = ? WHERE MTID =?";
-            try
-            {
-                con = getConnection();
-                ps = con.prepareStatement(query);
+            try (Connection con = getConnection();
+                    PreparedStatement ps = con.prepareStatement(query)) {
                 ps.setString(1, branch.getBranchCode());
                 ps.setString(2, branch.getManagerName());
                 ps.setString(3, branch.getStatus());
@@ -5950,10 +5502,7 @@ public boolean updateBranchManager(BranchManager branch)
                 System.out.println("WARNING:Error executing Query to Update am_branch_Manager ->" + e.getMessage());
                 e.printStackTrace();
             }
-            finally
-            {
-                closeConnection(con, ps);
-            }
+           
             return done;
 
     }
@@ -5966,14 +5515,9 @@ public java.util.List getRegionZoneByQuery(String filter) {
 				+ ",Zone_Address,Zone_Phone,Zone_Fax,Zone_Status,User_Id,Create_Date" + " FROM am_ad_Zone ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
-
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		 try (Connection con = getConnection();
+		         PreparedStatement ps = con.prepareStatement(query);
+		         ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
 				String zoneId = rs.getString("Zone_Id");
 				String zoneCode = rs.getString("Zone_code");
@@ -5996,9 +5540,7 @@ public java.util.List getRegionZoneByQuery(String filter) {
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return _list;
 
 	}
@@ -6012,14 +5554,11 @@ public legend.admin.objects.RegionZone getZoneInRegion(String regionid,
 			+ " FROM REGION_ZONE WHERE regionId='" + regionid
 			+ "' AND zoneId='" + zoneId + "'";
 
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
-		rs = ps.executeQuery();
+	 try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
 		while (rs.next()) {
 			String regioncode = rs.getString("regionCode");
 			String zonecode = rs.getString("zoneCode");
@@ -6037,9 +5576,7 @@ public legend.admin.objects.RegionZone getZoneInRegion(String regionid,
 		}
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching all Zone Assigned ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
 	return zone;
 
 }
@@ -6049,14 +5586,11 @@ public boolean insertZoneForRegion(java.util.ArrayList list) {
 	String query = "INSERT INTO REGION_ZONE(regionCode"
 			+ ",zoneCode,regionId" + ",zoneId"
 			+ ",mtid)" + " VALUES(?,?,?,?,?)";
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+	
 	legend.admin.objects.RegionZone bd = null;
 	int[] d = null;
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	 try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
         apph = new ApplicationHelper();
         String mtId = apph.getGeneratedId("REGION_ZONE");
         
@@ -6072,9 +5606,7 @@ public boolean insertZoneForRegion(java.util.ArrayList list) {
 		d = ps.executeBatch();
 	} catch (Exception ex) {
 		System.out.println("AdminHandler: insertZoneForRegion(): WARN: Error fetching all region ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
 	return (d.length > 0);
 }
 
@@ -6082,14 +5614,11 @@ public boolean updateZoneForRegion(java.util.ArrayList list) {
 	String query = "UPDATE REGION_ZONE SET regionCode = ?"
 			+ ",zoneCode = ?"
 			+ " WHERE regionId=?" + " AND zoneId=?";
-	Connection con = null;
-	PreparedStatement ps = null;
-	ResultSet rs = null;
+
 	legend.admin.objects.RegionZone bd = null;
 	int[] d = null;
-	try {
-		con = getConnection();
-		ps = con.prepareStatement(query);
+	 try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
 
 		for (int i = 0; i < list.size(); i++) {
 			bd = (legend.admin.objects.RegionZone) list.get(i);
@@ -6101,14 +5630,19 @@ public boolean updateZoneForRegion(java.util.ArrayList list) {
 			ps.addBatch();
 		}
 		d = ps.executeBatch();
+		 for (int result : d) {
+	            if (result == Statement.EXECUTE_FAILED) {
+	                return false;
+	            }
+	        }
+
+	        return true;
 
 	} catch (Exception ex) {
 		System.out.println("WARN: Error fetching all Zones ->" + ex);
-	} finally {
-		closeConnection(con, ps);
-	}
+		return false;
+	} 
 
-	return (d.length > 0);
 }
 
 public java.util.List getSlaByQuery(String filter,String deptCode) {
@@ -6118,14 +5652,9 @@ public java.util.List getSlaByQuery(String filter,String deptCode) {
     		+ "FROM am_gb_sla where Dept_Code = '"+deptCode+"' ";
     query = query + filter;
 //    System.out.println("=====getSlaByQuery in getSlaByQuery: "+query);
-    Connection c = null;
-    ResultSet rs = null;
-    Statement s = null;
-
-    try {
-        c = getConnection();
-        s = c.createStatement();
-        rs = s.executeQuery(query); 
+    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) { 
         while (rs.next()) {
             String sla_ID = rs.getString("sla_ID");
             String sla_name = rs.getString("sla_name");
@@ -6145,9 +5674,8 @@ public java.util.List getSlaByQuery(String filter,String deptCode) {
 
     } catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, s, rs);
-    }
+    } 
+    
     return _list;
 
 }
@@ -6165,14 +5693,9 @@ private legend.admin.objects.Sla getSla(String filter) {
     String query = "SELECT sla_ID,sla_name ,sla_description,Dept_Code,user_id,create_date,STATUS,SLA_Start_Date,SLA_End_Date FROM am_gb_sla ";
     query = query + filter;
 //    System.out.println("======query in getSla:"+query);
-    Connection c = null;
-    ResultSet rs = null;
-    Statement s = null;  
-
-    try {
-        c = getConnection(); 
-        s = c.createStatement();
-        rs = s.executeQuery(query);
+    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query);
+	         ResultSet rs = ps.executeQuery()) {
         while (rs.next()) {
             String sla_ID = rs.getString("sla_ID");
             String sla_name = rs.getString("sla_name");
@@ -6191,9 +5714,7 @@ private legend.admin.objects.Sla getSla(String filter) {
 
     } catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, s, rs);
-    }
+    } 
     return sla;
 
 }
@@ -6208,8 +5729,7 @@ public Sla getSlaById(String slaId)
 
 public boolean createSla(Sla sla)
 {
-    Connection con;
-    PreparedStatement ps;
+   
     boolean done;
     String query;
     con = null;
@@ -6219,12 +5739,10 @@ public boolean createSla(Sla sla)
 "Code,Category_Code,SLA_Start_Date,SLA_End_Date,RemainExecDays)   VALUES (?,?,?,?,?,?,?,?,?,?)"
 ;
 //    System.out.println((new StringBuilder("I am in createSla ")).append(sla.getSla_ID()).toString());
-    try
-    {
+    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
     	String dateDiff = htmlUtil.getCodeName("DATEDIFF(day, (SELECT GETDATE()), '"+sla.getSlaEndDate()+"')");
 //    	System.out.println("=====>>>>dateDiff: "+dateDiff);
-        con = getConnection();
-        ps = con.prepareStatement(query);
         ps.setString(1, sla.getSla_ID());
         ps.setString(2, sla.getSla_name());
         ps.setString(3, sla.getSla_description());
@@ -6242,16 +5760,13 @@ public boolean createSla(Sla sla)
     {
         e.printStackTrace();
         System.out.println((new StringBuilder("WARNING:Error creating Sla ->")).append(e.getMessage()).toString());
-	} finally {
-		closeConnection(con, ps);
-	}
+	} 
 	return done;
 }
 
 public boolean updateSla(Sla sla)
 {
-    Connection con;
-    PreparedStatement ps;
+  
     boolean done;
     String query;
     con = null;
@@ -6260,10 +5775,8 @@ public boolean updateSla(Sla sla)
     query = "UPDATE am_gb_sla SET sla_name = ?, sla_description = ?  ,Dept_code = ?,SLA_Start_Date = ?,SLA_End_Date = ? WHERE s" +
 "la_ID=?"
 ;
-    try
-    {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1, sla.getSla_name());
         ps.setString(2, sla.getSla_description());
         ps.setString(3, sla.getDeptCode());
@@ -6276,9 +5789,7 @@ public boolean updateSla(Sla sla)
     {
         System.out.println((new StringBuilder(String.valueOf(getClass().getName()))).append(" ERROR:Error Updating Sla ->").append(e.getMessage()).toString());
     }
- finally {
-	closeConnection(con, ps);
-}
+ 
 return done;
 }
 
@@ -6322,13 +5833,11 @@ return done;
 
 public boolean createCriteriaRule(String slaId,String crt,String desc,String userId) {
 
-    Connection con = null;
-    PreparedStatement ps = null; 
+    
     boolean done = false;
     String query = "INSERT INTO am_criteria_rules(criteria_ID,rules_NAME,criteria_DESCRIPTION, USER_ID,CREATE_DATE)   VALUES (?,?,?,?,?)";
-    try {
-        con = getConnection();
-        ps = con.prepareStatement(query); 
+    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
 //       String id=new ApplicationHelper().getSelectId("AM_GB_SLA");
        String id=new ApplicationHelper().getGeneratedId2("AM_GB_SLA");
         ps.setString(1, id);   
@@ -6341,32 +5850,24 @@ public boolean createCriteriaRule(String slaId,String crt,String desc,String use
 
     } catch (Exception e) {e.printStackTrace();
         System.out.println("WARNING:Error creating am_criteria_rules ->" + e.getMessage());
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
     return done;
 
 }        
 
-public ArrayList getRulesRecords(String filter)
+public ArrayList getRulesRecordsOld(String filter)
 {
     ArrayList _list;
     String query;
-    Connection c;
-    ResultSet rs;
-    Statement s;
+   
     _list = new ArrayList();
     Rules trlc = null;
     query = " SELECT * FROM am_criteria_rules  ";
     query = (new StringBuilder(String.valueOf(query))).append(filter).toString();
-    c = null;
-    rs = null;
-    s = null;
+   
 //    System.out.println((new StringBuilder("KKKKKqueryKKKKK>>> ")).append(query).toString());
-    try
-    {
-        c = getConnection();
-        s = c.createStatement();
+    try (Connection con = getConnection();
+	         PreparedStatement s = con.prepareStatement(query)) {
       
         for(rs = s.executeQuery(query); rs.next(); _list.add(trlc))
         {
@@ -6381,16 +5882,42 @@ public ArrayList getRulesRecords(String filter)
     {
         e.printStackTrace();
     }
-    finally {
-    	 closeConnection(c, s, rs);
-    }
+   
     return _list;
+}
+
+public ArrayList getRulesRecords(String filter) {
+
+	ArrayList list = new ArrayList();
+    String baseQuery = "SELECT criteria_ID, rules_NAME, criteria_DESCRIPTION, USER_ID FROM am_criteria_rules ";
+    String query = baseQuery + (filter != null ? filter : "");
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+
+            Rules rule = new Rules(
+                    rs.getString("criteria_ID"),
+                    rs.getString("rules_NAME"),
+                    rs.getString("criteria_DESCRIPTION"),
+                    rs.getString("USER_ID")
+            );
+
+            list.add(rule);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
 }
 
 public boolean createResponse(RuleConstraints constrsint, String DeptCode, String CatCode, int sla_ID)
 {
-    Connection con;
-    PreparedStatement ps;
+   
     boolean done;
     String query;
     con = null;
@@ -6400,10 +5927,8 @@ public boolean createResponse(RuleConstraints constrsint, String DeptCode, Strin
 "SE_MINUTE,RESOLVE_DAY,RESOLVE_HOUR,RESOLVE_MINUTE,CONSTRAINTS,DEPT_CODE,CAT_CODE,ALERTFREQ,ALERTSTART,ALERTSTARTDATE" +
 ")   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 ;
-    try
-    {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
         String id = (new ApplicationHelper()).getGeneratedId("SLA_RESPONSE");
         ps.setInt(1, sla_ID);
         ps.setString(2, constrsint.getNAME());
@@ -6427,16 +5952,13 @@ public boolean createResponse(RuleConstraints constrsint, String DeptCode, Strin
         e.printStackTrace();
         System.out.println((new StringBuilder("WARNING:Error creating SLA_ESCALATE ->")).append(e.getMessage()).toString());
     }
-    finally {
-    	closeConnection(con, ps);
-   }
+   
     return done;
 }
 
 public boolean createEscalate(RuleConstraints constrsint)
 {
-    Connection con;
-    PreparedStatement ps;
+   
     boolean done;
     String query;
     con = null;
@@ -6446,10 +5968,8 @@ public boolean createEscalate(RuleConstraints constrsint)
 "NUTE,RESOLVE_DAY,RESOLVE_HOUR,RESOLVE_MINUTE,CONSTRAINTS,NAME2)   VALUES (?,?,?," +
 "?,?,?,?,?,?,?)"
 ;
-    try
-    {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1, constrsint.getCriteria_ID());
         ps.setString(2, constrsint.getNAME());
         ps.setString(3, constrsint.getRESPONSE_DAY());
@@ -6466,9 +5986,7 @@ public boolean createEscalate(RuleConstraints constrsint)
         e.printStackTrace();
         System.out.println((new StringBuilder("WARNING:Error creating SLA_ESCALATE ->")).append(e.getMessage()).toString());
     }
-    finally {
-    	closeConnection(con, ps);
-   }
+   
     return done;
 }
 
@@ -6476,21 +5994,14 @@ public RuleConstraints getResponseByQuery(String filter)
 {
     RuleConstraints values;
     String query;
-    Connection c;
-    ResultSet rs;
-    Statement s;
+   
     values = null;
     query = "SELECT *  FROM SLA_RESPONSE";
     query = (new StringBuilder(String.valueOf(query))).append(filter).toString();
 //    System.out.println("=======query in getResponseByQuery: "+query);
-    c = null;
-    rs = null;
-    s = null;
-    try
-    {
-        c = getConnection();
-        s = c.createStatement();
-        for(rs = s.executeQuery(query); rs.next();)
+    try (Connection con = getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
+        while(rs.next())
         {
             String Id = String.valueOf(rs.getString("criteria_ID"));
             String itemName = rs.getString("ITEM_NAME");
@@ -6511,13 +6022,11 @@ public RuleConstraints getResponseByQuery(String filter)
     {
         System.out.println((new StringBuilder(String.valueOf(getClass().getName()))).append(" ERROR:Error Selecting SLA_RESPONSE ->").append(e.getMessage()).toString());
     }
-    finally {
-    	closeConnection(c, s, rs);
-   }
+    
     return values;
 }
 
-public RuleConstraints getEscalateByQuery(String filter)
+public RuleConstraints getEscalateByQueryOld(String filter)
 {
     RuleConstraints values;
     String query;
@@ -6562,10 +6071,51 @@ public RuleConstraints getEscalateByQuery(String filter)
     return values;
 }
 
+public RuleConstraints getEscalateByQuery(String criteriaId) {
+
+    String query = "SELECT criteria_ID, NAME, RESPONSE_DAY, RESPONSE_HOUR, RESPONSE_MINUTE, " +
+                   "RESOLVE_DAY, RESOLVE_HOUR, RESOLVE_MINUTE, CONSTRAINTS, NAME2, CONSTRAINTS2 " +
+                   "FROM SLA_ESCALATE WHERE criteria_ID = ?";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, criteriaId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+
+                RuleConstraints values = new RuleConstraints(
+                        rs.getString("criteria_ID"),
+                        rs.getString("NAME"),
+                        rs.getString("RESPONSE_DAY"),
+                        rs.getString("RESPONSE_HOUR"),
+                        rs.getString("RESPONSE_MINUTE"),
+                        rs.getString("RESOLVE_DAY"),
+                        rs.getString("RESOLVE_HOUR"),
+                        rs.getString("RESOLVE_MINUTE"),
+                        rs.getString("CONSTRAINTS")
+                );
+
+                values.setItemName2(rs.getString("NAME2"));
+                values.setCONSTRAINT2(rs.getString("CONSTRAINTS2"));
+
+                return values;
+            }
+        }
+
+    } catch (Exception e) {
+        System.out.println(getClass().getName() +
+                " ERROR: Selecting SLA_ESCALATE -> " + e.getMessage());
+    }
+
+    return null;
+}
+
 public boolean updateResponse(RuleConstraints values, String DeptCode, String CatCode)
 {
-    Connection con;
-    PreparedStatement ps;
+    
     boolean done;
     String query;
     con = null;
@@ -6575,11 +6125,8 @@ public boolean updateResponse(RuleConstraints values, String DeptCode, String Ca
 "UTE=?,RESOLVE_DAY=?,RESOLVE_HOUR=?,RESOLVE_MINUTE=?,CONSTRAINTS=?,ALERTFREQ=?,ALERTSTART=?,ALERTSTARTDATE=?  WHERE Dept_Co" +
 "de=? AND Cat_Code=? AND criteria_ID=? "
 ;
-    try
-    {
-//    	System.out.println("=======values.getAlertFreq()===>: "+values.getAlertFreq()+" ======>>>>>values.getAlertStart(): "+values.getAlertStart()+"  =====values.getCriteria_ID(): "+values.getCriteria_ID());
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1, values.getNAME());
         ps.setString(2, values.getRESPONSE_DAY());
         ps.setString(3, values.getRESPONSE_HOUR());
@@ -6602,16 +6149,13 @@ public boolean updateResponse(RuleConstraints values, String DeptCode, String Ca
         e.printStackTrace();
         System.out.println((new StringBuilder("WARNING:Error UPDATING SLA_RESPONSE ->")).append(e.getMessage()).toString());
     }
-    finally {
-    	closeConnection(con, ps);
-   }
+   
     return done;
 }
 
 public boolean updateEscalate(RuleConstraints values)
 {
-    Connection con;
-    PreparedStatement ps;
+  
     boolean done;
     String query;
     con = null;
@@ -6621,10 +6165,8 @@ public boolean updateEscalate(RuleConstraints values)
 ",RESOLVE_DAY=?,RESOLVE_HOUR=?,RESOLVE_MINUTE=?,CONSTRAINTS=?,ALERTSTARTDATE=? WHERE criteria_ID=?" +
 " "
 ;
-    try
-    {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1, values.getNAME());
         ps.setString(2, values.getRESPONSE_DAY());
         ps.setString(3, values.getRESPONSE_HOUR());
@@ -6643,16 +6185,13 @@ public boolean updateEscalate(RuleConstraints values)
         e.printStackTrace();
         System.out.println((new StringBuilder("WARNING:Error UPDATING SLA_ESCALATE ->")).append(e.getMessage()).toString());
     }
-    finally {
-    	closeConnection(con, ps);
-   }
+    
     return done;
 }
 
 public String createSlaNew(Sla sla)
 {
-    Connection con;
-    PreparedStatement ps;
+  
     String id;
     String query;
     con = null;
@@ -6662,10 +6201,8 @@ public String createSlaNew(Sla sla)
     query = "INSERT INTO am_gb_sla(sla_ID,sla_name ,sla_description,user_id,create_date,Dept_" +
 "Code)   VALUES (?,?,?,?,?,?)"
 ;
-    try
-    {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1, sla.getSla_ID());
         ps.setString(2, sla.getSla_name());
         ps.setString(3, sla.getSla_description());
@@ -6683,16 +6220,13 @@ public String createSlaNew(Sla sla)
         e.printStackTrace();
         System.out.println((new StringBuilder("WARNING:Error creating Sla ->")).append(e.getMessage()).toString());
     }
-    finally {
-    	closeConnection(con, ps);
-   }
+  
     return id;
 }
 
 public boolean updateEscalate(RuleConstraints values, String name2, String DeptCode, String CatCode)
 {
-    Connection con;
-    PreparedStatement ps;
+   
     boolean done;
     String query;
     con = null;
@@ -6702,10 +6236,8 @@ public boolean updateEscalate(RuleConstraints values, String name2, String DeptC
 ",RESOLVE_DAY=?,RESOLVE_HOUR=?,RESOLVE_MINUTE=?,CONSTRAINTS=?,NAME2=?,CONSTRAINTS" +
 "2=? WHERE Dept_Code=? AND Cat_Code=? AND criteria_ID=? "
 ;
-    try
-    {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1, name2);
         ps.setString(2, values.getRESPONSE_DAY());
         ps.setString(3, values.getRESPONSE_HOUR());
@@ -6726,16 +6258,13 @@ public boolean updateEscalate(RuleConstraints values, String name2, String DeptC
         e.printStackTrace();
         System.out.println((new StringBuilder("WARNING:Error UPDATING SLA_ESCALATE ->")).append(e.getMessage()).toString());
     }
-    finally {
-    	closeConnection(con, ps);
-   }
+   
     return done;
 }
 
 public boolean createEscalate(RuleConstraints constrsint, String name2, String DeptCode, String CatCode, int sla_ID)
 {
-    Connection con;
-    PreparedStatement ps;
+   
     boolean done;
     String query;
     con = null;
@@ -6745,10 +6274,8 @@ public boolean createEscalate(RuleConstraints constrsint, String name2, String D
 "NUTE,RESOLVE_DAY,RESOLVE_HOUR,RESOLVE_MINUTE,CONSTRAINTS,NAME2,CONSTRAINTS2,DEPT" +
 "_CODE,CAT_CODE)   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
 ;
-    try
-    {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    try (Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(query)) {
         String id = (new ApplicationHelper()).getGeneratedId("SLA_ESCALATE");
         ps.setInt(1, sla_ID);
         ps.setString(2, name2);
@@ -6771,14 +6298,12 @@ public boolean createEscalate(RuleConstraints constrsint, String name2, String D
         e.printStackTrace();
         System.out.println((new StringBuilder("WARNING:Error creating SLA_ESCALATE ->")).append(e.getMessage()).toString());
     }
-    finally {
-    	closeConnection(con, ps);
-   }
+    
     return done;
 }
 
 
-public ArrayList getRecords(String column, String table)
+public ArrayList getRecordsOld(String column, String table)
 {
     ArrayList _list;
     String query;
@@ -6813,8 +6338,51 @@ public ArrayList getRecords(String column, String table)
     return _list;
 }
 
+public ArrayList getRecords(String column, String table) {
 
-public ArrayList getRecordsCategory(String column, String table, String DeptCode)
+	ArrayList list = new ArrayList();
+
+    // ✅ Whitelist allowed tables
+    Set<String> allowedTables = Set.of(
+            "am_users",
+            "am_criteria_rules",
+            "SLA_ESCALATE"
+    );
+
+    // ✅ Whitelist allowed columns
+    Set<String> allowedColumns = Set.of(
+            "USER_ID",
+            "NAME",
+            "criteria_ID",
+            "rules_NAME"
+    );
+
+    if (!allowedTables.contains(table) || !allowedColumns.contains(column)) {
+        throw new IllegalArgumentException("Invalid table or column name.");
+    }
+
+    String query = "SELECT " + column + " FROM " + table;
+
+    try (Connection con = getConnection();
+         Statement stmt = con.createStatement();
+         ResultSet rs = stmt.executeQuery(query)) {
+
+        while (rs.next()) {
+
+            TableColumn tc = new TableColumn();
+            tc.setColumnName(rs.getString(1));
+            list.add(tc);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+
+
+public ArrayList getRecordsCategoryOld(String column, String table, String DeptCode)
 {
     ArrayList _list;
     String query;
@@ -6856,8 +6424,54 @@ public ArrayList getRecordsCategory(String column, String table, String DeptCode
     return _list;
 }
 
+public ArrayList getRecordsCategory(String column, String table,String DeptCode) {
 
-public ArrayList getUserRecords()
+	ArrayList list = new ArrayList();
+
+    // ✅ Whitelisted tables
+    Set<String> allowedTables = Set.of(
+            "am_sub_category",
+            "am_region"
+    );
+
+    // ✅ Whitelisted column mappings
+    Map<String, String> columnMapping = Map.of(
+            "sub_category_name", "sub_category_code",
+            "Region_Name", "Region_Code"
+    );
+
+    if (!allowedTables.contains(table) || !columnMapping.containsKey(column)) {
+        throw new IllegalArgumentException("Invalid table or column.");
+    }
+
+    String codeColumn = columnMapping.get(column);
+
+    String query = "SELECT " + column + ", " + codeColumn +
+                   " FROM " + table +
+                   " WHERE " + column + " IS NOT NULL";
+
+    try (Connection con = getConnection();
+         Statement stmt = con.createStatement();
+         ResultSet rs = stmt.executeQuery(query)) {
+
+        while (rs.next()) {
+
+            TableColumn tc = new TableColumn();
+            tc.setColumnName(rs.getString(1));
+            tc.setColumId(rs.getString(2));
+
+            list.add(tc);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+
+
+public ArrayList getUserRecordsOld()
 {
     ArrayList _list;
     String query;
@@ -6893,6 +6507,39 @@ public ArrayList getUserRecords()
     return _list;
 }
 
+
+public ArrayList getUserRecords() {
+
+	ArrayList list = new ArrayList();
+
+    String query = "  SELECT user_name, full_name\r\n"
+    		+ "        FROM am_gb_user\r\n"
+    		+ "        WHERE User_Status = ?\r\n"
+    		+ "        ORDER BY full_name";
+
+    try (Connection con = getConnection();
+         PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, "ACTIVE");
+
+        try (ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                User user = new User();
+                user.setUserName(rs.getString("user_name"));
+                user.setUserFullName(rs.getString("full_name"));
+
+                list.add(user);
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
 
 public boolean createComplaintCategory(legend.admin.objects.ComplaintCategory comCat) {
 
@@ -7066,7 +6713,7 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
         return done;
     }
 
-    public boolean deleteRule(String slaId, String rule_name) {
+    public boolean deleteRule(String slaId, String rule_name) throws SQLException {
         boolean done = true;
         //Connection conn = null;
         con = getConnection();
@@ -7468,8 +7115,7 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 
     public String createCategoryTmp(legend.admin.objects.Category category) {
 
-		Connection con = null;
-		PreparedStatement ps = null;
+		
 		boolean done = false;
 		String result = "";
 		String query = "INSERT INTO am_ad_categoryTmp"
@@ -7485,9 +7131,8 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 				+ "upexassets,recaldep,residualchange,maxNo_Dep_Improve)"
 		+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-		try {
-			con = getConnection();
-			ps = con.prepareStatement(query);
+		  try (Connection con = getConnection();
+		             PreparedStatement ps = con.prepareStatement(query)) {
 			String tmpId = (new ApplicationHelper()).getGeneratedId("am_ad_categoryTmp");
 			//ps.setLong(1, System.currentTimeMillis());
 			ps.setString(1, category.getCategoryCode());
@@ -7531,9 +7176,7 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 		} catch (Exception e) {
 			System.out.println(this.getClass().getName()
 					+ " ERROR:Error creating category Temp -> " + e.getMessage());
-		} finally {
-			closeConnection(con, ps);
-		}
+		} 
 		return result;
 
 	}  
@@ -7551,14 +7194,11 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 				+ ",acct_type ,currency_Id,enforceBarcode,category_type,maxNo_Dep_Improve" + " FROM am_ad_categoryTmp ";
 
 		query = query + filter;
-		Connection c = null;
-		ResultSet rs = null;
-		Statement s = null;
+		
 		//System.out.println("===> query in getACategory2Tmp: "+query);
-		try {
-			c = getConnection();
-			s = c.createStatement();
-			rs = s.executeQuery(query);
+		  try (Connection con = getConnection();
+			         PreparedStatement ps = con.prepareStatement(query);
+			         ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
 				String categoryId = rs.getString("category_ID");
 				String categoryCode = rs.getString("category_code");
@@ -7611,9 +7251,7 @@ public legend.admin.objects.ComplaintCategory getComplaintCategoryByID(String co
 			e.printStackTrace();
 		}
 
-		finally {
-			closeConnection(c, s, rs);
-		}
+		
 		return category;
 
 	}

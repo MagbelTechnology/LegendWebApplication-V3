@@ -3,15 +3,16 @@ package legend;
 //import com.magbel.util.CurrentDateTime;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Map;
 
 import com.magbel.legend.bus.ApprovalRecords;
 
 import magma.net.dao.MagmaDBConnection;
 
 
-public class AutoIDSetup extends legend.ConnectionClass {
+public class AutoIDSetup_27_02_2026 extends legend.ConnectionClass {
 	public ApprovalRecords approve;
-    public AutoIDSetup() throws Exception {
+    public AutoIDSetup_27_02_2026() throws Exception {
     	approve = new ApprovalRecords(); 
     }
 
@@ -433,419 +434,511 @@ public class AutoIDSetup extends legend.ConnectionClass {
         return (result.equals("Y"));
     }
 
-    public String getIdentityOld(String bra, String dep, String sec, String cat) throws
-            Throwable {
-//    	System.out.println("<<<<bra: "+bra+"   dep: "+dep+"  sec: "+sec+"   cat: "+cat);
-        StringBuffer sb = new StringBuffer(100);
+//    public String getIdentityOld(String bra, String dep, String sec, String cat) throws
+//            Throwable {
+////    	System.out.println("<<<<bra: "+bra+"   dep: "+dep+"  sec: "+sec+"   cat: "+cat);
+//        StringBuffer sb = new StringBuffer(100);
+//
+//        String v1 = "", v2 = "", v3 = "", v4 = "", v5 = "", v6 = "", v7 = "",
+//                dl = "";
+//        int curr = 0;
+//        String identity = "";
+//
+//        ResultSet rsa = getStatement().executeQuery(
+//                "select * from am_ad_auto_identity");
+//        ResultSet rsb = getStatement().executeQuery(
+//                "select * from am_ad_cart_identity");
+//
+//        ResultSet rs1 = getStatement().executeQuery(
+//                "select acronym from am_gb_company");
+//        ResultSet rs2 = getStatement().executeQuery(
+//                "select group_acronym from am_ad_group");
+//        ResultSet rs3 = getStatement().executeQuery(
+//                "select region_acronym from am_ad_region where region_code = (select region_code from am_ad_branch where branch_id = '" +
+//                bra + "')");
+//        ResultSet rs4 = getStatement().executeQuery(
+//                "select branch_acronym from am_ad_branch where branch_id = '" +
+//                bra + "'");
+//        ResultSet rs5 = getStatement().executeQuery(
+//                "select dept_acronym from am_ad_department where dept_id = '" +
+//                dep + "'");
+//        ResultSet rs6 = getStatement().executeQuery(
+//                "select section_acronym from am_ad_section where section_id = '" +
+//                sec + "'");
+//        ResultSet rs7 = getStatement().executeQuery(
+//                "select category_acronym from am_ad_category where category_id = '" +
+//                cat + "'");
+//        ResultSet rs8 = getStatement().executeQuery(
+//                "select cart_cr from am_ad_cart_identity where cart_id = '" +
+//                cat + "'");
+//        ResultSet rs9 = getStatement().executeQuery(
+//                "select sequ_cr from am_ad_sequ_identity");
+//
+//        if (rsa.next()) {
+//            if (rsa.getString(1).equals("COMP")) {
+//                if (rs1.next()) {
+//                    v1 = rs1.getString(1);
+//                } else {
+//                    v1 = "";
+//                }
+//            } else if (rsa.getString(1).equals("GRPP")) {
+//                if (rs2.next()) {
+//                    v1 = rs2.getString(1);
+//                } else {
+//                    v1 = "";
+//                }
+//            } else if (rsa.getString(1).equals("REGN")) {
+//                if (rs3.next()) {
+//                    v1 = rs3.getString(1);
+//                } else {
+//                    v1 = "";
+//                }
+//            } else if (rsa.getString(1).equals("BRCH")) {
+//                if (rs4.next()) {
+//                    v1 = rs4.getString(1);
+//                } else {
+//                    v1 = "";
+//                }
+//            } else if (rsa.getString(1).equals("DEPT")) {
+//                if (rs5.next()) {
+//                    v1 = rs5.getString(1);
+//                } else {
+//                    v1 = "";
+//                }
+//            } else if (rsa.getString(1).equals("SECT")) {
+//                if (rs6.next()) {
+//                    v1 = rs6.getString(1);
+//                } else {
+//                    v1 = "";
+//                }
+//            } else if (rsa.getString(1).equals("CATG")) {
+//                if (rs7.next()) {
+//                    v1 = rs7.getString(1);
+//                } else {
+//                    v1 = "";
+//                }
+//            } else {
+//                v1 = rsa.getString(1);
+//            }
+//
+//            if (rsa.getString(2).equals("COMP")) {
+//                if (rs1.next()) {
+//                    v2 = rs1.getString(1);
+//                } else {
+//                    v2 = "";
+//                }
+//            } else if (rsa.getString(2).equals("GRPP")) {
+//                if (rs2.next()) {
+//                    v2 = rs2.getString(1);
+//                } else {
+//                    v2 = "";
+//                }
+//            } else if (rsa.getString(2).equals("REGN")) {
+//                if (rs3.next()) {
+//                    v2 = rs3.getString(1);
+//                } else {
+//                    v2 = "";
+//                }
+//            } else if (rsa.getString(2).equals("BRCH")) {
+//                if (rs4.next()) {
+//                    v2 = rs4.getString(1);
+//                } else {
+//                    v2 = "";
+//                }
+//            } else if (rsa.getString(2).equals("DEPT")) {
+//                if (rs5.next()) {
+//                    v2 = rs5.getString(1);
+//                } else {
+//                    v2 = "";
+//                }
+//            } else if (rsa.getString(2).equals("SECT")) {
+//                if (rs6.next()) {
+//                    v2 = rs6.getString(1);
+//                } else {
+//                    v2 = "";
+//                }
+//            } else if (rsa.getString(2).equals("CATG")) {
+//                if (rs7.next()) {
+//                    v2 = rs7.getString(1);
+//                } else {
+//                    v2 = "";
+//                }
+//            } else {
+//                v2 = rsa.getString(2);
+//            }
+//
+//            if (rsa.getString(3).equals("COMP")) {
+//                if (rs1.next()) {
+//                    v3 = rs1.getString(1);
+//                } else {
+//                    v3 = "";
+//                }
+//            } else if (rsa.getString(3).equals("GRPP")) {
+//                if (rs2.next()) {
+//                    v3 = rs2.getString(1);
+//                } else {
+//                    v3 = "";
+//                }
+//            } else if (rsa.getString(3).equals("REGN")) {
+//                if (rs3.next()) {
+//                    v3 = rs3.getString(1);
+//                } else {
+//                    v3 = "";
+//                }
+//            } else if (rsa.getString(3).equals("BRCH")) {
+//                if (rs4.next()) {
+//                    v3 = rs4.getString(1);
+//                } else {
+//                    v3 = "";
+//                }
+//            } else if (rsa.getString(3).equals("DEPT")) {
+//                if (rs5.next()) {
+//                    v3 = rs5.getString(1);
+//                } else {
+//                    v3 = "";
+//                }
+//            } else if (rsa.getString(3).equals("SECT")) {
+//                if (rs6.next()) {
+//                    v3 = rs6.getString(1);
+//                } else {
+//                    v3 = "";
+//                }
+//            } else if (rsa.getString(3).equals("CATG")) {
+//                if (rs7.next()) {
+//                    v3 = rs7.getString(1);
+//                } else {
+//                    v3 = "";
+//                }
+//            } else {
+//                v3 = rsa.getString(3);
+//            }
+//
+//            if (rsa.getString(4).equals("COMP")) {
+//                if (rs1.next()) {
+//                    v4 = rs1.getString(1);
+//                } else {
+//                    v4 = "";
+//                }
+//            } else if (rsa.getString(4).equals("GRPP")) {
+//                if (rs2.next()) {
+//                    v4 = rs2.getString(1);
+//                } else {
+//                    v4 = "";
+//                }
+//            } else if (rsa.getString(4).equals("REGN")) {
+//                if (rs3.next()) {
+//                    v4 = rs3.getString(1);
+//                } else {
+//                    v4 = "";
+//                }
+//            } else if (rsa.getString(4).equals("BRCH")) {
+//                if (rs4.next()) {
+//                    v4 = rs4.getString(1);
+//                } else {
+//                    v4 = "";
+//                }
+//            } else if (rsa.getString(4).equals("DEPT")) {
+//                if (rs5.next()) {
+//                    v4 = rs5.getString(1);
+//                } else {
+//                    v4 = "";
+//                }
+//            } else if (rsa.getString(4).equals("SECT")) {
+//                if (rs6.next()) {
+//                    v4 = rs6.getString(1);
+//                } else {
+//                    v4 = "";
+//                }
+//            } else if (rsa.getString(4).equals("CATG")) {
+//                if (rs7.next()) {
+//                    v4 = rs7.getString(1);
+//                } else {
+//                    v4 = "";
+//                }
+//            } else {
+//                v4 = rsa.getString(4);
+//            }
+//
+//            if (rsa.getString(5).equals("COMP")) {
+//                if (rs1.next()) {
+//                    v5 = rs1.getString(1);
+//                } else {
+//                    v5 = "";
+//                }
+//            } else if (rsa.getString(5).equals("GRPP")) {
+//                if (rs2.next()) {
+//                    v5 = rs2.getString(1);
+//                } else {
+//                    v5 = "";
+//                }
+//            } else if (rsa.getString(5).equals("REGN")) {
+//                if (rs3.next()) {
+//                    v5 = rs3.getString(1);
+//                } else {
+//                    v5 = "";
+//                }
+//            } else if (rsa.getString(5).equals("BRCH")) {
+//                if (rs4.next()) {
+//                    v5 = rs4.getString(1);
+//                } else {
+//                    v5 = "";
+//                }
+//            } else if (rsa.getString(5).equals("DEPT")) {
+//                if (rs5.next()) {
+//                    v5 = rs5.getString(1);
+//                } else {
+//                    v5 = "";
+//                }
+//            } else if (rsa.getString(5).equals("SECT")) {
+//                if (rs6.next()) {
+//                    v5 = rs6.getString(1);
+//                } else {
+//                    v5 = "";
+//                }
+//            } else if (rsa.getString(5).equals("CATG")) {
+//                if (rs7.next()) {
+//                    v5 = rs7.getString(1);
+//                } else {
+//                    v5 = "";
+//                }
+//            } else {
+//                v5 = rsa.getString(5);
+//            }
+//
+//            if (rsa.getString(6).equals("COMP")) {
+//                if (rs1.next()) {
+//                    v6 = rs1.getString(1);
+//                } else {
+//                    v6 = "";
+//                }
+//            } else if (rsa.getString(6).equals("GRPP")) {
+//                if (rs2.next()) {
+//                    v6 = rs2.getString(1);
+//                } else {
+//                    v6 = "";
+//                }
+//            } else if (rsa.getString(6).equals("REGN")) {
+//                if (rs3.next()) {
+//                    v6 = rs3.getString(1);
+//                } else {
+//                    v6 = "";
+//                }
+//            } else if (rsa.getString(6).equals("BRCH")) {
+//                if (rs4.next()) {
+//                    v6 = rs4.getString(1);
+//                } else {
+//                    v6 = "";
+//                }
+//            } else if (rsa.getString(6).equals("DEPT")) {
+//                if (rs5.next()) {
+//                    v6 = rs5.getString(1);
+//                } else {
+//                    v6 = "";
+//                }
+//            } else if (rsa.getString(6).equals("SECT")) {
+//                if (rs6.next()) {
+//                    v6 = rs6.getString(1);
+//                } else {
+//                    v6 = "";
+//                }
+//            } else if (rsa.getString(6).equals("CATG")) {
+//                if (rs7.next()) {
+//                    v6 = rs7.getString(1);
+//                } else {
+//                    v6 = "";
+//                }
+//            } else {
+//                v6 = rsa.getString(6);
+//            }
+//
+//            if (rsa.getString(7).equals("COMP")) {
+//                if (rs1.next()) {
+//                    v7 = rs1.getString(1);
+//                } else {
+//                    v7 = "";
+//                }
+//            } else if (rsa.getString(7).equals("GRPP")) {
+//                if (rs2.next()) {
+//                    v7 = rs2.getString(1);
+//                } else {
+//                    v7 = "";
+//                }
+//            } else if (rsa.getString(7).equals("REGN")) {
+//                if (rs3.next()) {
+//                    v7 = rs3.getString(1);
+//                } else {
+//                    v7 = "";
+//                }
+//            } else if (rsa.getString(7).equals("BRCH")) {
+//                if (rs4.next()) {
+//                    v7 = rs4.getString(1);
+//                } else {
+//                    v7 = "";
+//                }
+//            } else if (rsa.getString(7).equals("DEPT")) {
+//                if (rs5.next()) {
+//                    v7 = rs5.getString(1);
+//                } else {
+//                    v7 = "";
+//                }
+//            } else if (rsa.getString(7).equals("SECT")) {
+//                if (rs6.next()) {
+//                    v7 = rs6.getString(1);
+//                } else {
+//                    v7 = "";
+//                }
+//            } else if (rsa.getString(7).equals("CATG")) {
+//                if (rs7.next()) {
+//                    v7 = rs7.getString(1);
+//                } else {
+//                    v7 = "";
+//                }
+//            } else {
+//                v7 = rsa.getString(7);
+//            }
+//
+//            dl = rsa.getString(8);
+//
+//            if (!v1.equals("")) {
+//                sb.append(v1 + dl);
+//            }
+//            if (!v2.equals("")) {
+//                sb.append(v2 + dl);
+//            }
+//            if (!v3.equals("")) {
+//                sb.append(v3 + dl);
+//            }
+//            if (!v4.equals("")) {
+//                sb.append(v4 + dl);
+//            }
+//            if (!v5.equals("")) {
+//                sb.append(v5 + dl);
+//            }
+//            if (!v6.equals("")) {
+//                sb.append(v6 + dl);
+//            }
+//            if (!v7.equals("")) {
+//                sb.append(v7 + dl);
+//            }
+//
+//            rs8.next();
+//            curr = rs8.getInt(1);
+//            ++curr;
+////            System.out.println("<<<<SB: "+sb.toString());
+//            getStatement().executeUpdate(
+//                    "update am_ad_cart_identity set cart_cr = " + curr +
+//                    " where cart_id = (select category_id from am_ad_category where category_id = " +
+//                    "'" + cat + "')");
+//
+//            identity = sb.toString() + (curr - 1);
+//            
+//        } else if (rsb.next()) {
+//            rs9.next();
+//            curr = rs9.getInt(1);
+//            ++curr;
+//
+//            getStatement().executeUpdate(
+//                    "update am_ad_sequ_identity set sequ_cr = " + curr);
+//
+//            identity = String.valueOf(curr - 1);
+//        }
+// //freeResource();
+//// System.out.println("<<<<SBA: "+identity);
+//        return identity;
+//    }
 
-        String v1 = "", v2 = "", v3 = "", v4 = "", v5 = "", v6 = "", v7 = "",
-                dl = "";
+    public String getIdentityOld(String bra, String dep, String sec, String cat) throws SQLException {
+        StringBuilder sb = new StringBuilder(100);
         int curr = 0;
         String identity = "";
+        MagmaDBConnection dbConnection = new MagmaDBConnection();
 
-        ResultSet rsa = getStatement().executeQuery(
-                "select * from am_ad_auto_identity");
-        ResultSet rsb = getStatement().executeQuery(
-                "select * from am_ad_cart_identity");
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             Statement stmt = con.createStatement()) {
 
-        ResultSet rs1 = getStatement().executeQuery(
-                "select acronym from am_gb_company");
-        ResultSet rs2 = getStatement().executeQuery(
-                "select group_acronym from am_ad_group");
-        ResultSet rs3 = getStatement().executeQuery(
-                "select region_acronym from am_ad_region where region_code = (select region_code from am_ad_branch where branch_id = '" +
-                bra + "')");
-        ResultSet rs4 = getStatement().executeQuery(
-                "select branch_acronym from am_ad_branch where branch_id = '" +
-                bra + "'");
-        ResultSet rs5 = getStatement().executeQuery(
-                "select dept_acronym from am_ad_department where dept_id = '" +
-                dep + "'");
-        ResultSet rs6 = getStatement().executeQuery(
-                "select section_acronym from am_ad_section where section_id = '" +
-                sec + "'");
-        ResultSet rs7 = getStatement().executeQuery(
-                "select category_acronym from am_ad_category where category_id = '" +
-                cat + "'");
-        ResultSet rs8 = getStatement().executeQuery(
-                "select cart_cr from am_ad_cart_identity where cart_id = '" +
-                cat + "'");
-        ResultSet rs9 = getStatement().executeQuery(
-                "select sequ_cr from am_ad_sequ_identity");
-
-        if (rsa.next()) {
-            if (rsa.getString(1).equals("COMP")) {
-                if (rs1.next()) {
-                    v1 = rs1.getString(1);
-                } else {
-                    v1 = "";
+            // Load auto identity
+            ResultSet rsa = stmt.executeQuery("SELECT * FROM am_ad_auto_identity");
+            if (!rsa.next()) {
+                // fallback: check cart identity
+                ResultSet rsb = stmt.executeQuery("SELECT * FROM am_ad_cart_identity");
+                if (rsb.next()) {
+                    ResultSet rsSeq = stmt.executeQuery("SELECT sequ_cr FROM am_ad_sequ_identity");
+                    if (rsSeq.next()) {
+                        curr = rsSeq.getInt(1) + 1;
+                        stmt.executeUpdate("UPDATE am_ad_sequ_identity SET sequ_cr = " + curr);
+                        return String.valueOf(curr - 1);
+                    }
                 }
-            } else if (rsa.getString(1).equals("GRPP")) {
-                if (rs2.next()) {
-                    v1 = rs2.getString(1);
-                } else {
-                    v1 = "";
-                }
-            } else if (rsa.getString(1).equals("REGN")) {
-                if (rs3.next()) {
-                    v1 = rs3.getString(1);
-                } else {
-                    v1 = "";
-                }
-            } else if (rsa.getString(1).equals("BRCH")) {
-                if (rs4.next()) {
-                    v1 = rs4.getString(1);
-                } else {
-                    v1 = "";
-                }
-            } else if (rsa.getString(1).equals("DEPT")) {
-                if (rs5.next()) {
-                    v1 = rs5.getString(1);
-                } else {
-                    v1 = "";
-                }
-            } else if (rsa.getString(1).equals("SECT")) {
-                if (rs6.next()) {
-                    v1 = rs6.getString(1);
-                } else {
-                    v1 = "";
-                }
-            } else if (rsa.getString(1).equals("CATG")) {
-                if (rs7.next()) {
-                    v1 = rs7.getString(1);
-                } else {
-                    v1 = "";
-                }
-            } else {
-                v1 = rsa.getString(1);
+                return ""; // no identity found
             }
 
-            if (rsa.getString(2).equals("COMP")) {
-                if (rs1.next()) {
-                    v2 = rs1.getString(1);
-                } else {
-                    v2 = "";
+            // Load all acronym values once
+            String company = getSingleValue(stmt, "SELECT acronym FROM am_gb_company");
+            String group = getSingleValue(stmt, "SELECT group_acronym FROM am_ad_group");
+            String region = getSingleValue(stmt, 
+                "SELECT region_acronym FROM am_ad_region WHERE region_code = " +
+                "(SELECT region_code FROM am_ad_branch WHERE branch_id = ?)", bra);
+            String branch = getSingleValue(stmt, 
+                "SELECT branch_acronym FROM am_ad_branch WHERE branch_id = ?", bra);
+            String dept = getSingleValue(stmt, 
+                "SELECT dept_acronym FROM am_ad_department WHERE dept_id = ?", dep);
+            String section = getSingleValue(stmt, 
+                "SELECT section_acronym FROM am_ad_section WHERE section_id = ?", sec);
+            String category = getSingleValue(stmt, 
+                "SELECT category_acronym FROM am_ad_category WHERE category_id = ?", cat);
+
+            Map<String, String> acronymMap = Map.of(
+                "COMP", company,
+                "GRPP", group,
+                "REGN", region,
+                "BRCH", branch,
+                "DEPT", dept,
+                "SECT", section,
+                "CATG", category
+            );
+
+            // Loop through 7 identity fields
+            for (int i = 1; i <= 7; i++) {
+                String key = rsa.getString(i);
+                String val = acronymMap.getOrDefault(key, key != null ? key : "");
+                if (!val.isEmpty()) {
+                    sb.append(val).append(rsa.getString(8)); // delimiter
                 }
-            } else if (rsa.getString(2).equals("GRPP")) {
-                if (rs2.next()) {
-                    v2 = rs2.getString(1);
-                } else {
-                    v2 = "";
-                }
-            } else if (rsa.getString(2).equals("REGN")) {
-                if (rs3.next()) {
-                    v2 = rs3.getString(1);
-                } else {
-                    v2 = "";
-                }
-            } else if (rsa.getString(2).equals("BRCH")) {
-                if (rs4.next()) {
-                    v2 = rs4.getString(1);
-                } else {
-                    v2 = "";
-                }
-            } else if (rsa.getString(2).equals("DEPT")) {
-                if (rs5.next()) {
-                    v2 = rs5.getString(1);
-                } else {
-                    v2 = "";
-                }
-            } else if (rsa.getString(2).equals("SECT")) {
-                if (rs6.next()) {
-                    v2 = rs6.getString(1);
-                } else {
-                    v2 = "";
-                }
-            } else if (rsa.getString(2).equals("CATG")) {
-                if (rs7.next()) {
-                    v2 = rs7.getString(1);
-                } else {
-                    v2 = "";
-                }
-            } else {
-                v2 = rsa.getString(2);
             }
 
-            if (rsa.getString(3).equals("COMP")) {
-                if (rs1.next()) {
-                    v3 = rs1.getString(1);
-                } else {
-                    v3 = "";
-                }
-            } else if (rsa.getString(3).equals("GRPP")) {
-                if (rs2.next()) {
-                    v3 = rs2.getString(1);
-                } else {
-                    v3 = "";
-                }
-            } else if (rsa.getString(3).equals("REGN")) {
-                if (rs3.next()) {
-                    v3 = rs3.getString(1);
-                } else {
-                    v3 = "";
-                }
-            } else if (rsa.getString(3).equals("BRCH")) {
-                if (rs4.next()) {
-                    v3 = rs4.getString(1);
-                } else {
-                    v3 = "";
-                }
-            } else if (rsa.getString(3).equals("DEPT")) {
-                if (rs5.next()) {
-                    v3 = rs5.getString(1);
-                } else {
-                    v3 = "";
-                }
-            } else if (rsa.getString(3).equals("SECT")) {
-                if (rs6.next()) {
-                    v3 = rs6.getString(1);
-                } else {
-                    v3 = "";
-                }
-            } else if (rsa.getString(3).equals("CATG")) {
-                if (rs7.next()) {
-                    v3 = rs7.getString(1);
-                } else {
-                    v3 = "";
-                }
-            } else {
-                v3 = rsa.getString(3);
+            // Update cart
+            ResultSet rsCart = stmt.executeQuery(
+                "SELECT cart_cr FROM am_ad_cart_identity WHERE cart_id = '" + cat + "'");
+            if (rsCart.next()) {
+                curr = rsCart.getInt(1) + 1;
+                stmt.executeUpdate(
+                    "UPDATE am_ad_cart_identity SET cart_cr = " + curr +
+                    " WHERE cart_id = '" + cat + "'"
+                );
             }
-
-            if (rsa.getString(4).equals("COMP")) {
-                if (rs1.next()) {
-                    v4 = rs1.getString(1);
-                } else {
-                    v4 = "";
-                }
-            } else if (rsa.getString(4).equals("GRPP")) {
-                if (rs2.next()) {
-                    v4 = rs2.getString(1);
-                } else {
-                    v4 = "";
-                }
-            } else if (rsa.getString(4).equals("REGN")) {
-                if (rs3.next()) {
-                    v4 = rs3.getString(1);
-                } else {
-                    v4 = "";
-                }
-            } else if (rsa.getString(4).equals("BRCH")) {
-                if (rs4.next()) {
-                    v4 = rs4.getString(1);
-                } else {
-                    v4 = "";
-                }
-            } else if (rsa.getString(4).equals("DEPT")) {
-                if (rs5.next()) {
-                    v4 = rs5.getString(1);
-                } else {
-                    v4 = "";
-                }
-            } else if (rsa.getString(4).equals("SECT")) {
-                if (rs6.next()) {
-                    v4 = rs6.getString(1);
-                } else {
-                    v4 = "";
-                }
-            } else if (rsa.getString(4).equals("CATG")) {
-                if (rs7.next()) {
-                    v4 = rs7.getString(1);
-                } else {
-                    v4 = "";
-                }
-            } else {
-                v4 = rsa.getString(4);
-            }
-
-            if (rsa.getString(5).equals("COMP")) {
-                if (rs1.next()) {
-                    v5 = rs1.getString(1);
-                } else {
-                    v5 = "";
-                }
-            } else if (rsa.getString(5).equals("GRPP")) {
-                if (rs2.next()) {
-                    v5 = rs2.getString(1);
-                } else {
-                    v5 = "";
-                }
-            } else if (rsa.getString(5).equals("REGN")) {
-                if (rs3.next()) {
-                    v5 = rs3.getString(1);
-                } else {
-                    v5 = "";
-                }
-            } else if (rsa.getString(5).equals("BRCH")) {
-                if (rs4.next()) {
-                    v5 = rs4.getString(1);
-                } else {
-                    v5 = "";
-                }
-            } else if (rsa.getString(5).equals("DEPT")) {
-                if (rs5.next()) {
-                    v5 = rs5.getString(1);
-                } else {
-                    v5 = "";
-                }
-            } else if (rsa.getString(5).equals("SECT")) {
-                if (rs6.next()) {
-                    v5 = rs6.getString(1);
-                } else {
-                    v5 = "";
-                }
-            } else if (rsa.getString(5).equals("CATG")) {
-                if (rs7.next()) {
-                    v5 = rs7.getString(1);
-                } else {
-                    v5 = "";
-                }
-            } else {
-                v5 = rsa.getString(5);
-            }
-
-            if (rsa.getString(6).equals("COMP")) {
-                if (rs1.next()) {
-                    v6 = rs1.getString(1);
-                } else {
-                    v6 = "";
-                }
-            } else if (rsa.getString(6).equals("GRPP")) {
-                if (rs2.next()) {
-                    v6 = rs2.getString(1);
-                } else {
-                    v6 = "";
-                }
-            } else if (rsa.getString(6).equals("REGN")) {
-                if (rs3.next()) {
-                    v6 = rs3.getString(1);
-                } else {
-                    v6 = "";
-                }
-            } else if (rsa.getString(6).equals("BRCH")) {
-                if (rs4.next()) {
-                    v6 = rs4.getString(1);
-                } else {
-                    v6 = "";
-                }
-            } else if (rsa.getString(6).equals("DEPT")) {
-                if (rs5.next()) {
-                    v6 = rs5.getString(1);
-                } else {
-                    v6 = "";
-                }
-            } else if (rsa.getString(6).equals("SECT")) {
-                if (rs6.next()) {
-                    v6 = rs6.getString(1);
-                } else {
-                    v6 = "";
-                }
-            } else if (rsa.getString(6).equals("CATG")) {
-                if (rs7.next()) {
-                    v6 = rs7.getString(1);
-                } else {
-                    v6 = "";
-                }
-            } else {
-                v6 = rsa.getString(6);
-            }
-
-            if (rsa.getString(7).equals("COMP")) {
-                if (rs1.next()) {
-                    v7 = rs1.getString(1);
-                } else {
-                    v7 = "";
-                }
-            } else if (rsa.getString(7).equals("GRPP")) {
-                if (rs2.next()) {
-                    v7 = rs2.getString(1);
-                } else {
-                    v7 = "";
-                }
-            } else if (rsa.getString(7).equals("REGN")) {
-                if (rs3.next()) {
-                    v7 = rs3.getString(1);
-                } else {
-                    v7 = "";
-                }
-            } else if (rsa.getString(7).equals("BRCH")) {
-                if (rs4.next()) {
-                    v7 = rs4.getString(1);
-                } else {
-                    v7 = "";
-                }
-            } else if (rsa.getString(7).equals("DEPT")) {
-                if (rs5.next()) {
-                    v7 = rs5.getString(1);
-                } else {
-                    v7 = "";
-                }
-            } else if (rsa.getString(7).equals("SECT")) {
-                if (rs6.next()) {
-                    v7 = rs6.getString(1);
-                } else {
-                    v7 = "";
-                }
-            } else if (rsa.getString(7).equals("CATG")) {
-                if (rs7.next()) {
-                    v7 = rs7.getString(1);
-                } else {
-                    v7 = "";
-                }
-            } else {
-                v7 = rsa.getString(7);
-            }
-
-            dl = rsa.getString(8);
-
-            if (!v1.equals("")) {
-                sb.append(v1 + dl);
-            }
-            if (!v2.equals("")) {
-                sb.append(v2 + dl);
-            }
-            if (!v3.equals("")) {
-                sb.append(v3 + dl);
-            }
-            if (!v4.equals("")) {
-                sb.append(v4 + dl);
-            }
-            if (!v5.equals("")) {
-                sb.append(v5 + dl);
-            }
-            if (!v6.equals("")) {
-                sb.append(v6 + dl);
-            }
-            if (!v7.equals("")) {
-                sb.append(v7 + dl);
-            }
-
-            rs8.next();
-            curr = rs8.getInt(1);
-            ++curr;
-//            System.out.println("<<<<SB: "+sb.toString());
-            getStatement().executeUpdate(
-                    "update am_ad_cart_identity set cart_cr = " + curr +
-                    " where cart_id = (select category_id from am_ad_category where category_id = " +
-                    "'" + cat + "')");
 
             identity = sb.toString() + (curr - 1);
-            
-        } else if (rsb.next()) {
-            rs9.next();
-            curr = rs9.getInt(1);
-            ++curr;
-
-            getStatement().executeUpdate(
-                    "update am_ad_sequ_identity set sequ_cr = " + curr);
-
-            identity = String.valueOf(curr - 1);
         }
- //freeResource();
-// System.out.println("<<<<SBA: "+identity);
+
         return identity;
     }
 
+    // Utility method for single value retrieval
+    private String getSingleValue(Statement stmt, String sql) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            return rs.next() ? rs.getString(1) : "";
+        }
+    }
+
+    // Overloaded for prepared statements with parameters
+    private String getSingleValue(Statement stmt, String sql, String param) throws SQLException {
+        try (PreparedStatement ps = stmt.getConnection().prepareStatement(sql)) {
+            ps.setString(1, param);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getString(1) : "";
+            }
+        }
+    }
 
     public String getIdentityforStock2(String bra, String dep, String sec, String cat) throws
             Throwable {
@@ -1674,7 +1767,7 @@ if (rsa.next()) {
 
     identity = String.valueOf(curr - 1);
 }
-freeResource();
+
 return identity;
 //	return identity;
 }

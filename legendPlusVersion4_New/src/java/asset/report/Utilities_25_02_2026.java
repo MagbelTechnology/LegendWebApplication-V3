@@ -12,7 +12,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-public class Utilities
+public class Utilities_25_02_2026
 {
    
     Connection con;
@@ -22,7 +22,7 @@ public class Utilities
     ResultSet rs;
     private String jndiName;
 
-    public Utilities()
+    public Utilities_25_02_2026()
     {
         con = null;
         stmt = null;

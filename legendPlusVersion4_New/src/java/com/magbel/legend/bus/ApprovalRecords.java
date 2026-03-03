@@ -551,14 +551,14 @@ return false;
         String result = "";
 
         try (Connection con = getConnection("legendPlus");
-             PreparedStatement ps = con.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
-
+             PreparedStatement ps = con.prepareStatement(query)) {
+        	 ps.setQueryTimeout(30);
+        	 try( ResultSet rs = ps.executeQuery()){
             if (rs.next()) { 
                 result = rs.getString(1);
                 if (result == null) result = "";
             }
-
+        	 }
         } catch (SQLException e) {
             System.out.println("Error in getCodeName() for query: " + query);
             e.printStackTrace();
@@ -607,7 +607,7 @@ return false;
         
         try (Connection con = getConnection("legendPlus");
              PreparedStatement ps = con.prepareStatement(query)) {
-
+        	 ps.setQueryTimeout(30);
             ps.setString(1, param);
 
             try (ResultSet rs = ps.executeQuery()) {

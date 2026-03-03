@@ -2,6 +2,7 @@ package com.magbel.legend.servlet;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -10,6 +11,8 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -18,12 +21,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import legend.admin.handlers.CompanyHandler;
+import legend.admin.handlers.SecurityHandler;
+import legend.admin.objects.User;
+import magma.ApprovalBean;
 import magma.AssetRecordsBean;
+import magma.GroupAssetBean;
 import magma.net.manager.SytemsManager;
 import magma.util.Codes;
 import com.magbel.legend.bus.ApprovalRecords;
 import com.magbel.legend.bus.Report;
 import com.magbel.legend.mail.EmailSmsServiceBus;
+import com.magbel.util.ApplicationHelper;
+import com.magbel.util.CurrencyNumberformat;
+import com.magbel.util.HtmlUtility;
 
 
 @MultipartConfig(
@@ -31,510 +42,596 @@ import com.magbel.legend.mail.EmailSmsServiceBus;
 		  maxFileSize = 0xa00000,    
 		  maxRequestSize = 0x3200000
 		)
-public class GroupAssetServlet extends HttpServlet
-{
-	private EmailSmsServiceBus mail ;
-	
-	private ApprovalRecords records;
-	 legend.admin.handlers.SecurityHandler sechanle = new legend.admin.handlers.SecurityHandler();
-	 com.magbel.util.HtmlUtility htmlUtil  = new com.magbel.util.HtmlUtility();
-	 com.magbel.legend.bus.ApprovalRecords aprecords  = new com.magbel.legend.bus.ApprovalRecords();
-	 com.magbel.util.ApplicationHelper appHelper  = new com.magbel.util.ApplicationHelper();
-	 legend.admin.handlers.CompanyHandler comp  = new legend.admin.handlers.CompanyHandler();
-   public void doPost(HttpServletRequest request, 
-    HttpServletResponse response)
-      throws ServletException, IOException
-     
-   {
-	   try {
-	 String userClass = (String) request.getSession().getAttribute("UserClass");
-	 String user_Id =(String) request.getSession().getAttribute("CurrentUser");
-	// System.out.println("<<<<<<user_Id: "+user_Id);
-	 PrintWriter out = response.getWriter();
-	
-	 HttpSession session = request.getSession();
-	 Properties prop = new Properties();
-	 File file = new File("C:\\Property\\LegendPlus.properties");
-	 FileInputStream input = new FileInputStream(file);
-	 prop.load(input);
-	 
-	 String ThirdPartyLabel = prop.getProperty("ThirdPartyLabel");
-	//System.out.println("ThirdPartyLabel: " + ThirdPartyLabel);
-	String groupAssetByAsset = prop.getProperty("groupAssetByAsset");
-	String singleApproval = prop.getProperty("singleApproval");
-	//System.out.println("groupAssetByAsset: " + groupAssetByAsset);
-	String VATRequired = prop.getProperty("VATREQUIRED");
-	String sbuRequired = prop.getProperty("SBUREQUIRED");
-	
-	AssetRecordsBean ad = new AssetRecordsBean();
-	 magma.ApprovalBean apbean = new magma.ApprovalBean();
-	 magma.GroupAssetBean adGroup = new magma.GroupAssetBean();
-	 Part filePart = request.getPart("file");
-	 
-
-	 String destination = "DocumentHelp.jsp?np=groupAssetUpdate";
-	
-	 String fileName = filePart.getSubmittedFileName();
-	 System.out.println("fileName: " + fileName);
-
-	String currentPage = "groupAssetUpdate";
-	 String tran_status ="A";	 
-	 String tran_type = "Group Asset Update"; 
-	String id = request.getParameter("id");
-	String categoryId = request.getParameter("categoryId");
-	String groupid = request.getParameter("gid");
-	String saveBtn = request.getParameter("saveBtn");
-	String isNew =  request.getParameter("s");
-	String category = request.getParameter("category_id");
-	String payType = request.getParameter("payType");
-	String payCode = request.getParameter("category_id");
-	String partPay = request.getParameter("partPay");
-	String acronym = request.getParameter("acronym");
-	//System.out.println("JJJJJJJJJJJJJ acronym "+acronym);
-	if(payCode == null){payCode = "0";}
-	if(payType == null){payType = "N";}
-	if(acronym == null){acronym = "";}
-	if(category == null){category = "0";}
-	if(partPay == null){partPay = "";}
-	
-	String vatCostLabel = "";
-	if(VATRequired.equals("N")){vatCostLabel = "Asset Cost";}
-	if(VATRequired.equals("Y")){vatCostLabel = "Vatable Cost";}
-
-	String sup_name_qry = "";
-	String Supervisor_name = "";
-	//System.out.println("JJJJJJJJJJJJJ category "+category);
-
-	String userid = (String)session.getAttribute("CurrentUser");
-	String branch_id = request.getParameter("branch_id");
-	String subjecttovat = aprecords.getCodeName("select VAT_SELECTION from am_gb_company");
-	String thirdpartyrqd = aprecords.getCodeName("select THIRDPARTY_REQUIRE from am_gb_company");
-	String Cost_Threshold = aprecords.getCodeName("select Cost_Threshold from am_gb_company");
-	String lpo = request.getParameter("lpo");
-	String invoiceNo = request.getParameter("invoiceNum");
-	String vendorNo = request.getParameter("sb");
-	com.magbel.util.CurrencyNumberformat formata = new com.magbel.util.CurrencyNumberformat();
-	String newURL ="";
-	int numOfTransactionLevel =  ad.getNumOfTransactionLevel("3");
-	//System.out.println("JJJJJJJJJJJJJ numOfTransactionLevel "+numOfTransactionLevel);
-	legend.admin.objects.User user = sechanle.getUserByUserID(userid);
-	String userName = user.getUserName();
-	String branchRestrict = user.getBranchRestrict();
-	String UserRestrict = user.getDeptRestrict();
-	String departCode = user.getDeptCode();
-	String branch = user.getBranch();
-	//System.out.println("JJJJJJJJJJJJJ branch "+branch );
-	String limitCode=apbean.getApprovalLimit(userid);
-	//System.out.println("JJJJJJJJJJJJJ limitCode "+limitCode );
-	apbean.getApprovalDetail(limitCode);
-	double min_approval = apbean.getMini_approval();
-	double max_approval = apbean.getMax_approval();
-	String vatRate ="0";
-	String taxRate ="0";
-	//System.out.println ("min_approval >>>>> " + min_approval);
-	//System.out.println ("max_approval >>>>> " + max_approval);
-	String workstationIp = request.getRemoteAddr();
-	InetAddress address = InetAddress.getByName(workstationIp);
-	String workstationName =  address.getHostName();
-	//System.out.println("workstationName : "+ workstationName);
-	//System.out.println("workstationIp : "+ workstationIp);
-
-	//System.out.println("Transaction level : "+ numOfTransactionLevel);
-	if(workstationIp == null){workstationIp = "";}
-	
-
-	String branchrestricted = "";  
-	if(userid != null){
-	   branchrestricted = sechanle.getBranchRestrictedUser(userid);	
-	}
-
-
-	if(isNew!=null && isNew.equalsIgnoreCase("n")) session.setAttribute("groupNewAsset",null);
-	if(session.getAttribute("groupNewAsset")!=null)
-	  {
-	  	ad=(magma.AssetRecordsBean)session.getAttribute("groupNewAsset");
-		category = ad.getCategory_id();
-	  }
-	
-	 	String asset_id = request.getParameter("asset_id");
-	 	String date_of_purchase = request.getParameter("date_of_purchase");
-	    String sub_category_id = request.getParameter("sub_category_id");
-	    String sbu_code = request.getParameter("sbu_code");
-	    String cost_price = request.getParameter("cost_price");
-	    String vat_amount =  request.getParameter("vat_amount");
-	    String vatable_cost = request.getParameter("vatable_cost");
-	    String wh_tax_amount = request.getParameter("wh_tax_amount");
-	    String residual_value = request.getParameter("residual_value");
-	    String amountPTD = request.getParameter("amountPTD");
-	    String department_id = request.getParameter("department_id");
-	    String descriptions = request.getParameter("description1").equals("0") ? request.getParameter("description2") : request.getParameter("description1");
-	    String region = request.getParameter("region");
-	    String make = request.getParameter("make");
-	    String location = request.getParameter("location");
-	    String section_id = request.getParameter("section_id");
-	    String state = request.getParameter("state");
-	    String driver = request.getParameter("driver");
-	    String bar_code = request.getParameter("bar_code");
-	   String vendor_acc = request.getParameter("vendor_accountOld");
-	   String vendor_name =  request.getParameter("vendorName");
-	   String maintained_by = request.getParameter("maintained_by");
-	   String purchaseReason = request.getParameter("reason");
-	   String authorized_by = request.getParameter("authorized_by");
-	   String no_of_items = request.getParameter("no_of_items");
-	   String depr_start_date = request.getParameter("depreciation_start_date");
-	   String depr_end_date = request.getParameter("depreciation_end_date");
-	   String assetUser = request.getParameter("user");
-	   String subject_to_vatOld = request.getParameter("subject_to_vatOld");
-	    String wh_tax_cb= request.getParameter("wh_tax_cb");
-	    String transport_cost = request.getParameter("transport_cost");
-	    String other_cost = request.getParameter("other_cost");
-	    String depreciation_rate = request.getParameter("depreciation_rate");
-	    String accum_dep = request.getParameter("accum_dep");
-	    String nbv = request.getParameter("nbv");
-	    String supplied_by = request.getParameter("sb");
-	    String who_to_rem1 = request.getParameter("who_to_rem");
-	    String invoiceNum = request.getParameter("invoiceNum");
-	    String e_mail1 = request.getParameter("email_1");
-	    String who_to_rem2 = request.getParameter("who_to_rem2");
-	    String posting_date = request.getParameter("posting_date");
-	    String email2 = request.getParameter("email2");
-	    String spare_1 = request.getParameter("spare_1");
-	    String spare_2 = request.getParameter("spare_2");
-	    String spare_3 = request.getParameter("spare_3");
-	    String spare_4 = request.getParameter("spare_4");
-	    String spare_5 = request.getParameter("spare_5");
-	    String spare_6 = request.getParameter("spare_6");
-	    String warrantyStartDate = request.getParameter("warrantyStartDate");
-	    String noOfMonths = request.getParameter("noOfMonths");
-	    String expiryDate = request.getParameter("expiryDate");
-	    String projectCode = request.getParameter("projectCode");
-	    String require_depreciation = request.getParameter("require_depreciation");
-	    String require_redistribution = request.getParameter("require_redistribution");
-	    String fullyPAID = request.getParameter("fullyPAID");
-	    String registration_no = request.getParameter("registration_no");
-	    if(require_redistribution == null){require_redistribution = "";}
-	    if(sbu_code == null){sbu_code = "";}
-	    if(projectCode == null){projectCode = "";}
-	   		//adGroup.setAsset_id(asset_id);
-	    
-	    	adGroup.setGroup_id(groupid);
-	   		adGroup.setNo_of_items(no_of_items);
-	   		adGroup.setDepreciation_start_date(depr_start_date);
-		   adGroup.setDepreciation_end_date(depr_end_date);
-		   adGroup.setDepartment_id(department_id);
-		    adGroup.setDate_of_purchase(date_of_purchase);
-		    adGroup.setSub_category_id(sub_category_id);
-		    adGroup.setSbu_code(sbu_code);
-		    adGroup.setBranch_id(branch_id);
-		    adGroup.setCategory_id(category);
-		    adGroup.setCost_price(cost_price);
-		    adGroup.setVat_amount(vat_amount);
-		    adGroup.setVatable_cost(vatable_cost);
-		    adGroup.setWh_tax_amount(wh_tax_amount);
-		    adGroup.setResidual_value(residual_value);
-		    adGroup.setAmountPTD(amountPTD);
-		    adGroup.setDescription(descriptions);
-		    adGroup.setVendorName(vendor_name);
-		//    adGroup.setRegionCode(region);
-		    adGroup.setMake(make);
-		    adGroup.setLocation(location);
-		    adGroup.setSection(section_id);
-		    adGroup.setSection_id(section_id);
-		    adGroup.setState(state);
-		    adGroup.setDriver(driver);
-		    adGroup.setBar_code(bar_code);
-		    adGroup.setVendor_account(vendor_acc);
-		    adGroup.setVendorName(vendor_name);
-		    adGroup.setMaintained_by(maintained_by);
-		    adGroup.setReason(purchaseReason);
-		    adGroup.setUser(assetUser);
-		   // adGroup.setSupplied_by(vendorNo);
-		    adGroup.setSbu_code(sbu_code);
-		    adGroup.setLpo(lpo);
-		    adGroup.setAuthorized_by(authorized_by);
-		    //adGroup.setUser_id(user_Id);
-		    adGroup.setSubject_to_vat(subject_to_vatOld);
-		    adGroup.setWh_tax_cb(wh_tax_cb);
-		    adGroup.setTransport_cost(transport_cost);
-		    adGroup.setOther_cost(other_cost);
-		    adGroup.setDepreciation_rate(depreciation_rate);
-		    adGroup.setAccum_dep(accum_dep);
-		    adGroup.setSupplied_by(supplied_by);
-		    adGroup.setWho_to_rem(who_to_rem1);
-		    adGroup.setInvoiceNum(invoiceNum);
-		    adGroup.setEmail_1(e_mail1);
-		    adGroup.setWho_to_rem_2(who_to_rem2);
-		    adGroup.setPosting_date(posting_date);
-		    adGroup.setEmail2(email2);
-		    adGroup.setSpare_1(spare_1);
-		    adGroup.setSpare_2(spare_2);
-		    adGroup.setSpare_3(spare_3);
-		    adGroup.setSpare_4(spare_4);
-		    adGroup.setSpare_5(spare_5);
-		    adGroup.setSpare_6(spare_6);
-		    adGroup.setWarrantyStartDate(warrantyStartDate);
-		    adGroup.setNoOfMonths(noOfMonths);
-		    adGroup.setExpiryDate(expiryDate);
-		    adGroup.setProjectCode(projectCode);
-		    adGroup.setRequire_depreciation(require_depreciation);
-		    adGroup.setRequire_redistribution(require_redistribution);
-		    adGroup.setUser_id(user_Id);
-		    adGroup.setFullyPAID(fullyPAID);
-		    adGroup.setPartPAY(partPay);
-		    adGroup.setRegistration_no(registration_no);
-		    
-		    
-		    
-		    //adGroup.set
-	   
-		    System.out.println("<<<<<<======saveBtn: "+request.getParameter("saveBtn"));	  
-
-	if(request.getParameter("saveBtn") != null)
-	{
-		try
-			{
-			System.out.println("<<<<<< *******====%%%%%%%%%% ");
-			//System.out.println("<<<<<< groupAssetByAsset: " + groupAssetByAsset+"   singleApproval: "+singleApproval+"  branch: "+branch+"  departCode: "+departCode+"   userName: "+userName);
-				long [] statux = adGroup.insertGroupAssetRecord(groupAssetByAsset,singleApproval,branch,departCode,userName);
-			//	System.out.println("<<<<<< statux: " + statux);
-			//	System.out.println("<<<<<< statux[0]: " + statux[0]);
-			    
-				  prop.load(input);
-		            String UPLOAD_FOLDER = prop.getProperty("imagesUrl");
-		            String uploadPath = UPLOAD_FOLDER;
-		            
-		            File uploadDir = new File(uploadPath);
-		            if(!uploadDir.exists())
-		            {
-		                uploadDir.mkdir();
-		            }
-		            try
-		            {
-		            	 if(!fileName.endsWith(".php") || !fileName.endsWith(".sql")) {
-		            	 for (Part part : request.getParts()) {
-		                        
-		                        String ext = FilenameUtils.getExtension(fileName);
-		                    //    System.out.println("The extension is =>: " + ext);
-		                        
-		                        String filePath = uploadPath + "W" + fileName.toString();
-		                       // System.out.println("The file path is ==: " + filePath);
-		                        
-		                        String newPath = uploadPath + "W" + statux[1] + "." + ext;
-//		                        System.out.println("The new file path is >=: " + newPath);
-		                        
-		                       
-		                        File oldFile = new File(filePath);
-		                        
-		                        File newFile = new File(newPath);
-		                        
-		                        String newFileName = newFile.getName().substring(0, newFile.getName().lastIndexOf("."));
-		                        
-		                      //  System.out.println("newFileName >=: " + newFileName);
-		                        
-		                        File folder = new File(UPLOAD_FOLDER);
-		            	        File[] listOfFiles = folder.listFiles();
-		            	        
-		            	       String listFiles = Arrays.toString(listOfFiles);
-		            	       	       
-		                        
-		                        oldFile.renameTo(newFile);
-
-		                        part.write(newPath);
-		                        
-		                       // System.out.println("uploaded successfully.");
-		                  
-		        	    }
-		            	 
-		               // System.out.println("The destination is ==: " + destination);
-		               System.out.println("Upload has been done successfully!");
-
-		                
-		                }else {
-		                	System.out.println("Incorrect File..");
-		                }
-		            }
-		            catch(Exception ex)
-		            {
-		                System.out.println((new StringBuilder("There was an error: ")).append(ex.getMessage()).toString());
-		              
-		            }
-				
-				if(statux[0] == 0 )
-				 {
-				 //SET ASSET CREATION FOR TRANSACTION APPROVAL
-				  //this if condition is to test for asset creation where approval level is 0.
-				    id = adGroup.getAsset_id();
-				System.out.println(" ID >>>>>  "+id);
-				  long group_ID = adGroup.getGroupID(id);
-				  String groupID = Long.toString(group_ID);
-				  System.out.println(" groupID >>>>> "+groupID);
-//				  System.out.println(" groupID >>>>>  "+groupID);
-		 		 if(numOfTransactionLevel == 0)
-		 		 {
-
-		 // ad.updateGroupAssetStatus(id); 
-		 //commented by ayo, since there is only one group asset for all the assets, using the assetId to update am_group_asset will mean that only one 	the assets will be updated, so that's why I changed it to the Group_id instead
-		 
-		  //ad.updateGroupAssetStatus(groupID); NOT NEEDED SINCE THEIR IS ANOTHER CALL TO THE METHOD JUST BELOW
-		  
-		  //ad.setPendingTrans(ad.setApprovalDataGroup(group_ID),"3"); 
-		  //ad.updateAssetStatusChange("update am_group_asset set asset_status='ACTIVE' where asset_id='"+id+"'");
-		 // ad.updateGroupAssetStatus(id); commented by ayojava; same as above
-	  	//  ad.updateGroupAssetStatus(groupID); will be done in the code
-		 // boolean b = ad.updateNewApprovalAssetStatus(id,Integer.parseInt(userid)); commented by ayojava
-		 
-		  boolean b = ad.updateNewApprovalAssetStatus(groupID,Integer.parseInt(userid));
-		  
-		  //THE SEGMENT BELOW IS TO RAISE ENTRY FOR NEW ASSET CREATION THAT DOESN'T REQUIRE APPROVAL
-		  
-		   //THE SEGMENT BEGINS RAISE ENTRY FOR NEW ASSET CREATION THAT DOESN'T REQUIRE APPROVAL
-		
-		  String page1 = "Group ASSET CREATION RAISE ENTRY";
-		  //String url = "DocumentHelp.jsp?np=updateAsset&amp;id="+id+"&pageDirect=Y";
-		  String url = "DocumentHelp.jsp?np=groupAssetUpdate&id="+groupID+"&pageDirect=Y";
-		  
-		  String flag= "";
-//		  String partPay="";
-		  String Name =aprecords.getCodeName(" SELECT full_name from am_gb_user where user_id=?",userid);
-		  String branchName= aprecords.getCodeName(" SELECT branch_name from am_ad_branch where branch_id=?",branch_id);
-		  String description= adGroup.getDescription();
-		  /*String subjectT= ad.subjectToVat(id);//modify this method to read from am_group_asset_main
-		  String whT= ad.whTax(id);//modify this method to read from am_group_asset_main*/
-		  String subjectT= adGroup.subjectToVat(id);
-		  String whT= adGroup.whTax(id);
-		  
-		 /* System.out.println("description : " + description );
-		  System.out.println("subjectT : " + subjectT );
-		  System.out.println("whT : " + whT );*/
-		  //aprecords.insertApproval(id, description, page1, flag, partPay,Name,branchName,subjectT,whT,url)
-		  //aprecords.updateRaiseEntry(id);
-		  //;-commented as above
-//		  note that the methods called have been modified to receive asset_id instead of group_id
-	//TEMPORARILY COMMENTED BY AYOJAVA SINCE IT WILL BE DONE IN THE CODE
-		  //aprecords.insertApproval(groupID, description, page1, flag, partPay,Name,branchName,subjectT,whT,url);
-		  //aprecords.updateRaiseEntry(groupID);// look through this method,it is updating am_asset and we don't have entries in dt table
-		//  adGroup.updateGroupAssetRaiseEntry(groupID);
-		
-			 //THE SEGMENT ENDS RAISE ENTRY FOR NEW ASSET CREATION THAT DOESN'T REQUIRE APPROVAL
-		 
-		
-		//===============================BEGIN: THIS SEGMENT IS TO SEND E-MAIL TO RECEPIENT AFTER ASSET CREATION
-		/* 
-		 
-		 if(b){
-		 	
-			legend.admin.handlers.CompanyHandler compHandler = new legend.admin.handlers.CompanyHandler();
-				String mail_code="201"; //the mail code for each transaction is setup in AM_TRANSACTION_TYPE
-			
-			if(compHandler.getEmailStatus(mail_code).equalsIgnoreCase("Active")){ //if mail status is active then send email
-		 
-			String transaction_type="Group Asset Creation";
-			String subject ="Group Asset Creation";
-			
-			Codes message= new Codes();
-			
-			EmailSmsServiceBus mail = new EmailSmsServiceBus();
-
-			String to = message.MailTo(mail_code, transaction_type);  //retrieves recipients from database
-
-			String msgText1 ="New asset with ID: "+id +" was successfully created.";
-
-			mail.sendMail(to,subject,msgText1);
-		}//if(compHandler.getEmailStatus(mail_code).equalsIgnoreCase("Active"))
-		 
-		 }//if(b)
-		 
-		 
-		 */
-		  
-	 	  
-		  
-		 //================================END:  THIS SEGMENT IS TO SEND E-MAIL TO RECEPIENT AFTER ASSET CREATION
-			String invnumb = vendorNo+'-'+invoiceNo;
-		  htmlUtil.insToAm_Invoice_No(groupID,lpo,invnumb,"Group Asset Creation");		 
-//		  out.print("<script>");
-//		  out.print("alert('Group Asset creation successful');");
-//		  out.print("window.location='DocumentHelp.jsp?np=groupAssetUpdate&img=n&id="+groupID+"';");
-//		  out.print("</script>");
-
-		  out.print("<script>");
-	 	   out.print("alert('Group Asset will be submitted for Approval after Final Creation Of Assets');");
-		 	out.print("window.location='"+destination+"&id="+statux[1] +"&tran_status="+tran_status+"&tran_type="+tran_type+"&assetId="+id+"&reason=&pPage="+currentPage+"';");
-		 	out.print("</script>");
-		  }//if(numOfTransactionLevel == 0)
-		  
-		  else
-		  {
-			 sup_name_qry="select full_name from am_gb_user where user_id=(select supervisor from am_group_asset_main where group_id=?)";
-			System.out.println("sup_name_qry >>>>> " + sup_name_qry);
-	 		Supervisor_name = aprecords.getCodeName((sup_name_qry).toUpperCase(),groupID);	 
-	 		
-	 		String invnumb = vendorNo+'-'+invoiceNo;
-	 		System.out.println("invnumb >>>>> " + invnumb);
-	 		htmlUtil.insToAm_Invoice_No(groupID,lpo,invnumb,"Group Asset Creation");
-		  
-		//	ad.setPendingTrans(ad.setApprovalDataGroup(groupid));
-		if(groupAssetByAsset.equalsIgnoreCase("Y")){
-		//newURL = "<script>alert('Group Asset will be submitted for Approval after Final Creation Of Assets');window.location='DocumentHelp.jsp?np=groupAssetUpdate&img=n&id="+statux[1]+"';</script>";
-		//	newURL = "<script>alert('Group Asset will be submitted for Approval after Final Creation Of Assets');window.location='DocumentHelp.jsp?np=uploadImage&img=n&assetId="+statux[1]+"&previousPage="+currentPage+"&assetCode="+statux[1]+"';</script>";
-		out.print("<script>");
-	 	   out.print("alert('Group Asset will be submitted for Approval after Final Creation Of Assets');");
-		 	out.print("window.location='"+destination+"&id="+statux[1] +"&tran_status="+tran_status+"&tran_type="+tran_type+"&assetId="+id+"&reason=&pPage="+currentPage+"';");
-		 	out.print("</script>");
-		}
-	 	if(groupAssetByAsset.equalsIgnoreCase("N")){
-//		newURL = "<script>alert('Group Asset Has Been Sent For Approval');window.location='DocumentHelp.jsp?np=groupAssetUpdate&img=n&id="+statux[1]+"';</script>";
-//		newURL = "<script>alert('Group Asset Has Been Sent For Approval');window.location='DocumentHelp.jsp?np=uploadImage&img=n&assetId="+statux[1]+"&previousPage="+currentPage+"&assetCode="+statux[1]+"';</script>";
-	 	
-	 	 	out.print("<script>");
-	 	   out.print("alert('Group Asset Has Been Sent For Approval');");
-		 	out.print("window.location='"+destination+"&id="+statux[1] +"&tran_status="+tran_status+"&tran_type="+tran_type+"&assetId="+id+"&reason=&pPage="+currentPage+"';");
-		 	out.print("</script>");
-	 	}
-		
-		   }//else for if(numOfTransactionLevel == 0) 
-				 
-				 out.print(newURL);
-		   
-				 
-		}
-		 else if(statux[0] == 1 || statux[0] == 2 ) 
-		 {  out.print("<script>");
-			out.print("alert('Addition of Assets will over shoot quarterly budget for this category and you are not allowed to do so. Please exit and seek supplementary budgetary Allocation "+statux+"');");
-			out.print("history.go(-2);");
-			out.print("</script>");
-			
-		  } else{
-			out.print("<script>");
-			out.print("alert('Records can not be saved!. Please Check your entries.');");
-			out.print("history.go(-2);");
-			out.print("</script>");
-		  }
-			}catch(Exception e){
+public class GroupAssetServlet extends HttpServlet {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupAssetServlet.class);
+    private static final String PROPERTIES_PATH = "C:\\Property\\LegendPlus.properties";
+    private static final String DESTINATION_PAGE = "DocumentHelp.jsp?np=groupAssetUpdate";
+    
+    private EmailSmsServiceBus emailService;
+    private ApprovalRecords approvalRecords;
+    private ApprovalRecords busApprovalRecords;
+    private SecurityHandler securityHandler;
+    private HtmlUtility htmlUtil;
+    private ApplicationHelper appHelper;
+    private CompanyHandler companyHandler;
+    private AssetRecordsBean assetRecords;
+    private ApprovalBean approvalBean;
+    private CurrencyNumberformat currencyFormatter;
+    
+    @Override
+    public void init() throws ServletException {
+        try {
+            emailService = new EmailSmsServiceBus();
+            approvalRecords = new ApprovalRecords();
+            busApprovalRecords = new ApprovalRecords();
+            securityHandler = new SecurityHandler();
+            htmlUtil = new HtmlUtility();
+            appHelper = new ApplicationHelper();
+            companyHandler = new CompanyHandler();
+            assetRecords = new AssetRecordsBean();
+            approvalBean = new ApprovalBean();
+            currencyFormatter = new CurrencyNumberformat();
+            
+            LOGGER.info("GroupAssetServlet initialized successfully");
+        } catch (Exception e) {
+            LOGGER.error("Failed to initialize GroupAssetServlet", e);
+            throw new ServletException("Initialization failed", e);
+        }
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        response.setContentType("text/html;charset=UTF-8");
+        
+        try (PrintWriter out = response.getWriter()) {
+            processRequest(request, out);
+        } catch (Exception e) {
+            LOGGER.error("Error processing request", e);
+            handleError(response, "An error occurred while processing the request");
+        } catch (Throwable e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("\n\nError creating Group Asset\n"+e+"\n");
-				out.print("<script>alert('Unable to save. Error encountered');history.go(-1);</script>");
-			}
-		
 		}
-		
-		
-	String[] sui = ad.setUpInfo();
-	String lpoSetup = sui[0];
-	String barcodeSetup = sui[1];
-	double cpSetup = Double.parseDouble(sui[2]);
+    }
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        doPost(request, response);
+    }
+    
+    private void processRequest(HttpServletRequest request, PrintWriter out) throws Throwable {
+        RequestContext context = extractRequestContext(request);
+        Properties config = loadProperties();
+        
+        String groupAssetByAsset = config.getProperty("groupAssetByAsset", "N");
+        String singleApproval = config.getProperty("singleApproval", "N");
+        String vatRequired = config.getProperty("VATREQUIRED", "N");
+        String sbuRequired = config.getProperty("SBUREQUIRED", "N");
+        String thirdPartyLabel = config.getProperty("ThirdPartyLabel", "");
+        
+        UserInfo userInfo = extractUserInfo(request);
+        PostingParameters params = extractPostingParameters(request, userInfo);
+        
+        // Handle save button action
+        if (params.saveBtn != null) {
+            handleSaveAction(request, out, context, params, userInfo, 
+                           groupAssetByAsset, singleApproval, vatRequired);
+        }
+    }
+    
+    private void handleSaveAction(HttpServletRequest request, PrintWriter out, 
+                                  RequestContext context, PostingParameters params,
+                                  UserInfo userInfo, String groupAssetByAsset, 
+                                  String singleApproval, String vatRequired) throws Throwable {
+        
+        int numOfTransactionLevel = assetRecords.getNumOfTransactionLevel("3");
+        Properties config = loadProperties();
+        
+        GroupAssetBean groupAsset = buildGroupAssetBean(request, params, userInfo);
+        
+        LOGGER.info("Saving group asset with parameters: groupAssetByAsset={}, singleApproval={}", 
+                   groupAssetByAsset, singleApproval);
+        
+        long[] status = groupAsset.insertGroupAssetRecord(groupAssetByAsset, singleApproval, 
+                                                         userInfo.branch, userInfo.deptCode, 
+                                                         userInfo.userName);
+        
+        if (status[0] == 0) {
+            handleSuccessfulSave(request, out, params, userInfo, groupAsset, 
+                               status, numOfTransactionLevel, groupAssetByAsset, vatRequired);
+        } else if (status[0] == 1 || status[0] == 2) {
+            handleBudgetExceeded(out, status);
+        } else {
+            handleSaveFailure(out);
+        }
+    }
+    
+    private void handleSuccessfulSave(HttpServletRequest request, PrintWriter out,
+                                      PostingParameters params, UserInfo userInfo,
+                                      GroupAssetBean groupAsset, long[] status,
+                                      int numOfTransactionLevel, String groupAssetByAsset,
+                                      String vatRequired) throws Exception {
+        
+        // Handle file upload
+        handleFileUpload(request, status);
+        
+        String assetId = groupAsset.getAsset_id();
+        long groupId = groupAsset.getGroupID(assetId);
+        String groupIdStr = Long.toString(groupId);
+        
+        LOGGER.info("Group asset saved successfully: assetId={}, groupId={}", assetId, groupIdStr);
+        
+        // Insert invoice information
+        String invNumber = params.suppliedBy + "-" + params.invoiceNum;
+        htmlUtil.insToAm_Invoice_No(groupIdStr, params.lpo, invNumber, "Group Asset Creation");
+        
+        if (numOfTransactionLevel == 0) {
+            handleZeroTransactionLevel(out, params, userInfo, groupAsset, 
+                                      groupIdStr, assetId, status, vatRequired);
+        } else {
+            handleMultiTransactionLevel(out, params, groupIdStr, assetId, 
+                                       status, groupAssetByAsset);
+        }
+    }
+    
+    private void handleZeroTransactionLevel(PrintWriter out, PostingParameters params,
+                                           UserInfo userInfo, GroupAssetBean groupAsset,
+                                           String groupIdStr, String assetId, 
+                                           long[] status, String vatRequired) throws Exception {
+        
+        // Update approval status
+        boolean updated = assetRecords.updateNewApprovalAssetStatus(groupIdStr, 
+                                                                   Integer.parseInt(userInfo.userId));
+        
+        // Get supervisor name
+        String supervisorQuery = "SELECT full_name FROM am_gb_user WHERE user_id = " +
+                                "(SELECT supervisor FROM am_group_asset_main WHERE group_id = ?)";
+        String supervisorName = busApprovalRecords.getCodeName(supervisorQuery, groupIdStr);
+        
+        // Insert raise entry
+        String pageName = "Group ASSET CREATION RAISE ENTRY";
+        String url = DESTINATION_PAGE + "&id=" + groupIdStr + "&pageDirect=Y";
+        String name = busApprovalRecords.getCodeName(
+            "SELECT full_name FROM am_gb_user WHERE user_id = ?", userInfo.userId);
+        String branchName = busApprovalRecords.getCodeName(
+            "SELECT branch_name FROM am_ad_branch WHERE branch_id = ?", params.branchId);
+        
+        String subjectT = groupAsset.subjectToVat(assetId);
+        String whT = groupAsset.whTax(assetId);
+        
+        busApprovalRecords.insertApproval(groupIdStr, groupAsset.getDescription(), 
+                                         pageName, "", params.partPay, name, 
+                                         branchName, subjectT, whT, url);
+        busApprovalRecords.updateRaiseEntry(groupIdStr);
+        
+        // Send email if enabled
+        sendCreationEmail(assetId);
+        
+        showSuccessAlert(out, "Group Asset creation successful", 
+                        DESTINATION_PAGE + "&img=n&id=" + groupIdStr);
+    }
+    
+    private void handleMultiTransactionLevel(PrintWriter out, PostingParameters params,
+                                            String groupIdStr, String assetId,
+                                            long[] status, String groupAssetByAsset) {
+        
+        String supervisorQuery = "SELECT full_name FROM am_gb_user WHERE user_id = " +
+                                "(SELECT supervisor FROM am_group_asset_main WHERE group_id = ?)";
+        String supervisorName = busApprovalRecords.getCodeName(supervisorQuery, groupIdStr);
+        
+        String message = groupAssetByAsset.equalsIgnoreCase("Y") 
+            ? "Group Asset will be submitted for Approval after Final Creation Of Assets"
+            : "Group Asset Has Been Sent For Approval";
+        
+        String redirectUrl = DESTINATION_PAGE + "&id=" + status[1] + 
+                            "&tran_status=A&tran_type=Group Asset Update&assetId=" + 
+                            assetId + "&reason=&pPage=groupAssetUpdate";
+        
+        showSuccessAlert(out, message, redirectUrl);
+    }
+    
+    private void handleBudgetExceeded(PrintWriter out, long[] status) {
+        String message = "Addition of Assets will overshoot quarterly budget for this category. " +
+                        "Please exit and seek supplementary budgetary allocation " + Arrays.toString(status);
+        showErrorAlert(out, message, -2);
+    }
+    
+    private void handleSaveFailure(PrintWriter out) {
+        showErrorAlert(out, "Records cannot be saved! Please check your entries.", -2);
+    }
+    
+    private void handleFileUpload(HttpServletRequest request, long[] status) throws Exception {
+        Properties config = loadProperties();
+        String uploadFolder = config.getProperty("imagesUrl");
+        
+        if (uploadFolder == null || uploadFolder.isEmpty()) {
+            LOGGER.warn("Upload folder not configured");
+            return;
+        }
+        
+        File uploadDir = new File(uploadFolder);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdir();
+        }
+        
+        for (Part part : request.getParts()) {
+            if (part == null || part.getSize() == 0) continue;
+            
+            String fileName = part.getSubmittedFileName();
+            if (fileName == null || fileName.endsWith(".php") || fileName.endsWith(".sql")) {
+               // LOGGER.warn("Invalid file type: {}", fileName);
+                continue;
+            }
+            
+            String ext = FilenameUtils.getExtension(fileName);
+            String newFileName = "W" + status[1] + "." + ext;
+            String filePath = uploadFolder + File.separator + newFileName;
+            
+            try (InputStream input = part.getInputStream()) {
+                part.write(filePath);
+                LOGGER.info("File uploaded successfully: {}", filePath);
+            }
+        }
+    }
+    
+    private void sendCreationEmail(String assetId) {
+        try {
+            String mailCode = "201"; // Mail code for asset creation
+            if (companyHandler.getEmailStatus(mailCode).equalsIgnoreCase("Active")) {
+                Codes codes = new Codes();
+                String to = codes.MailTo(mailCode, "Group Asset Creation");
+                String subject = "Group Asset Creation";
+                String message = "New asset with ID: " + assetId + " was successfully created.";
+                emailService.sendMail(to, subject, message);
+                LOGGER.info("Creation email sent for asset: {}", assetId);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to send creation email", e);
+        }
+    }
+    
+    private GroupAssetBean buildGroupAssetBean(HttpServletRequest request, 
+                                               PostingParameters params,
+                                               UserInfo userInfo) throws Exception {
+        GroupAssetBean groupAsset = new GroupAssetBean();
+        
+        // Basic information
+        groupAsset.setGroup_id(params.groupId);
+        groupAsset.setNo_of_items(params.noOfItems);
+        groupAsset.setDepreciation_start_date(params.deprStartDate);
+        groupAsset.setDepreciation_end_date(params.deprEndDate);
+        groupAsset.setDepartment_id(params.departmentId);
+        groupAsset.setDate_of_purchase(params.dateOfPurchase);
+        groupAsset.setSub_category_id(params.subCategoryId);
+        groupAsset.setSbu_code(params.sbuCode);
+        groupAsset.setBranch_id(params.branchId);
+        groupAsset.setCategory_id(params.category);
+        
+        // Financial information
+        groupAsset.setCost_price(params.costPrice);
+        groupAsset.setVat_amount(params.vatAmount);
+        groupAsset.setVatable_cost(params.vatableCost);
+        groupAsset.setWh_tax_amount(params.whTaxAmount);
+        groupAsset.setResidual_value(params.residualValue);
+        groupAsset.setAmountPTD(params.amountPTD);
+        groupAsset.setTransport_cost(params.transportCost);
+        groupAsset.setOther_cost(params.otherCost);
+        groupAsset.setDepreciation_rate(params.depreciationRate);
+        groupAsset.setAccum_dep(params.accumDep);
+        
+        // Descriptive information
+        groupAsset.setDescription(params.description);
+        groupAsset.setVendorName(params.vendorName);
+        groupAsset.setMake(params.make);
+        groupAsset.setLocation(params.location);
+        groupAsset.setSection(params.sectionId);
+        groupAsset.setSection_id(params.sectionId);
+        groupAsset.setState(params.state);
+        groupAsset.setDriver(params.driver);
+        groupAsset.setBar_code(params.barCode);
+        groupAsset.setVendor_account(params.vendorAccount);
+        groupAsset.setMaintained_by(params.maintainedBy);
+        groupAsset.setReason(params.purchaseReason);
+        groupAsset.setUser(params.assetUser);
+        groupAsset.setSbu_code(params.sbuCode);
+        groupAsset.setLpo(params.lpo);
+        groupAsset.setAuthorized_by(params.authorizedBy);
+        groupAsset.setSubject_to_vat(params.subjectToVatOld);
+        groupAsset.setWh_tax_cb(params.whTaxCb);
+        groupAsset.setSupplied_by(params.suppliedBy);
+        groupAsset.setWho_to_rem(params.whoToRem1);
+        groupAsset.setInvoiceNum(params.invoiceNum);
+        groupAsset.setEmail_1(params.email1);
+        groupAsset.setWho_to_rem_2(params.whoToRem2);
+        groupAsset.setPosting_date(params.postingDate);
+        groupAsset.setEmail2(params.email2);
+        
+        // Spare fields
+        groupAsset.setSpare_1(params.spare1);
+        groupAsset.setSpare_2(params.spare2);
+        groupAsset.setSpare_3(params.spare3);
+        groupAsset.setSpare_4(params.spare4);
+        groupAsset.setSpare_5(params.spare5);
+        groupAsset.setSpare_6(params.spare6);
+        
+        // Warranty information
+        groupAsset.setWarrantyStartDate(params.warrantyStartDate);
+        groupAsset.setNoOfMonths(params.noOfMonths);
+        groupAsset.setExpiryDate(params.expiryDate);
+        
+        // Project and flags
+        groupAsset.setProjectCode(params.projectCode);
+        groupAsset.setRequire_depreciation(params.requireDepreciation);
+        groupAsset.setRequire_redistribution(params.requireRedistribution);
+        groupAsset.setUser_id(userInfo.userId);
+        groupAsset.setFullyPAID(params.fullyPaid);
+        groupAsset.setPartPAY(params.partPay);
+        groupAsset.setRegistration_no(params.registrationNo);
+        
+        return groupAsset;
+    }
+    
+    private RequestContext extractRequestContext(HttpServletRequest request) {
+        RequestContext context = new RequestContext();
+        context.remoteAddr = request.getRemoteAddr();
+        
+        try {
+            InetAddress address = InetAddress.getByName(context.remoteAddr);
+            context.workstationName = address.getHostName();
+        } catch (Exception e) {
+            context.workstationName = "";
+           // LOGGER.warn("Could not resolve workstation name for IP: {}", context.remoteAddr);
+        }
+        
+        return context;
+    }
+    
+    private UserInfo extractUserInfo(HttpServletRequest request) {
+        UserInfo userInfo = new UserInfo();
+        HttpSession session = request.getSession();
+        
+        userInfo.userId = (String) session.getAttribute("CurrentUser");
+        userInfo.userClass = (String) session.getAttribute("UserClass");
+        
+        if (userInfo.userId != null) {
+            User user = securityHandler.getUserByUserID(userInfo.userId);
+            userInfo.userName = user.getUserName();
+            userInfo.branchRestrict = user.getBranchRestrict();
+            userInfo.deptRestrict = user.getDeptRestrict();
+            userInfo.deptCode = user.getDeptCode();
+            userInfo.branch = user.getBranch();
+            userInfo.branchRestricted = securityHandler.getBranchRestrictedUser(userInfo.userId);
+            
+            approvalBean.getApprovalDetail(approvalBean.getApprovalLimit(userInfo.userId));
+            userInfo.minApproval = approvalBean.getMini_approval();
+            userInfo.maxApproval = approvalBean.getMax_approval();
+        }
+        
+        return userInfo;
+    }
+    
+    private PostingParameters extractPostingParameters(HttpServletRequest request, UserInfo userInfo) {
+        PostingParameters params = new PostingParameters();
+        
+        // Basic parameters
+        params.id = request.getParameter("id");
+        params.categoryId = request.getParameter("categoryId");
+        params.groupId = request.getParameter("gid");
+        params.saveBtn = request.getParameter("saveBtn");
+        params.isNew = request.getParameter("s");
+        params.category = request.getParameter("category_id");
+        params.payType = getParameterOrDefault(request.getParameter("payType"), "N");
+        params.payCode = getParameterOrDefault(request.getParameter("category_id"), "0");
+        params.partPay = getParameterOrDefault(request.getParameter("partPay"), "");
+        params.acronym = getParameterOrDefault(request.getParameter("acronym"), "");
+        params.branchId = request.getParameter("branch_id");
+        params.lpo = request.getParameter("lpo");
+        params.invoiceNum = request.getParameter("invoiceNum");
+        params.suppliedBy = request.getParameter("sb");
+        
+        // Asset details
+        params.assetId = request.getParameter("asset_id");
+        params.dateOfPurchase = request.getParameter("date_of_purchase");
+        params.subCategoryId = request.getParameter("sub_category_id");
+        params.sbuCode = request.getParameter("sbu_code");
+        params.costPrice = request.getParameter("cost_price");
+        params.vatAmount = request.getParameter("vat_amount");
+        params.vatableCost = request.getParameter("vatable_cost");
+        params.whTaxAmount = request.getParameter("wh_tax_amount");
+        params.residualValue = request.getParameter("residual_value");
+        params.amountPTD = request.getParameter("amountPTD");
+        params.departmentId = request.getParameter("department_id");
+        
+        String desc1 = request.getParameter("description1");
+        String desc2 = request.getParameter("description2");
+        params.description = (desc1 != null && !"0".equals(desc1)) ? desc1 : desc2;
+        
+        params.region = request.getParameter("region");
+        params.make = request.getParameter("make");
+        params.location = request.getParameter("location");
+        params.sectionId = request.getParameter("section_id");
+        params.state = request.getParameter("state");
+        params.driver = request.getParameter("driver");
+        params.barCode = request.getParameter("bar_code");
+        params.vendorAccount = request.getParameter("vendor_accountOld");
+        params.vendorName = request.getParameter("vendorName");
+        params.maintainedBy = request.getParameter("maintained_by");
+        params.purchaseReason = request.getParameter("reason");
+        params.authorizedBy = request.getParameter("authorized_by");
+        params.noOfItems = request.getParameter("no_of_items");
+        params.deprStartDate = request.getParameter("depreciation_start_date");
+        params.deprEndDate = request.getParameter("depreciation_end_date");
+        params.assetUser = request.getParameter("user");
+        params.subjectToVatOld = request.getParameter("subject_to_vatOld");
+        params.whTaxCb = request.getParameter("wh_tax_cb");
+        params.transportCost = request.getParameter("transport_cost");
+        params.otherCost = request.getParameter("other_cost");
+        params.depreciationRate = request.getParameter("depreciation_rate");
+        params.accumDep = request.getParameter("accum_dep");
+        params.nbv = request.getParameter("nbv");
+        params.whoToRem1 = request.getParameter("who_to_rem");
+        params.email1 = request.getParameter("email_1");
+        params.whoToRem2 = request.getParameter("who_to_rem2");
+        params.postingDate = request.getParameter("posting_date");
+        params.email2 = request.getParameter("email2");
+        
+        // Spare fields
+        params.spare1 = request.getParameter("spare_1");
+        params.spare2 = request.getParameter("spare_2");
+        params.spare3 = request.getParameter("spare_3");
+        params.spare4 = request.getParameter("spare_4");
+        params.spare5 = request.getParameter("spare_5");
+        params.spare6 = request.getParameter("spare_6");
+        
+        // Warranty
+        params.warrantyStartDate = request.getParameter("warrantyStartDate");
+        params.noOfMonths = request.getParameter("noOfMonths");
+        params.expiryDate = request.getParameter("expiryDate");
+        params.projectCode = getParameterOrDefault(request.getParameter("projectCode"), "");
+        params.requireDepreciation = getParameterOrDefault(request.getParameter("require_depreciation"), "");
+        params.requireRedistribution = getParameterOrDefault(request.getParameter("require_redistribution"), "");
+        params.fullyPaid = request.getParameter("fullyPAID");
+        params.registrationNo = request.getParameter("registration_no");
+        
+        return params;
+    }
+    
+    private String getParameterOrDefault(String value, String defaultValue) {
+        return value != null ? value : defaultValue;
+    }
+    
+    private Properties loadProperties() throws IOException {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream(PROPERTIES_PATH)) {
+            props.load(input);
+        }
+        return props;
+    }
+    
+    private void showSuccessAlert(PrintWriter out, String message, String redirectUrl) {
+        out.println("<script>");
+        out.println("alert('" + message + "');");
+        out.println("window.location='" + redirectUrl + "';");
+        out.println("</script>");
+    }
+    
+    private void showErrorAlert(PrintWriter out, String message, int historyStep) {
+        out.println("<script>");
+        out.println("alert('" + message + "');");
+        out.println("history.go(" + historyStep + ");");
+        out.println("</script>");
+    }
+    
+    private void handleError(HttpServletResponse response, String message) throws IOException {
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<script>");
+            out.println("alert('" + message + "');");
+            out.println("history.go(-1);");
+            out.println("</script>");
+        }
+    }
+    
+    // ==================== INNER CLASSES ====================
+    
+    private static class RequestContext {
+        String remoteAddr;
+        String workstationName;
+    }
+    
+    private static class UserInfo {
+        String userId;
+        String userClass;
+        String userName;
+        String branchRestrict;
+        String deptRestrict;
+        String deptCode;
+        String branch;
+        String branchRestricted;
+        double minApproval;
+        double maxApproval;
+    }
+    
+    private static class PostingParameters {
+        // Basic parameters
+        String id;
+        String categoryId;
+        String groupId;
+        String saveBtn;
+        String isNew;
+        String category;
+        String payType;
+        String payCode;
+        String partPay;
+        String acronym;
+        String branchId;
+        String lpo;
+        String invoiceNum;
+        String suppliedBy;
+        
+        // Asset details
+        String assetId;
+        String dateOfPurchase;
+        String subCategoryId;
+        String sbuCode;
+        String costPrice;
+        String vatAmount;
+        String vatableCost;
+        String whTaxAmount;
+        String residualValue;
+        String amountPTD;
+        String departmentId;
+        String description;
+        String region;
+        String make;
+        String location;
+        String sectionId;
+        String state;
+        String driver;
+        String barCode;
+        String vendorAccount;
+        String vendorName;
+        String maintainedBy;
+        String purchaseReason;
+        String authorizedBy;
+        String noOfItems;
+        String deprStartDate;
+        String deprEndDate;
+        String assetUser;
+        String subjectToVatOld;
+        String whTaxCb;
+        String transportCost;
+        String otherCost;
+        String depreciationRate;
+        String accumDep;
+        String nbv;
+        String whoToRem1;
+        String email1;
+        String whoToRem2;
+        String postingDate;
+        String email2;
+        
+        // Spare fields
+        String spare1;
+        String spare2;
+        String spare3;
+        String spare4;
+        String spare5;
+        String spare6;
+        
+        // Warranty
+        String warrantyStartDate;
+        String noOfMonths;
+        String expiryDate;
+        String projectCode;
+        String requireDepreciation;
+        String requireRedistribution;
+        String fullyPaid;
+        String registrationNo;
+    }
 
 
-	 }catch(Throwable e) {
-		 e.getMessage();
-	 }
-	 
-	
-   }
-   public void doGet(HttpServletRequest request, 
-		    HttpServletResponse response)
-		      throws ServletException, IOException
-		   {
-	   doPost(request, response);
-		   }
 }

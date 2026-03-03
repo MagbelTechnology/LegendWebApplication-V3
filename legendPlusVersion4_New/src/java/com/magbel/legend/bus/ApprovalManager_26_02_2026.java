@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.magbel.legend.vao.ViewAssetDetails;
-public class ApprovalManager extends ConnectionClass {
+public class ApprovalManager_26_02_2026 extends ConnectionClass {
 
 	public ApprovalRecords approvalRec;
     private MagmaDBConnection dbConnection;
@@ -35,11 +35,10 @@ public class ApprovalManager extends ConnectionClass {
     private java.text.SimpleDateFormat timer;
     com.magbel.util.DatetimeFormat df;
 
-    public ApprovalManager() {
+    public ApprovalManager_26_02_2026() {
 
         try {
         	System.out.println("Instantiating the ApprovalManager.....");
-            freeResource();
             sdf = new java.text.SimpleDateFormat("dd-MM-yyyy hh:mm:ss.SSS");
             timer = new java.text.SimpleDateFormat("hh:mm:ss");
             dbConnection = new MagmaDBConnection();

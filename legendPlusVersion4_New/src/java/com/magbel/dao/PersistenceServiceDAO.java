@@ -27,22 +27,26 @@ public class PersistenceServiceDAO implements ConnectionDAO{
         sdf = new SimpleDateFormat("dd-MM-yyyy");
     }
 
+   
+    
     public void executeQuery(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            System.out.println("WARNING: Empty query passed to executeQuery");
+            return;
+        }
 
-        PreparedStatement ps = null;
-        Connection con = null;
-        try {
-            con = this.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        try (Connection con = this.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
             ps.execute();
-        } catch (Exception error) {
 
-        } finally {
-            closeConnection(con, ps);
+        } catch (SQLException e) {
+            System.out.println("ERROR executing query: " + query);
+            e.printStackTrace();
         }
     }
 
-    public void executeQueryString(String query,String jndiName) {
+    public void executeQueryStringOld(String query,String jndiName) {
 
 	        PreparedStatement ps = null;
 	        Connection con = null;
@@ -56,6 +60,24 @@ public class PersistenceServiceDAO implements ConnectionDAO{
 	        } finally {
 	            closeConnection(con, ps);
 	        }
+    }
+    
+    public void executeQueryString(String query, String jndiName) {
+        if (query == null || query.trim().isEmpty()) {
+            System.out.println("WARN: Empty query passed to executeQueryString");
+            return;
+        }
+
+        try (Connection con = this.getConnection(jndiName);
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.execute();
+
+        } catch (SQLException e) {
+            System.out.println("ERROR executing query on JNDI: " + jndiName);
+            System.out.println("Query: " + query);
+            e.printStackTrace();
+        }
     }
 
     public void closeConnection(Connection con, PreparedStatement ps) {
@@ -114,25 +136,36 @@ public class PersistenceServiceDAO implements ConnectionDAO{
 	        }
     }
 
+ 
+    
     public Connection getConnection() {
-	        Connection con = null;
-	        try {  
-	            con = new DataConnect("legendPlus").getConnection();
-	        } catch (Exception conError) {
-	            System.out.println("WARNING:Error getting connection - >" +
-	                               conError);
-	        } 
-	        return con;
+        Connection con = null;
+        try {
+            con = new DataConnect("legendPlus").getConnection();
+            if (con == null || con.isClosed()) {
+                throw new SQLException("Failed to obtain a valid connection from JNDI: ");
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR getting connection for JNDI: ");
+            e.printStackTrace();
+           
+        }
+        return con;
     }
 
 
+    
     public Connection getConnection(String jndiName) {
         Connection con = null;
         try {
             con = new DataConnect(jndiName).getConnection();
-        } catch (Exception conError) {
-            System.out.println("WARNING:Error getting connection - >" +
-                               conError);
+            if (con == null || con.isClosed()) {
+                throw new SQLException("Failed to obtain a valid connection from JNDI: " + jndiName);
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR getting connection for JNDI: " + jndiName);
+            e.printStackTrace();
+           
         }
         return con;
     }

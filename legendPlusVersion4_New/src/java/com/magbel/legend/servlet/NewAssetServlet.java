@@ -2,13 +2,18 @@ package com.magbel.legend.servlet;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FilenameUtils;
+
+import com.magbel.legend.bus.ApprovalRecords;
+import com.magbel.legend.mail.EmailSmsServiceBus;
+import com.magbel.util.ApplicationHelper;
+import com.magbel.util.HtmlUtility;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -17,617 +22,602 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import legend.admin.handlers.CompanyHandler;
+import legend.admin.handlers.SecurityHandler;
+import legend.admin.objects.User;
 import magma.AssetRecordsBean;
-import magma.net.manager.SytemsManager;
 import magma.util.Codes;
-import com.magbel.legend.bus.ApprovalRecords;
-import com.magbel.legend.bus.Report;
-import com.magbel.legend.mail.EmailSmsServiceBus;
+
 
 
 @MultipartConfig(
-		  fileSizeThreshold = 0x300000, 
-		  maxFileSize = 0xa00000,    
-		  maxRequestSize = 0x3200000
-		)
-public class NewAssetServlet extends HttpServlet
-{
-	private EmailSmsServiceBus mail ;
-	
-	private ApprovalRecords records;
-	 legend.admin.handlers.SecurityHandler sechanle = new legend.admin.handlers.SecurityHandler();
-	 com.magbel.util.HtmlUtility htmlUtil  = new com.magbel.util.HtmlUtility();
-	 com.magbel.legend.bus.ApprovalRecords aprecords  = new com.magbel.legend.bus.ApprovalRecords();
-	 com.magbel.util.ApplicationHelper appHelper  = new com.magbel.util.ApplicationHelper();
-	 legend.admin.handlers.CompanyHandler comp  = new legend.admin.handlers.CompanyHandler();
-   public void doPost(HttpServletRequest request, 
-    HttpServletResponse response)
-      throws ServletException, IOException
-     
-   {
-	   try {
-	 String userClass = (String) request.getSession().getAttribute("UserClass");
-	 String user_Id =(String) request.getSession().getAttribute("CurrentUser");
-	// System.out.println("<<<<<<user_Id: "+user_Id);
-	 PrintWriter out = response.getWriter();
-	
-	 HttpSession session = request.getSession();
-	 Properties prop = new Properties();
-	 File file = new File("C:\\Property\\LegendPlus.properties");
-	 FileInputStream input = new FileInputStream(file);
-	 prop.load(input);
-
-	 String ThirdPartyLabel = prop.getProperty("ThirdPartyLabel");
-	 String singleApproval = prop.getProperty("singleApproval");
-	 String VATRequired = prop.getProperty("VATREQUIRED");
-	 String sbuRequired = prop.getProperty("SBUREQUIRED");
-
-	 System.out.println("ThirdPartyLabel: " + ThirdPartyLabel);
-	 
-	// System.out.println("\n\n ============== the systemIp for current user is ============ ");
-	
-	AssetRecordsBean ad = new AssetRecordsBean();
-	 magma.ApprovalBean apbean = new magma.ApprovalBean();
-	 Part filePart = request.getPart("file");
- 	
- 	//String assetId = request.getParameter("assetId");
- 	//String tran_status = request.getParameter("tran_status");
- 	//String destination = request.getParameter("destination");
-	 String destination = "DocumentHelp.jsp?np=updateAssetView";
- 	
- 	
- 	//System.out.println("The destination is ==: " + destination);
- 	
-	 String fileName = filePart.getSubmittedFileName();
-	 System.out.println("fileName: " + fileName);
-	 	
-	 String vatCostLabel = "";
-	 if(VATRequired.equals("N")){vatCostLabel = "Asset Cost";}
-	 if(VATRequired.equals("Y")){vatCostLabel = "Vatable Cost";}
-
-	// String categoryId = request.getParameter("categoryId");
-	// String category = request.getParameter("code");
-	 String category = request.getParameter("category_id");
-	 String subCategory = request.getParameter("sub_category_id");
-	 System.out.println("category: " + category);
-	 System.out.println("subCategory: " + subCategory);
-	 String payType = request.getParameter("payType");
-	 //String acronym = request.getParameter("acronym");
-	// if(categoryId == null){categoryId = "0";}
-	 String subjecttovat = aprecords.getCodeName("select VAT_SELECTION from am_gb_company");
-	 String thirdpartyrqd = aprecords.getCodeName("select THIRDPARTY_REQUIRE from am_gb_company");
-	 //String subjecttovat = "";
-	 String root = "new";
-	 String userid = (String)session.getAttribute("CurrentUser");
-	 String systemIp = request.getRemoteAddr();
-	 String wipacronym = "WIP";
-	 //String acronym = aprecords.getCodeName("select category_Id from am_ad_category where category_acronym = ?",wipacronym);
-	 String payCode = request.getParameter("category_id");
-	 String partPay = request.getParameter("partPay");
-	 if(payCode == null){payCode = "0";}
-	 if(payType == null){payType = "N";}
-	// System.out.println("\n\n ============== the partPay for current user is ============ " + partPay);
-	 legend.admin.objects.User user = sechanle.getUserByUserID(userid);
-	 String userName = user.getUserName();
-	 System.out.println("userName: " + userName);
-	 String branchRestrict = user.getBranchRestrict();
-	 String UserRestrict = user.getDeptRestrict();
-	 String departCode = user.getDeptCode();
-	 System.out.println("departCode: " + departCode);
-	 String branch = user.getBranch();
-	 System.out.println("branch: " + branch);
-	 String tran_status ="A";
-	 String currentPage = "updateAssetView";	 
-	 String tran_type = "Asset Update"; 
-	 String dept = aprecords.getCodeName("select dept_Id from am_ad_department where dept_code = ? ",departCode);
-	 System.out.println("dept: " + dept);
-	 ArrayList approvelist =ad.getApprovalsId(branch,departCode,userName);
-	 
-	 System.out.println("approvelist: " + approvelist.size());
-	 System.out.print("Branch== "+branch+"  departCode: "+departCode+"   dept: "+dept);
-	// String makeExist = aprecords.getCodeName("SELECT COUNT(*) FROM am_ad_category WHERE CATEGORY_ID IN (SELECT CATEGORY_ID FROM am_gb_assetMake WHERE STATUS = 'ACTIVE') AND CATEGORY_ID = ? ",categoryId);	
-	 com.magbel.util.CurrencyNumberformat formata = new com.magbel.util.CurrencyNumberformat();
-
-	 String enforceBarcode = aprecords.getCodeName("select enforceBarcode from am_ad_category where CATEGORY_ID = ?",category);
-	 System.out.print("<<<<<enforceBarcode: "+enforceBarcode+"    <<<<<category: "+category);
-
-	   //To get information if approval is required for a transactionv
-	 String branchrestricted = "";  
-	 if(userid != null){
-	    branchrestricted = sechanle.getBranchRestrictedUser(userid);	
-	 }
-
-	// System.out.print("<<<<<branchrestricted: "+branchrestricted);
-	 			  
-	 int numOfTransactionLevel =  ad.getNumOfTransactionLevel("1");
-
-
-	 //String levelCode=apbean.getApprovalLevel(userid);
-	 //apbean.getApprovalDetail(levelCode);
-	 //double min_approval = apbean.getMini_approval();
-	 //double max_approval = apbean.getMax_approval();
-
-	 String limitCode=apbean.getApprovalLimit(userid);
-	 apbean.getApprovalDetail(limitCode);
-	 double min_approval = apbean.getMini_approval();
-	 double max_approval = apbean.getMax_approval();
-	 String vatRate ="0";
-	 String taxRate ="0";
-	 //String category = request.getParameter("categoryId");
-	 String acronym = request.getParameter("acronym");
-	 // System.out.println("acronym >>>>>>>>>>>>> " + acronym);
-	 if(category == null){category = "0";}
-	 if(acronym == null){acronym = "";}
-	 String isNew =  request.getParameter("s");
-	 String branch_id = request.getParameter("branch_id"); //ganiyu
-	 String supervisorID = request.getParameter("supervisor");
-	 EmailSmsServiceBus mail = new EmailSmsServiceBus();
-	 String lpo = request.getParameter("lpo");
-	 String invoiceNo = request.getParameter("invNo");
-	 String vendorNo = request.getParameter("sb");
-
-	 String ID = request.getParameter("ID");
-	 //System.out.print("supervisorID== "+supervisorID+"       barCode: "+barCode);
-	 //String branch_sbu = ad.getBranch_id();
-	 //String branch_sbu = "1";//ad.getBranch_id();
-	 ///System.out.println("================================TEST===========================================");
-	 if(isNew!=null && isNew.equalsIgnoreCase("n")) session.setAttribute("newAsset",null);
-	 if(session.getAttribute("newAsset")!=null)
-	   {
-	   	ad=(magma.AssetRecordsBean)session.getAttribute("newAsset");
-	 	category = ad.getCategory_id();
-	   branch_id = ad.getBranch_id(); //ganiyu
-	   }
-	 //System.out.print("<<<<<getVatRate: "+ad.getVatRate());
-	 SytemsManager sm = new SytemsManager();
-	   if(request.getParameter("saveBtn") != null){
-	   String multiple = request.getParameter("multiple");
-	   String section = request.getParameter("section_id");
-	   ad= new AssetRecordsBean();
-	   ad.setMultiple(multiple);
-	   ad.setSection_id(section);
-	   String memoV = request.getParameter("memo");
-	   ad.setMemo(memoV);
-	    session.setAttribute("newAsset", ad);
-	    String asset_id = request.getParameter("asset_id");
-	    String legacyId = request.getParameter("integrifyId");
-	    String category_id = request.getParameter("category_id");
-	    String date_of_purchase = request.getParameter("date_of_purchase");
-	    String sub_category_id = request.getParameter("sub_category_id");
-	    String sbu_code = request.getParameter("sbu_code");
-	    String cost_price = request.getParameter("cost_price");
-	    String vat_amount =  request.getParameter("vat_amount");
-	    String vatable_cost = request.getParameter("vatable_cost");
-	    String wh_tax_amount = request.getParameter("wh_tax_amount");
-	    String residual_value = request.getParameter("residual_value");
-	    String amountPTD = request.getParameter("amountPTD");
-	    String department_id = request.getParameter("department_id");
-	    String descriptions = request.getParameter("description1").equals("0") ? request.getParameter("description2") : request.getParameter("description1");
-	  //  System.out.println("description1 >>>>>>>>>>>>> " + description1);
-	    String region = request.getParameter("regionCode");
-	    String make = request.getParameter("make");
-	    String location = request.getParameter("location");
-	    String serial_number = request.getParameter("serial_number");
-	   // String section_id = request.getParameter("section_id");
-	    String fullyPAID = request.getParameter("fullyPAID");
-	    String state = request.getParameter("state");
-	    String driver = request.getParameter("driver");
-	    String bar_code = request.getParameter("bar_code");
-	   String vendor_acc = request.getParameter("vendor_accountOld");
-	   String vendor_name =  request.getParameter("vendorName");
-	   String maintained_by = request.getParameter("maintained_by");
-	   String purchaseReason = request.getParameter("reason");
-	   String assetUser = request.getParameter("user");
-	    String authorized_by = request.getParameter("authorized_by");
-	    String subject_to_vatOld = request.getParameter("subject_to_vatOLD");
-	    String wh_tax_cb= request.getParameter("wh_tax_cb");
-	    String transport_cost = request.getParameter("transport_cost");
-	    String other_cost = request.getParameter("other_cost");
-	    String depreciation_rate = request.getParameter("depreciation_rate");
-	    String accum_dep = request.getParameter("accum_dep");
-	    String nbv = request.getParameter("nbv");
-	    String supplied_by = request.getParameter("sb");
-	    String who_to_rem1 = request.getParameter("who_to_remind");
-	    String invoiceNum = request.getParameter("invNo");
-	    String e_mail1 = request.getParameter("email_1");
-	    String who_to_rem2 = request.getParameter("who_to_rem2");
-	    String posting_date = request.getParameter("posting_date");
-	    String email2 = request.getParameter("email2");
-	    String spare_1 = request.getParameter("spare_1");
-	    String spare_2 = request.getParameter("spare_2");
-	    String spare_3 = request.getParameter("spare_3");
-	    String spare_4 = request.getParameter("spare_4");
-	    String spare_5 = request.getParameter("spare_5");
-	    String spare_6 = request.getParameter("spare_6");
-	    String warrantyStartDate = request.getParameter("warrantyStartDate");
-	    String noOfMonths = request.getParameter("noOfMonths");
-	    String expiryDate = request.getParameter("expiryDate");
-	    String projectCode = request.getParameter("projectCode");
-	    String require_depreciation = request.getParameter("require_depreciation");
-	    String require_redistribution = request.getParameter("require_redistribution");
-	    String memo = request.getParameter("memo");
-	    String engine_number = request.getParameter("engine_number");
-	    String model = request.getParameter("model");
+	    fileSizeThreshold = 0x300000,  // 3MB
+	    maxFileSize = 0xA00000,        // 10MB
+	    maxRequestSize = 0x3200000     // 50MB
+	)
+	public class NewAssetServlet extends HttpServlet {
 	    
-	   
+	    private static final Logger LOGGER = Logger.getLogger(NewAssetServlet.class.getName());
+	    private static final String PROPERTIES_PATH = "C:\\Property\\LegendPlus.properties";
+	    private static final String DESTINATION_PAGE = "DocumentHelp.jsp?np=updateAssetView";
+	    private static final String CURRENT_PAGE = "updateAssetView";
+	    private static final String TRANSACTION_TYPE = "Asset Update";
+	    private static final String ROOT = "new";
 	    
-	   // System.out.println("category >>>>>>>>>>>>> " + category);
-//	    System.out.println("date_of_purchase >>>>>>>>>>>>> " + date_of_purchase);
-//	    System.out.println("sub_category_id >>>>>>>>>>>>> " + sub_category_id);
-//	    System.out.println("sbu_code >>>>>>>>>>>>> " + sbu_code);
-	   // System.out.println("department_id >>>>>>>>>>>>> " + department_id);
-	   	ad.setAsset_id(asset_id);
-	   	ad.setIntegrifyId(legacyId);
-	   	ad.setCategory_id(category_id);
-	    ad.setDepartment_id(department_id);
-	    ad.setDate_of_purchase(date_of_purchase);
-	    ad.setSub_category_id(sub_category_id);
-	    ad.setSbu_code(sbu_code);
-	    ad.setBranch_id(branch_id);
-	    ad.setCategory_id(category);
-	    ad.setCost_price(cost_price);
-	    ad.setVat_amount(vat_amount);
-	    ad.setVatable_cost(vatable_cost);
-	    ad.setWh_tax_amount(wh_tax_amount);
-	    ad.setResidual_value(residual_value);
-	    ad.setAmountPTD(amountPTD);
-	    ad.setDescription(descriptions);
-	    ad.setRegionCode(region);
-	    ad.setMake(make);
-	    ad.setLocation(location);
-	    ad.setSerial_number(serial_number);
-	  //  ad.setSection_id(section_id);
-	    ad.setState(state);
-	    ad.setDriver(driver);
-	    ad.setBar_code(bar_code);
-	    ad.setVendor_account(vendor_acc);
-	    ad.setVendorName(vendor_name);
-	    ad.setMaintained_by(maintained_by);
-	    ad.setReason(purchaseReason);
-	    ad.setUser(assetUser);
-	    ad.setSupplied_by(vendorNo);
-	    ad.setSbu_code(sbu_code);
-	    ad.setLpo(lpo);
-	  //  ad.setUser_id(user_Id);
-	    ad.setAuthorized_by(authorized_by);
-	   // ad.setUser_id(user_Id);
-	    ad.setSubject_to_vat(subject_to_vatOld);
-	    ad.setWh_tax_cb(wh_tax_cb);
-	    ad.setTransport_cost(transport_cost);
-	    ad.setOther_cost(other_cost);
-	    ad.setDepreciation_rate(depreciation_rate);
-	    ad.setAccum_dep(accum_dep);
-	    ad.setNbv(nbv);
-	    ad.setSupplied_by(supplied_by);
-	    ad.setMemo(memo);
-	    ad.setEngine_number(engine_number);
-	    ad.setEmail_1(e_mail1);
-	    ad.setModel(model);
-	    ad.setPosting_date(posting_date);
-	    ad.setEmail2(email2);
-	    ad.setSpare_1(spare_1);
-	    ad.setSpare_2(spare_2);
-	    ad.setSpare_3(spare_3);
-	    ad.setSpare_4(spare_4);
-	    ad.setSpare_5(spare_5);
-	    ad.setSpare_6(spare_6);
-	    ad.setWarrantyStartDate(warrantyStartDate);
-	    ad.setNoOfMonths(noOfMonths);
-	    ad.setExpiryDate(expiryDate);
-	    ad.setProjectCode(projectCode);
-	    ad.setRequire_depreciation(require_depreciation);
-	    ad.setRequire_redistribution(require_redistribution);
-	    ad.setUser_id(user_Id);
-	    ad.setFullyPAID(fullyPAID);
-
+	    private EmailSmsServiceBus mailService;
+	    private ApprovalRecords approvalRecords;
+	    private SecurityHandler securityHandler;
+	    private HtmlUtility htmlUtil;
+	    private CompanyHandler companyHandler;
+	    private ApplicationHelper appHelper;
 	    
-	 System.out.println("branch >>>>>>>>>>>>> " + branch);
-	     int statux = ad.insertAssetRecord(branch);
-	 	  System.out.println("statux >>>>>>>>>>>>> " + statux);
-//	 	String invoiceNumber = vendorNo+'-'+invoiceNo;
-	 	String invnumb = vendorNo+'-'+invoiceNo;
-//	 	System.out.println("invoice Number in JSP >>>>>>>>>>>>> " + invnumb);
-	 htmlUtil.insToAm_Invoice_No(ad.getAsset_id(),lpo,invnumb,"Asset Creation");	   
-	 	 if(statux == 0 )
-	 	 {
-//	 	  	String q3_rfid = "update ST_INVENTORY_RFID set SCANN_STATUS='P' where RFID_TAG = ?";
-//	 		ad.updateAssetStatusChange(q3_rfid,ad.getBar_code());
-	 	 
-	 	  String id = ad.getAsset_id();
-	 	  
-	 //	  System.out.println("id before asset code >>>>>>> " + id);
-	 	  
-	 	  int assetCode =ad.getAssetCode();
-	 	  System.out.println("assetCode >>>>>> " + assetCode);
-	 	 prop.load(input);
-         String UPLOAD_FOLDER = prop.getProperty("imagesUrl");
-         String uploadPath = UPLOAD_FOLDER;
-         
-         File uploadDir = new File(uploadPath);
-         if(!uploadDir.exists())
-         {
-             uploadDir.mkdir();
-         }
-         try
-         {
-         	 if(!fileName.endsWith(".php") || !fileName.endsWith(".sql")) {
-         	 for (Part part : request.getParts()) {
-                     
-                     String ext = FilenameUtils.getExtension(fileName);
-                 //    System.out.println("The extension is =>: " + ext);
-                     
-                     String filePath = uploadPath + "W" + fileName.toString();
-                    // System.out.println("The file path is ==: " + filePath);
-                     
-                     String newPath = uploadPath + "W" + assetCode + "." + ext;
-//                     System.out.println("The new file path is >=: " + newPath);
-                     
-                    
-                     File oldFile = new File(filePath);
-                     
-                     File newFile = new File(newPath);
-                     
-                     String newFileName = newFile.getName().substring(0, newFile.getName().lastIndexOf("."));
-                     
-                   //  System.out.println("newFileName >=: " + newFileName);
-                     
-                     File folder = new File(UPLOAD_FOLDER);
-         	        File[] listOfFiles = folder.listFiles();
-         	        
-         	       String listFiles = Arrays.toString(listOfFiles);
-         	       	       
-                     
-                     oldFile.renameTo(newFile);
+	    public NewAssetServlet() {
+	        this.mailService = new EmailSmsServiceBus();
+	        this.approvalRecords = new ApprovalRecords();
+	        this.securityHandler = new SecurityHandler();
+	        this.htmlUtil = new HtmlUtility();
+	        this.companyHandler = new CompanyHandler();
+	        this.appHelper = new ApplicationHelper();
+	    }
+	    
+	    @Override
+	    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+	            throws ServletException, IOException {
+	        
+	        response.setContentType("text/html");
+	        PrintWriter out = response.getWriter();
+	       
+	        
+	        try {
+	            UserSession userSession = extractUserSession(request);
+	            SystemConfiguration config = loadSystemConfiguration();
+	            
+	            if (request.getParameter("saveBtn") != null) {
+	                try {
+						handleAssetSave(request, response, out, userSession, config);
+					} catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	            }
+	            
+	        } catch (Exception e) {
+	            LOGGER.log(Level.SEVERE, "Error processing asset creation", e);
+	            handleError(out, "An error occurred while processing your request");
+	        }
+	    }
+	    
+	    private UserSession extractUserSession(HttpServletRequest request) {
+	        HttpSession session = request.getSession();
+	        UserSession userSession = new UserSession();
+	        
+	        userSession.setUserId((String) session.getAttribute("CurrentUser"));
+	        userSession.setUserClass((String) session.getAttribute("UserClass"));
+	        userSession.setSystemIp(request.getRemoteAddr());
+	        
+	        if (userSession.getUserId() != null) {
+	            User user = securityHandler.getUserByUserID(userSession.getUserId());
+	            userSession.setUserName(user.getUserName());
+	            userSession.setBranch(user.getBranch());
+	            userSession.setDeptCode(user.getDeptCode());
+	            userSession.setBranchRestrict(user.getBranchRestrict());
+	            userSession.setDeptRestrict(user.getDeptRestrict());
+	            userSession.setBranchRestricted(securityHandler.getBranchRestrictedUser(userSession.getUserId()));
+	        }
+	        
+	        return userSession;
+	    }
+	    
+	    private SystemConfiguration loadSystemConfiguration() throws IOException {
+	        Properties props = new Properties();
+	        try (FileInputStream input = new FileInputStream(new File(PROPERTIES_PATH))) {
+	            props.load(input);
+	        }
+	        
+	        SystemConfiguration config = new SystemConfiguration();
+	        config.setThirdPartyLabel(props.getProperty("ThirdPartyLabel"));
+	        config.setSingleApproval(props.getProperty("singleApproval"));
+	        config.setVatRequired(props.getProperty("VATREQUIRED"));
+	        config.setSbuRequired(props.getProperty("SBUREQUIRED"));
+	        config.setUploadFolder(props.getProperty("imagesUrl"));
+	        
+	        LOGGER.info("ThirdPartyLabel: " + config.getThirdPartyLabel());
+	        
+	        return config;
+	    }
+	    
+	    private void handleAssetSave(HttpServletRequest request, HttpServletResponse response, 
+	                                 PrintWriter out, UserSession userSession, SystemConfiguration config) 
+	            throws Throwable {
+	        
+	        AssetRecordsBean assetBean = initializeAssetBean(request, userSession);
+	        HttpSession session = request.getSession();
+	        session.setAttribute("newAsset", assetBean);
+	        
+	        // Populate asset bean from request parameters
+	        populateAssetFromRequest(assetBean, request);
+	        assetBean.setUser_id(userSession.getUserId());
+	        
+	        // Insert asset record
+	        int status = assetBean.insertAssetRecord(userSession.getBranch());
+	        LOGGER.info("Asset insertion status: " + status);
+	        
+	        if (status == 0) {
+	            handleSuccessfulAssetCreation(request, response, out, assetBean, userSession, config);
+	        } else if (status == 1 || status == 2) {
+	            handleBudgetExceededError(out);
+	        } else {
+	            handleGeneralError(out);
+	        }
+	    }
+	    
+	    private AssetRecordsBean initializeAssetBean(HttpServletRequest request, UserSession userSession) throws Exception {
+	        AssetRecordsBean bean = new AssetRecordsBean();
+	        HttpSession session = request.getSession();
+	        
+	        if (session.getAttribute("newAsset") != null && "n".equals(request.getParameter("s"))) {
+	            session.setAttribute("newAsset", null);
+	        }
+	        
+	        if (session.getAttribute("newAsset") != null) {
+	            bean = (AssetRecordsBean) session.getAttribute("newAsset");
+	        }
+	        
+	        bean.setMultiple(request.getParameter("multiple"));
+	        bean.setSection_id(request.getParameter("section_id"));
+	        bean.setMemo(request.getParameter("memo"));
+	        
+	        return bean;
+	    }
+	    
+	    private void populateAssetFromRequest(AssetRecordsBean bean, HttpServletRequest request) throws Exception {
+	        // Basic Information
+	        bean.setAsset_id(request.getParameter("asset_id"));
+	        bean.setIntegrifyId(request.getParameter("integrifyId"));
+	        bean.setCategory_id(request.getParameter("category_id"));
+	        bean.setSub_category_id(request.getParameter("sub_category_id"));
+	        bean.setDepartment_id(request.getParameter("department_id"));
+	        bean.setBranch_id(request.getParameter("branch_id"));
+	        bean.setSbu_code(request.getParameter("sbu_code"));
+	        
+	        // Dates
+	        bean.setDate_of_purchase(request.getParameter("date_of_purchase"));
+	        bean.setPosting_date(request.getParameter("posting_date"));
+	        bean.setWarrantyStartDate(request.getParameter("warrantyStartDate"));
+	        bean.setExpiryDate(request.getParameter("expiryDate"));
+	        bean.setNoOfMonths(request.getParameter("noOfMonths"));
+	        
+	        // Financial Information
+	        bean.setCost_price(request.getParameter("cost_price"));
+	        bean.setVat_amount(request.getParameter("vat_amount"));
+	        bean.setVatable_cost(request.getParameter("vatable_cost"));
+	        bean.setWh_tax_amount(request.getParameter("wh_tax_amount"));
+	        bean.setResidual_value(request.getParameter("residual_value"));
+	        bean.setAmountPTD(request.getParameter("amountPTD"));
+	        bean.setTransport_cost(request.getParameter("transport_cost"));
+	        bean.setOther_cost(request.getParameter("other_cost"));
+	        bean.setDepreciation_rate(request.getParameter("depreciation_rate"));
+	        bean.setAccum_dep(request.getParameter("accum_dep"));
+	        bean.setNbv(request.getParameter("nbv"));
+	        
+	        // Description (handle both description1 and description2)
+	        String description = request.getParameter("description1");
+	        if ("0".equals(description)) {
+	            description = request.getParameter("description2");
+	        }
+	        bean.setDescription(description);
+	        
+	        // Asset Details
+	        bean.setRegionCode(request.getParameter("regionCode"));
+	        bean.setMake(request.getParameter("make"));
+	        bean.setModel(request.getParameter("model"));
+	        bean.setLocation(request.getParameter("location"));
+	        bean.setSerial_number(request.getParameter("serial_number"));
+	        bean.setBar_code(request.getParameter("bar_code"));
+	        bean.setEngine_number(request.getParameter("engine_number"));
+	        bean.setState(request.getParameter("state"));
+	        bean.setDriver(request.getParameter("driver"));
+	        
+	        // Vendor Information
+	        bean.setVendor_account(request.getParameter("vendor_accountOld"));
+	        bean.setVendorName(request.getParameter("vendorName"));
+	        bean.setSupplied_by(request.getParameter("sb"));
+	        bean.setLpo(request.getParameter("lpo"));
+	        
+	        // Personnel Information
+	        bean.setUser(request.getParameter("user"));
+	        bean.setMaintained_by(request.getParameter("maintained_by"));
+	        bean.setAuthorized_by(request.getParameter("authorized_by"));
+	        bean.setReason(request.getParameter("reason"));
+	        
+	        // Tax Information
+	        bean.setSubject_to_vat(request.getParameter("subject_to_vatOLD"));
+	        bean.setWh_tax_cb(request.getParameter("wh_tax_cb"));
+	        
+	        // Additional Fields
+	        bean.setFullyPAID(request.getParameter("fullyPAID"));
+	        bean.setProjectCode(request.getParameter("projectCode"));
+	        bean.setRequire_depreciation(request.getParameter("require_depreciation"));
+	        bean.setRequire_redistribution(request.getParameter("require_redistribution"));
+	        
+	        // Email and Notification
+	        bean.setEmail_1(request.getParameter("email_1"));
+	        bean.setEmail2(request.getParameter("email2"));
+	        
+	        // Spare Fields
+	        bean.setSpare_1(request.getParameter("spare_1"));
+	        bean.setSpare_2(request.getParameter("spare_2"));
+	        bean.setSpare_3(request.getParameter("spare_3"));
+	        bean.setSpare_4(request.getParameter("spare_4"));
+	        bean.setSpare_5(request.getParameter("spare_5"));
+	        bean.setSpare_6(request.getParameter("spare_6"));
+	    }
+	    
+	    private void handleSuccessfulAssetCreation(HttpServletRequest request, HttpServletResponse response,
+	                                               PrintWriter out, AssetRecordsBean assetBean,
+	                                               UserSession userSession, SystemConfiguration config) 
+	            throws NumberFormatException, Exception {
+	        
+	        String assetId = assetBean.getAsset_id();
+	        int assetCode = assetBean.getAssetCode();
+	        LOGGER.info("Asset Code: " + assetCode);
+	        
+	        // Handle file upload
+	        handleFileUpload(request, assetCode, config);
+	        
+	        // Update invoice information
+	        String invoiceNo = request.getParameter("sb") + "-" + request.getParameter("invNo");
+	        htmlUtil.insToAm_Invoice_No(assetId, request.getParameter("lpo"), invoiceNo, "Asset Creation");
+	        
+	        // Get transaction levels
+	        int numOfTransactionLevel = assetBean.getNumOfTransactionLevel("1");
+	        
+	        if (numOfTransactionLevel == 0) {
+	            handleNoApprovalRequired(out, assetBean, assetId, assetCode, userSession, config);
+	        } else {
+	            handleApprovalRequired(request, out, assetBean, assetId, assetCode, userSession, config);
+	        }
+	    }
+	    
+	    private void handleFileUpload(HttpServletRequest request, int assetCode, SystemConfiguration config) 
+	            throws IOException, ServletException {
+	        
+	    	Part filePart = request.getPart("file");
+	    	if (filePart == null || filePart.getSize() == 0) {
+	    	    LOGGER.info("No file uploaded or file is empty");
+	    	    return; // Exit gracefully without exception
+	    	}
 
-                     part.write(newPath);
-                     
-                    // System.out.println("uploaded successfully.");
-               
-     	    }
-         	 
-            // System.out.println("The destination is ==: " + destination);
-            System.out.println("Upload has been done successfully!");
+	    	String fileName = filePart.getSubmittedFileName();
+	    	LOGGER.info("Uploading file: " + fileName);
 
-             
-             }else {
-             	System.out.println("Incorrect File..");
-             }
-         }
-         catch(Exception ex)
-         {
-             System.out.println((new StringBuilder("There was an error: ")).append(ex.getMessage()).toString());
-           
-         }
-	 	   	 
-	 	  
-	 	  //this if condition is to test for asset creation where approval level is 0.
-	 	  if(numOfTransactionLevel == 0)
-	 	  {
-	 	  
-	 	  if(ad.updateNewAssetStatux(id))
-	 	  {
-	 	  
-	 	  /////SETUP INFORMATION FOR RAISING ENTRY STARTS HERE//////////////////////////////
-	 	 // String page1 = "ASSET CREATION RAISE ENTRY";
-	 	 // String url = "DocumentHelp.jsp?np=updateAsset&amp;id="+id+"&pageDirect=Y";
-	 	 // String flag= "y";
-	 	  //String partPay="1";
-	 	  //String Name =aprecords.getCodeName(" SELECT full_name from am_gb_user where user_id="+userid+"");
-	 	  //String branchName= aprecords.getCodeName(" SELECT branch_name from am_ad_branch where branch_id='"+branch_id+"'");
-	 	  
-	 	  ////SETUP INFORMATION FOR RAISING ENTRY ENDS HERE//////////////////////////////
-	 	  
-	 	 //  int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(request.getParameter("assetCode"));
-	 	//  System.out.println("The Asset Code is ==: " + assetCode);
-	 	  ad.setPendingTrans(ad.setApprovalData(id),"1",assetCode);
-	 	  String lastMTID = ad.getCurrentMtid("am_asset_approval");
-	 	  ad.setPendingTransArchive(ad.setApprovalData(id),"1",Integer.parseInt(lastMTID),assetCode);
-	 	  boolean b = ad.updateNewApprovalAssetStatus(id,Integer.parseInt(userid));
-//	 	  System.out.print("<<<<<lastMTID: "+lastMTID+"    <<<<<assetCode: "+assetCode);
-	 	  //THE SEGMENT BELOW IS TO RAISE ENTRY FOR NEW ASSET CREATION THAT DOESN'T REQUIRE APPROVAL
+	    	// Check if fileName is null or empty
+	    	if (fileName == null || fileName.trim().isEmpty()) {
+	    	    LOGGER.warning("File name is null or empty");
+	    	    return;
+	    	}
 
-	 	  //THE SEGMENT BEGINS RAISE ENTRY FOR NEW ASSET CREATION THAT DOESN'T REQUIRE APPROVAL
-	 	 
-	 	 //--int assetCode = request.getParameter("assetCode") == null?0:Integer.parseInt(request.getParameter("assetCode"));
-
-
-	 String assetRaiseEntry =aprecords.getCodeName(" SELECT raise_entry from am_gb_company ");
-
-
-	 	if(assetRaiseEntry != null && assetRaiseEntry.equalsIgnoreCase("Y")){
-	 	  String page1 = "ASSET CREATION RAISE ENTRY";
-	 	  String url = "DocumentHelp.jsp?np=updateAsset&amp;id="+id+"&pageDirect=Y";
-	 	  String flag= "";
-//	 	  String partPay="";
-	 	  String Name =aprecords.getCodeName(" SELECT full_name from am_gb_user where user_id=?",userid);
-	 	String branchName= aprecords.getCodeName(" SELECT branch_name from am_ad_branch where branch_id=?",branch_id);
-	 	String description= ad.getDescription();
-	 	String subjectT= ad.subjectToVat(id);
-	 	String whT= ad.whTax(id);
-	 	aprecords.insertApprovalx(id, description, page1, flag, partPay,Name,branchName,subjectT,whT,url,Integer.parseInt(lastMTID),assetCode);
-	 	}
-//	 	System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 1 ");
-	 		  if(assetRaiseEntry != null && assetRaiseEntry.equalsIgnoreCase("N")){
-	 	  ad.updateAssetStatusChange("update am_asset set asset_status='ACTIVE' where asset_id=?",id);
-	 	  ad.updateAssetStatusChange("update am_asset_archive set asset_status='ACTIVE' where asset_id=?",id);
-	 	  ad.updateAssetStatusChange("update am_asset_approval set process_status='A', asset_status='ACTIVE' where asset_id=?",id);
-	 	   ad.updateAssetStatusChange("update am_asset_approval_archive set process_status='A', asset_status='ACTIVE'where asset_id=?",id);
-	 	  }
-	 	
-//	 	System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 2 ");
-	 	aprecords.updateRaiseEntry(id);
-	 	
-	 	 //THE SEGMENT ENDS RAISE ENTRY FOR NEW ASSET CREATION THAT DOESN'T REQUIRE APPROVAL
-	 	 
-	 	
-	 	//===============================BEGIN: THIS SEGMENT IS TO SEND E-MAIL TO RECEPIENT AFTER ASSET CREATION
-	 	// if(b){
-	 	 	
-	 		legend.admin.handlers.CompanyHandler compHandler = new legend.admin.handlers.CompanyHandler();
-	 			//String mail_code="002"; //the mail code for each transaction is setup in AM_TRANSACTION_TYPE
-	 			//String Status1=compHandler.getEmailStatus(mail_code);
-
-	 		String[] mailSetUp = compHandler.getEmailStatusAndName("asset creation");
-	 		String Status1 = mailSetUp[0];
-	 		String mail_code = mailSetUp[1];
-	 		
-	 		Status1 = Status1.trim();
-//	 		System.out.println("#$$$$$$$$$$$ Status1 "+Status1+" $$$$$$$$$$$$$$$$$");
-	 		//System.out.println("#$$$$$$$$$$$ mail_code "+mail_code+" $$$$$$$$$$$$$$$$$");
-	 		
-	 		if(Status1.equalsIgnoreCase("Approved"))
-	 		{ //if mail status is active then send email
-	 	 
-	 		String transaction_type="Asset Creation";
-	 		String subject ="Asset Creation";
-	 		
-	 		Codes message= new Codes();
-	 		
-	 		
-
-	 		String to = message.MailTo(mail_code, transaction_type);  //retrieves recipients from database
-
-	 		String msgText1 =message.MailMessage(mail_code, transaction_type);//"New asset with ID: "+id +" was successfully created.";
-	 		//System.out.println("#$$$$$$$$$$$ "+to);
-	 		mail.sendMail(to,subject,msgText1);
-	 	}//if(compHandler.getEmailStatus(mail_code).equalsIgnoreCase("Active"))
-	 	 
-	 	// }//if(b)
-	 	 
-	 	 //================================END:  THIS SEGMENT IS TO SEND E-MAIL TO RECEPIENT AFTER ASSET CREATION
-	 	 
-	 	  out.print("<script>");
-	 	out.print("alert('Asset creation successful');");
-	 	//out.print("window.location='DocumentHelp.jsp'");
-	 	//out.print("window.location='DocumentHelp.jsp?np=updateAssetView&id="+id+"&root="+root+"';");
-	 	
-	 	
-	 	out.print("window.location='DocumentHelp.jsp?np=uploadImage&assetId="+id+"&previousPage="+currentPage+"&root="+root+"&tran_type="+tran_type+"&InitPage=New"+"&assetCode="+assetCode+"';");
-	 	
-	 	out.print("</script>");
-	 	  
-	 	  }//if(ad.updateNewAssetStatus(id))
-	 	  
-	 	  }//if(numOfTransactionLevel == 0)
-	 	  
-	 	  else{
-	 	  
-	 	//  int assetCode =ad.getAssetCode();
-	 	  //System.out.println("assetCode >>>>>> " + assetCode);
-	 	  String supervisorName = "";
-	 	  String mailAddress = "";
-//	 	  if(updateNewAssetStatus(id))
-	 	  //System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@the supervisor id is 1 ");
-	 	  if(singleApproval.equalsIgnoreCase("Y")){
-	 	  ad.setPendingTrans(ad.setApprovalData(id),"1",assetCode);
-	 	 // System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@the supervisor id is 2 ");
-	 	  String lastMTID = ad.getCurrentMtid("am_asset_approval");
-	 	// System.out.println("lastMTID >>>>>> " + lastMTID);
-	 	 // System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@the supervisor id is lastMTID " +lastMTID);
-	 	  ad.setPendingTransArchive(ad.setApprovalData(id),"1",Integer.parseInt(lastMTID),assetCode);
-	 	// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@the supervisor id is 4 ");
-	 	 // ad.setPendingTransArchive(ad.setApprovalData(id),"1");
-	 	 	  //===============================BEGIN: THIS SEGMENT IS TO SEND E-MAIL TO RECEPIENT AFTER ASSET CREATION
-	 		//System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@the supervisor id is " + supervisorID);
-	 		String subjectr ="Asset Creation Approval";
-	 		String msgText11 ="Asset with ID: "+ id +" is waiting for your approval.";
-	    //     mail.sendMailSupervisor(supervisorID, subjectr, msgText11);
-	 		
-	  		String  approvaltransId  = aprecords.getCodeName("select transaction_id from am_asset_approval where ASSET_ID=?",id);	  
-	 String otherparam = "newAssetApproval&operation=1&id="+id+"&tranId="+approvaltransId+"&transaction_level=1&approval_level_count=0&assetCode="+assetCode;				
-//	 				mail.sendMailSupervisor(supervisorID, subjectr, msgText11,otherparam);
-	 				
-	 		
-	 //================================END:  THIS SEGMENT IS TO SEND E-MAIL TO RECEPIENT AFTER ASSET CREATION
-	 	supervisorName =aprecords.getCodeName(" SELECT full_name from am_gb_user where user_id=?",supervisorID);
-	 	mailAddress =aprecords.getCodeName(" SELECT full_name from am_gb_user where user_id=?",supervisorID);	  			       
-	 	comp.insertMailRecords(mailAddress,subjectr,msgText11);
-
-	 	out.print("<script>");
-	 	out.print("alert('Asset creation submitted to "+supervisorName+" for approval');");
-	 	out.print("window.location='DocumentHelp.jsp?np=uploadImage&assetId="+id+"&previousPage="+currentPage+"&tran_type="+tran_type+"&root="+root+"&InitPage=New"+"&assetCode="+assetCode+"';");
-	 	out.print("</script>");	  
-	 	  }
-	 	   if(singleApproval.equalsIgnoreCase("N")){
-	 	   
-	 	  		String mtid =  appHelper.getGeneratedId("am_asset_approval");
-	 	  		//System.out.println("mtid >>>>>> " + mtid);
-//	 	   		System.out.println("approvelist.size()#$$$$$$$$$$$ "+approvelist.size());
-	 	   	 for(int i=0;i<approvelist.size();i++)
-	 	     {  
-	 		  	legend.admin.objects.User usr = (legend.admin.objects.User)approvelist.get(i);   	 
-	 			String supervisorId =  usr.getUserId();
-	 			//System.out.println("supervisorId >>>>>> " + supervisorId);
-	 			mailAddress = usr.getEmail();
-	 			supervisorName = usr.getUserName();
-	 			String supervisorfullName = usr.getUserFullName();
-//	 			System.out.println("SupervisorId#$$$$$$$$$$$ "+supervisorId);
-	 		//	System.out.println("We are here >>>>>> ");
-	 	  		 ad.setPendingTransMultiApp(ad.setApprovalData(id),"1",assetCode,supervisorId,mtid);
-	 	  	//	System.out.println("We are here 2 >>>>>> ");
-	 			 String lastMTID = ad.getCurrentMtid("am_asset_approval");
-//	 		 ad.setPendingMultiApprTransArchive(ad.setApprovalData(id),"1",Integer.parseInt(lastMTID),assetCode,supervisorId);
-	 			String subjectr ="Asset Creation Approval";
-	 			String msgText11 ="Asset with ID: "+ id +" is waiting for your approval.";
-	  		String  approvaltransId  = aprecords.getCodeName("select transaction_id from am_asset_approval where ASSET_ID=?",id);	  
-	 //String otherparam = "newAssetApproval&operation=1&id="+id+"&tranId="+approvaltransId+"&transaction_level=1&approval_level_count=0&assetCode="+assetCode;				
-	 				 comp.insertMailRecords(mailAddress,subjectr,msgText11);
-	 	     	}
-//	 	out.print("<script>");
-//	 	out.print("alert('Asset creation submitted for approval');");
-//	 	out.print("window.location='DocumentHelp.jsp?np=uploadImage&assetId="+id+"&previousPage="+currentPage+"&tran_type="+tran_type+"&root="+root+"&InitPage=New"+"&assetCode="+assetCode+"';");
-//	 	out.print("</script>");		
-	 	   
-          
-	 	   	out.print("<script>");
-		 	//out.print("alert('Asset creation submitted to "+supervisorName+" for approval');");
-	 	   out.print("alert('Asset creation submitted for approval');");
-		 	//out.print("window.location='DocumentHelp.jsp'");
-		 	//out.print("window.location='DocumentHelp.jsp?np=updateAssetView&id="+id+"&root="+root+"&category="+category+"';");
-		    out.print("window.location='"+destination+"&id="+id +"&tran_status="+tran_status+"&tran_type="+tran_type+"&assetId="+id+"&reason=&pPage="+currentPage+"';");
-		 	
-//		 	out.print("window.location='DocumentHelp.jsp?np=uploadImage&assetId="+id+"&previousPage="+currentPage+"&tran_type="+tran_type+"&root="+root+"&assetCode="+assetCode+"';");
-		 	
-		 	out.print("</script>");
-	 	  	 }
-
-//	 	
-	 	//==========================================TRANSACTION PROCESS===============================================
-	 	
-	 	//ad. staticApprovalInfo(id);
-	 	}//else of if(numOfTransactionLevel == 0)
-	 	
-	 	}
-	 	 else if(statux == 1 || statux == 2 ) 
-	 	 {
-	 		out.print("<script>");
-	 		out.print("alert('Addition of Asset will over shoot quarterly budget for this category and you are not allowed to do so. Please exit and seek supplementary budgetary Allocation "+statux+"');");
-	 		out.print("window.location='DocumentHelp.jsp?np=newAsset&id';");
-	 		out.print("</script>");
-	 	  }
-	 	  else{
-	 		out.print("<script>");
-	 		out.print("alert('Records can not be saved!. Your Asset does not fall in any budget quarter.');");
-	 		out.print("window.location='DocumentHelp.jsp?np=newAsset&id';");
-	 		out.print("</script>");
-	 	  }
-	   }
-	   
-	  //int len = htmlUtil.getArrayList().size(); 
-	  //System.out.print("===================== the length is @@@@=="+len+"================================");
-
-	 String[] sui = ad.setUpInfo();
-	 String lpoSetup = sui[0];
-	 String barcodeSetup = sui[1];
-	 double cpSetup = Double.parseDouble(sui[2]);
-	 double cphold = Double.parseDouble(sui[3]);
-
-	 }catch(Throwable e) {
-		 e.getMessage();
-	 }
-	 
+	    	// Check for invalid file types
+	    	if (isInvalidFile(fileName)) {
+	    	    LOGGER.warning("Invalid file type: " + fileName);
+	    	    return;
+	    	}
+	        
+	        String uploadPath = config.getUploadFolder();
+	        File uploadDir = new File(uploadPath);
+	        if (!uploadDir.exists()) {
+	            uploadDir.mkdir();
+	        }
+	        
+	        String extension = FilenameUtils.getExtension(fileName);
+	        String newFileName = "W" + assetCode + "." + extension;
+	        String filePath = uploadPath + newFileName;
+	        
+	        try {
+	            filePart.write(filePath);
+	            LOGGER.info("File uploaded successfully: " + filePath);
+	        } catch (Exception e) {
+	            LOGGER.log(Level.SEVERE, "Error uploading file", e);
+	        }
+	    }
+	    
+	    private boolean isInvalidFile(String fileName) {
+	        if (fileName == null) {
+	            return true; // Consider null filenames as invalid
+	        }
+	        
+	        String lowerFileName = fileName.toLowerCase();
+	        return lowerFileName.endsWith(".php") || 
+	               lowerFileName.endsWith(".sql") || 
+	               lowerFileName.endsWith(".jsp") ||  // Add other dangerous extensions
+	               lowerFileName.endsWith(".exe") ||
+	               lowerFileName.endsWith(".sh") ||
+	               lowerFileName.endsWith(".bat");
+	    }
+	    
+	    private void handleNoApprovalRequired(PrintWriter out, AssetRecordsBean assetBean,
+	                                          String assetId, int assetCode,
+	                                          UserSession userSession, SystemConfiguration config) throws NumberFormatException, Exception {
+	        
+	        if (assetBean.updateNewAssetStatux(assetId)) {
+	            // Set up pending transactions
+	            assetBean.setPendingTrans(assetBean.setApprovalData(assetId), "1", assetCode);
+	            String lastMTID = assetBean.getCurrentMtid("am_asset_approval");
+	            assetBean.setPendingTransArchive(assetBean.setApprovalData(assetId), "1", 
+	                                             Integer.parseInt(lastMTID), assetCode);
+	            assetBean.updateNewApprovalAssetStatus(assetId, Integer.parseInt(userSession.getUserId()));
+	            
+	            // Handle raise entry if configured
+	            handleRaiseEntry(assetBean, assetId, userSession, assetCode, lastMTID);
+	            
+	            // Send email notification
+	            sendCreationEmail(assetId);
+	            
+	            // Redirect to upload page
+	            redirectToUploadPage(out, assetId, assetCode);
+	        }
+	    }
+	    
+	    private void handleRaiseEntry(AssetRecordsBean assetBean, String assetId, 
+	                                   UserSession userSession, int assetCode, String lastMTID) throws Exception {
+	        
+	        String assetRaiseEntry = approvalRecords.getCodeName("SELECT raise_entry FROM am_gb_company");
+	        
+	        if ("Y".equalsIgnoreCase(assetRaiseEntry)) {
+	            String page1 = "ASSET CREATION RAISE ENTRY";
+	            String url = "DocumentHelp.jsp?np=updateAsset&amp;id=" + assetId + "&pageDirect=Y";
+	            String userName = approvalRecords.getCodeName("SELECT full_name FROM am_gb_user WHERE user_id=?", 
+	                                                          userSession.getUserId());
+	            String branchName = approvalRecords.getCodeName("SELECT branch_name FROM am_ad_branch WHERE branch_id=?", 
+	                                                            assetBean.getBranch_id());
+	            
+	            approvalRecords.insertApprovalx(assetId, assetBean.getDescription(), page1, "", 
+	                                           assetBean.getFullyPAID(), userName, branchName,
+	                                           assetBean.subjectToVat(assetId), assetBean.whTax(assetId),
+	                                           url, Integer.parseInt(lastMTID), assetCode);
+	        } else if ("N".equalsIgnoreCase(assetRaiseEntry)) {
+	            activateAsset(assetId);
+	        }
+	        
+	        approvalRecords.updateRaiseEntry(assetId);
+	    }
+	    
+	    private void activateAsset(String assetId) throws Exception {
+	    	AssetRecordsBean assetBean = new AssetRecordsBean();
+	        String updateQuery = "UPDATE am_asset SET asset_status='ACTIVE' WHERE asset_id=?";
+	        assetBean.updateAssetStatusChange(updateQuery, assetId);
+	        assetBean.updateAssetStatusChange(updateQuery.replace("am_asset", "am_asset_archive"), assetId);
+	        
+	        String approvalUpdate = "UPDATE am_asset_approval SET process_status='A', asset_status='ACTIVE' WHERE asset_id=?";
+	        assetBean.updateAssetStatusChange(approvalUpdate, assetId);
+	        assetBean.updateAssetStatusChange(approvalUpdate.replace("am_asset_approval", "am_asset_approval_archive"), assetId);
+	    }
+	    
+	    private void sendCreationEmail(String assetId) {
+	        String[] mailSetup = companyHandler.getEmailStatusAndName("asset creation");
+	        String status = mailSetup[0].trim();
+	        String mailCode = mailSetup[1];
+	        
+	        if ("Approved".equalsIgnoreCase(status)) {
+	            String to = new Codes().MailTo(mailCode, "Asset Creation");
+	            String message = new Codes().MailMessage(mailCode, "Asset Creation");
+	            message = "New asset with ID: " + assetId + " was successfully created.";
+	            
+	            mailService.sendMail(to, "Asset Creation", message);
+	        }
+	    }
+	    
+	    private void handleApprovalRequired(HttpServletRequest request, PrintWriter out,
+	                                        AssetRecordsBean assetBean, String assetId, int assetCode,
+	                                        UserSession userSession, SystemConfiguration config) {
+	        
+	        String supervisorID = request.getParameter("supervisor");
+	        ArrayList approvers = assetBean.getApprovalsId(userSession.getBranch(), 
+	                                                        userSession.getDeptCode(), 
+	                                                        userSession.getUserName());
+	        
+	        if ("Y".equalsIgnoreCase(config.getSingleApproval())) {
+	            handleSingleApproval(out, assetBean, assetId, assetCode, supervisorID);
+	        } else if ("N".equalsIgnoreCase(config.getSingleApproval())) {
+	            handleMultipleApproval(out, assetBean, assetId, assetCode, approvers);
+	        }
+	    }
+	    
+	    private void handleSingleApproval(PrintWriter out, AssetRecordsBean assetBean,
+	                                      String assetId, int assetCode, String supervisorID) {
+	        
+	        assetBean.setPendingTrans(assetBean.setApprovalData(assetId), "1", assetCode);
+	        String lastMTID = assetBean.getCurrentMtid("am_asset_approval");
+	        assetBean.setPendingTransArchive(assetBean.setApprovalData(assetId), "1", 
+	                                         Integer.parseInt(lastMTID), assetCode);
+	        
+	        // Send approval email
+	        String subject = "Asset Creation Approval";
+	        String message = "Asset with ID: " + assetId + " is waiting for your approval.";
+	        String approvalTransId = approvalRecords.getCodeName(
+	            "SELECT transaction_id FROM am_asset_approval WHERE ASSET_ID=?", assetId);
+	        
+	        String supervisorName = approvalRecords.getCodeName(
+	            "SELECT full_name FROM am_gb_user WHERE user_id=?", supervisorID);
+	        
+	        companyHandler.insertMailRecords(supervisorID, subject, message);
+	        
+	        out.print("<script>");
+	        out.print("alert('Asset creation submitted to " + supervisorName + " for approval');");
+	        out.print("window.location='DocumentHelp.jsp?np=uploadImage&assetId=" + assetId + 
+	                  "&previousPage=" + CURRENT_PAGE + "&tran_type=" + TRANSACTION_TYPE + 
+	                  "&root=" + ROOT + "&InitPage=New&assetCode=" + assetCode + "';");
+	        out.print("</script>");
+	    }
+	    
+	    private void handleMultipleApproval(PrintWriter out, AssetRecordsBean assetBean,
+	                                        String assetId, int assetCode, ArrayList approvers) {
+	        
+	        String mtid = appHelper.getGeneratedId("am_asset_approval");
+	        
+	        for (int i = 0; i < approvers.size(); i++) {
+	            User approver = (User) approvers.get(i);
+	            String supervisorId = approver.getUserId();
+	            String email = approver.getEmail();
+	            
+	            assetBean.setPendingTransMultiApp(assetBean.setApprovalData(assetId), "1", 
+	                                              assetCode, supervisorId, mtid);
+	            
+	            String subject = "Asset Creation Approval";
+	            String message = "Asset with ID: " + assetId + " is waiting for your approval.";
+	            companyHandler.insertMailRecords(email, subject, message);
+	        }
+	        
+	        out.print("<script>");
+	        out.print("alert('Asset creation submitted for approval');");
+	        out.print("window.location='" + DESTINATION_PAGE + "&id=" + assetId + 
+	                  "&tran_status=A&tran_type=" + TRANSACTION_TYPE + 
+	                  "&assetId=" + assetId + "&reason=&pPage=" + CURRENT_PAGE + "';");
+	        out.print("</script>");
+	    }
+	    
+	    private void handleBudgetExceededError(PrintWriter out) {
+	        out.print("<script>");
+	        out.print("alert('Addition of Asset will overshoot quarterly budget for this category and you are not allowed to do so. Please exit and seek supplementary budgetary Allocation');");
+	        out.print("window.location='DocumentHelp.jsp?np=newAsset&id';");
+	        out.print("</script>");
+	    }
+	    
+	    private void handleGeneralError(PrintWriter out) {
+	        out.print("<script>");
+	        out.print("alert('Records cannot be saved! Your Asset does not fall in any budget quarter.');");
+	        out.print("window.location='DocumentHelp.jsp?np=newAsset&id';");
+	        out.print("</script>");
+	    }
+	    
+	    private void handleError(PrintWriter out, String message) {
+	        out.print("<script>");
+	        out.print("alert('" + message + "');");
+	        out.print("window.history.back();");
+	        out.print("</script>");
+	    }
+	    
+	    private void redirectToUploadPage(PrintWriter out, String assetId, int assetCode) {
+	        out.print("<script>");
+	        out.print("alert('Asset creation successful');");
+	        out.print("window.location='DocumentHelp.jsp?np=uploadImage&assetId=" + assetId + 
+	                  "&previousPage=" + CURRENT_PAGE + "&tran_type=" + TRANSACTION_TYPE + 
+	                  "&root=" + ROOT + "&InitPage=New&assetCode=" + assetCode + "';");
+	        out.print("</script>");
+	    }
+	    
+	    // Inner classes for better organization
+	    private static class UserSession {
+	        private String userId;
+	        private String userClass;
+	        private String userName;
+	        private String branch;
+	        private String deptCode;
+	        private String branchRestrict;
+	        private String deptRestrict;
+	        private String branchRestricted;
+	        private String systemIp;
+			public String getUserId() {
+				return userId;
+			}
+			public void setUserId(String userId) {
+				this.userId = userId;
+			}
+			public String getUserClass() {
+				return userClass;
+			}
+			public void setUserClass(String userClass) {
+				this.userClass = userClass;
+			}
+			public String getUserName() {
+				return userName;
+			}
+			public void setUserName(String userName) {
+				this.userName = userName;
+			}
+			public String getBranch() {
+				return branch;
+			}
+			public void setBranch(String branch) {
+				this.branch = branch;
+			}
+			public String getDeptCode() {
+				return deptCode;
+			}
+			public void setDeptCode(String deptCode) {
+				this.deptCode = deptCode;
+			}
+			public String getBranchRestrict() {
+				return branchRestrict;
+			}
+			public void setBranchRestrict(String branchRestrict) {
+				this.branchRestrict = branchRestrict;
+			}
+			public String getDeptRestrict() {
+				return deptRestrict;
+			}
+			public void setDeptRestrict(String deptRestrict) {
+				this.deptRestrict = deptRestrict;
+			}
+			public String getBranchRestricted() {
+				return branchRestricted;
+			}
+			public void setBranchRestricted(String branchRestricted) {
+				this.branchRestricted = branchRestricted;
+			}
+			public String getSystemIp() {
+				return systemIp;
+			}
+			public void setSystemIp(String systemIp) {
+				this.systemIp = systemIp;
+			}
+	        
+	        
+	    }
+	    
+	    private static class SystemConfiguration {
+	        private String thirdPartyLabel;
+	        private String singleApproval;
+	        private String vatRequired;
+	        private String sbuRequired;
+	        private String uploadFolder;
+	        
+	        
+			public String getThirdPartyLabel() {
+				return thirdPartyLabel;
+			}
+			public void setThirdPartyLabel(String thirdPartyLabel) {
+				this.thirdPartyLabel = thirdPartyLabel;
+			}
+			public String getSingleApproval() {
+				return singleApproval;
+			}
+			public void setSingleApproval(String singleApproval) {
+				this.singleApproval = singleApproval;
+			}
+			public String getVatRequired() {
+				return vatRequired;
+			}
+			public void setVatRequired(String vatRequired) {
+				this.vatRequired = vatRequired;
+			}
+			public String getSbuRequired() {
+				return sbuRequired;
+			}
+			public void setSbuRequired(String sbuRequired) {
+				this.sbuRequired = sbuRequired;
+			}
+			public String getUploadFolder() {
+				return uploadFolder;
+			}
+			public void setUploadFolder(String uploadFolder) {
+				this.uploadFolder = uploadFolder;
+			}
+	        
+	        
+	    }
 	
-   }
+	    
    public void doGet(HttpServletRequest request, 
 		    HttpServletResponse response)
 		      throws ServletException, IOException

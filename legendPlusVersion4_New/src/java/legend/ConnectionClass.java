@@ -33,6 +33,7 @@ public class ConnectionClass {
     private ApprovalRecords approv = new ApprovalRecords();
     private int record_start = 0;
     private int record_count = 2;
+    private Connection conn;
     /* =========================================================
        CONNECTION PROVIDERS (THREAD SAFE)
        ========================================================= */
@@ -58,6 +59,12 @@ public class ConnectionClass {
         }
     }
 
+    public Statement getStatement() throws Exception {
+        if (this.conn == null || this.conn.isClosed()) {
+            this.conn = getConnection();
+        }
+        return this.conn.createStatement();
+    }
     /* =========================================================
        SAFE RESOURCE CLOSERS
        ========================================================= */
@@ -928,6 +935,41 @@ return a;
 
 
 }
+
+public String[][] getBranchesForCombo() throws Exception {
+    String query = "SELECT * FROM AM_AD_BRANCH WHERE BRANCH_STATUS = 'ACTIVE' ORDER BY BRANCH_NAME ASC";
+    String counterQuery = "SELECT count(*) FROM AM_AD_BRANCH WHERE BRANCH_STATUS = 'ACTIVE'";
+
+    try (Connection conn = getConnection();
+         PreparedStatement psCount = conn.prepareStatement(counterQuery);
+         ResultSet rsc = psCount.executeQuery()) {
+
+        rsc.next();
+        int count = rsc.getInt(1);
+        if (count == 0) return new String[0][0]; // no active branches
+
+        String[][] branches = new String[count][12];
+
+        try (PreparedStatement psQuery = conn.prepareStatement(query);
+             ResultSet rs = psQuery.executeQuery()) {
+
+            int i = 0;
+            while (rs.next()) {
+                for (int j = 0; j < 12; j++) {
+                    branches[i][j] = rs.getString(j + 1);
+                }
+                i++;
+            }
+        }
+
+        return branches;
+
+    } catch (Exception e) {
+        e.printStackTrace(); // log the exception
+        throw e; // rethrow to inform caller
+    }
+}
+
     
     
     public String[][] getBranchesForCombo(String code, String branchRestrict) throws Exception {

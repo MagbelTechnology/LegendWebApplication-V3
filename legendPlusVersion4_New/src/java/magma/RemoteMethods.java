@@ -15,28 +15,28 @@ import magma.net.dao.MagmaDBConnection;
 
 import com.magbel.util.NumberToWordConverter;
 public class RemoteMethods extends RemoteScripting {
-	private static MagmaDBConnection dbConnection;
 	
-    private static ConnectionClass conClass;
-    
-
+	
     public void log(String msg) {
         System.out.println("RemoteScripting: " + msg);
     }
+    
+   
 
     public static String getDepRate(String Category) {
+    	MagmaDBConnection dbConnection = new MagmaDBConnection();
     	
         String query = "select dep_rate from am_ad_category  " +
                        "where category_id=?";
-        try {
-        	Connection con = dbConnection.getConnection("legendPlus");
-            PreparedStatement ps = con.prepareStatement(query);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);) {
+        	
             ps.setString(1, Category);
-            ResultSet rs = ps.executeQuery();
-           
+          try(  ResultSet rs = ps.executeQuery()){  
             if (rs.next()) {
                 return rs.getString(1);
             }
+          }
             
         }  catch (Exception ex) {
             System.out.println("WARN : RemoteMethod >> error getting depRate " +
@@ -46,7 +46,8 @@ public class RemoteMethods extends RemoteScripting {
     }
     
     public static String getDepRate2(String categoryId) {
-       
+    	
+    	MagmaDBConnection dbConnection = new MagmaDBConnection();
         String depRate = "";
 
         String query = "SELECT dep_rate FROM am_ad_category WHERE category_id = ?";
@@ -76,7 +77,7 @@ public class RemoteMethods extends RemoteScripting {
     public static String getResidualValueOld(String Category)
     {
 
-    	dbConnection = new MagmaDBConnection();
+    	MagmaDBConnection dbConnection = new MagmaDBConnection();
     	Connection con = null;
     	PreparedStatement ps = null;
     	ResultSet rs = null;
@@ -105,6 +106,7 @@ public class RemoteMethods extends RemoteScripting {
     }
     
     public static String getResidualValue(String categoryId) {
+    	MagmaDBConnection dbConnection = new MagmaDBConnection();
 
         dbConnection = new MagmaDBConnection();
         String residualValue = "";
@@ -135,7 +137,7 @@ public class RemoteMethods extends RemoteScripting {
 
     public static String getVendorACOld(String vendor) {
 
-    	dbConnection = new MagmaDBConnection();
+    	MagmaDBConnection dbConnection = new MagmaDBConnection();
     	Connection con = null;
     	PreparedStatement ps = null;
     	ResultSet rs = null;
@@ -167,7 +169,7 @@ public class RemoteMethods extends RemoteScripting {
     
     public static String getVendorAC(String vendorId) {
 
-        dbConnection = new MagmaDBConnection();
+    	MagmaDBConnection dbConnection = new MagmaDBConnection();
         String accountNumber = "";
 
         String query = "SELECT ACCOUNT_NUMBER FROM AM_AD_VENDOR WHERE VENDOR_ID = ?";
@@ -298,7 +300,7 @@ public class RemoteMethods extends RemoteScripting {
  public static String getEnforceBarCodeOld(String Category)
     {
 
-	 	dbConnection = new MagmaDBConnection();
+	 MagmaDBConnection dbConnection = new MagmaDBConnection();
 	 	Connection con = null;
 	 	PreparedStatement ps = null;
 	 	ResultSet rs = null;
@@ -327,7 +329,7 @@ public class RemoteMethods extends RemoteScripting {
  
  public static String getEnforceBarCode(String categoryId) {
 
-	    dbConnection = new MagmaDBConnection();
+	 MagmaDBConnection dbConnection = new MagmaDBConnection();
 	    String enforceBarcode = "";
 
 	    String query = "SELECT enforceBarcode FROM am_ad_category WHERE category_id = ?";
@@ -360,6 +362,7 @@ public class RemoteMethods extends RemoteScripting {
 	 	Connection con = null;
 	 	PreparedStatement ps = null;
 	 	ResultSet rs = null;
+	 	MagmaDBConnection dbConnection = new MagmaDBConnection();
      String query = "select SUB_CATEGORY_CODE from am_ad_sub_category " +
                     "where SUB_CATEGORY_ID=" + Category;
 //     System.out.println("query in RemoteMethods in getsubcategory >>>>> " + query);
@@ -386,7 +389,7 @@ public class RemoteMethods extends RemoteScripting {
 
  public static String getsubcategory(String categoryId) {
 
-	    dbConnection = new MagmaDBConnection();
+	 MagmaDBConnection dbConnection = new MagmaDBConnection();
 	    String subCategoryCode = "";
 
 	    String query = "SELECT SUB_CATEGORY_CODE FROM am_ad_sub_category WHERE SUB_CATEGORY_ID = ?";

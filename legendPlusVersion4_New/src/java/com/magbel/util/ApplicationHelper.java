@@ -176,6 +176,7 @@ public String getGeneratedId(String tableName) {
 
         // Get current MT_ID
         try (PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+        	ps.setQueryTimeout(30);
             ps.setString(1, tableName);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -276,6 +277,7 @@ public String getGeneratedId(String tableName) {
 
 	        // Get current MT_ID
 	        try (PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+	        	ps.setQueryTimeout(30);
 	            ps.setString(1, tableName);
 	            try (ResultSet rs = ps.executeQuery()) {
 	                if (rs.next()) {
@@ -284,6 +286,7 @@ public String getGeneratedId(String tableName) {
 	                    counter = 1; // initialize if missing
 	                    String insertQuery = "INSERT INTO IA_MTID_TABLE(MT_TABLENAME, MT_ID) VALUES (?, ?)";
 	                    try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+	                    	psInsert.setQueryTimeout(30);
 	                        psInsert.setString(1, tableName);
 	                        psInsert.setInt(2, counter);
 	                        psInsert.executeUpdate();
@@ -294,6 +297,7 @@ public String getGeneratedId(String tableName) {
 
 	        // Increment MT_ID
 	        try (PreparedStatement psUpdate = con.prepareStatement(UPDATE_QUERY)) {
+	        	psUpdate.setQueryTimeout(30);
 	            psUpdate.setString(1, tableName);
 	            psUpdate.executeUpdate();
 	        }
@@ -368,7 +372,7 @@ public String getSelectId(String tableName) {
 
     try (Connection con = getConnection();
          PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
-
+    	ps.setQueryTimeout(30);
         ps.setString(1, tableName);
 
         try (ResultSet rs = ps.executeQuery()) {

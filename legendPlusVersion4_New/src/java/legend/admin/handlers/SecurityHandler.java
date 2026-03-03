@@ -278,20 +278,14 @@ public class SecurityHandler
     
     public String email(String userName){
     	String response =null;
-    	 Connection con;
-         PreparedStatement ps;
-         ResultSet rs;
+    	
        
-         con = null;
-         ps = null;
-         rs = null;
-         try
-         {
-        	 String query = "Select email from AM_GB_USER WHERE user_name =?";
-             con = getConnection();
-             ps = con.prepareStatement(query);
+    	 String query = "Select email from AM_GB_USER WHERE user_name =?";
+    	 try (Connection c = getConnection();
+    	         PreparedStatement ps = c.prepareStatement(query)) {
+
              ps.setString(1, userName);
-             rs = ps.executeQuery();
+             try (ResultSet rs = ps.executeQuery()) {
              while(rs.next()){
             	 String email = rs.getString(1);
             	 String str = email;
@@ -301,12 +295,12 @@ public class SecurityHandler
 	         			response = fullName;
 	         		}
              }
+             }
              
          }catch(Exception e){
         	 e.getMessage();
-         }finally {
-             closeConnection(con, ps, rs);
          }
+    	 
     	return response;
     }
 
@@ -319,16 +313,13 @@ public class SecurityHandler
                 + " FROM am_ad_class_privileges"
                 + " WHERE clss_uuid=? AND role_uuid=?";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
+        try (Connection c = getConnection();
+   	         PreparedStatement ps = c.prepareStatement(query)) {
             ps.setString(1, classid);
             ps.setString(2, roleuuid);
-            rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String clss_uuid = rs.getString("clss_uuid");
 
@@ -342,27 +333,23 @@ public class SecurityHandler
                 classprivilege = new legend.admin.objects.ClassPrivilege(
                         clss_uuid, role_uuid, role_view, role_addn, role_edit);
             }
+            }
  //           closeConnection(con, ps);
         } catch (Exception ex) {
             System.out.println("WARN: Error fetching Class Privileges ->" + ex);
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return classprivilege;
 
     }
 
-    public boolean removeClassPrivilege(java.util.ArrayList list) {
+    public boolean removeClassPrivilegeOld(java.util.ArrayList list) {
         String query = "DELETE FROM am_ad_class_privileges"
                 + " WHERE clss_uuid=? AND role_uuid=?";
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
         legend.admin.objects.ClassPrivilege cp = null;
         int[] d = null;
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
+        try (Connection c = getConnection();
+      	         PreparedStatement ps = c.prepareStatement(query)) {
             for (int i = 0; i < list.size(); i++) {
                 cp = (legend.admin.objects.ClassPrivilege) list.get(i);
 
@@ -375,13 +362,34 @@ public class SecurityHandler
 //            closeConnection(con, ps);
         } catch (Exception ex) {
             System.out.println("WARN: Error removing Class Privileges->" + ex);
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return (d.length > 0);   
     }
+    
+    public boolean removeClassPrivilege(java.util.ArrayList<legend.admin.objects.ClassPrivilege> list) {
+        String query = "DELETE FROM am_ad_class_privileges WHERE clss_uuid=? AND role_uuid=?";
+        int[] results = new int[0];
 
-        public boolean insertClassPrivileges(java.util.ArrayList list) {
+        try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement(query)) {
+
+            for (legend.admin.objects.ClassPrivilege cp : list) {
+                ps.setString(1, cp.getClss_uuid());
+                ps.setString(2, cp.getRole_uuid());
+                ps.addBatch();
+            }
+
+            results = ps.executeBatch();
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error removing Class Privileges -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return results != null && results.length > 0;
+    }
+
+        public boolean insertClassPrivilegesOld(java.util.ArrayList list) {
             String query = "INSERT INTO am_ad_class_privileges(clss_uuid,role_uuid"
                     + " ,role_view,role_addn ,role_edit)"
                     + " VALUES(?,?,?,?,?)";
@@ -412,6 +420,34 @@ public class SecurityHandler
 
             return (d.length > 0);
         }
+        
+        public boolean insertClassPrivileges(java.util.ArrayList<legend.admin.objects.ClassPrivilege> list) {
+            String query = "INSERT INTO am_ad_class_privileges(clss_uuid, role_uuid, role_view, role_addn, role_edit) "
+                         + "VALUES (?, ?, ?, ?, ?)";
+            int[] results = new int[0];
+
+            try (Connection con = getConnection();
+                 PreparedStatement ps = con.prepareStatement(query)) {
+
+                for (legend.admin.objects.ClassPrivilege cp : list) {
+                    ps.setString(1, cp.getClss_uuid());
+                    ps.setString(2, cp.getRole_uuid());
+                    ps.setString(3, cp.getRole_view());
+                    ps.setString(4, cp.getRole_addn());
+                    ps.setString(5, cp.getRole_edit());
+                    ps.addBatch();
+                }
+
+                results = ps.executeBatch();
+
+            } catch (Exception ex) {
+                System.out.println("WARN: Error inserting class privileges -> " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
+            return results != null && results.length > 0;
+        }
+        
 
     public legend.admin.objects.SecurityClass getSecurityClassById(String filter) {
 
@@ -420,15 +456,11 @@ public class SecurityHandler
                 + "  ,class_status,user_id,create_date,fleet_admin,facility_admin,store_admin"
                 + "  FROM am_gb_class WHERE  class_id= ?";
 
-        Connection c = null;
-        ResultSet rs = null;
-        PreparedStatement s = null;
 
-        try {
-            c = getConnection();
-            s = c.prepareStatement(query);
-            s.setString(1, filter);
-            rs = s.executeQuery();
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, filter);
+            try (ResultSet rs = ps.executeQuery()) {
             
             while (rs.next()) {
                 String classId = rs.getString("class_id");
@@ -454,12 +486,11 @@ public class SecurityHandler
                         userId, createDate, fleetAdmin,facilityAdmin,storeAdmin);
 
             }
+            }
 //            closeConnection(c, s, rs);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
+        } 
         return sc;
 
     }
@@ -471,15 +502,13 @@ public class SecurityHandler
                 + "  ,class_status,user_id,create_date,fleet_admin,facility_admin,store_admin"
                 + "  FROM am_gb_class WHERE  class_name= ? ";
 
-        Connection c = null;
-        ResultSet rs = null;
-        PreparedStatement s = null;
+        
 
-        try {
-            c = getConnection();
-            s = c.prepareStatement(query);
-            s.setString(1, filter);
-            rs = s.executeQuery();
+
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, filter);
+            try (ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String classId = rs.getString("class_id");
                 String description = rs.getString("class_desc");
@@ -504,28 +533,26 @@ public class SecurityHandler
                         userId, createDate, fleetAdmin,facilityAdmin,storeAdmin);
 
             }
+            }
 //            closeConnection(c, s, rs);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
+        } 
+        
         return sc;
 
     }
 
     public boolean updateSecurityClass(legend.admin.objects.SecurityClass sc) {
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = false;
         String query = "UPDATE am_gb_class SET class_desc = ?,class_name = ?"
                 + "   ,is_supervisor = ?,class_status = ?"
                 + "   ,fleet_admin = ?,facility_admin =?,store_admin=?" + "   WHERE class_id = ?";
 
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
             ps.setString(1, sc.getDescription());
             ps.setString(2, sc.getClassName());
             ps.setString(3, sc.getIsSupervisor());
@@ -540,25 +567,21 @@ public class SecurityHandler
             System.out.println(this.getClass().getName()
                     + " ERROR:Error Updating Security Class ->"
                     + e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
     }
 
     public boolean createSecurityClass(legend.admin.objects.SecurityClass sc) {
-
-        Connection con = null;
-        PreparedStatement ps = null;
+    	
         boolean done = false;
         String query = "INSERT INTO am_gb_class(class_desc,class_name,is_supervisor,class_status"
                 + "    ,user_id,create_date ,fleet_admin,class_id,facility_admin,store_admin)"
                 + "    VALUES (?,?,?,?,?,?,?,?,?,?)";
 
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
             ps.setString(1, sc.getDescription());
             ps.setString(2, sc.getClassName());
             ps.setString(3, sc.getIsSupervisor());
@@ -577,9 +600,8 @@ public class SecurityHandler
             System.out.println(this.getClass().getName()
                     + " ERROR:Error Updating Security Class ->"
                     + e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
     }
@@ -592,15 +614,12 @@ public class SecurityHandler
                 + "  FROM am_gb_class WHERE CLASS_STATUS = ?";
 
 //        query = query + filter;
-        Connection c = null;
-        ResultSet rs = null;
-        PreparedStatement s = null;
+        
 
-        try {
-            c = getConnection();
-            s = c.prepareStatement(query);
-            s.setString(1, filter);
-            rs = s.executeQuery();
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, filter);
+          try( ResultSet rs = ps.executeQuery();){
             while (rs.next()) {
                 String classId = rs.getString("class_id");
                 String description = rs.getString("class_desc");
@@ -626,20 +645,20 @@ public class SecurityHandler
 
                 _list.add(sc);
             }
+          }
 //            closeConnection(c, s, rs);
         } catch (Exception e) {
             System.out.println("this error is generated in getSecurityClassByQuery(String filter) of securityHandler class");
             e.printStackTrace();
 
-        } finally {
-            closeConnection(c, s, rs);
-        }
+        } 
+        
         return _list;
 
     } 
 
   
-    public boolean updateClassPrivilege(java.util.ArrayList list) {
+    public boolean updateClassPrivilegeOld(java.util.ArrayList list) {
         String query = "UPDATE am_ad_class_privileges SET "
                 + "role_view = ?,role_addn = ?,role_edit = ?"
                 + " WHERE clss_uuid=? AND role_uuid=?";
@@ -672,6 +691,34 @@ public class SecurityHandler
 
         return (d.length > 0);
     }
+    
+    public boolean updateClassPrivilege(java.util.ArrayList<legend.admin.objects.ClassPrivilege> list) {
+        String query = "UPDATE am_ad_class_privileges SET "
+                     + "role_view = ?, role_addn = ?, role_edit = ? "
+                     + "WHERE clss_uuid = ? AND role_uuid = ?";
+        int[] results = new int[0];
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            for (legend.admin.objects.ClassPrivilege cp : list) {
+                ps.setString(1, cp.getRole_view());
+                ps.setString(2, cp.getRole_addn());
+                ps.setString(3, cp.getRole_edit());
+                ps.setString(4, cp.getClss_uuid());
+                ps.setString(5, cp.getRole_uuid());
+                ps.addBatch();
+            }
+
+            results = ps.executeBatch();
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Error updating class privileges -> " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        return results != null && results.length > 0;
+    }
 
     public java.util.List getAllUsers() {
         java.util.List _list = new java.util.ArrayList();
@@ -683,14 +730,11 @@ public class SecurityHandler
                 + ", Password_Expiry, Login_Date, Login_System, Fleet_Admin"
                 + ", email, Branch,password_changed,region_code,zone_code,region_restriction,zone_restriction,Facility_Admin,Store_Admin" + " FROM AM_GB_USER";
 
-        Connection c = null;
-        ResultSet rs = null;
-        Statement s = null;
+       
 
-        try {
-            c = getConnection();
-            s = c.createStatement();
-            rs = s.executeQuery(query);
+        try (Connection c = getConnection();
+   	         PreparedStatement s = c.prepareStatement(query)) {
+          try( ResultSet rs = s.executeQuery(query);){
             while (rs.next()) {
                 String userId = rs.getString("User_Id");
                 String userName = rs.getString("User_Name");
@@ -750,12 +794,12 @@ public class SecurityHandler
                 user.setIsStoreAdministrator(storeAdmin);
                 _list.add(user);
             }
+          }
  //           closeConnection(c, s, rs);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
-        }
+        } 
+        
         return _list;
 
     } 
@@ -1308,6 +1352,7 @@ public class SecurityHandler
              PreparedStatement ps = con.prepareStatement(query)) {
 
             ps.setString(1, userID);
+            ps.setQueryTimeout(30);
 
             try (ResultSet rs = ps.executeQuery()) {
 
@@ -2304,24 +2349,18 @@ public class SecurityHandler
 
     private boolean executeQuery(String query)
     {
-        Connection con;
-        PreparedStatement ps;
         boolean done;
-        con = null;
-        ps = null;
         done = false;
-        try {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+    	try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query);) {
         done = ps.execute();
  //       closeConnection(con, ps);
         }
         catch (Exception e) {
             System.out.println("WARNING:Error executing Query in executeQuery ->"
                     + e.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+    	
         return done;
     }
 
@@ -2336,29 +2375,23 @@ public class SecurityHandler
     {
         String branchRestrict;
         String query;
-        Connection c;
-        ResultSet rs;
-        PreparedStatement s;
+        
         branchRestrict = "";
         query = "SELECT branch_restriction "
                 + " FROM AM_GB_USER WHERE User_Id = ?";
  //       query = (new StringBuilder()).append("SELECT branch_restriction  FROM AM_GB_USER WHERE User_Id = '").append(userId).append("'").toString();
-        c = null;
-        rs = null;
-        s = null;
-        try {
-        c = getConnection();
-        s = c.prepareStatement(query);
+       
+        try(Connection con = getConnection();
+                PreparedStatement s = con.prepareStatement(query);) {
         s.setString(1, userId);
-        rs = s.executeQuery();
+       try(ResultSet rs = s.executeQuery()){
         while (rs.next()) {
             branchRestrict = rs.getString("branch_restriction");
         }
         }
+        }
         catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(c, s, rs);
         }
 
         return branchRestrict;
@@ -2368,12 +2401,10 @@ public class SecurityHandler
     {
         
         boolean done;
-       
         done = false;
-        try {
         String query = "update am_gb_user set expiry_date = null where user_id = ?";
-        Connection con = dbConnection.getConnection("legendPlus");
-        PreparedStatement ps  = con.prepareStatement(query);
+        try(Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query);) {
         ps.setInt(1, user_id);
         done = ps.executeUpdate() != -1;
 //        closeConnection(con, ps);
@@ -2385,7 +2416,7 @@ public class SecurityHandler
         return done;
     }
 
-    public boolean createManageUser(legend.admin.objects.User user, String limit)
+    public boolean createManageUserOld(legend.admin.objects.User user, String limit)
     {
         Connection con;
         PreparedStatement ps;
@@ -2493,9 +2524,84 @@ public class SecurityHandler
 
 
     }
+    
+    
+    public boolean createManageUser(legend.admin.objects.User user, String limit) {
+        boolean done = false;
+        String userId = (new ApplicationHelper()).getGeneratedId("AM_GB_USER");
+
+        String query = "INSERT INTO AM_GB_USER("
+                + "User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, Phone_No, "
+                + "Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, Create_Date, "
+                + "Password_Expiry, Fleet_Admin, Email, User_id, branch_restriction, Expiry_Days, "
+                + "Expiry_Date, Approval_Limit, dept_code, dept_restriction, UnderTaker, region_code, "
+                + "zone_code, region_restriction, zone_restriction, Facility_Admin, Store_Admin"
+                + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, user.getUserName());
+            ps.setString(2, user.getUserFullName());
+            ps.setString(3, user.getLegacySystemId());
+            ps.setString(4, user.getUserClass());
+            ps.setString(5, user.getBranch());
+            ps.setString(6, user.getPassword());
+            ps.setString(7, user.getPhoneNo());
+            ps.setString(8, user.getIsSupervisor());
+            ps.setString(9, user.getMustChangePwd());
+            ps.setString(10, user.getLoginStatus());
+            ps.setString(11, user.getUserStatus());
+            ps.setString(12, user.getCreatedBy());
+            ps.setDate(13, df.dateConvert(new Date()));
+
+            // Conditional Password Expiry
+            java.sql.Date expiryDate = null;
+            if (user.getExpiryDate() == null || user.getExpiryDate().isEmpty() || "null".equalsIgnoreCase(user.getExpiryDate())) {
+                expiryDate = df.dateConvert(df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry())));
+            } else {
+                expiryDate = df.dateConvert(user.getExpiryDate());
+            }
+            ps.setDate(14, expiryDate);
+
+            ps.setString(15, user.getFleetAdmin());
+            ps.setString(16, user.getEmail());
+            ps.setString(17, userId);
+            ps.setString(18, user.getBranchRestrict());
+            ps.setInt(19, user.getExpiryDays());
+
+            if (user.getExpiryDate() == null || user.getExpiryDate().isEmpty() || "null".equalsIgnoreCase(user.getExpiryDate())) {
+                ps.setNull(20, java.sql.Types.DATE); // Expiry_Date
+            } else {
+                ps.setDate(20, df.dateConvert(user.getExpiryDate()));
+            }
+
+            ps.setString(21, limit);
+            ps.setString(22, user.getDeptCode());
+            ps.setString(23, user.getDeptRestrict());
+            ps.setString(24, user.getUnderTaker());
+            ps.setString(25, user.getRegionCode());
+            ps.setString(26, user.getZoneCode());
+            ps.setString(27, user.getRegionRestrict());
+            ps.setString(28, user.getZoneRestrict());
+            ps.setString(29, user.getIsFacilityAdministrator());
+            ps.setString(30, user.getIsStoreAdministrator());
+
+            done = ps.executeUpdate() != -1;
+
+            // Save password history
+            createPasswordHistory(userId, user.getPassword());
+
+        } catch (Exception e) {
+            System.out.println("WARNING: Error executing createManageUser -> " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return done;
+    }
 
 
-    public boolean updateManageUser(legend.admin.objects.User user, String limit)
+    public boolean updateManageUserOld(legend.admin.objects.User user, String limit)
     {
         Connection con;
         PreparedStatement ps;
@@ -2591,6 +2697,68 @@ public class SecurityHandler
     return done;
 
 }
+    
+    public boolean updateManageUser(legend.admin.objects.User user, String limit) {
+        boolean done = false;
+
+        String query = "UPDATE AM_GB_USER SET "
+                + "User_Name = ?, Full_Name = ?, Legacy_Sys_Id = ?, Class = ?, Branch = ?, Password = ?, "
+                + "Phone_No = ?, Is_Supervisor = ?, Must_Change_Pwd = ?, Login_Status = ?, User_Status = ?, "
+                + "Fleet_Admin = ?, Email = ?, branch_restriction = ?, Expiry_Days = ?, "
+                + "Expiry_Date = ?, Approval_Limit = ?, dept_code = ?, region_code = ?, zone_code = ?, "
+                + "region_restriction = ?, zone_restriction = ?, Facility_Admin = ?, Store_Admin = ? "
+                + "WHERE User_Id = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, user.getUserName());
+            ps.setString(2, user.getUserFullName());
+            ps.setString(3, user.getLegacySystemId());
+            ps.setString(4, user.getUserClass());
+            ps.setString(5, user.getBranch());
+            ps.setString(6, user.getPassword());
+            ps.setString(7, user.getPhoneNo());
+            ps.setString(8, user.getIsSupervisor());
+            ps.setString(9, user.getMustChangePwd());
+            ps.setString(10, user.getLoginStatus());
+            ps.setString(11, user.getUserStatus());
+            ps.setString(12, user.getFleetAdmin());
+            ps.setString(13, user.getEmail());
+            ps.setString(14, user.getBranchRestrict());
+            ps.setInt(15, user.getExpiryDays());
+
+            // Expiry_Date handling
+            if (user.getExpiryDate() == null || user.getExpiryDate().isEmpty() || "null".equalsIgnoreCase(user.getExpiryDate())) {
+                ps.setNull(16, java.sql.Types.DATE);
+            } else {
+                ps.setDate(16, df.dateConvert(user.getExpiryDate()));
+            }
+
+            ps.setString(17, limit);
+            ps.setString(18, user.getDeptCode());
+            ps.setString(19, user.getRegionCode());
+            ps.setString(20, user.getZoneCode());
+            ps.setString(21, user.getRegionRestrict());
+            ps.setString(22, user.getZoneRestrict());
+            ps.setString(23, user.getIsFacilityAdministrator());
+            ps.setString(24, user.getIsStoreAdministrator());
+            ps.setString(25, user.getUserId());
+
+            done = ps.executeUpdate() != -1;
+
+            // Optional: update expiry date if needed
+            if (user.getExpiryDays() == 0) {
+                updateExpiryDate(Integer.parseInt(user.getUserId()));
+            }
+
+        } catch (Exception e) {
+            System.out.println("WARNING: Error executing updateManageUser -> " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return done;
+    }
 
     public void compareAuditValues(String role_view, String role_addn, String role_edit, String class_id, String role_id, String user_id, String branchCode,
             int loginId, String eff_date)
@@ -2600,9 +2768,7 @@ public class SecurityHandler
         String role_addn1;
         String role_edit1;
         String query;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
         atg = new AuditTrailGen();
         role_view1 = "";
         role_addn1 = "";
@@ -2610,18 +2776,16 @@ public class SecurityHandler
         query = "SELECT role_view, role_addn, role_edit FROM am_ad_class_privileges WHERE  clss_u" +
 "uid = ? AND Role_uuid=?"
 ;  
-        con = null;
-        ps = null;
-        rs = null;
+        
         boolean done = false;
-        try {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
+      
         ps.setInt(1, Integer.parseInt(class_id));
         ps.setInt(2, Integer.parseInt(role_id));
 //        System.out.println((new StringBuilder()).append("==============**=====class_id===============").append(class_id).toString());
 //        System.out.println((new StringBuilder()).append("==============**=====role_id===============").append(role_id).toString());
-        rs = ps.executeQuery();
+       try(ResultSet rs = ps.executeQuery();){
 //        System.out.println((new StringBuilder()).append("===================ResultSET===============").append(rs).toString());
         while (rs.next()) {
 //            System.out.println((new StringBuilder()).append("===================WHILE INSIDE A ResultSET===============").append(rs).toString());
@@ -2650,14 +2814,12 @@ public class SecurityHandler
         }
 //        System.out.println("===================logAuditTrailSecurityComp= within  compareAuditValues========" +
 //"======"
-//);
-//        closeConnection(con, ps, rs);
+
+       }
     } catch (Exception e) {
         System.out.println("WARNING:Error executing Query User Full NamecompareAuditValues: ->"
                 + e.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
-    }
+    } 
     //return UserFullName;
 }
     
@@ -2668,25 +2830,20 @@ public class SecurityHandler
         String role_class_status;
         String role_default_Class_Id;
         String query;
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
         atg = new AuditTrailGen();
         role_class_status = "";
         role_default_Class_Id = "";
         query = "SELECT class_status, DefaultClass_id FROM am_gb_classDisable WHERE class_id=?"
 ;  
-        con = null;
-        ps = null;
-        rs = null;
+        
         boolean done = false;
-        try {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
         ps.setInt(1, Integer.parseInt(class_id));
 //        System.out.println((new StringBuilder()).append("==============**=====class_id===============").append(class_id).toString());
 //        System.out.println((new StringBuilder()).append("==============**=====role_id===============").append(role_id).toString());
-		rs = ps.executeQuery();
+		try(ResultSet rs = ps.executeQuery();){
 //        System.out.println((new StringBuilder()).append("===================ResultSET===============").append(rs).toString());
         while (rs.next()) {
 //            System.out.println((new StringBuilder()).append("===================WHILE INSIDE A ResultSET===============").append(rs).toString());
@@ -2711,26 +2868,20 @@ public class SecurityHandler
 //        System.out.println("===================logAuditTrailSecurityComp= within  compareAuditValues========" +
 //"======"
 //);
-//        closeConnection(con, ps, rs);
+		}
     } catch (Exception e) {
         System.out.println("WARNING:Error executing Query User Full NamecompareAuditValues: ->"
                 + e.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
-    }
+    } 
     //return UserFullName;
 }    
     
     public ArrayList<UserDisableClass> getAllClassDisableDetails() {
 		ArrayList<UserDisableClass> list = new ArrayList<UserDisableClass>();
-		Connection con = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
-	    try {
 	    String query = "select class_id, class_desc, class_status,class_name, DefaultClass_id from am_gb_classDisable order by class_name";
-	    con = getConnection();
-	    ps = con.prepareStatement(query);
-	    rs = ps.executeQuery();
+	    try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(query)) {
+	    	 try (ResultSet rs = ps.executeQuery()) {
 	    while(rs.next()) {
 	    	UserDisableClass userDisableClass = new UserDisableClass();
 
@@ -2741,7 +2892,7 @@ public class SecurityHandler
 	    	userDisableClass.setDefaultClassId(rs.getString(5) != "NULL" ? rs.getString(5) : "NULL");
 	    	
 	    	list.add(userDisableClass);
-	    	
+	    }
 	    }
 	    }catch(Exception e){
 	    	e.getMessage();
@@ -2754,15 +2905,11 @@ public class SecurityHandler
     
     public ArrayList<SecurityRerouteClass> getAllSecurityRerouteDetails(String superId) {
 		ArrayList<SecurityRerouteClass> list = new ArrayList<SecurityRerouteClass>();
-		Connection con = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
-	    try {
 	    String query = "select Transaction_Id,tran_type,asset_id,description from am_asset_approval where process_status='P' and super_id=?";
-	    con = getConnection();
-	    ps = con.prepareStatement(query);
+	    try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(query)) {
 		ps.setString(1, superId);
-	    rs = ps.executeQuery();
+		 try (ResultSet rs = ps.executeQuery()) {
 	    while(rs.next()) {
 	    	SecurityRerouteClass securityRerouteClass = new SecurityRerouteClass();
 
@@ -2772,7 +2919,7 @@ public class SecurityHandler
 	    	securityRerouteClass.setDescription(rs.getString(4) != "NULL" ? rs.getString(4) : "NULL");
 	    	
 	    	list.add(securityRerouteClass);
-	    	
+	    }
 	    }
 	    }catch(Exception e){
 	    	e.getMessage();
@@ -2785,16 +2932,12 @@ public class SecurityHandler
     
     public ArrayList<SupervisorDetailsClass> getAllSupervisorDetails(String superId) {
   		ArrayList<SupervisorDetailsClass> list = new ArrayList<SupervisorDetailsClass>();
-  		Connection con = null;
-  	    PreparedStatement ps = null;
-  	    ResultSet rs = null;
-  	    try {
-  	    String query = "select user_id, user_name+' - '+full_name AS Full_Detail from am_gb_user where "
+  		String query = "select user_id, user_name+' - '+full_name AS Full_Detail from am_gb_user where "
   	    		+ "user_Name != ? and is_supervisor = 'Y' and User_Status='ACTIVE' order by user_name";
-  	    con = getConnection();
-  	    ps = con.prepareStatement(query);
+  		 try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(query)) {
   		ps.setString(1, superId);
-  	    rs = ps.executeQuery();
+  		 try (ResultSet rs = ps.executeQuery()) {
   	    while(rs.next()) {
   	    	SupervisorDetailsClass supervisorDetailsClass = new SupervisorDetailsClass();
 
@@ -2802,7 +2945,7 @@ public class SecurityHandler
   	    	supervisorDetailsClass.setFull_Detail(rs.getString(2));
   	    	
   	    	list.add(supervisorDetailsClass);
-  	    	
+  	    }
   	    }
   	    }catch(Exception e){
   	    	e.getMessage();
@@ -2816,14 +2959,10 @@ public class SecurityHandler
     
     public ArrayList<UserEnableClass> getAllClassEnableDetails() {
 		ArrayList<UserEnableClass> list = new ArrayList<UserEnableClass>();
-		Connection con = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
-	    try {
-	    String query = "select distinct class_id, class_desc, class_name, class_status from am_gb_classEnable order by class_name ";
-	    con = getConnection();
-	    ps = con.prepareStatement(query);
-	    rs = ps.executeQuery();
+		String query = "select distinct class_id, class_desc, class_name, class_status from am_gb_classEnable order by class_name ";
+		 try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(query)) {
+			 try (ResultSet rs = ps.executeQuery()) {
 	    while(rs.next()) {  
 	    	UserEnableClass userEnableClass = new UserEnableClass();
 
@@ -2833,7 +2972,7 @@ public class SecurityHandler
 	    	userEnableClass.setClassStatus(rs.getString(4));
 	    	
 	    	list.add(userEnableClass);
-	    	
+	    }
 	    }
 	    }catch(Exception e){
 	    	e.getMessage();
@@ -2863,19 +3002,14 @@ public class SecurityHandler
     public void updateClassPrivilege1(ClassPrivilege cp, int userid, String branchCode, int loginId, String eff_date)
     {
         String query;
-        Connection con;
-        PreparedStatement ps;
         AuditTrailGen atg1 = new AuditTrailGen();
         query = "UPDATE am_ad_class_privileges SET role_view = ?,role_addn = ?,role_edit = ? WHER" +
 "E clss_uuid=? AND Role_uuid=? "
 ;
-        con = null;
-        ps = null;
-        ResultSet rs = null;
+       
         int d[] = null;
-        try {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+        try (Connection con = getConnection();
+	             PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1, cp.getRole_view());
         ps.setString(2, cp.getRole_addn());
         ps.setString(3, cp.getRole_edit());
@@ -2888,35 +3022,32 @@ public class SecurityHandler
         }
         catch (Exception ex) {
         System.out.println("WARN: Error doing updateClassPrivilege ->" + ex);
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
 }
 
     public String getUserLogonStatus(String userName)
     {
        
         String result;
-        
-        result = null;
-        try {
-       Connection con = getConnection();
         String query = "select Login_Status from am_gb_User where user_name = ?";
-        PreparedStatement ps = con.prepareStatement("select Login_Status from am_gb_User where user_name = ?");
+        result = null;
+    	try(Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(query);) {
         ps.setString(1, userName);
-        ResultSet res = ps.executeQuery();
-        if(res.next())
+        try (ResultSet rs = ps.executeQuery()) {
+        if(rs.next())
         {
-            result = res.getString("Login_Status");
+            result = rs.getString("Login_Status");
         }
         }
+    	}
         catch (Exception ex) {
             ex.printStackTrace();
         } 
         return result;
     }
 
-    public boolean updateLoginAsAboveLimit(String user_name, String ip)
+    public boolean updateLoginAsAboveLimitOld(String user_name, String ip)
     {
         Connection con;
         PreparedStatement ps;
@@ -2947,49 +3078,61 @@ public class SecurityHandler
         return done;
 
     }
+    
+    public boolean updateLoginAsAboveLimit(String userName, String ip) {
+        boolean done = false;
+        String query = "UPDATE am_gb_user SET login_status = 3, login_system = ? WHERE user_name = ?";
+
+        // Trim leading/trailing whitespace only
+        String nameFilter = userName != null ? userName.trim() : "";
+        String ipFilter = ip != null ? ip.trim() : "";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, ipFilter);
+            ps.setString(2, nameFilter);
+
+            done = ps.executeUpdate() != -1;
+
+        } catch (Exception e) {
+            System.out.println("WARNING: Error executing updateLoginAsAboveLimit -> " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return done;
+    }
 
     public String getCompanyLoginAttempt()
     {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet res;
+       
         String result;
-        con = null;
-        ps = null;
-        res = null;
-        result = null;
-        try {
-        con = getConnection();
         String query = "select attempt_logon from am_gb_company";
-        ps = con.prepareStatement("select attempt_logon from am_gb_company");
-        res = ps.executeQuery();
+        result = null;
+    	try(Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(query);) {
+    		 try (ResultSet res = ps.executeQuery()) {
         if(res.next())
         {
             result = res.getString("attempt_logon");
         }
+    		 }
         } catch (Exception ex) {
             ex.printStackTrace();
-        } finally {
-            closeConnection(con, ps, res);
-        }
+        } 
         return result;
     }
 
     public boolean updateManageUser(User user)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         boolean done;
-        con = null;
-        ps = null;
+     
         done = false;
         String query = "";
-        try {
-         query = "UPDATE AM_GB_USER  SET  Password = ?, Must_Change_Pwd = ? ,Login_Status = ? WHER" +
-"E User_Id = ?"
-;
-        con = getConnection();
-        ps = con.prepareStatement(query);
+        query = "UPDATE AM_GB_USER  SET  Password = ?, Must_Change_Pwd = ? ,Login_Status = ? WHERE User_Id = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(query);){
         ps.setString(1, user.getPassword());
         ps.setString(2, user.getMustChangePwd());
         ps.setString(3, user.getLoginStatus());
@@ -2998,9 +3141,8 @@ public class SecurityHandler
     } catch (Exception e) {
         System.out.println("WARNING:Error executing Query in updateManageUser ->" + e.getMessage());
         e.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
+        
     return done;
 
 
@@ -3050,11 +3192,10 @@ public class SecurityHandler
 ;
         query = (new StringBuilder()).append(query).append(filter).toString();
        System.out.println("query in getUserByQuery with Three Parameter: "+query);
-       
-        try {
-        	Connection c = dbConnection.getConnection("legendPlus");
-            PreparedStatement s = c.prepareStatement(query);
-       ResultSet  rs = s.executeQuery();
+       try (Connection c = getConnection();
+  	         PreparedStatement s = c.prepareStatement(query)) {
+
+    	   try (ResultSet rs = s.executeQuery()) {
         while (rs.next()) {
             String userId = rs.getString("User_Id");
             String userName = rs.getString("User_Name");
@@ -3138,7 +3279,7 @@ public class SecurityHandler
                 _list.add(user);
             }
         }
-//        closeConnection(c, s, rs);
+    	   }
     } catch (Exception e) {
         e.printStackTrace();
     } 
@@ -3148,22 +3289,18 @@ public class SecurityHandler
 
     public PasswordHistory getPasswordHistory(String userid)
     {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
         String query;
         PasswordHistory ph;
-        con = null;
-        ps = null;
-        rs = null;
+       
 
         	query = "select * from ad_password_history where userid = ?";
          ph = null;
-         try {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+         try (Connection c = getConnection();
+    	         PreparedStatement ps = c.prepareStatement(query)) {
+
         ps.setString(1, userid);
-        rs = ps.executeQuery();
+        try (ResultSet rs = ps.executeQuery()) {
         
         while (rs.next()) {
             String userId = rs.getString("USERID");
@@ -3178,11 +3315,10 @@ public class SecurityHandler
         }
 //        closeConnection(con, ps, rs);
         }
+         }
         catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
 
 
         return ph;
@@ -3224,7 +3360,7 @@ public class SecurityHandler
         return result;
     }
 
-    public boolean updatePasswordHistory(PasswordHistory pass, String password)
+    public boolean updatePasswordHistoryOld(PasswordHistory pass, String password)
     {
         Connection con;
         PreparedStatement ps;
@@ -3292,6 +3428,38 @@ public class SecurityHandler
 
 
     }
+    
+    
+    public boolean updatePasswordHistory(PasswordHistory pass, String password) {
+        boolean done = false;
+
+        int currentCounter = pass.getCounter();
+        int nextCounter = (currentCounter == 5) ? 1 : currentCounter + 1;
+
+        // Dynamically determine password column
+        String passwordColumn = "PASSWORD" + currentCounter;
+
+        String query = "UPDATE ad_password_history " +
+                       "SET COUNTER = ?, " + passwordColumn + " = ?, CHANGEDATE = ? " +
+                       "WHERE USERID = ?";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setInt(1, nextCounter);
+            ps.setString(2, password);
+            ps.setDate(3, df.dateConvert(new Date()));
+            ps.setString(4, pass.getUserId());
+
+            done = ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            System.out.println("Error updating ad_password_history: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return done;
+    }
 
     public boolean login(String location, String compName, String Apps, String LicfileName)
     {
@@ -3345,21 +3513,19 @@ public class SecurityHandler
 
     public boolean createPasswordHistory(String userid, String Password)
     {
-        Connection con;
-        PreparedStatement ps;
+        
         boolean done;
         String query;
-        con = null;
-        ps = null;
+        
         done = false;
 /*        query = "INSERT INTO ad_password_history(USERID,COUNTER,PASSWORD1,PASSWORD2,PASSWORD3,PAS" +
 "SWORD4,PASSWORD5)    VALUES (?,?,?,?,?,?,?)"
 ;*/
 //        query = "INSERT INTO ad_password_history(USERID,COUNTER,PASSWORD)   VALUES (?,?,?,?,?,?,?)";
         query = "INSERT INTO ad_password_history(USERID,COUNTER,PASSWORD)   VALUES (?,?,?)";
-        try {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
+
         ps.setString(1, userid);
         ps.setInt(2, 1);
         ps.setString(3, Password);
@@ -3374,22 +3540,19 @@ public class SecurityHandler
             System.out.println(this.getClass().getName()
                     + " ERROR:Error inserting ad_password_history  ->");
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
     }
 
     public boolean updatePasswordHistory2(int counter, String password, String userId)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         boolean done;
         int limitValue;
         int freq;
-        con = null;
-        ps = null;
+       
         done = false;
         String query = "";
         int limit = 0;
@@ -3413,12 +3576,13 @@ public class SecurityHandler
         }
         System.out.println((new StringBuilder()).append("freq  ").append(freq).toString());
         updateFreq(freq, userId);
-        try {
+     
          query = "UPDATE ad_password_history  SET  LIMIT = ?, PASSWORD = ?  ,CHANGEDATE = ? WHERE " +
 "USERID = ? AND COUNTER = ?  "
 ;
-        con = getConnection();
-        ps = con.prepareStatement(query);
+         try (Connection con = getConnection();
+                 PreparedStatement ps = con.prepareStatement(query)) {
+
         ps.setInt(1, limitValue);
         ps.setString(2, password);
         ps.setTimestamp(3, getDateTime(new Date()));
@@ -3430,9 +3594,7 @@ public class SecurityHandler
         catch (Exception e) {
             System.out.println("WARNING:Error executing Query ->ad_password_history" + e.getMessage());
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return done;
 
 
@@ -3440,17 +3602,15 @@ public class SecurityHandler
 
     public boolean updateFreq(int freq, String userId)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         boolean done;
-        con = null;
-        ps = null;
+      
         done = false;
         String query = "";
-        try {
-         query = "UPDATE ad_password_history  SET  freq = ?  WHERE USERID = ?  ";
-        con = getConnection();
-        ps = con.prepareStatement(query);
+        query = "UPDATE ad_password_history  SET  freq = ?  WHERE USERID = ?  ";
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
+       
         ps.setInt(1, freq);
         ps.setString(2, userId);
         done = ps.executeUpdate() != -1;
@@ -3459,9 +3619,8 @@ public class SecurityHandler
         catch (Exception e) {
             System.out.println("WARNING:Error executing Query ->ad_password_history" + e.getMessage());
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
+        
         return done;
 
 
@@ -3471,19 +3630,14 @@ public class SecurityHandler
     {
     	java.util.ArrayList _list = new java.util.ArrayList();
         String query;
-        Connection c;
-        ResultSet rs;
-        PreparedStatement s;
+       
         PasswordHistory pass = null;
         query = "select * from ad_password_history where userid = ?";
-        c = null;
-        rs = null;
-        s = null;
-        try {
-        c = getConnection();
-        s = c.prepareStatement(query);
+      
+        try (Connection con = getConnection();
+                PreparedStatement s = con.prepareStatement(query)) {
         s.setString(1, userid);
-        rs = s.executeQuery();
+        try (ResultSet rs = s.executeQuery()) {
         while (rs.next()) {
             String userId = rs.getString("USERID");
             int counter = rs.getInt("COUNTER");
@@ -3494,13 +3648,13 @@ public class SecurityHandler
             pass.setUserId(userId);
             _list.add(pass);
         }
+        }
 //        closeConnection(c, s, rs);
     }
     catch (Exception e) {
         e.printStackTrace();
-    } finally {
-        closeConnection(c, s, rs);
-    }
+    } 
+        
     return _list;
 
 }
@@ -3549,17 +3703,14 @@ public class SecurityHandler
 
     public boolean createPasswordHistory(String userid, String Password, int counter)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         boolean done;
         String query;
-        con = null;
-        ps = null;
+       
         done = false;
         query = "INSERT INTO ad_password_history(USERID,COUNTER,PASSWORD)    VALUES (?,?,?)";
-        try {
-        con = getConnection();
-        ps = con.prepareStatement(query);
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
         ps.setString(1, userid);
         ps.setInt(2, counter);
         ps.setString(3, Password);
@@ -3570,14 +3721,13 @@ public class SecurityHandler
         System.out.println(this.getClass().getName()
                 + " ERROR:Error inserting ad_password_history  ->");
         e.printStackTrace();
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
+        
     return done;
 
 }
 
-    public PasswordHistory getPasswordHistory2(String userid)
+    public PasswordHistory getPasswordHistory2Old(String userid)
     {
         Connection con;
         PreparedStatement ps;
@@ -3613,65 +3763,86 @@ public class SecurityHandler
 
         return ph;
     }
+    
+    public PasswordHistory getPasswordHistory2(String userid) {
+        PasswordHistory ph = null;
+
+        String query = "SELECT USERID, COUNTER, PASSWORD, CHANGEDATE, LIMIT " +
+                       "FROM ad_password_history " +
+                       "WHERE USERID = ? " +
+                       "AND COUNTER = (SELECT MAX(COUNTER) FROM ad_password_history WHERE USERID = ? )";
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, userid);
+            ps.setString(2, userid);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    ph = new PasswordHistory(
+                            rs.getString("USERID"),
+                            rs.getInt("COUNTER"),
+                            rs.getString("PASSWORD"),
+                            rs.getInt("LIMIT")
+                    );
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ph;
+    }
 
     public int getPasswordHistory3(String userid)
     {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
         int limit;
         String query;
-        con = null;
-        ps = null;
-        rs = null;
+      
         limit = 0;
         query = "select  max(counter) LIMIT from ad_password_history where userid = ?";
 
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
-            ps.setString(1, userid);
-            rs = ps.executeQuery();
+        try (Connection c = getConnection();
+   	         PreparedStatement s = c.prepareStatement(query)) {
+            s.setString(1, userid);
+            try (ResultSet rs = s.executeQuery()) {
         while (rs.next()) {
             limit = rs.getInt("LIMIT");
         }
  //       closeConnection(con, ps, rs);
         }
+        }
         catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps, rs);
         }
         return limit;
     }
 
     public int getFreq(String userid)
     {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
         int frequency;
         String query;
-        con = null;
-        ps = null;
-        rs = null;
+        
         frequency = 0;
         query = "select  freq from ad_password_history where userid = ?";
-        try {
-            con = getConnection();
-            ps = con.prepareStatement(query);
-            ps.setString(1, userid);
-            rs = ps.executeQuery();
+        try (Connection c = getConnection();
+   	         PreparedStatement s = c.prepareStatement(query)) {
+            s.setString(1, userid);
+            try (ResultSet rs = s.executeQuery()) {
         while (rs.next()) {
             frequency = rs.getInt("freq");
         }
 //        closeConnection(con, ps, rs);
         }
+        }
         catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            closeConnection(con, ps, rs);
-        }
+        } 
         return frequency;
     }
 
@@ -3768,7 +3939,7 @@ public class SecurityHandler
         return password;
     }
 
-    public boolean createManageUser2(User user, String limit,String  supervisorId) throws IOException
+    public boolean createManageUser2Old(User user, String limit,String  supervisorId) throws IOException
     {
         Connection con;
         PreparedStatement ps;
@@ -3897,6 +4068,97 @@ public class SecurityHandler
         return done;
 
 
+    }
+    
+    
+    public boolean createManageUser2(User user, String limit, String supervisorId) {
+        boolean done = false;
+        String bank = "";
+        String userId = new ApplicationHelper().getGeneratedId("AM_GB_USER");
+
+        String query = "INSERT INTO AM_GB_USER (" +
+                "User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, " +
+                "Phone_No, Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, " +
+                "Create_Date, Password_Expiry, Fleet_Admin, Email, User_id, branch_restriction, " +
+                "Expiry_Days, Expiry_Date, Approval_Limit, dept_code, token_required, " +
+                "region_code, zone_code, region_restriction, zone_restriction, " +
+                "Facility_Admin, Store_Admin, Supervisor_Id) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        try (FileInputStream input = new FileInputStream("C:\\Property\\LegendPlus.properties");
+             Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            // Load property
+            Properties prop = new Properties();
+            prop.load(input);
+            bank = prop.getProperty("bank");
+
+            int index = 1;
+
+            ps.setString(index++, user.getUserName());
+            ps.setString(index++, user.getUserFullName());
+            ps.setString(index++, user.getLegacySystemId());
+            ps.setString(index++, user.getUserClass());
+            ps.setString(index++, user.getBranch());
+            ps.setString(index++, user.getPassword());
+            ps.setString(index++, user.getPhoneNo());
+            ps.setString(index++, user.getIsSupervisor());
+            ps.setString(index++, user.getMustChangePwd());
+            ps.setString(index++, user.getLoginStatus());
+            ps.setString(index++, user.getUserStatus());
+            ps.setString(index++, user.getCreatedBy());
+            ps.setDate(index++, df.dateConvert(new Date()));
+
+            // Password Expiry Logic
+            if ("ZENITH".equalsIgnoreCase(bank)) {
+                ps.setNull(index++, java.sql.Types.DATE);
+            } else {
+                java.sql.Date expiryDate = df.dateConvert(
+                        df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry()))
+                );
+                ps.setDate(index++, expiryDate);
+            }
+
+            ps.setString(index++, user.getFleetAdmin());
+            ps.setString(index++, user.getEmail());
+            ps.setString(index++, userId);
+            ps.setString(index++, user.getBranchRestrict());
+            ps.setInt(index++, user.getExpiryDays());
+
+            // Expiry Date (optional)
+            if (user.getExpiryDate() != null && 
+                !user.getExpiryDate().trim().isEmpty() && 
+                !"null".equalsIgnoreCase(user.getExpiryDate())) {
+
+                ps.setDate(index++, df.dateConvert(user.getExpiryDate()));
+            } else {
+                ps.setNull(index++, java.sql.Types.DATE);
+            }
+
+            ps.setString(index++, limit);
+            ps.setString(index++, user.getDeptCode());
+            ps.setString(index++, user.getTokenRequire());
+            ps.setString(index++, user.getRegionCode());
+            ps.setString(index++, user.getZoneCode());
+            ps.setString(index++, user.getRegionRestrict());
+            ps.setString(index++, user.getZoneRestrict());
+            ps.setString(index++, user.getIsFacilityAdministrator());
+            ps.setString(index++, user.getIsStoreAdministrator());
+            ps.setString(index++, supervisorId);
+
+            done = ps.executeUpdate() > 0;
+
+            if (done) {
+                createPasswordHistory(userId, user.getPassword());
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error in createManageUser2: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return done;
     }
 
     public boolean updateManageUser2Old(User user, String limit)
@@ -4073,7 +4335,7 @@ public class SecurityHandler
         return done;
     }
     
-    public java.util.ArrayList getAllUserByQuery()
+    public java.util.ArrayList getAllUserByQueryOld()
     {
         ArrayList _list;
         String query;
@@ -4183,8 +4445,73 @@ public class SecurityHandler
         return _list;
 
     }
+    
+    public java.util.ArrayList getAllUserByQuery() {
 
-    public java.util.ArrayList getAllUserByQuery(String loginUserId)
+    	java.util.ArrayList list = new ArrayList();
+
+        String query = "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, " +
+                "Phone_No, Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, " +
+                "Create_Date, Password_Expiry, Login_Date, Login_System, Fleet_Admin, Email, " +
+                "Password_Changed, Expiry_Date, Branch_Restriction, Approval_Limit, Approval_Level, " +
+                "Token_Required, Dept_Restriction, UnderTaker, Region_Code, Zone_Code, " +
+                "Region_Restriction, Zone_Restriction, Facility_Admin, Store_Admin " +
+                "FROM AM_GB_USER WHERE USER_STATUS = 'ACTIVE'";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                User user = new User();
+
+                user.setUserId(rs.getString("User_Id"));
+                user.setUserName(rs.getString("User_Name"));
+                user.setUserFullName(rs.getString("Full_Name"));
+                user.setLegacySystemId(rs.getString("Legacy_Sys_Id"));
+                user.setUserClass(rs.getString("Class"));
+                user.setBranch(rs.getString("Branch"));
+                user.setPhoneNo(rs.getString("Phone_No"));
+                user.setIsSupervisor(rs.getString("Is_Supervisor"));
+                user.setMustChangePwd(rs.getString("Must_Change_Pwd"));
+                user.setLoginStatus(rs.getString("Login_Status"));
+                user.setUserStatus(rs.getString("User_Status"));
+                user.setCreatedBy(rs.getString("UserId"));
+                user.setCreateDate(rs.getString("Create_Date"));
+                user.setPwdExpiry(rs.getString("Password_Expiry"));
+                user.setLastLogindate(rs.getString("Login_Date"));
+                user.setLoginSystem(rs.getString("Login_System"));
+                user.setFleetAdmin(rs.getString("Fleet_Admin"));
+                user.setEmail(rs.getString("Email"));
+                user.setPwdChanged(rs.getString("Password_Changed"));
+                user.setExpDate(rs.getDate("Expiry_Date"));
+                user.setBranchRestrict(rs.getString("Branch_Restriction"));
+                user.setApprvLimit(rs.getString("Approval_Limit"));
+                user.setApprvLevel(rs.getString("Approval_Level"));
+                user.setDeptRestrict(rs.getString("Dept_Restriction"));
+                user.setUnderTaker(rs.getString("UnderTaker"));
+                user.setRegionCode(rs.getString("Region_Code"));
+                user.setZoneCode(rs.getString("Zone_Code"));
+                user.setRegionRestrict(rs.getString("Region_Restriction"));
+                user.setZoneRestrict(rs.getString("Zone_Restriction"));
+                user.setIsFacilityAdministrator(rs.getString("Facility_Admin"));
+                user.setIsStoreAdministrator(rs.getString("Store_Admin"));
+
+                // Token handling (cleaner)
+                user.setTokenRequired("Y".equalsIgnoreCase(rs.getString("Token_Required")));
+
+                list.add(user);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public java.util.ArrayList getAllUserByQueryOld(String loginUserId)
     {
         ArrayList _list;
         String query;
@@ -4296,8 +4623,77 @@ public class SecurityHandler
         return _list;
 
     }
+    
+    public java.util.ArrayList getAllUserByQuery(String loginUserId) {
 
-    public boolean createManageUserfromUpload(String userName,String fullname,String legacyid,String userclass,String enterpasswords,String passwords,String email,
+    	java.util.ArrayList list = new ArrayList();
+
+        String query = "SELECT User_Id, User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, " +
+                "Phone_No, Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, " +
+                "Create_Date, Password_Expiry, Login_Date, Login_System, Fleet_Admin, Email, " +
+                "Password_Changed, Expiry_Date, Branch_Restriction, Approval_Limit, Approval_Level, " +
+                "Token_Required, Dept_Restriction, UnderTaker, Region_Code, Zone_Code, " +
+                "Region_Restriction, Zone_Restriction, Facility_Admin, Store_Admin " +
+                "FROM AM_GB_USER WHERE USER_STATUS = 'ACTIVE' AND User_Id != ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, loginUserId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    User user = new User();
+
+                    user.setUserId(rs.getString("User_Id"));
+                    user.setUserName(rs.getString("User_Name"));
+                    user.setUserFullName(rs.getString("Full_Name"));
+                    user.setLegacySystemId(rs.getString("Legacy_Sys_Id"));
+                    user.setUserClass(rs.getString("Class"));
+                    user.setBranch(rs.getString("Branch"));
+                    user.setPhoneNo(rs.getString("Phone_No"));
+                    user.setIsSupervisor(rs.getString("Is_Supervisor"));
+                    user.setMustChangePwd(rs.getString("Must_Change_Pwd"));
+                    user.setLoginStatus(rs.getString("Login_Status"));
+                    user.setUserStatus(rs.getString("User_Status"));
+                    user.setCreatedBy(rs.getString("UserId"));
+                    user.setCreateDate(rs.getString("Create_Date"));
+                    user.setPwdExpiry(rs.getString("Password_Expiry"));
+                    user.setLastLogindate(rs.getString("Login_Date"));
+                    user.setLoginSystem(rs.getString("Login_System"));
+                    user.setFleetAdmin(rs.getString("Fleet_Admin"));
+                    user.setEmail(rs.getString("Email"));
+                    user.setPwdChanged(rs.getString("Password_Changed"));
+                    user.setExpDate(rs.getDate("Expiry_Date"));
+                    user.setBranchRestrict(rs.getString("Branch_Restriction"));
+                    user.setApprvLimit(rs.getString("Approval_Limit"));
+                    user.setApprvLevel(rs.getString("Approval_Level"));
+                    user.setDeptRestrict(rs.getString("Dept_Restriction"));
+                    user.setUnderTaker(rs.getString("UnderTaker"));
+                    user.setRegionCode(rs.getString("Region_Code"));
+                    user.setZoneCode(rs.getString("Zone_Code"));
+                    user.setRegionRestrict(rs.getString("Region_Restriction"));
+                    user.setZoneRestrict(rs.getString("Zone_Restriction"));
+                    user.setIsFacilityAdministrator(rs.getString("Facility_Admin"));
+                    user.setIsStoreAdministrator(rs.getString("Store_Admin"));
+
+                    // Clean token logic
+                    user.setTokenRequired("Y".equalsIgnoreCase(rs.getString("Token_Required")));
+
+                    list.add(user);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public boolean createManageUserfromUploadOld(String userName,String fullname,String legacyid,String userclass,String enterpasswords,String passwords,String email,
 			String userBranch,String phoneNo,String isSupervisor,String fleetAdmin,String passwordMust,String expiry,String loginStatus,String userStatus,String userid,String branchRestrict,String deptCode,String regionCode,String zoneCode,String limit)
     {
         Connection con;
@@ -4373,7 +4769,89 @@ public class SecurityHandler
     }
     
     
-    public boolean createManageUserfromUpload(String userName,String fullname,String legacyid,String userclass,String enterpasswords,String passwords,String email,
+    public boolean createManageUserfromUpload(
+            String userName, String fullname, String legacyid,
+            String userclass, String enterpasswords, String passwords,
+            String email, String userBranch, String phoneNo,
+            String isSupervisor, String fleetAdmin,
+            String passwordMust, String expiry,
+            String loginStatus, String userStatus,
+            String userid, String branchRestrict,
+            String deptCode, String regionCode,
+            String zoneCode, String limit) {
+
+        boolean success = false;
+        String userId = new ApplicationHelper().getGeneratedId("AM_GB_USER");
+
+        String insertQuery = "INSERT INTO AM_GB_USER (" +
+                "User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, " +
+                "Phone_No, Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, " +
+                "UserId, Create_Date, Fleet_Admin, Email, User_id, Branch_Restriction, " +
+                "Approval_Limit, Dept_Code, Region_Code, Zone_Code) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        String deleteQuery = "DELETE FROM am_gb_User_Upload WHERE User_Name = ?";
+
+        try (Connection con = getConnection()) {
+
+            con.setAutoCommit(false); 
+
+            try (PreparedStatement ps = con.prepareStatement(insertQuery);
+                 PreparedStatement psDelete = con.prepareStatement(deleteQuery)) {
+
+                int index = 1;
+                ps.setString(index++, userName);
+                ps.setString(index++, fullname);
+                ps.setString(index++, legacyid);
+                ps.setString(index++, userclass);
+                ps.setString(index++, userBranch);
+                ps.setString(index++, passwords);
+                ps.setString(index++, phoneNo);
+                ps.setString(index++, isSupervisor);
+                ps.setString(index++, passwordMust);
+                ps.setString(index++, loginStatus);
+                ps.setString(index++, userStatus);
+                ps.setString(index++, userid);
+                ps.setDate(index++, df.dateConvert(new Date()));
+                ps.setString(index++, fleetAdmin);
+                ps.setString(index++, email);
+                ps.setString(index++, userId);
+                ps.setString(index++, branchRestrict);
+                ps.setString(index++, limit);
+                ps.setString(index++, deptCode);
+                ps.setString(index++, regionCode);
+                ps.setString(index++, zoneCode);
+
+                int insertCount = ps.executeUpdate();
+
+                if (insertCount > 0) {
+
+                    createPasswordHistory(userId, passwords);
+
+                    psDelete.setString(1, userName);
+                    int deleteCount = psDelete.executeUpdate();
+
+                    if (deleteCount >= 0) {
+                        con.commit();      // commit if all successful
+                        success = true;
+                    } else {
+                        con.rollback();    // rollback if delete fails
+                    }
+
+                } else {
+                    con.rollback();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return success;
+    }
+    
+    
+    public boolean createManageUserfromUploadOld(String userName,String fullname,String legacyid,String userclass,String enterpasswords,String passwords,String email,
 			String userBranch,String phoneNo,String isSupervisor,String fleetAdmin,String passwordMust,String expiry,String loginStatus,String userStatus,
 			String userid,String branchRestrict,String deptCode,String regionCode,String zoneCode,String limit, String tokenRequired, String regionRestrict,
 			String zoneRestrict)
@@ -4450,6 +4928,95 @@ public class SecurityHandler
 
     }
  
+    public boolean createManageUserfromUpload(
+            String userName, String fullname, String legacyid,
+            String userclass, String enterpasswords, String passwords,
+            String email, String userBranch, String phoneNo,
+            String isSupervisor, String fleetAdmin,
+            String passwordMust, String expiry,
+            String loginStatus, String userStatus,
+            String userid, String branchRestrict,
+            String deptCode, String regionCode,
+            String zoneCode, String limit,
+            String tokenRequired, String regionRestrict,
+            String zoneRestrict) {
+
+        boolean success = false;
+        String userId = new ApplicationHelper().getGeneratedId("AM_GB_USER");
+
+        String insertQuery =
+                "INSERT INTO AM_GB_USER (" +
+                "User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, " +
+                "Phone_No, Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, " +
+                "UserId, Create_Date, Fleet_Admin, Email, User_id, Branch_Restriction, " +
+                "Approval_Limit, Dept_Code, Region_Code, Zone_Code, " +
+                "Token_Required, Region_Restriction, Zone_Restriction) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        String deleteQuery =
+                "DELETE FROM am_gb_User_Upload WHERE User_Name = ?";
+
+        try (Connection con = dbConnection.getConnection("legendPlus")) {
+
+            con.setAutoCommit(false); // Start transaction
+
+            try (PreparedStatement psInsert = con.prepareStatement(insertQuery);
+                 PreparedStatement psDelete = con.prepareStatement(deleteQuery)) {
+
+                int i = 1;
+
+                psInsert.setString(i++, userName);
+                psInsert.setString(i++, fullname);
+                psInsert.setString(i++, legacyid);
+                psInsert.setString(i++, userclass);
+                psInsert.setString(i++, userBranch);
+                psInsert.setString(i++, passwords);
+                psInsert.setString(i++, phoneNo);
+                psInsert.setString(i++, isSupervisor);
+                psInsert.setString(i++, passwordMust);
+                psInsert.setString(i++, loginStatus);
+                psInsert.setString(i++, userStatus);
+                psInsert.setString(i++, userid);
+                psInsert.setDate(i++, df.dateConvert(new Date()));
+                psInsert.setString(i++, fleetAdmin);
+                psInsert.setString(i++, email);
+                psInsert.setString(i++, userId);
+                psInsert.setString(i++, branchRestrict);
+                psInsert.setString(i++, limit);
+                psInsert.setString(i++, deptCode);
+                psInsert.setString(i++, regionCode);
+                psInsert.setString(i++, zoneCode);
+                psInsert.setString(i++, tokenRequired);
+                psInsert.setString(i++, regionRestrict);
+                psInsert.setString(i++, zoneRestrict);
+
+                int insertCount = psInsert.executeUpdate();
+
+                if (insertCount > 0) {
+
+                    createPasswordHistory(userId, passwords);
+
+                    psDelete.setString(1, userName);
+                    psDelete.executeUpdate();
+
+                    con.commit();   // commit only if everything succeeds
+                    success = true;
+
+                } else {
+                    con.rollback();
+                }
+
+            } catch (Exception inner) {
+                con.rollback(); //  rollback on any failure
+                throw inner;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return success;
+    }
 
     public String getCompanyInfoOld(String compCode) throws SQLException {
         Connection con = null;
@@ -5818,7 +6385,7 @@ public class SecurityHandler
     }
 
 
-    public String createManageUser2Tmp(User user, String limit,String userId,String menuId)
+    public String createManageUser2TmpOld(User user, String limit,String userId,String menuId)
     {
         Connection con;
         PreparedStatement ps;
@@ -5937,6 +6504,91 @@ public class SecurityHandler
 
     }
     
+    public String createManageUser2Tmp(User user, String limit, String userId, String menuId) {
+        String result = "";
+        
+
+       
+            String tmpId = (new ApplicationHelper()).getGeneratedId("AM_GB_USERTMP");
+
+            // Determine if we have an expiry date
+            boolean hasExpiryDate = user.getExpiryDate() != null &&
+                                    !user.getExpiryDate().trim().isEmpty() &&
+                                    !"null".equalsIgnoreCase(user.getExpiryDate());
+
+            // Build query dynamically based on whether Expiry_Date exists
+            String query = "INSERT INTO AM_GB_USERTMP (" +
+                    "User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, Phone_No, " +
+                    "Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, Create_Date, " +
+                    "Password_Expiry, Fleet_Admin, Email, User_id, branch_restriction, Expiry_Days, " +
+                    (hasExpiryDate ? "Expiry_Date, " : "") +
+                    "Approval_Limit, dept_code, token_required, region_code, zone_code, " +
+                    "region_restriction, zone_restriction, Facility_Admin, Store_Admin, " +
+                    "TMP_CREATE_DATE, RECORD_TYPE, TMPID, menuId) " +
+                    "VALUES (" +
+                    "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+                    (hasExpiryDate ? ",?" : "") +
+                    ",?,?,?,?,?,?,?,?,?,?,?,?)";
+
+            try (Connection c = getConnection();
+       	         PreparedStatement ps = c.prepareStatement(query)) {
+
+            // Set parameters (keep a counter)
+            int index = 1;
+            ps.setString(index++, user.getUserName());
+            ps.setString(index++, user.getUserFullName());
+            ps.setString(index++, user.getLegacySystemId());
+            ps.setString(index++, user.getUserClass());
+            ps.setString(index++, user.getBranch());
+            ps.setString(index++, user.getPassword());
+            ps.setString(index++, user.getPhoneNo());
+            ps.setString(index++, user.getIsSupervisor());
+            ps.setString(index++, user.getMustChangePwd());
+            ps.setString(index++, user.getLoginStatus());
+            ps.setString(index++, user.getUserStatus());
+            ps.setString(index++, user.getCreatedBy());
+            ps.setDate(index++, df.dateConvert(new Date()));
+            ps.setDate(index++, df.dateConvert(df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry()))));
+            ps.setString(index++, user.getFleetAdmin());
+            ps.setString(index++, user.getEmail());
+            ps.setString(index++, userId);
+            ps.setString(index++, user.getBranchRestrict());
+            ps.setInt(index++, user.getExpiryDays());
+
+            if (hasExpiryDate) {
+                ps.setDate(index++, df.dateConvert(user.getExpiryDate()));
+            }
+
+            ps.setString(index++, limit);
+            ps.setString(index++, user.getDeptCode());
+            ps.setString(index++, user.getTokenRequire());
+            ps.setString(index++, user.getRegionCode());
+            ps.setString(index++, user.getZoneCode());
+            ps.setString(index++, user.getRegionRestrict());
+            ps.setString(index++, user.getZoneRestrict());
+            ps.setString(index++, user.getIsFacilityAdministrator());
+            ps.setString(index++, user.getIsStoreAdministrator());
+            ps.setDate(index++, df.dateConvert(new Date()));
+            ps.setString(index++, "I");
+            ps.setString(index++, tmpId);
+            ps.setString(index++, menuId);
+
+            boolean done = ps.executeUpdate() != -1;
+            if (done) {
+                result = tmpId;
+            }
+
+            // Save password history
+            createPasswordHistory(userId, user.getPassword());
+
+        } catch (Exception e) {
+            System.out.println("WARNING: Error executing Query in createManageUser2Tmp -> " + e.getMessage());
+        } 
+            
+
+        return result;
+    }
+    
     public legend.admin.objects.User getUserByUserTmpIDOld(String UserID)
     {
         User user;
@@ -5954,7 +6606,7 @@ public class SecurityHandler
         System.out.println("<<<<< userId: " + UserID);
         try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement s = con.prepareStatement(query)) {
-        	System.out.println("<<<<< We are here: ");
+        	//System.out.println("<<<<< We are here: ");
         s.setString(1, UserID);
         System.out.println("<<<<< We are here 2: ");
         try(ResultSet rs = s.executeQuery()){
@@ -6074,24 +6726,24 @@ public class SecurityHandler
                 "zone_restriction, Facility_Admin, Store_Admin, token_required " +
                 "FROM AM_GB_USERTMP WHERE TMPID = ?";
 
-        System.out.println("<<<<< userId: " + userID);
+     //   System.out.println("<<<<< userId: " + userID);
         
         try (Connection con = dbConnection.getConnection("legendPlus");
              PreparedStatement ps = con.prepareStatement(query)) {
-        	System.out.println("<<<<< We are here: ");
+        //	System.out.println("<<<<< We are here: ");
         	ps.setInt(1, Integer.parseInt(userID));
             
-            System.out.println("<<<<< We are here 2: ");
+         //   System.out.println("<<<<< We are here 2: ");
             try (ResultSet rs = ps.executeQuery()) {
             	
             
             	
                 if (rs.next()) {
-                	System.out.println("<<<<< We are here 4: ");
+                //	System.out.println("<<<<< We are here 4: ");
                     User user = new User();
-                    System.out.println("<<<<< We are here 5: ");
+                //    System.out.println("<<<<< We are here 5: ");
                     user.setUserId(rs.getString("User_Id"));
-                    System.out.println("<<<<< db userId: " + user.getUserId());
+                 //   System.out.println("<<<<< db userId: " + user.getUserId());
                     user.setUserName(rs.getString("User_Name"));
                     user.setUserFullName(rs.getString("Full_Name"));
                     user.setLegacySystemId(rs.getString("Legacy_Sys_Id"));
@@ -6144,8 +6796,9 @@ public class SecurityHandler
         return null;
     }
 
+    
 
-    public boolean createManageUser2(User user, String limit)
+    public boolean createManageUser2Old(User user, String limit)
     {
         Connection con;
         PreparedStatement ps;
@@ -6251,6 +6904,77 @@ public class SecurityHandler
         return done;
 
 
+    }
+    
+    public boolean createManageUser2(User user, String limit) {
+        boolean done = false;
+        String userId = (new ApplicationHelper()).getGeneratedId("AM_GB_USER");
+
+        try (Connection con = getConnection()) {
+            boolean hasExpiryDate = user.getExpiryDate() != null &&
+                                    !user.getExpiryDate().trim().isEmpty() &&
+                                    !"null".equalsIgnoreCase(user.getExpiryDate());
+
+            // Build query dynamically
+            String query = "INSERT INTO AM_GB_USER (" +
+                    "User_Name, Full_Name, Legacy_Sys_Id, Class, Branch, Password, Phone_No, " +
+                    "Is_Supervisor, Must_Change_Pwd, Login_Status, User_Status, UserId, Create_Date, " +
+                    "Password_Expiry, Fleet_Admin, Email, User_id, branch_restriction, Expiry_Days, " +
+                    (hasExpiryDate ? "Expiry_Date, " : "") +
+                    "Approval_Limit, dept_code, token_required, region_code, zone_code, " +
+                    "region_restriction, zone_restriction, Facility_Admin, Store_Admin) " +
+                    "VALUES (" +
+                    "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?" +
+                    (hasExpiryDate ? ",?" : "") +
+                    ",?,?,?,?,?,?,?,?,?)";
+
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                int index = 1;
+                ps.setString(index++, user.getUserName());
+                ps.setString(index++, user.getUserFullName());
+                ps.setString(index++, user.getLegacySystemId());
+                ps.setString(index++, user.getUserClass());
+                ps.setString(index++, user.getBranch());
+                ps.setString(index++, user.getPassword());
+                ps.setString(index++, user.getPhoneNo());
+                ps.setString(index++, user.getIsSupervisor());
+                ps.setString(index++, user.getMustChangePwd());
+                ps.setString(index++, user.getLoginStatus());
+                ps.setString(index++, user.getUserStatus());
+                ps.setString(index++, user.getCreatedBy());
+                ps.setDate(index++, df.dateConvert(new Date()));
+                ps.setDate(index++, df.dateConvert(df.addDayToDate(new Date(), Integer.parseInt(user.getPwdExpiry()))));
+                ps.setString(index++, user.getFleetAdmin());
+                ps.setString(index++, user.getEmail());
+                ps.setString(index++, userId);
+                ps.setString(index++, user.getBranchRestrict());
+                ps.setInt(index++, user.getExpiryDays());
+
+                if (hasExpiryDate) {
+                    ps.setDate(index++, df.dateConvert(user.getExpiryDate()));
+                }
+
+                ps.setString(index++, limit);
+                ps.setString(index++, user.getDeptCode());
+                ps.setString(index++, user.getTokenRequire());
+                ps.setString(index++, user.getRegionCode());
+                ps.setString(index++, user.getZoneCode());
+                ps.setString(index++, user.getRegionRestrict());
+                ps.setString(index++, user.getZoneRestrict());
+                ps.setString(index++, user.getIsFacilityAdministrator());
+                ps.setString(index++, user.getIsStoreAdministrator());
+
+                done = ps.executeUpdate() != -1;
+            }
+
+            // Save password history
+            createPasswordHistory(userId, user.getPassword());
+
+        } catch (Exception e) {
+            System.out.println("WARNING: Error executing Query in createManageUser2 -> " + e.getMessage());
+        }
+
+        return done;
     }
 
     public String[] PasswordChange(String userName, String pagePassword,String space)

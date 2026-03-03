@@ -15296,22 +15296,19 @@ public java.util.ArrayList getNewBranchRecordsFromLegacySystem()
 
 public boolean InsertNewBranch(String branchCode, String branchName, String branchAddress,String stateId)
 {
-    Connection con;
-    PreparedStatement ps;
+   
     boolean done;
     String query;
-    con = null;
-    ps = null;
+    
     done = false;
     query = "INSERT INTO AM_AD_BRANCH(BRANCH_ID,BRANCH_CODE,BRANCH_NAME,BRANCH_ACRONYM,GL_PREFIX,BRANCH_ADDRESS,STATE,REGION_CODE,BRANCH_STATUS,CREATE_DATE,EMAIL,PHONE_NO,USER_ID) "
     		+ "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
 ;
 //    System.out.println("################ the histId value is "+histId+"  integrifyId: "+integrifyId+"  tranType: "+tranType);
-    try
-    {
+    try (Connection c = getFinacleConnection();
+            PreparedStatement ps = c.prepareStatement(query)) {
     	String  groupid =  new ApplicationHelper().getGeneratedId("AM_AD_BRANCH");
         con = getConnection();
-        ps = con.prepareStatement(query);
         String acronym = branchName.substring(1,3);
         String newAcronym = acronym;
         String email = getCodeName("select companyMail from am_gb_company");
@@ -15339,13 +15336,12 @@ public boolean InsertNewBranch(String branchCode, String branchName, String bran
     catch(Exception e)
     {
         System.out.println("WARNING:Error executing in InsertNewBranch ->"+e.getMessage());
-    } finally {
-    	closeConnection(con, ps);
-	}   
+    } 
+    
     return done;
 }
 
-public java.util.ArrayList getLegacyTransactionRecords(String fromDate, String toDate,String bankingApp, String legacySysId)
+public java.util.ArrayList getLegacyTransactionRecordsOld(String fromDate, String toDate,String bankingApp, String legacySysId)
 { 
 	
 	java.util.ArrayList _list = new java.util.ArrayList();
@@ -15468,16 +15464,84 @@ public java.util.ArrayList getLegacyTransactionRecords(String fromDate, String t
 			return _list;
 }
 
+public ArrayList<newAssetTransaction> getLegacyTransactionRecords(String fromDate, String toDate, String bankingApp, String legacySysId) {
+    ArrayList<newAssetTransaction> list = new ArrayList<>();
+
+
+    String formattedFromDate = fromDate;
+    String formattedToDate = toDate;
+
+    if ("FLEXCUBE".equalsIgnoreCase(bankingApp)) {
+        try {
+            DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd-MMM-yyyy", Locale.ENGLISH);
+
+            LocalDate from = LocalDate.parse(fromDate, inputFormat);
+            LocalDate to = LocalDate.parse(toDate, inputFormat);
+
+            formattedFromDate = from.format(outputFormat);
+            formattedToDate = to.format(outputFormat);
+
+            System.out.println("FLEXCUBE date range: " + formattedFromDate + " to " + formattedToDate);
+        } catch (Exception e) {
+            System.out.println("Date parsing error: " + e.getMessage());
+        }
+    }
+
+    String query;
+    if ("FLEXCUBE".equalsIgnoreCase(bankingApp)) {
+        query = "SELECT * FROM ZENITHUBS.TRANSACTION_DETAILS WHERE POSTING_DATE BETWEEN ? AND ? AND MAKER_ID = ?";
+    } else { // FINACLE
+        query = "SELECT * FROM ZENITHUBS.TRANSACTION_DETAILS WHERE POSTING_DATE BETWEEN ? AND ?";
+    }
+
+    try (Connection c = getFinacleConnection();
+         PreparedStatement ps = c.prepareStatement(query)) {
+
+        // Set parameters
+        ps.setString(1, formattedFromDate);
+        ps.setString(2, formattedToDate);
+
+        if ("FLEXCUBE".equalsIgnoreCase(bankingApp)) {
+            ps.setString(3, legacySysId);
+        }
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                newAssetTransaction txn = new newAssetTransaction();
+                txn.setAssetId(rs.getString("MAKER_ID"));
+                txn.setBarCode(rs.getString("SERIAL_NO"));
+                txn.setSbuCode(rs.getString("CHECKER_ID"));
+                txn.setDescription(rs.getString("TRANSACTION_DESCRIPTION"));
+                txn.setAssetUser(rs.getString("BATCH_NO"));
+                txn.setVendorAC(rs.getString("ACCOUNT_NO"));
+
+                String amountStr = rs.getString("AMOUNT");
+                txn.setCostPrice(amountStr != null && !amountStr.isEmpty() ? Double.parseDouble(amountStr) : 0.0);
+
+                txn.setAssetType(rs.getString("TRANSACTION_TYPE"));
+                txn.setBranchCode(rs.getString("BRANCH_CODE"));
+                txn.setPostingDate(rs.getString("POSTING_DATE"));
+
+                list.add(txn);
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+
 
 public boolean InsertLegacyTransactions(String makerId, String serialNo, String checkerId, String transDescription,String batchNo, String accountNo, double amount, String tranType, String branchCode, String postingDate,String bankingApp)
 
 {
-    Connection con;
-    PreparedStatement ps;
+   
     boolean done;
     String query ="";
-    con = null;
-    ps = null;
+   
     done = false;
     if(bankingApp.equalsIgnoreCase("FLEXCUBE")) {
     	query = "INSERT INTO LEGACY_TRANSACTION(BATCH_NO,SERIAL_NO,ACCOUNT_NO,BRANCH_CODE,TRANSACTION_TYPE,AMOUNT,TRANSACTION_DESCRIPTION,MAKER_ID,CHECKER_ID,POSTING_DATE) "
@@ -15489,11 +15553,10 @@ public boolean InsertLegacyTransactions(String makerId, String serialNo, String 
     }    
 //    System.out.println("################ the histId value is "+histId+"  integrifyId: "+integrifyId+"  tranType: "+tranType);
 //    System.out.println("<<<<<<query: "+query);
-    try
-    {
-    	 if(bankingApp.equalsIgnoreCase("FLEXCUBE")) {
-        con = getConnection();
-        ps = con.prepareStatement(query);  
+    try (
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(query)){
+    	 if(bankingApp.equalsIgnoreCase("FLEXCUBE")) { 
         ps.setString(1, batchNo);
         ps.setString(2, serialNo);
         ps.setString(3, accountNo);
@@ -15508,8 +15571,7 @@ public boolean InsertLegacyTransactions(String makerId, String serialNo, String 
 //      System.out.println("################ Branch addition done: "+done);
     	 }
     	 if(bankingApp.equalsIgnoreCase("FINACLE")) {
-    	        con = getFinacleConnection();
-    	        ps = con.prepareStatement(query);      
+    	           
     	        ps.setString(1, batchNo);
     	        ps.setString(2, serialNo);
     	        ps.setString(3, accountNo);
@@ -15527,31 +15589,26 @@ public boolean InsertLegacyTransactions(String makerId, String serialNo, String 
     catch(Exception e)
     {
         System.out.println("WARNING:Error executing Query in InsertLegacyTransactions ->"+e.getMessage());
-    } finally {
-    	closeConnection(con, ps);
-	}   
+    } 
+    
     return done;
 }
 
 
 public boolean InsertNewVendor(String branchCode, String branchName, String branchAddress,String stateId)
 {
-    Connection con;
-    PreparedStatement ps;
+   
     boolean done;
     String query;
-    con = null;
-    ps = null;
+    
     done = false;
     query = "INSERT INTO am_ad_vendor(Vendor_ID,Vendor_Code,Vendor_Name,Contact_Person,Contact_Address,account_number,Vendor_Status,Create_date,RCNo) "
     		+ "VALUES(?,?,?,?,?,?,?,?,?)"
 ;
 //    System.out.println("################ the histId value is "+histId+"  integrifyId: "+integrifyId+"  tranType: "+tranType);
-    try
-    {
+    try (Connection c = getFinacleConnection();
+            PreparedStatement ps = c.prepareStatement(query)) {
     	String  groupid =  new ApplicationHelper().getGeneratedId("AM_AD_VENDOR");
-        con = getConnection();
-        ps = con.prepareStatement(query);
         String acronym = branchName.substring(1,3);
         String newAcronym = acronym;
         String vendorName = "FIXED ASSET TRANSIT - "+branchName;
@@ -15572,9 +15629,8 @@ public boolean InsertNewVendor(String branchCode, String branchName, String bran
     catch(Exception e)
     {
         System.out.println("WARNING:Error executing InsertNewVendor ->"+e.getMessage());
-    } finally {
-    	closeConnection(con, ps);
-	}   
+    } 
+    
     return done;
 }
 

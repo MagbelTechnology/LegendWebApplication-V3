@@ -216,53 +216,26 @@ if(operation.equals("3"))
 
 
 
-    public String getCodeName(String query)
-	    {
-	     String result = "";
-	     Connection con = null;
-	     ResultSet rs = null;
-	     PreparedStatement ps = null;
+    public String getCodeName(String query) {
 
-	     try
-	     {
-	      con = (new DataConnect("legendPlus")).getConnection();
-	      ps = con.prepareStatement(query);
-	      rs = ps.executeQuery();
+        String result = "";
 
-
-	      while(rs.next())
-	      {
-
-             // System.out.println("inside getcodename iteration");
-	       result = rs.getString(1) == null ? "" : rs.getString(1);
-//System.out.println("===========inside getcodename iteration=======================" + result);
-	      }
-	     }
-	     catch(Exception er)
-	     {
-	        System.out.println("Error in Query- getCodeName()... ->"+er);
-	        er.printStackTrace();
-	     }finally{
-	        closeConnection(con,ps,rs);
-	      }
-	      return result;
-	     }
-private void closeConnection(Connection con, PreparedStatement ps,
-                                 ResultSet rs) {
-        try {
-//System.out.println("=============inside closeConnection==========");
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.close();
+        try (Connection c = (new DataConnect("legendPlus")).getConnection();
+             PreparedStatement ps = c.prepareStatement(query)) {
+            ps.setQueryTimeout(30);   
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result = rs.getString(1) == null ? "" : rs.getString(1);
+                }
             }
 
-        } catch (Exception e) {
-            System.out.println("WANR: Error closing connection >>" + e);
+        } catch (Exception er) {
+            System.out.println("Error in Query- getCodeName()... ->" + er);
+            er.printStackTrace();
         }
+
+        return result;
     }
+    
+
 }
