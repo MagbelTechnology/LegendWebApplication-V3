@@ -373,8 +373,12 @@ public class GroupAssetBean extends legend.ConnectionClass {
 		}
 		
 		System.out.println("subject_to_vat after::: " + subject_to_vat);
-//		System.out.println(">>>>>>>>>  transport_cost <<<<<<<<<< " +transport_cost+"    other_cost: "+other_cost+"    cost_price: "+cost_price);
-	//	System.out.println(">>>>>>>>>  category_id <<<<<<<<<< " +category_id+"    sub_category_id: "+sub_category_id);
+		System.out.println(">>>>>>>>>  transport_cost <<<<<<<<<< " +transport_cost+"    other_cost: "+other_cost+"    cost_price: "+cost_price);
+		
+		System.out.println(">>>>>>>>>  warrantyStartDate <<<<<<<<<< " +warrantyStartDate+"    date_of_purchase: "+date_of_purchase+"    posting_date: "+posting_date);
+	
+		System.out.println(">>>>>>>>>  depreciation_start_date <<<<<<<<<< " +depreciation_start_date+"    depreciation_end_date: "+depreciation_end_date);
+		//	System.out.println(">>>>>>>>>  category_id <<<<<<<<<< " +category_id+"    sub_category_id: "+sub_category_id);
 		String subcategoryId = sub_category_id;
 		//System.out.println(">>>>>>>>> BEFORE CALLING CREATE GROUP MAIN IN GROUP ASSET BEAN <<<<<<<<<< ");
 		long gid = createGroupMain();
@@ -644,7 +648,159 @@ public class GroupAssetBean extends legend.ConnectionClass {
 		//ad.updateGroupAssetStatus(Long.toString(gid));
 		return gid;
 	}
+	
+	
+	public long createGroup(Connection con, String groupAssetByAsset, String branch) throws Exception {
+		ApprovalRecords  aprecs = new ApprovalRecords();
+		Codes codes = new Codes();
+		 List<String> allAssetIds = new ArrayList<>();
+	    System.out.println(">>>>>>>>> INSIDE CREATE GROUP <<<<<<<<<<");
 
+	    if (no_of_items == null || no_of_items.isEmpty()) no_of_items = "0";
+	    if (province == null || province.isEmpty()) province = "0";
+	    int itemsCount = Integer.parseInt(no_of_items);
+	    if (noOfMonths == null || noOfMonths.isEmpty()) noOfMonths = "0";
+	    if (branch_id == null || branch_id.isEmpty() || branch_id.equals("0")) branch_id = branch;
+
+	    if (warrantyStartDate != null && !warrantyStartDate.isEmpty()) warrantyStartDate = warrantyStartDate;
+	    if (expiryDate != null && !expiryDate.isEmpty()) expiryDate = expiryDate;
+	    if (supervisor == null || supervisor.isEmpty() || "0".equals(supervisor)) supervisor = user_id;
+	    if (make == null || make.isEmpty()) make = "0";
+	    if (transport_cost == null || transport_cost.isEmpty()) transport_cost = "0";
+	    if (other_cost == null || other_cost.isEmpty()) other_cost = "0";
+
+	    // VAT handling
+	    subject_to_vat = ("0".equals(vat_amount)) ? "N" : "Y";
+	    System.out.println("subject_to_vat: " + subject_to_vat);
+
+	    long gid = createGroupMain(con);
+
+	    // Build single insert statement
+	    String query = "INSERT INTO AM_GROUP_ASSET (ASSET_ID, REGISTRATION_NO, BRANCH_ID, DEPT_ID, CATEGORY_ID, SECTION_ID, DESCRIPTION, "
+	            + "VENDOR_AC, DATE_PURCHASED, DEP_RATE, ASSET_MAKE, ASSET_MODEL, ASSET_SERIAL_NO, ASSET_ENGINE_NO, SUPPLIER_NAME, "
+	            + "ASSET_USER, ASSET_MAINTENANCE, COST_PRICE, DEP_END_DATE, RESIDUAL_VALUE, AUTHORIZED_BY, WH_TAX, WH_TAX_AMOUNT, "
+	            + "POSTING_DATE, EFFECTIVE_DATE, PURCHASE_REASON, LOCATION, VATABLE_COST, VAT, REQ_DEPRECIATION, SUBJECT_TO_VAT, "
+	            + "WHO_TO_REM, EMAIL1, WHO_TO_REM_2, EMAIL2, STATE, DRIVER, SPARE_1, SPARE_2, USER_ID, PROVINCE, WAR_START_DATE, "
+	            + "WAR_MONTH, WAR_EXPIRY_DATE, BRANCH_CODE, DEPT_CODE, SECTION_CODE, CATEGORY_CODE, GROUP_ID, AMOUNT_PTD, AMOUNT_REM, "
+	            + "ACCUM_DEP, PART_PAY, FULLY_PAID, Asset_Status, supervisor, LPO, BAR_CODE, req_redistribution, Raise_entry, defer_pay, "
+	            + "process_flag, SBU_CODE, post_flag, Invoice_no, workstationIp, SPARE_3, SPARE_4, SPARE_5, SPARE_6, sub_category_id, "
+	            + "SUB_CATEGORY_CODE, INTEGRIFY, PROJECT_CODE, TRANPORT_COST, OTHER_COST, VENDOR_NAME) "
+	            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"
+	            + " ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+	            + "?, ?, ?, ?, ?, ?)";
+	    
+	    double costPrice = Double.parseDouble(cost_price);
+	    double transport = Double.parseDouble(transport_cost);
+	    double other = Double.parseDouble(other_cost);
+
+	   
+	    try (PreparedStatement ps = con.prepareStatement(query)) {
+	        for (int x = 0; x < itemsCount; x++) {
+	            // Generate asset_id per item
+	            String assetId = (groupAssetByAsset.equalsIgnoreCase("Y")) ?
+	                    new ApplicationHelper().getGeneratedId("am_group_asset") :
+	                    new legend.AutoIDSetup().getIdentity(branch_id, department_id, section_id, category_id);
+
+	            allAssetIds.add(assetId); // Add each ID to list for archive
+
+	            ps.setString(1, assetId);
+	            ps.setString(2, registration_no);
+	            ps.setString(3, branch_id);
+	            ps.setString(4, department_id);
+	            ps.setString(5, category_id);
+	            ps.setString(6, section_id);
+	            ps.setString(7, description.toUpperCase());
+	            ps.setString(8, vendor_account);
+	            ps.setString(9, DateManipulations.CalendarToDb(date_of_purchase));
+
+	            String depRate = aprecs.getCodeName("select dep_rate from am_ad_category where category_id = " + category_id);
+	            ps.setString(10, depRate);
+
+	            ps.setString(11, make);
+	            ps.setString(12, model);
+	            ps.setString(13, serial_number);
+	            ps.setString(14, engine_number);
+	            ps.setInt(15, Integer.parseInt(supplied_by));
+	            ps.setString(16, user);
+	            ps.setInt(17, Integer.parseInt(maintained_by));
+	            ps.setDouble(18, costPrice / itemsCount);
+	            ps.setDate(19, dateConvert(depreciation_end_date));
+	            ps.setDouble(20, Double.parseDouble(residual_value));
+	            ps.setString(21, authorized_by);
+	            ps.setString(22, wh_tax_cb);
+	            ps.setDouble(23, Double.parseDouble(wh_tax_amount) / itemsCount);
+	            ps.setString(24, DateManipulations.CalendarToDb(posting_date));
+	            ps.setDate(25, dateConvert(depreciation_start_date));
+	            ps.setString(26, reason);
+	            ps.setInt(27, Integer.parseInt(location));
+	            ps.setDouble(28, Double.parseDouble(vatable_cost) / itemsCount);
+	            ps.setDouble(29, Double.parseDouble(vat_amount) / itemsCount);
+	            ps.setString(30, require_depreciation);
+	            ps.setString(31, subject_to_vat);
+	            ps.setString(32, who_to_rem);
+	            ps.setString(33, email_1);
+	            ps.setString(34, who_to_rem_2);
+	            ps.setString(35, email2);
+	            ps.setInt(36, Integer.parseInt(state));
+	            ps.setInt(37, Integer.parseInt(driver));
+	            ps.setString(38, spare_1);
+	            ps.setString(39, spare_2);
+	            ps.setString(40, user_id);
+	            ps.setInt(41, Integer.parseInt(province));
+	            ps.setDate(42, dateConvert(warrantyStartDate));
+	            ps.setInt(43, Integer.parseInt(noOfMonths));
+	            ps.setDate(44, dateConvert(expiryDate));
+	            ps.setString(45, codes.getBranchCode(branch_id));
+	            ps.setString(46, codes.getDeptCode(department_id));
+	            ps.setString(47, codes.getSectionCode(section_id));
+	            ps.setString(48, codes.getCategoryCode(category_id));
+	            ps.setLong(49, gid);
+	            ps.setDouble(50, Double.parseDouble(amountPTD) / itemsCount);
+	            ps.setDouble(51, ((costPrice / itemsCount) - (Double.parseDouble(amountPTD) / itemsCount)));
+	            ps.setDouble(52, accum_dep);
+	            ps.setString(53, partPAY);
+	            ps.setString(54, fullyPAID);
+	            ps.setString(55, "PENDING");
+	            ps.setString(56, supervisor);
+	            ps.setString(57, lpo);
+	            ps.setString(58, bar_code);
+	            ps.setString(59, require_redistribution);
+	            ps.setString(60, "N"); // raise_entry
+	            ps.setString(61, deferPay);
+	            ps.setString(62, "N"); // process_flag
+	            ps.setString(63, sbu_code);
+	            ps.setString(64, "P"); // post_flag
+	            ps.setString(65, invoiceNum);
+	            ps.setString(66, workstationIp);
+	            ps.setString(67, spare_3);
+	            ps.setString(68, spare_4);
+	            ps.setString(69, spare_5);
+	            ps.setString(70, spare_6);
+	            ps.setString(71, sub_category_id);
+	            ps.setString(72, codes.getSubCategoryCode(sub_category_id));
+	            ps.setString(73, integrifyId);
+	            ps.setString(74, projectCode);
+	            ps.setDouble(75, transport / itemsCount);
+	            ps.setDouble(76, other / itemsCount);
+	            ps.setString(77, vendorName);
+
+	            ps.addBatch(); // Add to batch
+	        }
+
+	        ps.executeBatch(); // Execute all inserts at once  
+	        
+	        archiveUpdate(con, allAssetIds, gid, itemsCount);
+
+	       
+	        return gid;
+	    } catch (SQLException e) {
+	      
+	        System.err.println("Failed to create group. Asset IDs: " + allAssetIds);
+	        throw e;
+	    } 
+	}
+	
+	
 	public long createGroupUnclassified(String branch) throws Exception,Throwable
 	{
     	
@@ -1193,7 +1349,123 @@ catch (Exception r) {
 			} 
         }
 
+        public void archiveUpdate(
+                Connection con,          // use the same connection
+                List<String> assetIds,   // all asset IDs to archive
+                long groupId,
+                int itemsCount
+        ) throws SQLException {
 
+            if (assetIds == null || assetIds.isEmpty()) return;
+
+            Codes code = new Codes();
+
+            String query = "INSERT INTO AM_GROUP_ASSET_ARCHIVE(ASSET_ID, REGISTRATION_NO, BRANCH_ID, DEPT_ID, CATEGORY_ID, SECTION_ID, DESCRIPTION,"
+                    + " VENDOR_AC, DATE_PURCHASED, DEP_RATE, ASSET_MAKE, ASSET_MODEL, ASSET_SERIAL_NO, ASSET_ENGINE_NO, SUPPLIER_NAME,"
+                    + " ASSET_USER, ASSET_MAINTENANCE, COST_PRICE, DEP_END_DATE, RESIDUAL_VALUE, AUTHORIZED_BY, WH_TAX, WH_TAX_AMOUNT,"
+                    + " POSTING_DATE, EFFECTIVE_DATE, PURCHASE_REASON, LOCATION, VATABLE_COST, VAT, REQ_DEPRECIATION, SUBJECT_TO_VAT,"
+                    + " WHO_TO_REM, EMAIL1, WHO_TO_REM_2, EMAIL2, STATE, DRIVER, SPARE_1, SPARE_2, USER_ID, PROVINCE,"
+                    + " WAR_START_DATE, WAR_MONTH, WAR_EXPIRY_DATE, BRANCH_CODE, DEPT_CODE, SECTION_CODE, CATEGORY_CODE, GROUP_ID,"
+                    + " AMOUNT_PTD, AMOUNT_REM, ACCUM_DEP, PART_PAY, FULLY_PAID, Asset_Status, supervisor, LPO, BAR_CODE,"
+                    + " req_redistribution, Raise_entry, defer_pay, process_flag, SBU_CODE, post_flag, Invoice_no, workstationIp,"
+                    + " SPARE_3, SPARE_4, SPARE_5, SPARE_6, sub_category_id, SUB_CATEGORY_CODE, INTEGRIFY, TRANPORT_COST, OTHER_COST, VENDOR_NAME)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+
+                double costPriceTotal = Double.parseDouble(cost_price) 
+                                        + Double.parseDouble(transport_cost) 
+                                        + Double.parseDouble(other_cost);
+
+                for (String assetId : assetIds) {
+                    int index = 1;
+                    ps.setString(index++, assetId);
+                    ps.setString(index++, registration_no);
+                    ps.setString(index++, branch_id);
+                    ps.setString(index++, department_id);
+                    ps.setString(index++, category_id);
+                    ps.setString(index++, section_id);
+                    ps.setString(index++, description.toUpperCase());
+                    ps.setString(index++, vendor_account);
+                    ps.setString(index++, DateManipulations.CalendarToDb(date_of_purchase));
+                    ps.setString(index++, depreciation_rate);
+                    ps.setString(index++, make);
+                    ps.setString(index++, model);
+                    ps.setString(index++, serial_number);
+                    ps.setString(index++, engine_number);
+                    ps.setInt(index++, Integer.parseInt(supplied_by));
+                    ps.setString(index++, user);
+                    ps.setInt(index++, Integer.parseInt(maintained_by));
+                    ps.setDouble(index++, costPriceTotal / itemsCount);
+                    ps.setDate(index++, dateConvert(depreciation_end_date));
+                    ps.setDouble(index++, Double.parseDouble(residual_value));
+                    ps.setString(index++, authorized_by);
+                    ps.setString(index++, wh_tax_cb);
+                    ps.setDouble(index++, Double.parseDouble(wh_tax_amount) / itemsCount);
+                    ps.setString(index++, DateManipulations.CalendarToDb(posting_date));
+                    ps.setDate(index++, dateConvert(depreciation_start_date));
+                    ps.setString(index++, reason);
+                    ps.setInt(index++, Integer.parseInt(location));
+                    ps.setDouble(index++, Double.parseDouble(vatable_cost) / itemsCount);
+                    ps.setDouble(index++, Double.parseDouble(vat_amount) / itemsCount);
+                    ps.setString(index++, require_depreciation);
+                    ps.setString(index++, subject_to_vat);
+                    ps.setString(index++, who_to_rem);
+                    ps.setString(index++, email_1);
+                    ps.setString(index++, who_to_rem_2);
+                    ps.setString(index++, email2);
+                    ps.setInt(index++, Integer.parseInt(state));
+                    ps.setInt(index++, Integer.parseInt(driver));
+                    ps.setString(index++, spare_1);
+                    ps.setString(index++, spare_2);
+                    ps.setString(index++, user_id);
+                    ps.setInt(index++, Integer.parseInt(province));
+                    ps.setDate(index++, dateConvert(warrantyStartDate));
+                    ps.setInt(index++, Integer.parseInt(noOfMonths));
+                    ps.setDate(index++, dateConvert(expiryDate));
+                    ps.setString(index++, code.getBranchCode(branch_id));
+                    ps.setString(index++, code.getDeptCode(department_id));
+                    ps.setString(index++, code.getSectionCode(section_id));
+                    ps.setString(index++, code.getCategoryCode(category_id));
+                    ps.setLong(index++, groupId);
+                    ps.setDouble(index++, Double.parseDouble(amountPTD) / itemsCount);
+                    ps.setDouble(index++, (costPriceTotal / itemsCount) - (Double.parseDouble(amountPTD) / itemsCount));
+                    ps.setDouble(index++, accum_dep);
+                    ps.setString(index++, partPAY);
+                    ps.setString(index++, fullyPAID);
+                    ps.setString(index++, status);
+                    ps.setString(index++, supervisor);
+                    ps.setString(index++, lpo);
+                    ps.setString(index++, bar_code);
+                    ps.setString(index++, require_redistribution);
+                    ps.setString(index++, "N");  // Raise_entry
+                    ps.setString(index++, deferPay);
+                    ps.setString(index++, "N"); // process_flag
+                    ps.setString(index++, sbu_code);
+                    ps.setString(index++, "P"); // post_flag
+                    ps.setString(index++, invoiceNum);
+                    ps.setString(index++, workstationIp);
+                    ps.setString(index++, spare_3);
+                    ps.setString(index++, spare_4);
+                    ps.setString(index++, spare_5);
+                    ps.setString(index++, spare_6);
+                    ps.setString(index++, sub_category_id);
+                    ps.setString(index++, code.getSubCategoryCode(sub_category_id));
+                    ps.setString(index++, integrifyId);
+                    ps.setDouble(index++, Double.parseDouble(transport_cost) / itemsCount);
+                    ps.setDouble(index++, Double.parseDouble(other_cost) / itemsCount);
+                    ps.setString(index++, vendorName);
+
+                    ps.addBatch();
+                }
+
+                ps.executeBatch(); // ✅ single batch execution for all assets
+            } catch (SQLException e) {
+                System.out.println("ERROR: Failed to archive group assets >> " + e);
+                throw e;
+            }
+        }
 
 
 	public long createGroupMainOld() throws Exception {
@@ -1509,6 +1781,23 @@ catch (Exception r) {
 	    
 	    return groupId;
 	}
+	
+	public long createGroupMain(Connection connection) throws Exception {
+	    validateAndInitializeFields();
+	    
+	    long groupId = generateGroupId();
+	    double costPrice = calculateTotalCost();
+	    
+	    try  {
+	        insertIntoMainTable(connection, groupId, costPrice);
+	        insertIntoArchiveTable(connection,groupId, costPrice);
+	    } catch (SQLException e) {
+	        System.err.println("Error in createGroupMain: " + e.getMessage());
+	        throw new Exception("Failed to create group main record", e);
+	    }
+	    
+	    return groupId;
+	}
 
 	private void validateAndInitializeFields() {
 	    no_of_items = defaultIfEmpty(no_of_items, "0");
@@ -1557,6 +1846,20 @@ catch (Exception r) {
 
 	    try (Connection connection = getConnection();
 	         PreparedStatement ps = connection.prepareStatement(query)) {
+
+	        setArchiveParameters(ps, groupId, costPrice);
+	        ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        System.err.println("INFO: Error creating AM_GROUP_ASSET_MAIN_Archive >> " + e.getMessage());
+	        e.printStackTrace(); // Log full stack trace for debugging
+	    }
+	}
+	
+	private void insertIntoArchiveTable(Connection connection, long groupId, double costPrice) {
+	    String query = buildArchiveInsertQuery();
+
+	    try (PreparedStatement ps = connection.prepareStatement(query)) {
 
 	        setArchiveParameters(ps, groupId, costPrice);
 	        ps.executeUpdate();
@@ -2709,176 +3012,437 @@ catch (Exception r) {
 		//return id;
 	}
 
-	public long [] insertGroupAssetRecord(String groupAssetByAsset,String singleApproval,String branch,String departCode,String userName) throws Exception, Throwable {
-		//System.out.println("INSIDE INSERT GROUP ASSET RECORD OF GROUP ASSET BEAN");
-		System.out.println("<<<<<<<<<<<<singleApproval: "+singleApproval+"    <<<<branch: "+branch+"    <<<<departCode: "+departCode+"    <<<<userName: "+userName+"    <<<<groupAssetByAsset: "+groupAssetByAsset);
-		 java.util.ArrayList approvelist =ad.getApprovalsId(branch,departCode,userName);
-		 System.out.println("<<<<< approvelist.size() " + approvelist.size());;
-		String[] budget = getBudgetInfo();
-		double[] bugdetvalues = getBudgetValues();
-		int DONE = 0; // everything is oK
-		int BUDGETENFORCED = 1; // EF budget = Yes, CF = NO, ERROR_FLAG
-		int BUDGETENFORCEDCF = 2; // EF budget = Yes, CF = Yes, ERROR_FLAG
-		int ASSETPURCHASEBD = 3; // asset falls into no quarter purchase date
-
-		long [] value = new long[2];
-
-		// older than bugdet
-		String Q = getQuarter();
-		//System.out.println("BUDGET VALUE  =======  "  + budget[3]);
-		if(budget[3].equalsIgnoreCase("N")){
-			value[1]=createGroup(groupAssetByAsset,branch);
-			value[0]= DONE;
-		}
-		else if(budget[3].equalsIgnoreCase("Y")){
-		if (!Q.equalsIgnoreCase("NQ")) {
-			if (budget[3].equalsIgnoreCase("Y")
-					&& budget[4].equalsIgnoreCase("N")) {
-				if (chkBudgetAllocation(Q, bugdetvalues, false)) {
-					updateBudget(Q, budget);
-					value[1]=createGroup(groupAssetByAsset,branch);
-					value[0]= DONE;
-				} else {
-					value[0]=  BUDGETENFORCED;
-				}
-
-			} else if (budget[4].equalsIgnoreCase("Y")) {
-				if (chkBudgetAllocation(Q, bugdetvalues, true)) {
-					updateBudget(Q, budget);
-					value[1]=createGroup(groupAssetByAsset,branch);
-					value[0]=  DONE;
-				} else {
-					value[0]=  BUDGETENFORCEDCF;
-				}
-
-			} else {
-				value[1]=createGroup(groupAssetByAsset,branch);
-				value[0]= DONE;
-			}
-		} else {
-			//value[1]=createGroup();
-			value[0]= ASSETPURCHASEBD;
-		}
-	}
-	else{}
-		if(groupAssetByAsset.equalsIgnoreCase("N")){
-		String groupId = String.valueOf(value[1]);
-		int assetCode = 0;
-        String page1 = "";
-        String flag= "";
-  	  	String partPay="";
-	   	String subjectT= "";
-	   	String whT= "";
-  	   	String Name = "";
-  	   	String url = "";
-  	   	String supervisorName = "";
-  	  	String mailAddress = "";
-  //	  	String qryBranch =" SELECT branch_name from am_ad_branch where branch_id='"+brancId+"'";
-  	   	String Branch = "";
-//  	   	String subjectT= adGroup.subjectToVat(group_id);
-//  	   	String whT= adGroup.whTax(group_id);
-
-  	   	
-//		System.out.println("<<<<<<<<<<<<catid: "+groupAssetByAsset+"    <<<<groupAssetByAsset: "+groupId);
-	     java.util.ArrayList catlist =getAsstCategoryId(groupId);
-	     java.util.ArrayList AssetIdGenlist =getAsstIdGeneration(groupId);
-	     String assetRaiseEntry =htmlUtil.getCodeName(" SELECT raise_entry from am_gb_company ");
-//	     System.out.println("<<<<<<<< Group By Category List Number>> "+catlist.size() );
-//	     System.out.println("<<<<<<<< Asset By Id List Number>> "+AssetIdGenlist.size() );
-//	     boolean duplicate = comp.raisentry_postDuplicate();
-//	     boolean duplicate2 = comp.asset_approvalDuplicate();
-	      //================================
-	     for(int i=0;i<catlist.size();i++)
-	     {
-	     com.magbel.legend.vao.ViewAssetDetails  assetcat = (com.magbel.legend.vao.ViewAssetDetails)catlist.get(i);    	 
-			int catid =  assetcat.getId();
-			double depRate = assetcat.getDepRate();
-//		System.out.println("<<<<<<<<<<<<catid: "+catid+"    <<<<depRate: "+depRate);	
-			groupAssetRateGen(groupId,catid,depRate);
-	     }    
-	     for(int i=0;i<AssetIdGenlist.size();i++)
-	     {
-	    	 magma.net.vao.Asset  assetIdGen = (magma.net.vao.Asset)AssetIdGenlist.get(i);    
-	     	int Id = Integer.parseInt(assetIdGen.getId());
-	     	String brancId = assetIdGen.getBranchId();
-	     	String deptId = assetIdGen.getDepartmentId();
-	     	String catId = assetIdGen.getCategory();
-	     	String sectId = assetIdGen.getSection();
-	     	int userId = assetIdGen.getUserid();
-	     	System.out.println("<<<<<<<<<<<<brancId: "+brancId+"    <<<<deptId: "+deptId+"    <<<<catId: "+catId+"    <<<<sectId: "+sectId);	
-			String assetId = new legend.AutoIDSetup().getIdentity(brancId,deptId, sectId, catId);
-			assetCode = Integer.parseInt(new ApplicationHelper().getGeneratedId("AM_ASSET"));
-		System.out.println("<<<<<<<<<<<<groupId: "+groupId+"    <<<<Id: "+Id+"    <<<<assetId: "+assetId+"    <<<<assetCode: "+assetCode);	
-		assetIdandCodeGen(groupId, Id, assetId, assetCode);
+//	public long [] insertGroupAssetRecord(String groupAssetByAsset,String singleApproval,String branch,String departCode,String userName) throws Exception, Throwable {
+//		//System.out.println("INSIDE INSERT GROUP ASSET RECORD OF GROUP ASSET BEAN");
+//		System.out.println("<<<<<<<<<<<<singleApproval: "+singleApproval+"    <<<<branch: "+branch+"    <<<<departCode: "+departCode+"    <<<<userName: "+userName+"    <<<<groupAssetByAsset: "+groupAssetByAsset);
+//		 java.util.ArrayList approvelist =ad.getApprovalsId(branch,departCode,userName);
+//		 System.out.println("<<<<< approvelist.size() " + approvelist.size());;
+//		String[] budget = getBudgetInfo();
+//		double[] bugdetvalues = getBudgetValues();
+//		int DONE = 0; // everything is oK
+//		int BUDGETENFORCED = 1; // EF budget = Yes, CF = NO, ERROR_FLAG
+//		int BUDGETENFORCEDCF = 2; // EF budget = Yes, CF = Yes, ERROR_FLAG
+//		int ASSETPURCHASEBD = 3; // asset falls into no quarter purchase date
+//
+//		long [] value = new long[2];
+//
+//		// older than bugdet
+//		String Q = getQuarter();
+//		//System.out.println("BUDGET VALUE  =======  "  + budget[3]);
+//		if(budget[3].equalsIgnoreCase("N")){
+//			value[1]=createGroup(groupAssetByAsset,branch);
+//			value[0]= DONE;
+//		}
+//		else if(budget[3].equalsIgnoreCase("Y")){
+//		if (!Q.equalsIgnoreCase("NQ")) {
+//			if (budget[3].equalsIgnoreCase("Y")
+//					&& budget[4].equalsIgnoreCase("N")) {
+//				if (chkBudgetAllocation(Q, bugdetvalues, false)) {
+//					updateBudget(Q, budget);
+//					value[1]=createGroup(groupAssetByAsset,branch);
+//					value[0]= DONE;
+//				} else {
+//					value[0]=  BUDGETENFORCED;
+//				}
+//
+//			} else if (budget[4].equalsIgnoreCase("Y")) {
+//				if (chkBudgetAllocation(Q, bugdetvalues, true)) {
+//					updateBudget(Q, budget);
+//					value[1]=createGroup(groupAssetByAsset,branch);
+//					value[0]=  DONE;
+//				} else {
+//					value[0]=  BUDGETENFORCEDCF;
+//				}
+//
+//			} else {
+//				value[1]=createGroup(groupAssetByAsset,branch);
+//				value[0]= DONE;
+//			}
+//		} else {
+//			//value[1]=createGroup();
+//			value[0]= ASSETPURCHASEBD;
+//		}
+//	}
+//	else{}
+//		if(groupAssetByAsset.equalsIgnoreCase("N")){
+//		String groupId = String.valueOf(value[1]);
+//		int assetCode = 0;
+//        String page1 = "";
+//        String flag= "";
+//  	  	String partPay="";
+//	   	String subjectT= "";
+//	   	String whT= "";
+//  	   	String Name = "";
+//  	   	String url = "";
+//  	   	String supervisorName = "";
+//  	  	String mailAddress = "";
+//  //	  	String qryBranch =" SELECT branch_name from am_ad_branch where branch_id='"+brancId+"'";
+//  	   	String Branch = "";
+////  	   	String subjectT= adGroup.subjectToVat(group_id);
+////  	   	String whT= adGroup.whTax(group_id);
+//
+//  	   	
+////		System.out.println("<<<<<<<<<<<<catid: "+groupAssetByAsset+"    <<<<groupAssetByAsset: "+groupId);
+//	     java.util.ArrayList catlist =getAsstCategoryId(groupId);
+//	     java.util.ArrayList AssetIdGenlist =getAsstIdGeneration(groupId);
+//	     String assetRaiseEntry =htmlUtil.getCodeName(" SELECT raise_entry from am_gb_company ");
+////	     System.out.println("<<<<<<<< Group By Category List Number>> "+catlist.size() );
+////	     System.out.println("<<<<<<<< Asset By Id List Number>> "+AssetIdGenlist.size() );
+////	     boolean duplicate = comp.raisentry_postDuplicate();
+////	     boolean duplicate2 = comp.asset_approvalDuplicate();
+//	      //================================
+//	     for(int i=0;i<catlist.size();i++)
+//	     {
+//	     com.magbel.legend.vao.ViewAssetDetails  assetcat = (com.magbel.legend.vao.ViewAssetDetails)catlist.get(i);    	 
+//			int catid =  assetcat.getId();
+//			double depRate = assetcat.getDepRate();
+////		System.out.println("<<<<<<<<<<<<catid: "+catid+"    <<<<depRate: "+depRate);	
+//			groupAssetRateGen(groupId,catid,depRate);
+//	     }    
+//	     for(int i=0;i<AssetIdGenlist.size();i++)
+//	     {
+//	    	 magma.net.vao.Asset  assetIdGen = (magma.net.vao.Asset)AssetIdGenlist.get(i);    
+//	     	int Id = Integer.parseInt(assetIdGen.getId());
+//	     	String brancId = assetIdGen.getBranchId();
+//	     	String deptId = assetIdGen.getDepartmentId();
+//	     	String catId = assetIdGen.getCategory();
+//	     	String sectId = assetIdGen.getSection();
+//	     	int userId = assetIdGen.getUserid();
+//	     	System.out.println("<<<<<<<<<<<<brancId: "+brancId+"    <<<<deptId: "+deptId+"    <<<<catId: "+catId+"    <<<<sectId: "+sectId);	
+//			String assetId = new legend.AutoIDSetup().getIdentity(brancId,deptId, sectId, catId);
+//			assetCode = Integer.parseInt(new ApplicationHelper().getGeneratedId("AM_ASSET"));
+//		System.out.println("<<<<<<<<<<<<groupId: "+groupId+"    <<<<Id: "+Id+"    <<<<assetId: "+assetId+"    <<<<assetCode: "+assetCode);	
+//		assetIdandCodeGen(groupId, Id, assetId, assetCode);
+//		
+//  	   	 Name =htmlUtil.getCodeName(" SELECT full_name from am_gb_user where user_id='"+userId+"'");
+////  	   	 url = "DocumentHelp.jsp?np=groupAssetPosting&amp;id=" + groupId + "&pageDirect=Y";
+//  	   	
+//	     htmlUtil.insGrpToAm_Invoice_No(assetId,lpo,invoiceNum,"Asset Creation",groupId);
+//         page1 = "ASSET GROUP CREATION RAISE ENTRY";
+//   	     String qryBranch =" SELECT branch_name from am_ad_branch where branch_id='"+brancId+"'";
+//   	   	 Branch = htmlUtil.getCodeName(qryBranch);
+////   	   	String subjectT= adGroup.subjectToVat(group_id);
+////   	   	String whT= adGroup.whTax(group_id);
+//   	   	 Name =htmlUtil.getCodeName(" SELECT full_name from am_gb_user where user_id='"+userId+"'");
+//   	   	 url = "DocumentHelp.jsp?np=groupAssetPosting&amp;id=" + groupId + "&pageDirect=Y";
+//	  	
+//	     }  
+//	   String  depRate = htmlUtil.getCodeName(" SELECT DEP_RATE FROM AM_GROUP_ASSET WHERE Group_id = '"+groupId+"'");
+//	     boolean status = saveGroupToAsset(groupId,depRate);
+//	 	boolean approval_level_val =checkApprovalStatus("3");
+//
+//			String [] approvalResult=ad.setApprovalDataGroup(Long.parseLong(groupId));
+//			approvalResult[10]="A";
+//			System.out.println("<<<<<<<<<<<<status: "+status+"    <<<<approval_level_val: "+approval_level_val);
+//      	if((status)&&(approval_level_val))
+//      	{
+////      		System.out.println("<<<<<<<<<<<<assetRaiseEntry: "+assetRaiseEntry+"    <<<<groupAssetByAsset: "+groupAssetByAsset);
+////			if(assetRaiseEntry != null && assetRaiseEntry.equalsIgnoreCase("Y")){
+////				aprecords.insertApprovalx2(groupId, approvalResult[5], page1, flag, partPay,Name, Branch, subjectT,
+////                  whT, url,Integer.parseInt(approvalResult[0]),assetCode);
+////          }
+////      	 System.out.println("====== Inserting into Approval ======");
+//      	 changeGroupAssetStatus(groupId,"PENDING");
+////      	if(singleApproval.equalsIgnoreCase("Y")){
+////        String trans_id = setGroupPendingTrans(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",assetCode);
+////        
+////                 ad.setPendingTransArchive(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",Integer.parseInt(approvalResult[0]),assetCode);
+////      	 //write a method to change status to pending
+////    	}
+//      	if(singleApproval.equalsIgnoreCase("N")){
+//      		System.out.println("approvelist.size()#$$$$$$$$$$$ "+approvelist.size());
+//     	   	 for(int i=0;i<approvelist.size();i++)
+//       	     {  
+//       		  	legend.admin.objects.User usr = (legend.admin.objects.User)approvelist.get(i);   	 
+//       			String supervisorId =  usr.getUserId();
+//       			mailAddress = usr.getEmail();
+//       			supervisorName = usr.getUserName();
+//       			String supervisorfullName = usr.getUserFullName();
+////       			System.out.println("SupervisorId#$$$$$$$$$$$ "+supervisorId+"    <<<<groupId: "+groupId);
+//       	  		 String trans_id = setGroupPendingMultipleTrans(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",assetCode,supervisorId,groupId);
+//       			 String lastMTID = ad.getCurrentMtid("am_asset_approval");
+////       		 ad.setPendingMultiApprTransArchive(ad.setApprovalData(id),"1",Integer.parseInt(lastMTID),assetCode,supervisorId);
+//       			String subjectr ="Asset Creation Approval";
+//       			String msgText11 ="Asset with ID: "+ groupId +" is waiting for your approval.";
+//        		String  approvaltransId  = aprecords.getCodeName("select transaction_id from am_asset_approval where ASSET_ID='"+groupId+"'");	  
+//       //String otherparam = "newAssetApproval&operation=1&id="+id+"&tranId="+approvaltransId+"&transaction_level=1&approval_level_count=0&assetCode="+assetCode;				
+//       				 comp.insertMailRecords(mailAddress,subjectr,msgText11);
+//       	     	}	
+//      		
+//      	}
+//       	if(singleApproval.equalsIgnoreCase("Y")){
+//	        String trans_id = setGroupPendingTrans(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",assetCode);
+//	      	approvalResult=ad.setApprovalDataGroup(Long.parseLong(groupId));
+//            ad.setPendingTransArchive(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",Integer.parseInt(approvalResult[0]),assetCode);	      	
+//       	}
+//      	}	
+//   	  	
+//	     } 
+////		System.out.println("value#$$$$$$$$$$$ "+value);
+//		return value;
+//
+//	}
+	
+	public long[] insertGroupAssetRecord(String groupAssetByAsset,
+            String singleApproval,
+            String branch,
+            String departCode,
+            String userName) throws Throwable {
 		
-  	   	 Name =htmlUtil.getCodeName(" SELECT full_name from am_gb_user where user_id='"+userId+"'");
-//  	   	 url = "DocumentHelp.jsp?np=groupAssetPosting&amp;id=" + groupId + "&pageDirect=Y";
-  	   	
-	     htmlUtil.insGrpToAm_Invoice_No(assetId,lpo,invoiceNum,"Asset Creation",groupId);
-         page1 = "ASSET GROUP CREATION RAISE ENTRY";
-   	     String qryBranch =" SELECT branch_name from am_ad_branch where branch_id='"+brancId+"'";
-   	   	 Branch = htmlUtil.getCodeName(qryBranch);
-//   	   	String subjectT= adGroup.subjectToVat(group_id);
-//   	   	String whT= adGroup.whTax(group_id);
-   	   	 Name =htmlUtil.getCodeName(" SELECT full_name from am_gb_user where user_id='"+userId+"'");
-   	   	 url = "DocumentHelp.jsp?np=groupAssetPosting&amp;id=" + groupId + "&pageDirect=Y";
-	  	
-	     }  
-	   String  depRate = htmlUtil.getCodeName(" SELECT DEP_RATE FROM AM_GROUP_ASSET WHERE Group_id = '"+groupId+"'");
-	     boolean status = saveGroupToAsset(groupId,depRate);
-	 	boolean approval_level_val =checkApprovalStatus("3");
+System.out.println("singleApproval: " + singleApproval + " branch: " + branch + " departCode: " + departCode + " userName: " + userName + " groupAssetByAsset: " + groupAssetByAsset);
 
-			String [] approvalResult=ad.setApprovalDataGroup(Long.parseLong(groupId));
-			approvalResult[10]="A";
-			System.out.println("<<<<<<<<<<<<status: "+status+"    <<<<approval_level_val: "+approval_level_val);
-      	if((status)&&(approval_level_val))
-      	{
-//      		System.out.println("<<<<<<<<<<<<assetRaiseEntry: "+assetRaiseEntry+"    <<<<groupAssetByAsset: "+groupAssetByAsset);
-//			if(assetRaiseEntry != null && assetRaiseEntry.equalsIgnoreCase("Y")){
-//				aprecords.insertApprovalx2(groupId, approvalResult[5], page1, flag, partPay,Name, Branch, subjectT,
-//                  whT, url,Integer.parseInt(approvalResult[0]),assetCode);
-//          }
-//      	 System.out.println("====== Inserting into Approval ======");
-      	 changeGroupAssetStatus(groupId,"PENDING");
-//      	if(singleApproval.equalsIgnoreCase("Y")){
-//        String trans_id = setGroupPendingTrans(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",assetCode);
-//        
-//                 ad.setPendingTransArchive(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",Integer.parseInt(approvalResult[0]),assetCode);
-//      	 //write a method to change status to pending
-//    	}
-      	if(singleApproval.equalsIgnoreCase("N")){
-      		System.out.println("approvelist.size()#$$$$$$$$$$$ "+approvelist.size());
-     	   	 for(int i=0;i<approvelist.size();i++)
-       	     {  
-       		  	legend.admin.objects.User usr = (legend.admin.objects.User)approvelist.get(i);   	 
-       			String supervisorId =  usr.getUserId();
-       			mailAddress = usr.getEmail();
-       			supervisorName = usr.getUserName();
-       			String supervisorfullName = usr.getUserFullName();
-//       			System.out.println("SupervisorId#$$$$$$$$$$$ "+supervisorId+"    <<<<groupId: "+groupId);
-       	  		 String trans_id = setGroupPendingMultipleTrans(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",assetCode,supervisorId,groupId);
-       			 String lastMTID = ad.getCurrentMtid("am_asset_approval");
-//       		 ad.setPendingMultiApprTransArchive(ad.setApprovalData(id),"1",Integer.parseInt(lastMTID),assetCode,supervisorId);
-       			String subjectr ="Asset Creation Approval";
-       			String msgText11 ="Asset with ID: "+ groupId +" is waiting for your approval.";
-        		String  approvaltransId  = aprecords.getCodeName("select transaction_id from am_asset_approval where ASSET_ID='"+groupId+"'");	  
-       //String otherparam = "newAssetApproval&operation=1&id="+id+"&tranId="+approvaltransId+"&transaction_level=1&approval_level_count=0&assetCode="+assetCode;				
-       				 comp.insertMailRecords(mailAddress,subjectr,msgText11);
-       	     	}	
-      		
-      	}
-       	if(singleApproval.equalsIgnoreCase("Y")){
-	        String trans_id = setGroupPendingTrans(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",assetCode);
-	      	approvalResult=ad.setApprovalDataGroup(Long.parseLong(groupId));
-            ad.setPendingTransArchive(ad.setApprovalDataGroup(Long.parseLong(groupId)),"3",Integer.parseInt(approvalResult[0]),assetCode);	      	
-       	}
-      	}	
-   	  	
-	     } 
-//		System.out.println("value#$$$$$$$$$$$ "+value);
-		return value;
+long[] result = new long[2];
 
+try (Connection con = getConnection()) {
+
+// Start transaction
+con.setAutoCommit(false);
+
+// =========================
+// 1. BUDGET VALIDATION
+// =========================
+int budgetStatus = validateBudget(con);
+
+if (budgetStatus != 0) {
+result[0] = budgetStatus;
+return result; // no commit needed
+}
+
+// =========================
+// 2. CREATE GROUP
+// =========================
+long groupId = createGroup(con, groupAssetByAsset, branch);
+result[0] = 0;
+result[1] = groupId;
+
+if (!"N".equalsIgnoreCase(groupAssetByAsset)) {
+con.commit();
+return result;
+}
+
+// =========================
+// 3. PROCESS ASSET GENERATION
+// =========================
+processAssetGeneration(con, String.valueOf(groupId));
+
+// =========================
+// 4. SAVE GROUP TO ASSET
+// =========================
+String depRate = htmlUtil.getCodeName(con,
+"SELECT DEP_RATE FROM AM_GROUP_ASSET WHERE Group_id = ?",
+String.valueOf(groupId));
+
+boolean saved = saveGroupToAsset(con, String.valueOf(groupId), depRate);
+boolean approvalEnabled = checkApprovalStatus(con, "3");
+
+if (!saved || !approvalEnabled) {
+con.rollback();
+return result;
+}
+
+
+// =========================
+// 5. APPROVAL PROCESSING
+// =========================
+processApproval(con,
+String.valueOf(groupId),
+singleApproval,
+branch,
+departCode,
+userName);
+
+// ✅ Everything successful
+con.commit();
+
+} catch (Exception e) {
+
+e.printStackTrace();
+throw e; // Let caller handle error
+
+}
+
+return result;
+}
+	
+	private int validateBudget() throws Exception {
+
+	    final int DONE = 0;
+	    final int BUDGETENFORCED = 1;
+	    final int BUDGETENFORCEDCF = 2;
+	    final int ASSETPURCHASEBD = 3;
+
+	    String[] budget = getBudgetInfo();
+	    double[] budgetValues = getBudgetValues();
+	    String quarter = getQuarter();
+
+	    if ("N".equalsIgnoreCase(budget[3])) {
+	        return DONE;
+	    }
+
+	    if ("NQ".equalsIgnoreCase(quarter)) {
+	        return ASSETPURCHASEBD;
+	    }
+
+	    if ("Y".equalsIgnoreCase(budget[3]) && "N".equalsIgnoreCase(budget[4])) {
+
+	        if (!chkBudgetAllocation(quarter, budgetValues, false)) {
+	            return BUDGETENFORCED;
+	        }
+
+	        updateBudget(quarter, budget);
+	        return DONE;
+	    }
+
+	    if ("Y".equalsIgnoreCase(budget[4])) {
+
+	        if (!chkBudgetAllocation(quarter, budgetValues, true)) {
+	            return BUDGETENFORCEDCF;
+	        }
+
+	        updateBudget(quarter, budget);
+	        return DONE;
+	    }
+
+	    return DONE;
 	}
+	
+	private int validateBudget(Connection con) throws Exception {
+
+	    final int DONE = 0;
+	    final int BUDGETENFORCED = 1;
+	    final int BUDGETENFORCEDCF = 2;
+	    final int ASSETPURCHASEBD = 3;
+
+	    String[] budget = getBudgetInfo();
+	    double[] budgetValues = getBudgetValues();
+	    String quarter = getQuarter();
+
+	    if ("N".equalsIgnoreCase(budget[3])) {
+	        return DONE;
+	    }
+
+	    if ("NQ".equalsIgnoreCase(quarter)) {
+	        return ASSETPURCHASEBD;
+	    }
+
+	    if ("Y".equalsIgnoreCase(budget[3]) && "N".equalsIgnoreCase(budget[4])) {
+
+	        if (!chkBudgetAllocation(quarter, budgetValues, false)) {
+	            return BUDGETENFORCED;
+	        }
+
+	        updateBudget(quarter, budget);
+	        return DONE;
+	    }
+
+	    if ("Y".equalsIgnoreCase(budget[4])) {
+
+	        if (!chkBudgetAllocation(quarter, budgetValues, true)) {
+	            return BUDGETENFORCEDCF;
+	        }
+
+	        updateBudget(quarter, budget);
+	        return DONE;
+	    }
+
+	    return DONE;
+	}
+	
+	private void processAssetGeneration(Connection con ,String groupId) throws Exception {
+
+	    List<?> categoryList = getAsstCategoryId(con, groupId);
+	    List<?> assetList = getAsstIdGeneration(con, groupId);
+
+	    // Generate depreciation rates
+	    for (Object obj : categoryList) {
+	        com.magbel.legend.vao.ViewAssetDetails assetCat =
+	                (com.magbel.legend.vao.ViewAssetDetails) obj;
+
+	        groupAssetRateGen(con, groupId,
+	                assetCat.getId(),
+	                assetCat.getDepRate());
+	    }
+
+	    int assetCode = 0;
+
+	    for (Object obj : assetList) {
+
+	        magma.net.vao.Asset asset = (magma.net.vao.Asset) obj;
+
+	        int id = Integer.parseInt(asset.getId());
+
+	        String assetId = new legend.AutoIDSetup()
+	                .getIdentity(con,asset.getBranchId(),
+	                        asset.getDepartmentId(),
+	                        asset.getSection(),
+	                        asset.getCategory());
+
+	        assetCode = Integer.parseInt(
+	                new ApplicationHelper().getGeneratedId(con,"AM_ASSET"));
+
+	        assetIdandCodeGen(con,groupId, id, assetId, assetCode);
+
+	        htmlUtil.insGrpToAm_Invoice_No(assetId,
+	                lpo,
+	                invoiceNum,
+	                "Asset Creation",
+	                groupId);
+	    }
+	}
+	
+	private void processApproval(Connection con,String groupId,
+            String singleApproval,
+            String branch,
+            String departCode,
+            String userName) throws Exception {
+
+changeGroupAssetStatus(groupId, "PENDING");
+
+List<?> approvalList = ad.getApprovalsId(branch, departCode, userName);
+
+String[] approvalData = ad.setApprovalDataGroup(Long.parseLong(groupId));
+
+if ("Y".equalsIgnoreCase(singleApproval)) {
+
+int assetCode = Integer.parseInt(approvalData[0]);
+
+setGroupPendingTrans(approvalData, "3", assetCode);
+
+ad.setPendingTransArchive(approvalData,
+"3",
+assetCode,
+assetCode);
+
+return;
+}
+
+// Multiple Approval
+//collect recipients
+List<String> mailList = new ArrayList<>();
+for (Object obj : approvalList) {
+ legend.admin.objects.User usr = (legend.admin.objects.User) obj;
+ setGroupPendingMultipleTrans(
+     approvalData,
+     "3",
+     Integer.parseInt(approvalData[0]),
+     usr.getUserId(),
+     groupId
+ );
+ mailList.add(usr.getEmail());
+}
+
+//commit transaction first
+con.commit();
+
+//then send emails
+for (String email : mailList) {
+ comp.insertMailRecords(email,
+     "Asset Creation Approval",
+     "Asset with ID: " + groupId + " is waiting for your approval."
+ );
+}
+}
+	
     public long [] insertGroupAssetRecordUnclassified(String groupAssetByAsset,String singleApproval,String branch,String departCode,String userName) throws Exception, Throwable {
 		//System.out.println("INSIDE INSERT GROUP ASSET RECORD OF GROUP ASSET BEAN");
     	java.util.ArrayList approvelist =ad.getApprovalsId(branch,departCode,userName);
@@ -3060,6 +3624,7 @@ catch (Exception r) {
 		
 		 try (Connection c = getConnection();
 		         PreparedStatement ps = c.prepareStatement(query)) {
+			 ps.setQueryTimeout(30);
 		try(ResultSet rs = ps.executeQuery()){
 			while (rs.next()) {
 				result[0] = sdf.format(rs.getDate("financial_start_date"));
@@ -3092,6 +3657,7 @@ catch (Exception r) {
 		
 		 try (Connection c = getConnection();
 		         PreparedStatement ps = c.prepareStatement(query)) {
+			 ps.setQueryTimeout(30);
 		try(ResultSet rs = ps.executeQuery()){
 			while (rs.next()) {
 				result[0] = rs.getDouble("Q1_ALLOCATION");
@@ -4883,7 +5449,7 @@ catch (Exception r) {
 
                     // ✅ Get approval level safely (NO string concatenation)
                     try (PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
-
+                    	psLevel.setQueryTimeout(30);
                         psLevel.setString(1, code);
 
                         try (ResultSet rs = psLevel.executeQuery()) {
@@ -6114,6 +6680,90 @@ public boolean saveGroupToAsset(String groupId, String catRate) {
     return done;
 }
 
+public boolean saveGroupToAsset(Connection con, String groupId, String catRate) throws Exception {
+
+    boolean done = false;
+    double rateValue;
+
+    // Safe rate calculation
+    if ("0.00".equalsIgnoreCase(catRate)) {
+        rateValue = 0;
+    } else {
+        double depRate = Double.parseDouble(catRate);
+        rateValue = (100 / depRate) * 12;
+    }
+
+    String insertAssetQuery =
+            "INSERT INTO AM_ASSET (ASSET_ID, REGISTRATION_NO, BRANCH_ID, DEPT_ID, SECTION_ID, CATEGORY_ID, DESCRIPTION, " +
+            "VENDOR_AC, DATE_PURCHASED, DEP_RATE, ASSET_MAKE, ASSET_MODEL, ASSET_SERIAL_NO, ASSET_ENGINE_NO, SUPPLIER_NAME, " +
+            "ASSET_USER, ASSET_MAINTENANCE, ACCUM_DEP, MONTHLY_DEP, COST_PRICE, NBV, DEP_END_DATE, RESIDUAL_VALUE, " +
+            "AUTHORIZED_BY, POSTING_DATE, EFFECTIVE_DATE, PURCHASE_REASON, USEFUL_LIFE, TOTAL_LIFE, LOCATION, REMAINING_LIFE, " +
+            "VATABLE_COST, VAT, WH_TAX, WH_TAX_AMOUNT, REQ_DEPRECIATION, REQ_REDISTRIBUTION, SUBJECT_TO_VAT, WHO_TO_REM, EMAIL1, WHO_TO_REM_2, " +
+            "EMAIL2, RAISE_ENTRY, DEP_YTD, SECTION, STATE, DRIVER, SPARE_1, SPARE_2, ASSET_STATUS, USER_ID, MULTIPLE, PROVINCE, WAR_START_DATE, " +
+            "WAR_MONTH, WAR_EXPIRY_DATE, LPO, BAR_CODE, BRANCH_CODE, CATEGORY_CODE, GROUP_ID, PART_PAY, FULLY_PAID, DEFER_PAY, SBU_CODE, SECTION_CODE, " +
+            "DEPT_CODE, system_ip, asset_code, memo, memoValue, SUB_CATEGORY_ID, SUB_CATEGORY_CODE, SPARE_3, SPARE_4, SPARE_5, SPARE_6, ZONE_CODE, " +
+            "REGION_CODE, PROJECT_CODE, INTEGRIFY, TRANPORT_COST, OTHER_COST, VENDOR_NAME) " +
+
+            "SELECT ASSET_ID, REGISTRATION_NO, BRANCH_ID, DEPT_ID, SECTION_ID, CATEGORY_ID, DESCRIPTION, " +
+            "VENDOR_AC, DATE_PURCHASED, DEP_RATE, ASSET_MAKE, ASSET_MODEL, ASSET_SERIAL_NO, ASSET_ENGINE_NO, SUPPLIER_NAME, " +
+            "ASSET_USER, ASSET_MAINTENANCE, ACCUM_DEP, 0.00, COST_PRICE, COST_PRICE - 10, DEP_END_DATE, RESIDUAL_VALUE, " +
+            "AUTHORIZED_BY, POSTING_DATE, EFFECTIVE_DATE, PURCHASE_REASON, 0, ?, LOCATION, ?, VATABLE_COST, VAT, WH_TAX, WH_TAX_AMOUNT, " +
+            "REQ_DEPRECIATION, REQ_REDISTRIBUTION, SUBJECT_TO_VAT, WHO_TO_REM, EMAIL1, WHO_TO_REM_2, EMAIL2, RAISE_ENTRY, DEP_YTD, SECTION, STATE, DRIVER, " +
+            "SPARE_1, SPARE_2, ASSET_STATUS, USER_ID, 'N', PROVINCE, WAR_START_DATE, WAR_MONTH, WAR_EXPIRY_DATE, LPO, BAR_CODE, BRANCH_CODE, " +
+            "CATEGORY_CODE, GROUP_ID, PART_PAY, FULLY_PAID, DEFER_PAY, SBU_CODE, SECTION_CODE, DEPT_CODE, ?, asset_code, 'N', '', " +
+            "SUB_CATEGORY_ID, SUB_CATEGORY_CODE, SPARE_3, SPARE_4, SPARE_5, SPARE_6, ZONE_CODE, REGION_CODE, PROJECT_CODE, INTEGRIFY, " +
+            "TRANPORT_COST, OTHER_COST, VENDOR_NAME FROM AM_GROUP_ASSET WHERE GROUP_ID = ?";
+    
+    String insertArchiveQuery = insertAssetQuery
+            .replace("AM_ASSET", "AM_ASSET_ARCHIVE")
+            .replace(", memo, memoValue", "")
+            .replace(", 'N', ''", "");
+
+    try {
+
+        boolean originalAutoCommit = con.getAutoCommit();
+        con.setAutoCommit(false);
+
+        try (PreparedStatement ps1 = con.prepareStatement(insertAssetQuery);
+             PreparedStatement ps2 = con.prepareStatement(insertArchiveQuery)) {
+
+            // --- AM_ASSET
+            ps1.setDouble(1, rateValue);
+            ps1.setDouble(2, rateValue);
+            ps1.setString(3, "127.0.0.1");
+            ps1.setString(4, groupId);
+
+            int rows1 = ps1.executeUpdate();
+
+            // --- ARCHIVE
+            ps2.setDouble(1, rateValue);
+            ps2.setDouble(2, rateValue);
+            ps2.setString(3, "127.0.0.1");
+            ps2.setString(4, groupId);
+
+            int rows2 = ps2.executeUpdate();
+
+            if (rows1 > 0 && rows2 > 0) {
+                con.commit();
+                done = true;
+            } else {
+                con.rollback();
+            }
+
+        } catch (Exception e) {
+            con.rollback();
+            throw e;
+        } finally {
+            con.setAutoCommit(originalAutoCommit); // restore state
+        }
+
+    } catch (Exception ex) {
+        System.out.println("ERROR: saveGroupToAsset -> " + ex.getMessage());
+        throw ex;
+    }
+
+    return done;
+}
 public boolean saveGroupToUncapAssetOld(String GroupId) {
     boolean done = false;
     
@@ -6299,7 +6949,42 @@ public java.util.ArrayList getAsstCategoryId(String groupId) {
          PreparedStatement ps = c.prepareStatement(query)) {
 
         ps.setString(1, groupId);
-        ps.setQueryTimeout(30);
+       // ps.setQueryTimeout(30);
+        try (ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                ViewAssetDetails asset = new ViewAssetDetails();
+                asset.setId(rs.getInt("Category_ID"));
+                asset.setDepRate(rs.getDouble("dep_rate"));
+
+                list.add(asset);
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+
+public java.util.ArrayList getAsstCategoryId(Connection c, String groupId) {
+
+	java.util.ArrayList list = new java.util.ArrayList();
+
+    String query =
+        "SELECT a.Category_ID, c.dep_rate " +
+        "FROM AM_GROUP_ASSET a " +
+        "JOIN am_ad_category c ON a.Category_ID = c.Category_ID " +
+        "WHERE a.Group_id = ? " +
+        "GROUP BY a.Category_ID, c.dep_rate";
+
+    try (
+         PreparedStatement ps = c.prepareStatement(query)) {
+
+        ps.setString(1, groupId);
+       // ps.setQueryTimeout(30);
         try (ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
@@ -6391,6 +7076,47 @@ public java.util.ArrayList getAsstIdGeneration(String GroupId)
 	return _list;
 } 
 
+
+public java.util.ArrayList getAsstIdGeneration(Connection c, String GroupId)
+{ 
+	java.util.ArrayList _list = new java.util.ArrayList();
+	String finacleTransId= null;
+		String query = "SELECT Category_ID,ID,Branch_ID,Dept_ID,section_id,user_ID FROM AM_GROUP_ASSET WHERE Group_id = '"+GroupId+"' ";
+
+
+
+		 try (
+		         PreparedStatement ps = c.prepareStatement(query);) {
+		//	 ps.setQueryTimeout(30);
+		try(ResultSet rs = ps.executeQuery()){
+			while (rs.next())
+			   {				
+				String strid = rs.getString("ID");
+//				  System.out.println("getAsstIdGeneration strid === "+strid);  
+				String cateId = rs.getString("Category_ID");
+				String branchId = rs.getString("Branch_ID");
+				String deptId = rs.getString("Dept_ID");
+				String sectId = rs.getString("section_id");
+				int userId = rs.getInt("user_ID");
+				Asset asset = new Asset();
+				asset.setId(strid);
+				asset.setCategory(cateId);
+				asset.setBranchId(branchId);
+				asset.setDepartmentId(deptId);
+				asset.setSection(sectId);
+				asset.setUserid(userId);
+				_list.add(asset);
+			   }
+		}
+	 }   
+				 catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+					
+	return _list;
+} 
+
 public java.util.ArrayList getUncapAsstIdGeneration(String GroupId)
 { 
 	java.util.ArrayList _list = new java.util.ArrayList();
@@ -6446,6 +7172,23 @@ public void groupAssetRateGen(String groupId, int catId, double depRate) {
 
    }
 
+public void groupAssetRateGen(Connection con, String groupId, int catId, double depRate) {
+    
+    String NOTIFY_QUERY ="UPDATE AM_GROUP_ASSET SET dep_rate = ? WHERE Group_id = ? and Category_ID = ? ";
+
+    try (
+	         PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY)) {
+        ps.setDouble(1, depRate);
+        ps.setString(2, groupId);
+        ps.setInt(3, catId);
+        ps.executeUpdate();
+
+    } catch (Exception ex) {
+        System.out.println("WARNING: cannot update am_group_asset : "+ex.getMessage());
+    } 
+
+}
+
 public void groupUncpAssetRateGen(String groupId, int catId, double depRate) {
        
        String NOTIFY_QUERY ="UPDATE AM_GROUP_ASSET_UNCAPITALIZED SET dep_rate = ? WHERE Group_id = ? and Category_ID = ? ";
@@ -6469,6 +7212,7 @@ public void assetIdandCodeGen(String groupId, int Id, String assetId,int assetCo
 //       System.out.println("<<<<<<<<<<<<groupId in assetIdandCodeGen: "+groupId+"    <<<<Id: "+Id+"    <<<<assetId: "+assetId+"    <<<<assetCode: "+assetCode);
        try (Connection c = getConnection();
     	         PreparedStatement ps = c.prepareStatement(NOTIFY_QUERY)) {
+    	   ps.setQueryTimeout(30);
            ps.setString(1, assetId);
            ps.setInt(2, assetCode); 
            ps.setString(3, groupId);
@@ -6480,6 +7224,25 @@ public void assetIdandCodeGen(String groupId, int Id, String assetId,int assetCo
        } 
 
    }
+
+public void assetIdandCodeGen(Connection con, String groupId, int Id, String assetId,int assetCode) {
+    
+    String NOTIFY_QUERY ="UPDATE AM_GROUP_ASSET SET Asset_Id = ?, asset_code = ? WHERE Group_id = ? and Id = ? ";
+//    System.out.println("<<<<<<<<<<<<groupId in assetIdandCodeGen: "+groupId+"    <<<<Id: "+Id+"    <<<<assetId: "+assetId+"    <<<<assetCode: "+assetCode);
+    try (
+ 	         PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY)) {
+ 	   ps.setQueryTimeout(30);
+        ps.setString(1, assetId);
+        ps.setInt(2, assetCode); 
+        ps.setString(3, groupId);
+        ps.setInt(4, Id);
+        ps.executeUpdate();
+
+    } catch (Exception ex) {
+        System.out.println("WARNING: cannot update am_group_asset in assetIdandCodeGen: "+ex.getMessage());
+    } 
+
+}
 
 public void UncapAssetIdandCodeGen(String groupId, int Id, String assetId,int assetCode) {
        
@@ -6672,6 +7435,34 @@ private boolean checkApprovalStatus(String code)
     return status;
 }
 
+private boolean checkApprovalStatus(Connection con, String code)
+{
+	// TODO Auto-generated method stub
+	boolean status = false;
+	String approval_status_qry = "select level from approval_level_setup where code ='"+code+"'";
+	
+    int level = 0;
+    try(PreparedStatement ps = con.prepareStatement(approval_status_qry)){
+        ps.setQueryTimeout(30);
+    	try( ResultSet rs = ps.executeQuery();){
+    	if(rs.next())
+    	{
+    		level= rs.getInt(1);
+    	}
+    	if (level > 0)
+    	{
+    		status = true;
+    	}
+    	}
+    }
+    catch(Exception ex) 
+    {
+        System.out.println("WARN: Error checkApprovalStatus ->" + ex);
+    }
+      
+    return status;
+}
+
 public String setGroupPendingMultipleTransOld(String[] a, String code,int assetCode,String supervisorId,String mtid){
 
 int transaction_level=0;
@@ -6746,6 +7537,7 @@ public String setGroupPendingMultipleTrans(String[] a, String code, int assetCod
 
         // --- Get transaction level and type
         try (PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+        	psLevel.setQueryTimeout(30);
             psLevel.setString(1, code);
             try (ResultSet rs = psLevel.executeQuery()) {
                 if (rs.next()) {
@@ -6759,7 +7551,7 @@ public String setGroupPendingMultipleTrans(String[] a, String code, int assetCod
         mtid = new ApplicationHelper().getGeneratedId("am_asset_approval");
 
         try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
-
+        	psInsert.setQueryTimeout(30);
             SimpleDateFormat timer = new SimpleDateFormat("HH:mm:ss");
 
             psInsert.setString(1, (a[0] != null) ? a[0] : "");

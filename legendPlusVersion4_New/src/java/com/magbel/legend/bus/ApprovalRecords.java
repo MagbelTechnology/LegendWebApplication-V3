@@ -566,6 +566,26 @@ return false;
 
         return result;
     }
+    
+    public String getCodeName(Connection con, String query) {
+        String result = "";
+
+        try (
+             PreparedStatement ps = con.prepareStatement(query)) {
+        	 ps.setQueryTimeout(30);
+        	 try( ResultSet rs = ps.executeQuery()){
+            if (rs.next()) { 
+                result = rs.getString(1);
+                if (result == null) result = "";
+            }
+        	 }
+        } catch (SQLException e) {
+            System.out.println("Error in getCodeName() for query: " + query);
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 
     public String getCodeNameOld(String query,String param)
     {

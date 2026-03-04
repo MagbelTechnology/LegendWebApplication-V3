@@ -9305,7 +9305,7 @@ public String[] setApprovalDataGroup(long id) {
 
     try (Connection con = dbConnection.getConnection("legendPlus");
          PreparedStatement ps = con.prepareStatement(query)) {
-
+    	ps.setQueryTimeout(30);
         ps.setLong(1, id);
 
         try (ResultSet rs = ps.executeQuery()) {

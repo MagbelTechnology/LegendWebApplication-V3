@@ -246,6 +246,34 @@ public class HtmlUtility {
 
         return result == null ? "" : result;
     }
+    
+    
+    public String getCodeName(Connection con, String query, String param) {
+
+        String result = "";
+
+        try (PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setQueryTimeout(QUERY_TIMEOUT_SECONDS);
+            ps.setString(1, param);
+
+            if (query.trim().toUpperCase().startsWith("UPDATE")) {
+                ps.executeUpdate();
+                return "";
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    result = rs.getString(1);
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("ERROR getCodeName(param): " + e.getMessage());
+        }
+
+        return result == null ? "" : result;
+    }
 
     /* =========================================================
        SAFE INSERT METHODS
@@ -302,6 +330,33 @@ public class HtmlUtility {
             System.err.println("ERROR insGrpToAm_Invoice_No(): " + e.getMessage());
         }
     }
+    
+    public void insGrpToAm_Invoice_No(Connection con, String assetID, String lpo,
+            String invoiceNo, String transType,
+            String grpID) {
+
+String sql = "INSERT INTO Am_Invoice_no " +
+"(asset_id,lpo,invoice_no,trans_type,group_id,create_date) " +
+"VALUES (?,?,?,?,?,?)";
+
+try (
+PreparedStatement ps = con.prepareStatement(sql)) {
+
+ps.setQueryTimeout(QUERY_TIMEOUT_SECONDS);
+
+ps.setString(1, assetID);
+ps.setString(2, lpo);
+ps.setString(3, invoiceNo);
+ps.setString(4, transType);
+ps.setString(5, grpID);
+ps.setString(6, String.valueOf(df.dateConvert(new Date())));
+
+ps.executeUpdate();
+
+} catch (Exception e) {
+System.err.println("ERROR insGrpToAm_Invoice_No(): " + e.getMessage());
+}
+}
 
     /* =========================================================
        SAFE findCategoryItems()

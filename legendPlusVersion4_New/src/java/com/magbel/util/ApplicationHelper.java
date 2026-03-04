@@ -176,7 +176,6 @@ public String getGeneratedId(String tableName) {
 
         // Get current MT_ID
         try (PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
-        	ps.setQueryTimeout(30);
             ps.setString(1, tableName);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -208,6 +207,53 @@ public String getGeneratedId(String tableName) {
         e.printStackTrace();
         id = null; 
     }
+
+    return id;
+}
+
+public String getGeneratedId(Connection con, String tableName) throws SQLException {
+
+    int counter = 0;
+    String id;
+
+    String FINDER_QUERY = 
+        "SELECT MT_ID FROM IA_MTID_TABLE WITH (UPDLOCK, ROWLOCK) WHERE MT_TABLENAME = ?";
+    String UPDATE_QUERY = 
+        "UPDATE IA_MTID_TABLE SET MT_ID = MT_ID + 1 WHERE MT_TABLENAME = ?";
+
+    // Do NOT open new connection here
+    try (PreparedStatement ps = con.prepareStatement(FINDER_QUERY)) {
+
+       // ps.setQueryTimeout(30);
+        ps.setString(1, tableName);
+
+        try (ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                counter = rs.getInt(1);
+            } else {
+                counter = 1;
+
+                String insertQuery =
+                    "INSERT INTO IA_MTID_TABLE(MT_TABLENAME, MT_ID) VALUES (?, ?)";
+
+                try (PreparedStatement psInsert =
+                         con.prepareStatement(insertQuery)) {
+
+                    psInsert.setString(1, tableName);
+                    psInsert.setInt(2, counter);
+                    psInsert.executeUpdate();
+                }
+            }
+        }
+    }
+
+    try (PreparedStatement psUpdate = con.prepareStatement(UPDATE_QUERY)) {
+        psUpdate.setString(1, tableName);
+        psUpdate.executeUpdate();
+    }
+
+    id = String.format("%05d", counter);
 
     return id;
 }
