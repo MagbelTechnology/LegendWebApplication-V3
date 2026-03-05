@@ -1785,7 +1785,7 @@ catch (Exception r) {
 	public long createGroupMain(Connection connection) throws Exception {
 	    validateAndInitializeFields();
 	    
-	    long groupId = generateGroupId();
+	    long groupId = generateGroupId(connection);
 	    double costPrice = calculateTotalCost();
 	    
 	    try  {
@@ -1830,6 +1830,27 @@ catch (Exception r) {
 	    String generatedId = new ApplicationHelper().getGeneratedId("AM_GROUP_ASSET_MAIN");
 	    String groupIdWithUser = generatedId + user_id;
 	    return Long.parseLong(groupIdWithUser);
+	}
+	
+	private long generateGroupId(Connection con) throws Exception {
+	    String generatedId = new ApplicationHelper().getGeneratedId(con,"AM_GROUP_ASSET_MAIN");
+	    String groupIdWithUser = generatedId + user_id;
+	    return Long.parseLong(groupIdWithUser);
+	}
+	
+	private void insertIntoMainTable(long groupId, double costPrice) throws SQLException {
+	    String query = buildMainInsertQuery();
+	    
+	    try (Connection connection = getConnection();
+		      PreparedStatement ps = connection.prepareStatement(query)) {
+	    	 setCommonParameters(ps, groupId, costPrice, 1);
+		        ps.executeUpdate();
+		    } catch (Exception e) {
+		        System.err.println("INFO: Error creating AM_GROUP_ASSET_MAIN_Archive >> " + e.getMessage());
+		        e.printStackTrace(); 
+		    }
+	    
+	   
 	}
 
 	private void insertIntoMainTable(Connection connection, long groupId, double costPrice) throws SQLException {
@@ -3183,20 +3204,22 @@ catch (Exception r) {
 //
 //	}
 	
-	public long[] insertGroupAssetRecord(String groupAssetByAsset,
+	public long[] insertGroupAssetRecord(Connection con,
+            String groupAssetByAsset,
             String singleApproval,
             String branch,
             String departCode,
-            String userName) throws Throwable {
-		
-System.out.println("singleApproval: " + singleApproval + " branch: " + branch + " departCode: " + departCode + " userName: " + userName + " groupAssetByAsset: " + groupAssetByAsset);
+            String userName) throws Exception {
+
+System.out.println("singleApproval: " + singleApproval +
+" branch: " + branch +
+" departCode: " + departCode +
+" userName: " + userName +
+" groupAssetByAsset: " + groupAssetByAsset);
 
 long[] result = new long[2];
 
-try (Connection con = getConnection()) {
-
-// Start transaction
-con.setAutoCommit(false);
+try {
 
 // =========================
 // 1. BUDGET VALIDATION
@@ -3205,25 +3228,27 @@ int budgetStatus = validateBudget(con);
 
 if (budgetStatus != 0) {
 result[0] = budgetStatus;
-return result; // no commit needed
+return result;
 }
-
+System.out.println("Budget Validation done");
 // =========================
 // 2. CREATE GROUP
 // =========================
 long groupId = createGroup(con, groupAssetByAsset, branch);
+System.out.println("groupId" + groupId);
 result[0] = 0;
 result[1] = groupId;
 
 if (!"N".equalsIgnoreCase(groupAssetByAsset)) {
-con.commit();
 return result;
 }
+System.out.println("Create Group done");
 
 // =========================
 // 3. PROCESS ASSET GENERATION
 // =========================
 processAssetGeneration(con, String.valueOf(groupId));
+System.out.println("Process Asset Generation done");
 
 // =========================
 // 4. SAVE GROUP TO ASSET
@@ -3232,14 +3257,16 @@ String depRate = htmlUtil.getCodeName(con,
 "SELECT DEP_RATE FROM AM_GROUP_ASSET WHERE Group_id = ?",
 String.valueOf(groupId));
 
-boolean saved = saveGroupToAsset(con, String.valueOf(groupId), depRate);
+boolean saved = saveGroupToAsset(con,
+String.valueOf(groupId),
+depRate);
+
 boolean approvalEnabled = checkApprovalStatus(con, "3");
 
 if (!saved || !approvalEnabled) {
-con.rollback();
-return result;
+throw new RuntimeException("Save or approval check failed");
 }
-
+System.out.println("Save Group To Asset done");
 
 // =========================
 // 5. APPROVAL PROCESSING
@@ -3250,19 +3277,16 @@ singleApproval,
 branch,
 departCode,
 userName);
-
-// ✅ Everything successful
-con.commit();
-
-} catch (Exception e) {
-
-e.printStackTrace();
-throw e; // Let caller handle error
-
-}
+System.out.println("Approval Processing done");
 
 return result;
+
+} catch (Exception e) {
+throw e;
 }
+}
+
+
 	
 	private int validateBudget() throws Exception {
 
@@ -3313,9 +3337,9 @@ return result;
 	    final int BUDGETENFORCEDCF = 2;
 	    final int ASSETPURCHASEBD = 3;
 
-	    String[] budget = getBudgetInfo();
-	    double[] budgetValues = getBudgetValues();
-	    String quarter = getQuarter();
+	    String[] budget = getBudgetInfo(con);
+	    double[] budgetValues = getBudgetValues(con);
+	    String quarter = getQuarter(con);
 
 	    if ("N".equalsIgnoreCase(budget[3])) {
 	        return DONE;
@@ -3331,7 +3355,7 @@ return result;
 	            return BUDGETENFORCED;
 	        }
 
-	        updateBudget(quarter, budget);
+	        updateBudget(con,quarter, budget);
 	        return DONE;
 	    }
 
@@ -3341,7 +3365,7 @@ return result;
 	            return BUDGETENFORCEDCF;
 	        }
 
-	        updateBudget(quarter, budget);
+	        updateBudget(con, quarter, budget);
 	        return DONE;
 	    }
 
@@ -3389,58 +3413,64 @@ return result;
 	                groupId);
 	    }
 	}
+
 	
-	private void processApproval(Connection con,String groupId,
+	private List<String> processApproval(Connection con,
+            String groupId,
             String singleApproval,
             String branch,
             String departCode,
             String userName) throws Exception {
 
-changeGroupAssetStatus(groupId, "PENDING");
+// 1️⃣ Change status
+changeGroupAssetStatus(con, groupId, "PENDING");
 
-List<?> approvalList = ad.getApprovalsId(branch, departCode, userName);
+// 2️⃣ Load approval data
+List<?> approvalList = ad.getApprovalsId(con, branch, departCode, userName);
+String[] approvalData = ad.setApprovalDataGroup(con, Long.parseLong(groupId));
 
-String[] approvalData = ad.setApprovalDataGroup(Long.parseLong(groupId));
-
-if ("Y".equalsIgnoreCase(singleApproval)) {
+if (approvalData == null || approvalData.length == 0) {
+throw new IllegalStateException("Approval data not found for groupId: " + groupId);
+}
 
 int assetCode = Integer.parseInt(approvalData[0]);
 
-setGroupPendingTrans(approvalData, "3", assetCode);
+// 3️⃣ Single Approval Flow
+if ("Y".equalsIgnoreCase(singleApproval)) {
 
-ad.setPendingTransArchive(approvalData,
+setGroupPendingTrans(con, approvalData, "3", assetCode);
+
+ad.setPendingTransArchive(con,
+approvalData,
 "3",
 assetCode,
 assetCode);
 
-return;
+return Collections.emptyList(); // no mail list
 }
 
-// Multiple Approval
-//collect recipients
+// 4️⃣ Multiple Approval Flow
 List<String> mailList = new ArrayList<>();
+
 for (Object obj : approvalList) {
- legend.admin.objects.User usr = (legend.admin.objects.User) obj;
- setGroupPendingMultipleTrans(
-     approvalData,
-     "3",
-     Integer.parseInt(approvalData[0]),
-     usr.getUserId(),
-     groupId
- );
- mailList.add(usr.getEmail());
+
+legend.admin.objects.User usr =
+(legend.admin.objects.User) obj;
+
+setGroupPendingMultipleTrans(con,
+approvalData,
+"3",
+assetCode,
+usr.getUserId(),
+groupId);
+
+if (usr.getEmail() != null && !usr.getEmail().isEmpty()) {
+mailList.add(usr.getEmail());
+}
 }
 
-//commit transaction first
-con.commit();
-
-//then send emails
-for (String email : mailList) {
- comp.insertMailRecords(email,
-     "Asset Creation Approval",
-     "Asset with ID: " + groupId + " is waiting for your approval."
- );
-}
+// ⚠ NO COMMIT HERE
+return mailList;
 }
 	
     public long [] insertGroupAssetRecordUnclassified(String groupAssetByAsset,String singleApproval,String branch,String departCode,String userName) throws Exception, Throwable {
@@ -3624,7 +3654,35 @@ for (String email : mailList) {
 		
 		 try (Connection c = getConnection();
 		         PreparedStatement ps = c.prepareStatement(query)) {
-			 ps.setQueryTimeout(30);
+			 //ps.setQueryTimeout(30);
+		try(ResultSet rs = ps.executeQuery()){
+			while (rs.next()) {
+				result[0] = sdf.format(rs.getDate("financial_start_date"));
+				result[1] = rs.getString("financial_no_ofmonths");
+				result[2] = sdf.format(rs.getDate("financial_end_date"));
+				result[3] = rs.getString("enforce_acq_budget");
+				result[4] = rs.getString("quarterly_surplus_cf");
+			}
+			}
+		} catch (Exception e) {
+			String warning = "WARNING:Error Fetching Company Details in getBudgetInfo" + " ->"
+					+ e.getMessage();
+			System.out.println(warning);
+		} 
+
+		return result;
+	}
+	
+	public String[] getBudgetInfo(Connection c) {
+		String[] result = new String[5];
+
+		String query = " SELECT financial_start_date,financial_no_ofmonths"
+				+ ",financial_end_date,enforce_acq_budget,quarterly_surplus_cf"
+				+ " FROM am_gb_company";
+
+		
+		 try (PreparedStatement ps = c.prepareStatement(query)) {
+			// //ps.setQueryTimeout(30);
 		try(ResultSet rs = ps.executeQuery()){
 			while (rs.next()) {
 				result[0] = sdf.format(rs.getDate("financial_start_date"));
@@ -3657,7 +3715,45 @@ for (String email : mailList) {
 		
 		 try (Connection c = getConnection();
 		         PreparedStatement ps = c.prepareStatement(query)) {
-			 ps.setQueryTimeout(30);
+			 //ps.setQueryTimeout(30);
+		try(ResultSet rs = ps.executeQuery()){
+			while (rs.next()) {
+				result[0] = rs.getDouble("Q1_ALLOCATION");
+				result[1] = rs.getDouble("Q1_ACTUAL");
+				result[2] = rs.getDouble("Q2_ALLOCATION");
+				result[3] = rs.getDouble("Q2_ACTUAL");
+				result[4] = rs.getDouble("Q3_ALLOCATION");
+				result[5] = rs.getDouble("Q3_ACTUAL");
+				result[6] = rs.getDouble("Q4_ALLOCATION");
+				result[7] = rs.getDouble("Q4_ACTUAL");
+                result[8] = rs.getDouble("BALANCE_ALLOCATION");
+                result[9] = rs.getDouble("TOTAL_ACTUAL");				
+				// result[4] = rs.getDouble("quarterly_surplus_cf");
+			}
+			}
+		} catch (Exception e) {
+			String warning = "WARNING:Error Fetching Company Details IN getBudgetValues" + " ->"
+					+ e.getMessage();
+			System.out.println(warning);
+		} 
+//		System.out.println("=====>>>>result[3] in getBudgetValues: "+result[3]);
+		return result;
+	}
+	
+	public double[] getBudgetValues(Connection c) {
+
+
+
+		double[] result = new double[8];
+
+		String query = " SELECT [Q1_ALLOCATION],[Q1_ACTUAL],[Q2_ALLOCATION]"
+				+ ",[Q2_ACTUAL],[Q3_ALLOCATION],[Q3_ACTUAL],[Q4_ALLOCATION],[Q4_ACTUAL],BALANCE_ALLOCATION,TOTAL_ACTUAL"
+				+ " FROM [AM_ACQUISITION_BUDGET] WHERE [CATEGORY_CODE]='"
+				+ getCatCode() + "' AND " + " [BRANCH_ID]='" + branch_id + "'";
+		 System.out.println("=====>>>>query in getBudgetValues: "+query);
+		
+		 try (PreparedStatement ps = c.prepareStatement(query)) {
+			 //ps.setQueryTimeout(30);
 		try(ResultSet rs = ps.executeQuery()){
 			while (rs.next()) {
 				result[0] = rs.getDouble("Q1_ALLOCATION");
@@ -3686,6 +3782,42 @@ for (String email : mailList) {
 		//System.out.println("GETTING QUARTERS!!!!");
 		String quarter = "NQ";
 		String[] budg = getBudgetInfo();
+		//System.out.println("fsdate  " + budg[0]);
+		//System.out.println("pdate  " + date_of_purchase);
+		double q1 = (double) (Double.parseDouble(budg[1]) / 4);
+		int month = (int) dateFormat.getDayDifference(sdf
+				.format(date_of_purchase.getTime()), budg[0]) / 30;
+		//System.out.println("pdate  " + date_of_purchase);
+		//System.out.println("financial start and pdate diff months " + month);
+		boolean btw = dateFormat.isDateBetween(budg[0], budg[2], sdf
+				.format(date_of_purchase.getTime()));
+		//System.out.println("btw : " + btw);
+		if (btw) {
+			if ((double) month <= q1) {
+				quarter = "FIRST";
+				//System.out.println("1ST QUARTER");
+			} else if ((double) month > q1 && (double) month <= (q1 * 2.0)) {
+				quarter = "2ND";
+				//System.out.println("2ND QUARTER");
+			} else if ((double) month > (q1 * 2.0)
+					&& (double) month <= (q1 * 3.0)) {
+				quarter = "3RD";
+				//System.out.println("3RD QUARTER");
+			} else if (month > (q1 * 3.0)) {
+				quarter = "4TH";
+				//System.out.println("4TH QUARTER");
+			}
+
+		}
+		//System.out.println("the assets quarter is  " + quarter);
+		return quarter;
+
+	}
+	
+	public String getQuarter(Connection c) {
+		//System.out.println("GETTING QUARTERS!!!!");
+		String quarter = "NQ";
+		String[] budg = getBudgetInfo(c);
 		//System.out.println("fsdate  " + budg[0]);
 		//System.out.println("pdate  " + date_of_purchase);
 		double q1 = (double) (Double.parseDouble(budg[1]) / 4);
@@ -3926,6 +4058,57 @@ for (String email : mailList) {
 
 	    System.out.println("Budget updated successfully.");
 	}
+	
+	public void updateBudget(Connection conn, String quarter, String[] budgetInfo) {
+
+	    String columnName;
+
+	    switch (quarter.toUpperCase()) {
+	        case "FIRST":
+	            columnName = "Q1_ACTUAL";
+	            break;
+	        case "2ND":
+	            columnName = "Q2_ACTUAL";
+	            break;
+	        case "3RD":
+	            columnName = "Q3_ACTUAL";
+	            break;
+	        case "4TH":
+	            columnName = "Q4_ACTUAL";
+	            break;
+	        default:
+	            throw new IllegalArgumentException("Invalid quarter: " + quarter);
+	    }
+
+	    String updateSql =
+	        "UPDATE AM_ACQUISITION_BUDGET " +
+	        "SET " + columnName + " = (" + columnName + " + ?) " +
+	        "WHERE BRANCH_ID = ? " +
+	        "AND CATEGORY = ? " +
+	        "AND ACC_START_DATE = ? " +
+	        "AND ACC_END_DATE = ?";
+
+	    try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+
+	        double cost = Double.parseDouble(
+	                vatable_cost.replace(",", "")
+	        );
+
+	        ps.setDouble(1, cost);
+	        ps.setString(2, branch_id);
+	        ps.setString(3, getCatCode());
+	        ps.setDate(4, dateFormat.dateConvert(budgetInfo[0]));
+	        ps.setDate(5, dateFormat.dateConvert(budgetInfo[2]));
+
+	        ps.executeUpdate();
+
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
+
+	    System.out.println("Budget updated successfully.");
+	}
+
 
 	private boolean rinsertAssetRecord() throws Exception, Throwable {
 		
@@ -5495,6 +5678,68 @@ for (String email : mailList) {
 
                 return mtid;
             }
+            
+            
+            public String setGroupPendingTrans(Connection con, String[] a, String code, int assetCode) throws SQLException {
+            	 System.out.println(">>> setGroupPendingTrans: >>> ");
+                String mtid = null;
+
+                String insertQuery =
+                        "INSERT INTO am_asset_approval (" +
+                        "asset_id, user_id, super_id, amount, posting_date, description, " +
+                        "effective_date, branchCode, asset_status, tran_type, process_status, " +
+                        "tran_sent_time, transaction_id, batch_id, transaction_level, asset_code) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                String tranLevelQuery =
+                        "SELECT level, Transaction_type FROM approval_level_setup WHERE code = ?";
+
+                int transaction_level = 0;
+                String transaction_type = "";
+
+                // Get approval level
+                try (PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+
+                   // psLevel.setQueryTimeout(30);
+                    psLevel.setString(1, code);
+
+                    try (ResultSet rs = psLevel.executeQuery()) {
+                        if (rs.next()) {
+                            transaction_level = rs.getInt("level");
+                            transaction_type = rs.getString("Transaction_type");
+                        }
+                    }
+                }
+
+                // ✅ Generate ID using SAME connection
+                mtid = new ApplicationHelper().getGeneratedId(con, "am_asset_approval");
+                
+                SimpleDateFormat timer = new SimpleDateFormat("HH:mm:ss");
+
+                // Insert record
+                try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+
+                	 psInsert.setString(1,  (a[0] == null) ? "" : a[0]);
+                     psInsert.setString(2,  (a[1] == null) ? "" : a[1]);
+                     psInsert.setString(3,  (a[2] == null) ? "" : a[2]);
+                     psInsert.setDouble(4,  (a[3] == null) ? 0 : Double.parseDouble(a[3]));
+                     psInsert.setDate(5,    (a[4] == null) ? null : dateConvert(a[4]));
+                     psInsert.setString(6,  (a[5] == null) ? "" : a[5]);
+                     psInsert.setDate(7,    (a[6] == null) ? null : dateConvert(a[6]));
+                     psInsert.setString(8,  (a[7] == null) ? "" : a[7]);
+                     psInsert.setString(9,  (a[8] == null) ? "" : a[8]);
+                     psInsert.setString(10, transaction_type);
+                     psInsert.setString(11, (a[10] == null) ? "" : a[10]);
+                     psInsert.setString(12, timer.format(new java.util.Date()));
+                     psInsert.setString(13, mtid);
+                     psInsert.setString(14, mtid);
+                     psInsert.setInt(15,    transaction_level);
+                     psInsert.setInt(16,    assetCode);
+
+                    psInsert.executeUpdate();
+                }
+
+                return mtid;
+            }
 
         	public long [] insertGroupAssetTwoRecord() throws Exception, Throwable {
         		//System.out.println("INSIDE INSERT GROUP ASSET RECORD OF GROUP ASSET BEAN");
@@ -6949,7 +7194,7 @@ public java.util.ArrayList getAsstCategoryId(String groupId) {
          PreparedStatement ps = c.prepareStatement(query)) {
 
         ps.setString(1, groupId);
-       // ps.setQueryTimeout(30);
+       // //ps.setQueryTimeout(30);
         try (ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
@@ -6984,7 +7229,7 @@ public java.util.ArrayList getAsstCategoryId(Connection c, String groupId) {
          PreparedStatement ps = c.prepareStatement(query)) {
 
         ps.setString(1, groupId);
-       // ps.setQueryTimeout(30);
+       // //ps.setQueryTimeout(30);
         try (ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
@@ -7046,7 +7291,7 @@ public java.util.ArrayList getAsstIdGeneration(String GroupId)
 
 		 try (Connection c = getConnection();
 		         PreparedStatement ps = c.prepareStatement(query);) {
-			 ps.setQueryTimeout(30);
+			 //ps.setQueryTimeout(30);
 		try(ResultSet rs = ps.executeQuery()){
 			while (rs.next())
 			   {				
@@ -7087,7 +7332,7 @@ public java.util.ArrayList getAsstIdGeneration(Connection c, String GroupId)
 
 		 try (
 		         PreparedStatement ps = c.prepareStatement(query);) {
-		//	 ps.setQueryTimeout(30);
+		//	 //ps.setQueryTimeout(30);
 		try(ResultSet rs = ps.executeQuery()){
 			while (rs.next())
 			   {				
@@ -7212,7 +7457,7 @@ public void assetIdandCodeGen(String groupId, int Id, String assetId,int assetCo
 //       System.out.println("<<<<<<<<<<<<groupId in assetIdandCodeGen: "+groupId+"    <<<<Id: "+Id+"    <<<<assetId: "+assetId+"    <<<<assetCode: "+assetCode);
        try (Connection c = getConnection();
     	         PreparedStatement ps = c.prepareStatement(NOTIFY_QUERY)) {
-    	   ps.setQueryTimeout(30);
+    	   //ps.setQueryTimeout(30);
            ps.setString(1, assetId);
            ps.setInt(2, assetCode); 
            ps.setString(3, groupId);
@@ -7231,7 +7476,7 @@ public void assetIdandCodeGen(Connection con, String groupId, int Id, String ass
 //    System.out.println("<<<<<<<<<<<<groupId in assetIdandCodeGen: "+groupId+"    <<<<Id: "+Id+"    <<<<assetId: "+assetId+"    <<<<assetCode: "+assetCode);
     try (
  	         PreparedStatement ps = con.prepareStatement(NOTIFY_QUERY)) {
- 	   ps.setQueryTimeout(30);
+ 	   //ps.setQueryTimeout(30);
         ps.setString(1, assetId);
         ps.setInt(2, assetCode); 
         ps.setString(3, groupId);
@@ -7334,6 +7579,36 @@ public void changeGroupAssetStatus(String id, String status) {
     }
 }
 
+public void changeGroupAssetStatus(Connection con, String id, String status) throws SQLException {
+
+    String updateGroup =
+        "UPDATE am_group_asset SET asset_status = ? WHERE group_id = ?";
+
+    String updateArchive =
+        "UPDATE am_group_asset_archive SET asset_status = ? WHERE group_id = ?";
+
+    try (PreparedStatement ps1 = con.prepareStatement(updateGroup);
+         PreparedStatement ps2 = con.prepareStatement(updateArchive)) {
+
+        // --- Update main table
+        ps1.setString(1, status);
+        ps1.setString(2, id);
+        int rows1 = ps1.executeUpdate();
+
+        // --- Update archive table
+        ps2.setString(1, status);
+        ps2.setString(2, id);
+        int rows2 = ps2.executeUpdate();
+
+        if (rows1 == 0 && rows2 == 0) {
+            throw new SQLException("No rows updated for group_id: " + id);
+        }
+
+        changeGroupAssetMainStatus(con, id, status);
+
+    }
+}
+
 public void changeGroupAssetMainStatusOld(String id, String status2)
 {
 	// TODO Auto-generated method stub
@@ -7405,6 +7680,31 @@ public void changeGroupAssetMainStatus(String id, String status) {
     }
 }
 
+public void changeGroupAssetMainStatus(Connection con, String id, String status) throws SQLException {
+
+    String updateMain =
+        "UPDATE am_group_asset_main SET asset_status = ? WHERE group_id = ?";
+
+    String updateArchive =
+        "UPDATE am_group_asset_main_archive SET asset_status = ? WHERE group_id = ?";
+
+    try (PreparedStatement psMain = con.prepareStatement(updateMain);
+         PreparedStatement psArchive = con.prepareStatement(updateArchive)) {
+
+        psMain.setString(1, status);
+        psMain.setString(2, id);
+        int rowsMain = psMain.executeUpdate();
+
+        psArchive.setString(1, status);
+        psArchive.setString(2, id);
+        int rowsArchive = psArchive.executeUpdate();
+
+        if (rowsMain == 0 && rowsArchive == 0) {
+            throw new SQLException("No rows updated for group_id=" + id);
+        }
+    }
+}
+
 
 private boolean checkApprovalStatus(String code)
 {
@@ -7443,7 +7743,7 @@ private boolean checkApprovalStatus(Connection con, String code)
 	
     int level = 0;
     try(PreparedStatement ps = con.prepareStatement(approval_status_qry)){
-        ps.setQueryTimeout(30);
+        //ps.setQueryTimeout(30);
     	try( ResultSet rs = ps.executeQuery();){
     	if(rs.next())
     	{
@@ -7581,6 +7881,81 @@ public String setGroupPendingMultipleTrans(String[] a, String code, int assetCod
 
     return mtid;
 }
+
+
+
+public String setGroupPendingMultipleTrans(Connection con, String[] a, String code, int assetCode, String supervisorId, String mtid) throws SQLException {
+	 System.out.println("Starting to call setGroupPendingMultipleTrans:  ");
+    int transactionLevel = 0;
+    String transactionType = "";
+    
+    
+    String tranLevelQuery = "SELECT level, transaction_type FROM approval_level_setup WHERE code = ?";
+    System.out.println("tranLevelQuery " + tranLevelQuery );
+    
+    String insertQuery = "INSERT INTO am_asset_approval(" +
+            "asset_id, user_id, super_id, amount, posting_date, description, effective_date, branchCode, " +
+            "asset_status, tran_type, process_status, tran_sent_time, transaction_id, batch_id, transaction_level, asset_code) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    // --- Get transaction level and type
+    try (PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+       // psLevel.setQueryTimeout(30);
+        psLevel.setString(1, code);
+
+        try (ResultSet rs = psLevel.executeQuery()) {
+            if (rs.next()) {
+                transactionLevel = rs.getInt("level");
+                transactionType = rs.getString("transaction_type");
+            }
+        }
+    }
+
+    // --- Generate new transaction ID using SAME connection
+    mtid = new ApplicationHelper().getGeneratedId(con, "am_asset_approval");
+    
+    // --- Insert approval record
+    try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+       // psInsert.setQueryTimeout(30);
+        SimpleDateFormat timer = new SimpleDateFormat("HH:mm:ss");
+
+        psInsert.setString(1, (a[0] != null) ? a[0] : "");
+        psInsert.setString(2, (a[1] != null) ? a[1] : "");
+        psInsert.setString(3, supervisorId);
+        psInsert.setDouble(4, (a[3] != null) ? Double.parseDouble(a[3]) : 0);
+        psInsert.setDate(5, (a[4] != null) ? dateConvert(a[4]) : null);
+        psInsert.setString(6, (a[5] != null) ? a[5] : "");
+        psInsert.setDate(7, (a[6] != null) ? dateConvert(a[6]) : null);
+        psInsert.setString(8, (a[7] != null) ? a[7] : "");
+        psInsert.setString(9, (a[8] != null) ? a[8] : "");
+        psInsert.setString(10, transactionType);
+        psInsert.setString(11, (a[10] != null) ? a[10] : "");
+        psInsert.setString(12, timer.format(new java.util.Date()));
+        psInsert.setString(13, mtid);
+        psInsert.setString(14, mtid);
+        psInsert.setInt(15, transactionLevel);
+        psInsert.setInt(16, assetCode);
+
+        psInsert.executeUpdate();
+    }
+
+    return mtid;
+}
+
+// --- Helpers ---
+private String safe(String[] arr, int idx) {
+    return (arr != null && arr.length > idx && arr[idx] != null) ? arr[idx] : "";
+}
+
+private double parseDoubleSafe(String[] arr, int idx) {
+    try { return Double.parseDouble(safe(arr, idx)); } catch (Exception e) { return 0; }
+}
+
+private java.sql.Date dateSafe(String dateStr) {
+    if (dateStr == null || dateStr.isEmpty()) return null;
+    try { return dateConvert(dateStr); } catch (Exception e) { return null; }
+}
+
 public void deleteOtherSupervisors(String batchId, String supervisorId){
 	String query_del ="DELETE FROM am_asset_approval WHERE Asset_Id = '"+batchId+"' and super_id != '"+supervisorId+"' and Asset_Status = 'PENDING' ";
 //	System.out.println("query_r deleteOtherSupervisors>>>> "+query_del);

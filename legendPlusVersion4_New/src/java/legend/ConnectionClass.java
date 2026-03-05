@@ -39,6 +39,7 @@ public class ConnectionClass {
        ========================================================= */
 
     public Connection getConnection() throws SQLException {
+    	System.out.println("Connection opened by ConnectionClass: ");
         return lookupDataSource(LEGEND_DS).getConnection();
     }
 

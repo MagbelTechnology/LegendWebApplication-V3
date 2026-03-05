@@ -5,8 +5,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -27,7 +34,7 @@ import legend.admin.objects.User;
 import magma.ApprovalBean;
 import magma.AssetRecordsBean;
 import magma.GroupAssetBean;
-
+import magma.net.dao.MagmaDBConnection;
 import magma.util.Codes;
 
 import com.magbel.legend.bus.ApprovalRecords;
@@ -174,15 +181,16 @@ public class GroupAssetServlet extends HttpServlet {
             EmailSmsServiceBus emailService,
             CompanyHandler companyHandler
     ) throws Throwable {
-
+    	MagmaDBConnection dbConn = new MagmaDBConnection();
+    	 try (Connection c = dbConn.getConnection("legendPlus")) {
         int numOfTransactionLevel =
-                assetRecords.getNumOfTransactionLevel("3");
+                assetRecords.getNumOfTransactionLevel(c,"3");
 
         GroupAssetBean groupAsset =
                 buildGroupAssetBean(request, params, userInfo);
 
         long[] status =
-                groupAsset.insertGroupAssetRecord(
+                groupAsset.insertGroupAssetRecord(c,
                         groupAssetByAsset,
                         singleApproval,
                         userInfo.branch,
@@ -215,6 +223,7 @@ public class GroupAssetServlet extends HttpServlet {
 
             handleSaveFailure(out);
         }
+    	 }
     }
 
     /* =========================================================
@@ -449,6 +458,7 @@ public class GroupAssetServlet extends HttpServlet {
 
         params.saveBtn = request.getParameter("saveBtn");
         params.groupId = request.getParameter("gid");
+        System.out.println("groupId in servlet: " + params.groupId);
         params.lpo = request.getParameter("lpo");
         params.invoiceNum = request.getParameter("invoiceNum");
         params.suppliedBy = request.getParameter("sb");
@@ -466,8 +476,10 @@ public class GroupAssetServlet extends HttpServlet {
         
         // Asset details
         params.assetId = request.getParameter("asset_id");
+        
         params.dateOfPurchase = request.getParameter("date_of_purchase");
         params.subCategoryId = request.getParameter("sub_category_id");
+        System.out.println("subCategoryId in servlet: " + params.subCategoryId);
         params.sbuCode = request.getParameter("sbu_code");
         params.costPrice = request.getParameter("cost_price");
         params.vatAmount = request.getParameter("vat_amount");
@@ -738,4 +750,6 @@ public class GroupAssetServlet extends HttpServlet {
         String fullyPaid;
         String registrationNo;
     }
+    
+   
 }

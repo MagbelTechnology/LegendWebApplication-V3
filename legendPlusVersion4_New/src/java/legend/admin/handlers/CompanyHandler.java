@@ -15673,6 +15673,27 @@ try(Connection conn = getConnection();
 
 }//updateAssetStatus()
 
+public void insertMailRecords(Connection conn, String createdby,String subject, String msgText1){
+	System.out.println("createdby: " + createdby);
+String query_r ="INSERT INTO MAILS_TO_SEND (MAIL_ADDRESS,MAIL_HEADER,MAIL_BODY) VALUES(?,?,?) ";
+		
+
+try(PreparedStatement ps = conn.prepareStatement(query_r)) {
+//    con = dbConnection.getConnection("legendPlus");
+
+ //   System.out.println("insert Mail records beans================");
+            ps.setString(1,createdby);
+            ps.setString(2,subject);
+            ps.setString(3,msgText1);
+            ps.execute();
+//           dbConnection.closeConnection(con, ps);
+        } catch (Exception ex) {
+
+            System.out.println("CompanyHand: InsertMails()>>>>>" + ex);
+        } 
+
+}//updateAssetStatus()
+
 public boolean updateSlaJobRecordsOld( String id,String nextalertDate)
 {
 	Connection con = null;

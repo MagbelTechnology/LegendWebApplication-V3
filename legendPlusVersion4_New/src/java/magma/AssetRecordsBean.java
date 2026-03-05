@@ -6744,6 +6744,27 @@ public int getNumOfTransactionLevel(String levelCode) {
     return result;
 }
 
+public int getNumOfTransactionLevel(Connection con, String levelCode) {
+    int result = 100; 
+    String query = "SELECT level FROM approval_level_setup WHERE code = ?";
+
+    try (PreparedStatement ps = con.prepareStatement(query)) {
+
+        ps.setString(1, levelCode);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                result = rs.getInt(1);
+            }
+        }
+
+    } catch (SQLException ex) {
+        System.out.println("AssetRecordsBean: getNumOfTransactionLevel WARN: Error fetching level -> " + ex.getMessage());
+        ex.printStackTrace();
+    }
+
+    return result;
+}
 
 
 public boolean updateNewAssetStatusOld(String assetId) throws Exception {
@@ -9344,6 +9365,53 @@ public String[] setApprovalDataGroup(long id) {
 }
 
 
+public String[] setApprovalDataGroup(Connection con, long id) {
+
+    String[] result = new String[12];
+
+    String query = "SELECT group_id, user_ID, supervisor, Cost_Price, Posting_Date, " +
+                   "       description, effective_date, BRANCH_CODE, Asset_Status " +
+                   "FROM am_group_asset_main " +
+                   "WHERE group_id = ?";
+
+    try (PreparedStatement ps = con.prepareStatement(query)) {
+    	ps.setQueryTimeout(30);
+        ps.setLong(1, id);
+
+        try (ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+
+                result[0] = String.valueOf(id);
+                result[1] = rs.getString("user_ID");
+                result[2] = rs.getString("supervisor");
+                result[3] = rs.getString("Cost_Price");
+
+                result[4] = rs.getDate("Posting_Date") != null
+                        ? dbConnection.formatDate(rs.getDate("Posting_Date"))
+                        : "";
+
+                result[5] = rs.getString("description");
+
+                result[6] = rs.getDate("effective_date") != null
+                        ? dbConnection.formatDate(rs.getDate("effective_date"))
+                        : "";
+
+                result[7] = rs.getString("BRANCH_CODE");
+                result[8] = rs.getString("Asset_Status");
+            }
+        }
+
+    } catch (Exception ex) {
+        System.out.println("AssetRecordsBean: setApprovalDataGroup() WARN -> " + ex.getMessage());
+        ex.printStackTrace();
+    }
+
+    result[9] = "Group Asset Creation";
+    result[10] = "P";
+
+    return result;
+}
 
 
 public boolean updateNewApprovalAssetStatusOld(String groupID, int supervise) throws Exception {
@@ -12679,6 +12747,56 @@ return 	assetAcqusitionSuspense;
 	    }
 	}
 
+  
+  public void setPendingTransArchive(Connection con, String[] a, String code, long mtid, int assetCode) {
+	  System.out.println(">>> setPendingTransArchive: >>>>>>");
+	    int transactionLevel = 0;
+
+	    String tranLevelQuery = "SELECT level FROM approval_level_setup WHERE code = ?";
+	    String insertQuery = "INSERT INTO am_asset_approval_archive(" +
+	            "asset_id, user_id, super_id, amount, posting_date, description," +
+	            "effective_date, branchCode, asset_status, tran_type, process_status," +
+	            "tran_sent_time, transaction_id, batch_id, transaction_level, asset_code) " +
+	            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	    try (PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+	    	 //psLevel.setQueryTimeout(30);
+	        psLevel.setString(1, code);
+	        try (ResultSet rs = psLevel.executeQuery()) {
+	            if (rs.next()) {
+	                transactionLevel = rs.getInt(1);
+	            }
+	        }
+
+	        try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+	            java.util.Date now = new java.util.Date();
+	            SimpleDateFormat timer = new SimpleDateFormat("kk:mm:ss");
+	            
+	            psInsert.setString(1, safeGet(a, 0));
+	            psInsert.setString(2, safeGet(a, 1));
+	            psInsert.setString(3, safeGet(a, 2));
+	            psInsert.setDouble(4, safeParseDouble(a, 3));
+	            psInsert.setTimestamp(5, dbConnection.getDateTime(now));
+	            psInsert.setString(6, safeGet(a, 5));
+	            psInsert.setDate(7, safeParseDate(a, 6));
+	            psInsert.setString(8, safeGet(a, 7));
+	            psInsert.setString(9, safeGet(a, 8));
+	            psInsert.setString(10, safeGet(a, 9));
+	            psInsert.setString(11, safeGet(a, 10));
+	            psInsert.setString(12, timer.format(new java.util.Date()));
+	            psInsert.setLong(13, mtid);
+	            psInsert.setString(14, String.valueOf(mtid)); // batch_id
+	            psInsert.setInt(15, transactionLevel);
+	            psInsert.setInt(16, assetCode);
+
+	            psInsert.executeUpdate();
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println(">>>AssetRecordBeans:setPendingTransArchive() ERROR>>>>>>" + ex);
+	        ex.printStackTrace();
+	    }
+	}
 	
   
 //  public void setPendingTransRepost(String[] a, String code,long mtid,int assetCode){
@@ -18879,6 +18997,42 @@ public java.util.ArrayList getApprovalsId(String branchId, String deptCode, Stri
 	
 	try(Connection con = dbConnection.getConnection("legendPlus");
 	        PreparedStatement ps  = con.prepareStatement(query)){
+		 ps.setQueryTimeout(30);
+		 try(ResultSet rs = ps.executeQuery()){
+			while (rs.next())
+			   {				
+				String strUserId = rs.getString("USER_ID");
+				String strUserName = rs.getString("User_Name");
+				String strfullName= rs.getString("full_name");
+				String stremail= rs.getString("email");
+//				System.out.println("$$$$$$$$$$$$$$$$$$$$$$  strUserId: "+strUserId);
+				User user = new User();
+				user.setUserId(strUserId);
+				user.setUserName(strUserName);
+				user.setEmail(stremail);
+				user.setUserFullName(strfullName);
+				_list.add(user);
+			   }
+		 }
+	 }   
+				 catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+					
+	return _list;
+} 
+
+
+public java.util.ArrayList getApprovalsId(Connection con, String branchId, String deptCode, String userName)
+{ 
+	java.util.ArrayList _list = new java.util.ArrayList();
+	String finacleTransId= null;
+    String query = " select USER_ID,User_Name,email,full_name from am_gb_User where is_supervisor = 'Y' and User_Status = 'ACTIVE' and Branch = '"+branchId+"' and User_Name != '"+userName+"' "
+    		+ "and dept_code = '"+deptCode+"' order by branch, dept_code ";
+//    System.out.println("$$$$$$$$$$$$$$$$$$$$$$  query in getApprovalsId: "+query);
+	
+	try(PreparedStatement ps  = con.prepareStatement(query)){
 		 ps.setQueryTimeout(30);
 		 try(ResultSet rs = ps.executeQuery()){
 			while (rs.next())
