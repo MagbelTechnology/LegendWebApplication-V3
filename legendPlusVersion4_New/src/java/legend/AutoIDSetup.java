@@ -4,6 +4,7 @@ package legend;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.magbel.legend.bus.ApprovalRecords;
@@ -2534,7 +2535,7 @@ String query3 = "update am_ad_sequ_identity set sequ_cr = " + currValue;
 
 
 
-public String getIdentity(String bra, String dep, String sec, String cat) {
+public String getIdentity2(String bra, String dep, String sec, String cat) {
     System.out.println("====cat :" + cat);
     MagmaDBConnection dbConn = new MagmaDBConnection();
     String delim = approve.getCodeName("SELECT DELIMITER FROM am_ad_auto_identity ");
@@ -2606,13 +2607,69 @@ public String getIdentity(String bra, String dep, String sec, String cat) {
     return new_assetId;
 }
 
+public String getIdentity(String bra, String dep, String sec, String cat) {
+    String newAssetId = "";
+    MagmaDBConnection dbConn = new MagmaDBConnection();
+
+    try (Connection cnn = dbConn.getConnection("legendPlus")) {
+
+        // Fetch delimiter and current cart_cr
+        String delim = approve.getCodeName("SELECT DELIMITER FROM am_ad_auto_identity");
+        String curr = approve.getCodeName("SELECT cart_cr FROM am_ad_cart_identity WHERE cart_id = ?", cat);
+
+        // Fetch acronyms in a single query with JOINs (example, adjust column names)
+        String query = "SELECT " +
+                "(SELECT acronym FROM am_gb_company) AS comp, " +
+                "(SELECT branch_acronym FROM am_ad_branch WHERE branch_id = ?) AS branch, " +
+                "(SELECT category_acronym FROM am_ad_category WHERE category_id = ?) AS category";
+
+        try (PreparedStatement ps = cnn.prepareStatement(query)) {
+            ps.setString(1, bra);
+            ps.setString(2, cat);
+            ps.setQueryTimeout(30);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String comp = rs.getString("comp");
+                    String branch = rs.getString("branch");
+                    String category = rs.getString("category");
+
+                    int currValue = Integer.parseInt(curr) + 1;
+                    newAssetId = comp + delim + branch + delim + category + delim + currValue;
+
+                    // Update cart_cr
+                    try (PreparedStatement ps2 = cnn.prepareStatement(
+                            "UPDATE am_ad_cart_identity SET cart_cr = ? WHERE cart_id = ?")) {
+                        ps2.setInt(1, currValue);
+                        ps2.setString(2, cat);
+                        ps2.executeUpdate();
+                    }
+
+                    // Update sequ_cr
+                    try (PreparedStatement ps3 = cnn.prepareStatement(
+                            "UPDATE am_ad_sequ_identity SET sequ_cr = ?")) {
+                        ps3.setInt(1, currValue);
+                        ps3.executeUpdate();
+                    }
+                }
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return newAssetId;
+}
+
+
+
 
 public String getIdentity(Connection con,String bra, String dep, String sec, String cat) {
-    System.out.println("====cat :" + cat);
+   // System.out.println("====cat :" + cat);
   
     String delim = approve.getCodeName(con,"SELECT DELIMITER FROM am_ad_auto_identity ");
     String curr = approve.getCodeName(con,"select cart_cr from am_ad_cart_identity where cart_id = " + cat);
-    System.out.println("====curr :" + curr);
+   // System.out.println("====curr :" + curr);
 
     String query =
            "select acronym,'' AS group_acronym,'' AS region_acronym,'' AS branch_acronym,'' AS dept_acronym,'' AS section_acronym,'' AS category_acronym,0 AS cart_cr,0 AS sequ_cr from am_gb_company  " +
@@ -2679,6 +2736,118 @@ public String getIdentity(Connection con,String bra, String dep, String sec, Str
     return new_assetId;
 }
 
+//public String getIdentity(Connection con, String branchId, String deptId, String sectionId, String categoryId) throws SQLException {
+//    ApprovalRecords approve = new ApprovalRecords();
+//
+//    // 1️⃣ Get delimiter
+//    String delim = approve.getCodeName(con, "SELECT DELIMITER FROM am_ad_auto_identity");
+//
+//    // 2️⃣ Get current cart_cr
+//    int cartCr = Integer.parseInt(
+//        approve.getCodeName(con, "SELECT cart_cr FROM am_ad_cart_identity WHERE cart_id = '"+categoryId+"'")
+//    );
+//
+//    // 3️⃣ Fetch acronyms individually (single-row queries are faster)
+//    String companyAcr = approve.getCodeName(con, "SELECT acronym FROM am_gb_company");
+//    String branchAcr = approve.getCodeName(con, "SELECT branch_acronym FROM am_ad_branch WHERE branch_id = '"+branchId+"'");
+//    String categoryAcr = approve.getCodeName(con, "SELECT category_acronym FROM am_ad_category WHERE category_id = '"+categoryId+"'");
+//
+//    // 4️⃣ Increment cart_cr
+//    int newCartCr = cartCr + 1;
+//
+//    // 5️⃣ Build new asset ID
+//    String newAssetId = String.join(delim, companyAcr, branchAcr, categoryAcr, String.valueOf(newCartCr));
+//
+//    // 6️⃣ Update cart_cr and sequ_cr in one shot
+//    try (PreparedStatement psCart = con.prepareStatement(
+//            "UPDATE am_ad_cart_identity SET cart_cr = ? WHERE cart_id = ?")) {
+//        psCart.setInt(1, newCartCr);
+//        psCart.setString(2, categoryId);
+//        psCart.executeUpdate();
+//    }
+//
+//    try (PreparedStatement psSeq = con.prepareStatement(
+//            "UPDATE am_ad_sequ_identity SET sequ_cr = ?")) {
+//        psSeq.setInt(1, newCartCr);
+//        psSeq.executeUpdate();
+//    }
+//
+//    return newAssetId;
+//}
+
+
+
+public List<String> generateAssetIds(
+        Connection con,
+        String branchId,
+        String deptId,
+        String sectionId,
+        String categoryId,
+        int count) throws SQLException {
+
+    List<String> assetIds = new ArrayList<>();
+
+    // 1️⃣ Get delimiter
+    String delim = approve.getCodeName(con, "SELECT DELIMITER FROM am_ad_auto_identity");
+
+    // 2️⃣ Fetch acronyms (company, branch, category) once
+    String companyAcr = approve.getCodeName(con, "SELECT acronym FROM am_gb_company");
+    String branchAcr = approve.getCodeName(con, "SELECT branch_acronym FROM am_ad_branch WHERE branch_id = ?");
+    String categoryAcr = approve.getCodeName(con, "SELECT category_acronym FROM am_ad_category WHERE category_id = ?");
+
+    try (PreparedStatement ps = con.prepareStatement(
+            "SELECT branch_acronym FROM am_ad_branch WHERE branch_id = ?")) {
+        ps.setString(1, branchId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) branchAcr = rs.getString(1);
+        }
+    }
+
+    try (PreparedStatement ps = con.prepareStatement(
+            "SELECT category_acronym FROM am_ad_category WHERE category_id = ?")) {
+        ps.setString(1, categoryId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) categoryAcr = rs.getString(1);
+        }
+    }
+
+    // 3️⃣ Get current cart_cr
+    int currValue = 0;
+    try (PreparedStatement ps = con.prepareStatement(
+            "SELECT cart_cr FROM am_ad_cart_identity WHERE cart_id = ?")) {
+        ps.setString(1, categoryId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) currValue = rs.getInt(1);
+        }
+    }
+
+    // 4️⃣ Generate all asset IDs in memory
+    for (int i = 1; i <= count; i++) {
+        currValue++;
+        String assetId = String.join(delim,
+                companyAcr,
+                branchAcr,
+                categoryAcr,
+                String.valueOf(currValue));
+        assetIds.add(assetId);
+    }
+
+    // 5️⃣ Update cart_cr and sequ_cr once
+    try (PreparedStatement ps = con.prepareStatement(
+            "UPDATE am_ad_cart_identity SET cart_cr = ? WHERE cart_id = ?")) {
+        ps.setInt(1, currValue);
+        ps.setString(2, categoryId);
+        ps.executeUpdate();
+    }
+
+    try (PreparedStatement ps = con.prepareStatement(
+            "UPDATE am_ad_sequ_identity SET sequ_cr = ?")) {
+        ps.setInt(1, currValue);
+        ps.executeUpdate();
+    }
+
+    return assetIds;
+}
 
 public String getBidIdentityOld(String bra, String dep, String sec, String cat)
 {

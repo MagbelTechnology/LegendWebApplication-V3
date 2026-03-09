@@ -144,6 +144,147 @@ public class GroupAssetServlet extends HttpServlet {
         PostingParameters params =
                 extractPostingParameters(request);
 
+//        if (params.saveBtn != null) {
+//
+//            handleSaveAction(
+//                    request,
+//                    out,
+//                    params,
+//                    userInfo,
+//                    groupAssetByAsset,
+//                    singleApproval,
+//                    vatRequired,
+//                    assetRecords,
+//                    busApprovalRecords,
+//                    htmlUtil,
+//                    emailService,
+//                    companyHandler
+//            );
+//        }
+//    }
+//
+//    /* =========================================================
+//       SAVE ACTION
+//       ========================================================= */
+//
+//    private void handleSaveAction(
+//            HttpServletRequest request,
+//            PrintWriter out,
+//            PostingParameters params,
+//            UserInfo userInfo,
+//            String groupAssetByAsset,
+//            String singleApproval,
+//            String vatRequired,
+//            AssetRecordsBean assetRecords,
+//            ApprovalRecords busApprovalRecords,
+//            HtmlUtility htmlUtil,
+//            EmailSmsServiceBus emailService,
+//            CompanyHandler companyHandler
+//    ) throws Throwable {
+//    	  MagmaDBConnection dbConn = new MagmaDBConnection();
+//
+//    	    try (Connection c = dbConn.getConnection("legendPlus")) {
+//
+//    	        c.setAutoCommit(false);   // important
+//
+//    	        int numOfTransactionLevel =
+//    	                assetRecords.getNumOfTransactionLevel(c,"3");
+//
+//    	        GroupAssetBean groupAsset =
+//    	                buildGroupAssetBean(request, params, userInfo);
+//
+//    	        long[] status =
+//    	                groupAsset.insertGroupAssetRecord(
+//    	                        c,
+//    	                        groupAssetByAsset,
+//    	                        singleApproval,
+//    	                        userInfo.branch,
+//    	                        userInfo.deptCode,
+//    	                        userInfo.userName);
+//
+//    	        System.out.println("status[0]: " + status[0]);
+//    	        
+//    	        if (status[0] == 0) {
+//
+//    	            handleSuccessfulSave(c,
+//    	                    request,
+//    	                    out,
+//    	                    params,
+//    	                    userInfo,
+//    	                    groupAsset,
+//    	                    status,
+//    	                    numOfTransactionLevel,
+//    	                    groupAssetByAsset,
+//    	                    vatRequired,
+//    	                    busApprovalRecords,
+//    	                    htmlUtil,
+//    	                    emailService,
+//    	                    companyHandler
+//    	            );
+//
+//    	        } else if (status[0] == 1 || status[0] == 2) {
+//
+//    	            handleBudgetExceeded(out, status);
+//
+//    	        } else {
+//
+//    	            handleSaveFailure(out);
+//    	        }
+//
+//    	        c.commit();  // commit once
+//
+//    	    } 
+//    }
+//
+//    /* =========================================================
+//       SUCCESS HANDLER
+//       ========================================================= */
+//
+//    private void handleSuccessfulSave(Connection con,
+//            HttpServletRequest request,
+//            PrintWriter out,
+//            PostingParameters params,
+//            UserInfo userInfo,
+//            GroupAssetBean groupAsset,
+//            long[] status,
+//            int numOfTransactionLevel,
+//            String groupAssetByAsset,
+//            String vatRequired,
+//            ApprovalRecords busApprovalRecords,
+//            HtmlUtility htmlUtil,
+//            EmailSmsServiceBus emailService,
+//            CompanyHandler companyHandler
+//    ) throws Exception {
+//
+//        handleFileUpload(request, status);
+//
+//        String assetId = groupAsset.getAsset_id();
+//        System.out.println("assetId: " + assetId);
+//        long groupId = groupAsset.getGroupID(assetId);
+//        System.out.println("groupId: " + groupId);
+//        System.out.println("groupId 2: " + groupAsset.getGroup_id());
+//        String groupIdStr = Long.toString(groupId);
+//
+//        String invNumber =
+//                params.suppliedBy + "-" + params.invoiceNum;
+//
+//        htmlUtil.insToAm_Invoice_No(con,
+//                groupIdStr,
+//                params.lpo,
+//                invNumber,
+//                "Group Asset Creation"
+//        );
+//
+//        sendCreationEmail(assetId, emailService, companyHandler);
+//
+//        showSuccessAlert(
+//                out,
+//                "Group Asset creation successful",
+//                DESTINATION_PAGE + "&img=n&id=" + groupIdStr
+//        );
+//    }
+
+        
         if (params.saveBtn != null) {
 
             handleSaveAction(
@@ -199,7 +340,7 @@ public class GroupAssetServlet extends HttpServlet {
 
         if (status[0] == 0) {
 
-            handleSuccessfulSave(
+            handleSuccessfulSave(c,
                     request,
                     out,
                     params,
@@ -230,7 +371,7 @@ public class GroupAssetServlet extends HttpServlet {
        SUCCESS HANDLER
        ========================================================= */
 
-    private void handleSuccessfulSave(
+    private void handleSuccessfulSave(Connection con,
             HttpServletRequest request,
             PrintWriter out,
             PostingParameters params,
@@ -249,7 +390,10 @@ public class GroupAssetServlet extends HttpServlet {
         handleFileUpload(request, status);
 
         String assetId = groupAsset.getAsset_id();
-        long groupId = groupAsset.getGroupID(assetId);
+    
+        
+        long groupId = groupAsset.getGroupID(con, assetId);
+        
         String groupIdStr = Long.toString(groupId);
 
         String invNumber =
@@ -270,7 +414,8 @@ public class GroupAssetServlet extends HttpServlet {
                 DESTINATION_PAGE + "&img=n&id=" + groupIdStr
         );
     }
-
+    
+    
     /* =========================================================
        FILE UPLOAD
        ========================================================= */

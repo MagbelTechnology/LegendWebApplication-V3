@@ -303,6 +303,31 @@ public class HtmlUtility {
             System.err.println("ERROR insToAm_Invoice_No(): " + e.getMessage());
         }
     }
+    
+    public void insToAm_Invoice_No(Connection con, String assetID, String lpo,
+            String invoiceNo, String transType) {
+
+String sql = "INSERT INTO Am_Invoice_no " +
+"(asset_id,lpo,invoice_no,trans_type,create_date) " +
+"VALUES (?,?,?,?,?)";
+
+try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+//ps.setQueryTimeout(QUERY_TIMEOUT_SECONDS);
+
+ps.setString(1, assetID);
+ps.setString(2, lpo);
+ps.setString(3, invoiceNo);
+ps.setString(4, transType);
+ps.setString(5, String.valueOf(df.dateConvert(new Date())));
+
+ps.executeUpdate();
+
+} catch (Exception e) {
+System.err.println("ERROR insToAm_Invoice_No(): " + e.getMessage());
+}
+}
+
 
     public void insGrpToAm_Invoice_No(String assetID, String lpo,
                                       String invoiceNo, String transType,
@@ -554,6 +579,314 @@ System.err.println("ERROR insGrpToAm_Invoice_No(): " + e.getMessage());
 
         return html.toString();
     }
+
+    
+    public String getResourcesCheckAndDropText(String selectChk, String query) {
+
+        if (selectChk == null || "null".equals(selectChk)) {
+            selectChk = "0";
+        }
+
+        StringBuilder html = new StringBuilder();
+        Report rep = new Report();
+
+        try (Connection con = new DataConnect("legendPlus").getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                String id = rs.getString(1);
+                String col = rs.getString(2);
+                String operand = rs.getString(3);
+
+                String opr = "op" + id;
+
+                String dropDown = buildOperandDropdown(opr, operand);
+
+                String inputField = buildInputField(rep, id);
+
+                html.append("<tr>")
+                    .append("<td><input type='checkbox' name='")
+                    .append(selectChk)
+                    .append("' value='")
+                    .append(id)
+                    .append("' checked='checked'></td>")
+
+                    .append("<td>")
+                    .append(col)
+                    .append("</td>")
+
+                    .append("<td>")
+                    .append(dropDown)
+                    .append("</td>")
+
+                    .append("<td>")
+                    .append(inputField)
+                    .append("</td>")
+
+                    .append("</tr>");
+            }
+
+        } catch (Exception e) {
+            System.out.println("WARN getResourcesCheckAndDrop error: HtmlUtil -> " + e.getMessage());
+        }
+
+        return html.toString();
+    }
+    
+    private String buildOperandDropdown(String name, String operand) {
+
+        StringBuilder html = new StringBuilder();
+        html.append("<select name='").append(name).append("'>");
+
+        if ("C".equalsIgnoreCase(operand)) {
+
+            html.append("<option value='='>=</option>")
+                .append("<option value='<>'><></option>")
+                .append("<option value='IN'>IN</option>");
+
+        } else if ("N".equalsIgnoreCase(operand)) {
+
+            html.append("<option value='='>=</option>")
+                .append("<option value='>'>></option>")
+                .append("<option value='<'><</option>");
+
+        } else if ("D".equalsIgnoreCase(operand)) {
+
+            html.append("<option value='BETWEEN'>BETWEEN</option>");
+        }
+
+        html.append("</select>");
+
+        return html.toString();
+    }
+    
+    private String buildInputField(Report rep, String id) {
+
+        String temp = "temp";
+        String fromDate = "fromDate";
+        String toDate = "toDate";
+
+        if (rep.isNumeric(id, "N")) {
+
+            return "<td><input type='text' name='" + temp + id + "' id='" + temp + id +
+                   "' onBlur='getFormatedAmount(this);checkValidNumber(this.name)'></td>";
+
+        } else if (rep.isNumeric(id, "D")) {
+
+            return "<td>From <input name='" + fromDate + id + "' type='text'> " +
+                   "To <input name='" + toDate + id + "' type='text'> " +
+                   "<font color='red'>Format: YYYY-MM-DD</font></td>";
+        }
+
+        return "<td><input type='text' name='" + temp + id + "'></td>";
+    }
+    
+    public String getResourcesCheckAndDropText2(String selectChk, String query) {
+
+        if (selectChk == null || "null".equals(selectChk)) {
+            selectChk = "0";
+        }
+
+        StringBuilder html = new StringBuilder();
+        Report rep = new Report();
+
+        try (Connection con = new DataConnect("legendPlus").getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                String id = rs.getString(1);
+                String col = rs.getString(2);
+                String operand = rs.getString(3);
+                String opr = "op" + id;
+
+                String drop = buildOperandDropDown(opr, operand);
+
+                String htmlInput;
+
+                if (rep.isNumeric(id, "N")) {
+
+                    htmlInput =
+                            "<td><input type='text' name='temp" + id + "' id='temp" + id +
+                            "' onBlur='getFormatedAmount(this);checkValidNumber(this.name)'></td>";
+
+                }
+                else if (rep.isNumeric(id, "D")) {
+
+                    htmlInput =
+                            "<td><input name='temp" + id + "' type='hidden'>" +
+                            "<input name='fromDate" + id + "' type='text'> AND " +
+                            "<input name='toDate" + id + "' type='text'></td>";
+
+                }
+                else {
+
+                    String dropQuery =
+                            "SELECT " + col + "," +
+                            getColDesc(col) +
+                            " FROM " + getTaName(col);
+
+                    htmlInput =
+                            "<td><select name='temp" + id + "'>" +
+                            getResources("selected", dropQuery) +
+                            "</select></td>";
+                }
+
+                html.append("<tr>")
+                    .append("<td><input type='checkbox' name='")
+                    .append(selectChk)
+                    .append("' value='")
+                    .append(id)
+                    .append("'></td>")
+
+                    .append("<td>")
+                    .append(col)
+                    .append("</td>")
+
+                    .append("<td>")
+                    .append(drop)
+                    .append("</td>")
+
+                    .append(htmlInput)
+                    .append("</tr>");
+            }
+
+        } catch (Exception e) {
+            System.out.println("WARN getResourcesCheckAndDrop error: HtmlUtil -> " + e.getMessage());
+        }
+
+        return html.toString();
+    }
+    
+    private String buildOperandDropDown(String name, String operand) {
+
+        StringBuilder html = new StringBuilder();
+
+        html.append("<select name='").append(name).append("'>");
+
+        if ("C".equalsIgnoreCase(operand)) {
+
+            html.append("<option value='='>=</option>")
+                .append("<option value='<>'><></option>");
+
+        }
+        else if ("N".equalsIgnoreCase(operand)) {
+
+            html.append("<option value='='>=</option>")
+                .append("<option value='>'>></option>")
+                .append("<option value='<'><</option>");
+        }
+        else if ("D".equalsIgnoreCase(operand)) {
+
+            html.append("<option value='BETWEEN'>BETWEEN</option>");
+        }
+
+        html.append("</select>");
+
+        return html.toString();
+    }
+    
+
+    public String getTaName(String col){
+
+  
+String desc = "";
+String filter = "To";
+
+ String FINDER_QUERY = "SELECT TABLE_NAMES from COL_FILTER WHERE COLUMN_NAME =? AND PEG=?";
+
+ try (Connection c = (new DataConnect("legendPlus")).getConnection();
+         PreparedStatement ps = c.prepareStatement(FINDER_QUERY)) {
+  
+      ps.setString(1, col);
+       ps.setString(2, filter);
+   try(ResultSet rs = ps.executeQuery()){
+
+while (rs.next()) {
+
+          desc = rs.getString(1);
+}
+   }
+
+  } catch (Exception ex) {
+      System.out.println("WARNING: cannot fetch OPERAND from COL_LOOK_UP->" +
+              ex.getMessage());
+  } 
+
+
+  return desc;
+}
+
+public String getColDesc(String col){
+
+String desc = "";
+String filter = "To";
+
+ String FINDER_QUERY = "SELECT COLUMN_DESC from COL_FILTER WHERE COLUMN_NAME =? AND PEG=?";
+
+ try (Connection c = (new DataConnect("legendPlus")).getConnection();
+         PreparedStatement ps = c.prepareStatement(FINDER_QUERY)) {
+      ps.setString(1, col);
+       ps.setString(2, filter);
+       try(ResultSet rs = ps.executeQuery()){
+
+while (rs.next()) {
+
+          desc = rs.getString(1);
+}
+       }
+
+
+  } catch (Exception ex) {
+      System.out.println("WARNING: cannot fetch OPERAND from COL_LOOK_UP->" +
+              ex.getMessage());
+  } 
+
+
+  return desc;
+}
+
+
+public String getResourcesCheck(String select, String query) {
+
+    if (select == null || "null".equals(select)) {
+        select = "0";
+    }
+
+    StringBuilder html = new StringBuilder();
+
+    try (Connection c = new DataConnect("legendPlus").getConnection();
+         PreparedStatement ps = c.prepareStatement(query);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+
+            String id = rs.getString(1);
+            String desc = rs.getString(2);
+
+            html.append("<tr>")
+                .append("<td><input type='checkbox' name='")
+                .append(select)
+                .append("' value='")
+                .append(id)
+                .append("'></td>")
+                .append("<td>")
+                .append(desc)
+                .append("</td>")
+                .append("</tr>");
+        }
+
+    } catch (Exception e) {
+        System.out.println("WARN Check box error: HtmlUtil -> " + e.getMessage());
+    }
+
+    return html.toString();
+}
+
+
 
 
 }

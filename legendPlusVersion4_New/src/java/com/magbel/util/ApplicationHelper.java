@@ -18,6 +18,7 @@ import legend.admin.objects.MandatoryField;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p><h2>Project:</h2> <h1>Integrated Accounting Software</h1></p>
@@ -256,6 +257,56 @@ public String getGeneratedId(Connection con, String tableName) throws SQLExcepti
     id = String.format("%05d", counter);
 
     return id;
+}
+
+/**
+ * Generate a batch of sequential IDs for a table.
+ *
+ * @param con       JDBC connection (must be open)
+ * @param tableName Table for which IDs are generated
+ * @param count     Number of IDs to generate
+ * @return List of formatted IDs as Strings
+ * @throws SQLException
+ */
+public List<String> getGeneratedId(Connection con, String tableName, int count) throws SQLException {
+    List<String> ids = new ArrayList<>();
+    int startValue;
+
+    String selectQuery = "SELECT MT_ID FROM IA_MTID_TABLE WITH (UPDLOCK, ROWLOCK) WHERE MT_TABLENAME = ?";
+    String updateQuery = "UPDATE IA_MTID_TABLE SET MT_ID = MT_ID + ? WHERE MT_TABLENAME = ?";
+
+    // 1️⃣ Get current value
+    try (PreparedStatement ps = con.prepareStatement(selectQuery)) {
+        ps.setString(1, tableName);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                startValue = rs.getInt(1);
+            } else {
+                startValue = 1;
+                // Insert initial row
+                String insertQuery = "INSERT INTO IA_MTID_TABLE(MT_TABLENAME, MT_ID) VALUES (?, ?)";
+                try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+                    psInsert.setString(1, tableName);
+                    psInsert.setInt(2, startValue);
+                    psInsert.executeUpdate();
+                }
+            }
+        }
+    }
+
+    // 2️⃣ Generate all IDs in memory
+    for (int i = 0; i < count; i++) {
+        ids.add(String.format("%05d", startValue + i));
+    }
+
+    // 3️⃣ Update MT_ID in DB once
+    try (PreparedStatement ps = con.prepareStatement(updateQuery)) {
+        ps.setInt(1, count);
+        ps.setString(2, tableName);
+        ps.executeUpdate();
+    }
+
+    return ids;
 }
    
    public  String getGeneratedId2Old(String tableName) {

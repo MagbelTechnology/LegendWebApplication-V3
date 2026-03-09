@@ -189,7 +189,7 @@ public class MagmaDBConnection implements eConnection {
         try {
             Context initContext = new InitialContext();
             DataSource ds = (DataSource) initContext.lookup("java:/legendPlus");
-            System.out.println("Connection opened by getConnection in MagmaDBConnection: ");
+           // System.out.println("Connection opened by getConnection in MagmaDBConnection: ");
             return ds.getConnection();
         } catch (SQLException e) {
             System.out.println("SQL Error getting connection: " + e.getMessage());

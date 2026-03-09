@@ -572,7 +572,7 @@ return false;
 
         try (
              PreparedStatement ps = con.prepareStatement(query)) {
-        	 ps.setQueryTimeout(30);
+        	// ps.setQueryTimeout(30);
         	 try( ResultSet rs = ps.executeQuery()){
             if (rs.next()) { 
                 result = rs.getString(1);

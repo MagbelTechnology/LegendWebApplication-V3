@@ -9375,7 +9375,7 @@ public String[] setApprovalDataGroup(Connection con, long id) {
                    "WHERE group_id = ?";
 
     try (PreparedStatement ps = con.prepareStatement(query)) {
-    	ps.setQueryTimeout(30);
+    	//ps.setQueryTimeout(30);
         ps.setLong(1, id);
 
         try (ResultSet rs = ps.executeQuery()) {
@@ -19033,7 +19033,7 @@ public java.util.ArrayList getApprovalsId(Connection con, String branchId, Strin
 //    System.out.println("$$$$$$$$$$$$$$$$$$$$$$  query in getApprovalsId: "+query);
 	
 	try(PreparedStatement ps  = con.prepareStatement(query)){
-		 ps.setQueryTimeout(30);
+		 //ps.setQueryTimeout(30);
 		 try(ResultSet rs = ps.executeQuery()){
 			while (rs.next())
 			   {				
