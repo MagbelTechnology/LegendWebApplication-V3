@@ -49,6 +49,7 @@ public class ApprovalManager extends ConnectionClass {
         	
         }
     }
+    
 
     public boolean createApprovalRemark(ApprovalRemark remark) {
 

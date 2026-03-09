@@ -75,7 +75,7 @@ public class Jobs4 implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
-        	System.out.println("Starting to execute Jobs4.. ");
+        	//System.out.println("Starting to execute Jobs4.. ");
             // Fetch session timeout
             String sessionTimeout = comp.getCodeName("SELECT session_timeout FROM am_gb_company");
             if (sessionTimeout == null) sessionTimeout = "1";

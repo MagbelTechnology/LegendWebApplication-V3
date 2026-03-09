@@ -368,7 +368,7 @@ public class ApprovalRecords extends MagmaDBConnection
 
     }
     
-    public boolean updateApproval(String assetId) {
+    public void updateApproval(String assetId) {
         String UPDATE_QUERY = "UPDATE am_raisentry_post SET flag = ? WHERE ID = ?";
 
         try (Connection con = getConnection("legendPlus");
@@ -376,14 +376,13 @@ public class ApprovalRecords extends MagmaDBConnection
 
             ps.setString(1, "N");
             ps.setString(2, assetId);
+            ps.executeUpdate();
 
-            int rowsUpdated = ps.executeUpdate();
-            return rowsUpdated > 0; // true if at least one row was updated
 
         } catch (SQLException ex) {
             System.out.println("WARNING: Cannot update am_raisentry_post -> " + ex.getMessage());
             ex.printStackTrace();
-            return false;
+
         }
     }
 
@@ -410,7 +409,9 @@ public class ApprovalRecords extends MagmaDBConnection
         }
     }
     
-    public boolean updateRaiseEntry(String assetId) {
+    
+    
+    public void updateRaiseEntry(String assetId) {
         String UPDATE_QUERY = "UPDATE am_asset SET raise_entry = ? WHERE ASSET_ID = ?";
 
         try (Connection con = getConnection("legendPlus");
@@ -418,14 +419,13 @@ public class ApprovalRecords extends MagmaDBConnection
 
             ps.setString(1, "Y");
             ps.setString(2, assetId);
+             ps.executeUpdate();
 
-            int rowsUpdated = ps.executeUpdate();
-            return rowsUpdated > 0; // true if at least one row was updated
 
         } catch (SQLException ex) {
             System.out.println("WARNING: Cannot update am_asset -> " + ex.getMessage());
             ex.printStackTrace();
-            return false;
+
         }
     }
 
@@ -452,7 +452,7 @@ public class ApprovalRecords extends MagmaDBConnection
         }
     }
     
-    public boolean updateRaiseAsseg2Entry(String assetId) {
+    public void updateRaiseAsseg2Entry(String assetId) {
         String UPDATE_QUERY = "UPDATE am_asset2 SET raise_entry = ? WHERE ASSET_ID = ?";
 
         try (Connection con = getConnection("legendPlus");
@@ -460,14 +460,13 @@ public class ApprovalRecords extends MagmaDBConnection
 
             ps.setString(1, "Y");
             ps.setString(2, assetId);
-
-            int rowsUpdated = ps.executeUpdate();
-            return rowsUpdated > 0; // true if at least one row was updated
+             ps.executeUpdate();
+           
 
         } catch (SQLException ex) {
             System.out.println("WARNING: Cannot update am_asset2 -> " + ex.getMessage());
             ex.printStackTrace();
-            return false;
+           
         }
     }
 
@@ -621,28 +620,37 @@ return false;
         return result;
     }
     
+
+    
     public String getCodeName(String query, String param) {
+
         String result = "";
 
-        
         try (Connection con = getConnection("legendPlus");
              PreparedStatement ps = con.prepareStatement(query)) {
-        	 ps.setQueryTimeout(30);
+
             ps.setString(1, param);
 
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
-                    result = rs.getString(1) != null ? rs.getString(1) : "";
+                    String value = rs.getString(1);
+                    result = (value == null) ? "" : value;
                 }
+
             }
 
-        } catch (Exception e) {
-            System.out.println("Error in getCodeName() -> " + e.getMessage());
-            e.printStackTrace();
+        } catch (Exception er) {
+
+            System.out.println("Error in Query - getCodeName() -> " + er.getMessage());
+            er.printStackTrace();
+
         }
 
         return result;
     }
+    
+    
 
 
     public String getCodeNameOld(String query,String param1,String param2,String param3)
