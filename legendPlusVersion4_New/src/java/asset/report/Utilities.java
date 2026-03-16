@@ -30,7 +30,7 @@ public class Utilities {
        ========================================================= */
     public void executeProcedure(String callableProc) {
 
-        String[] finDates = companyDetails();
+        String[] finDates = company_Details();
         String startDate = toCAL(finDates[2]);
         String endDate = toCAL(finDates[3]);
 
@@ -66,7 +66,7 @@ public class Utilities {
     /* =========================================================
        COMPANY DETAILS
        ========================================================= */
-    public String[] companyDetails() {
+    public String[] company_Details() {
 
         String[] result = new String[4];
 

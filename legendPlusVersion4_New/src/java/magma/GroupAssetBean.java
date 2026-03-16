@@ -2,6 +2,7 @@ package magma;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -22,6 +23,7 @@ import com.magbel.util.DatetimeFormat;
 import com.magbel.util.HtmlUtility;
 
 import legend.admin.handlers.CompanyHandler;
+import legend.admin.objects.User;
 import magma.net.dao.MagmaDBConnection;
 import magma.net.manager.FleetHistoryManager;
 import magma.net.vao.Asset;
@@ -3567,87 +3569,154 @@ catch (Exception r) {
 //
 //	}
 	
+//	public long[] insertGroupAssetRecord(Connection con,
+//            String groupAssetByAsset,
+//            String singleApproval,
+//            String branch,
+//            String departCode,
+//            String userName) throws Exception {
+//
+//System.out.println("singleApproval: " + singleApproval +
+//" branch: " + branch +
+//" departCode: " + departCode +
+//" userName: " + userName +
+//" groupAssetByAsset: " + groupAssetByAsset);
+//
+//long[] result = new long[2];
+//
+//try {
+//
+//// =========================
+//// 1. BUDGET VALIDATION
+//// =========================
+//int budgetStatus = validateBudget(con);
+//
+//if (budgetStatus != 0) {
+//result[0] = budgetStatus;
+//return result;
+//}
+//System.out.println("Budget Validation done");
+//// =========================
+//// 2. CREATE GROUP
+//// =========================
+//long groupId = createGroup(con, groupAssetByAsset, branch);
+//System.out.println("groupId" + groupId);
+//result[0] = 0;
+//result[1] = groupId;
+//
+//if (!"N".equalsIgnoreCase(groupAssetByAsset)) {
+//return result;
+//}
+//System.out.println("Create Group done");
+//
+//// =========================
+//// 3. PROCESS ASSET GENERATION
+//// =========================
+//processAssetGeneration(con, String.valueOf(groupId));
+//System.out.println("Process Asset Generation done");
+//
+//// =========================
+//// 4. SAVE GROUP TO ASSET
+//// =========================
+//String depRate = htmlUtil.getCodeName(con,
+//"SELECT DEP_RATE FROM AM_GROUP_ASSET WHERE Group_id = ?",
+//String.valueOf(groupId));
+//
+//boolean saved = saveGroupToAsset(con,
+//String.valueOf(groupId),
+//depRate);
+//
+//boolean approvalEnabled = checkApprovalStatus(con, "3");
+//
+//if (!saved || !approvalEnabled) {
+//throw new RuntimeException("Save or approval check failed");
+//}
+//System.out.println("Save Group To Asset done");
+//
+//// =========================
+//// 5. APPROVAL PROCESSING
+//// =========================
+//processApproval(con,
+//String.valueOf(groupId),
+//singleApproval,
+//branch,
+//departCode,
+//userName);
+//System.out.println("Approval Processing done");
+//
+//return result;
+//
+//} catch (Exception e) {
+//throw e;
+//}
+//}
+	
 	public long[] insertGroupAssetRecord(Connection con,
-            String groupAssetByAsset,
-            String singleApproval,
-            String branch,
-            String departCode,
-            String userName) throws Exception {
+	        String groupAssetByAsset,
+	        String singleApproval,
+	        String branch,
+	        String departCode,
+	        String userName) throws Exception {
 
-System.out.println("singleApproval: " + singleApproval +
-" branch: " + branch +
-" departCode: " + departCode +
-" userName: " + userName +
-" groupAssetByAsset: " + groupAssetByAsset);
+	    long[] result = new long[2];
 
-long[] result = new long[2];
+	    try {
 
-try {
+	        int budgetStatus = validateBudget(con);
 
-// =========================
-// 1. BUDGET VALIDATION
-// =========================
-int budgetStatus = validateBudget(con);
+	        if (budgetStatus != 0) {
+	            result[0] = budgetStatus;
+	            return result;
+	        }
 
-if (budgetStatus != 0) {
-result[0] = budgetStatus;
-return result;
-}
-System.out.println("Budget Validation done");
-// =========================
-// 2. CREATE GROUP
-// =========================
-long groupId = createGroup(con, groupAssetByAsset, branch);
-System.out.println("groupId" + groupId);
-result[0] = 0;
-result[1] = groupId;
+	        long groupId = createGroup(con, groupAssetByAsset, branch);
 
-if (!"N".equalsIgnoreCase(groupAssetByAsset)) {
-return result;
-}
-System.out.println("Create Group done");
+	        result[0] = 0;
+	        result[1] = groupId;
 
-// =========================
-// 3. PROCESS ASSET GENERATION
-// =========================
-processAssetGeneration(con, String.valueOf(groupId));
-System.out.println("Process Asset Generation done");
+	        if (!"N".equalsIgnoreCase(groupAssetByAsset)) {
+	            con.commit();   // commit early if exiting
+	            return result;
+	        }
 
-// =========================
-// 4. SAVE GROUP TO ASSET
-// =========================
-String depRate = htmlUtil.getCodeName(con,
-"SELECT DEP_RATE FROM AM_GROUP_ASSET WHERE Group_id = ?",
-String.valueOf(groupId));
+	        processAssetGeneration(con, String.valueOf(groupId));
 
-boolean saved = saveGroupToAsset(con,
-String.valueOf(groupId),
-depRate);
+	        String depRate = htmlUtil.getCodeName(con,
+	                "SELECT DEP_RATE FROM AM_GROUP_ASSET WHERE Group_id = ?",
+	                String.valueOf(groupId));
 
-boolean approvalEnabled = checkApprovalStatus(con, "3");
+	        boolean saved = saveGroupToAsset(con,
+	                String.valueOf(groupId),
+	                depRate);
 
-if (!saved || !approvalEnabled) {
-throw new RuntimeException("Save or approval check failed");
-}
-System.out.println("Save Group To Asset done");
+	        boolean approvalEnabled = checkApprovalStatus(con, "3");
 
-// =========================
-// 5. APPROVAL PROCESSING
-// =========================
-processApproval(con,
-String.valueOf(groupId),
-singleApproval,
-branch,
-departCode,
-userName);
-System.out.println("Approval Processing done");
+	        if (!saved || !approvalEnabled) {
+	            throw new RuntimeException("Save or approval check failed");
+	        }
 
-return result;
+	        processApproval(con,
+	                String.valueOf(groupId),
+	                singleApproval,
+	                branch,
+	                departCode,
+	                userName);
 
-} catch (Exception e) {
-throw e;
-}
-}
+	        // ⭐ IMPORTANT
+	        con.commit();
+
+	        return result;
+
+	    } catch (Exception e) {
+
+	        // ⭐ rollback on failure
+	        if (con != null) {
+	            con.rollback();
+	        }
+
+	        throw e;
+	    }
+	}
 
 
 	
@@ -3862,63 +3931,151 @@ throw e;
 	}
 
 	
+//	private List<String> processApproval(Connection con,
+//            String groupId,
+//            String singleApproval,
+//            String branch,
+//            String departCode,
+//            String userName) throws Exception {
+//
+//// 1️⃣ Change status
+//changeGroupAssetStatus(con, groupId, "PENDING");
+//
+//// 2️⃣ Load approval data
+//List<?> approvalList = ad.getApprovalsId(con, branch, departCode, userName);
+//String[] approvalData = ad.setApprovalDataGroup(con, Long.parseLong(groupId));
+//
+//if (approvalData == null || approvalData.length == 0) {
+//throw new IllegalStateException("Approval data not found for groupId: " + groupId);
+//}
+//
+//int assetCode = Integer.parseInt(approvalData[0]);
+//
+//// 3️⃣ Single Approval Flow
+//if ("Y".equalsIgnoreCase(singleApproval)) {
+//
+//setGroupPendingTrans(con, approvalData, "3", assetCode);
+//
+//ad.setPendingTransArchive(con,
+//approvalData,
+//"3",
+//assetCode,
+//assetCode);
+//
+//return Collections.emptyList(); // no mail list
+//}
+//
+//// 4️⃣ Multiple Approval Flow
+//List<String> mailList = new ArrayList<>();
+//
+//for (Object obj : approvalList) {
+//
+//legend.admin.objects.User usr =
+//(legend.admin.objects.User) obj;
+//
+//setGroupPendingMultipleTrans(con,
+//approvalData,
+//"3",
+//assetCode,
+//usr.getUserId(),
+//groupId);
+//
+//if (usr.getEmail() != null && !usr.getEmail().isEmpty()) {
+//mailList.add(usr.getEmail());
+//}
+//}
+//
+//// ⚠ NO COMMIT HERE
+//return mailList;
+//}
+	
+	private static final String APPROVAL_STATUS_CODE = "3";
+	private static final String SINGLE_APPROVAL_YES = "Y";
+
 	private List<String> processApproval(Connection con,
-            String groupId,
-            String singleApproval,
-            String branch,
-            String departCode,
-            String userName) throws Exception {
+	        String groupId,
+	        String singleApproval,
+	        String branch,
+	        String departCode,
+	        String userName) throws Exception {
 
-// 1️⃣ Change status
-changeGroupAssetStatus(con, groupId, "PENDING");
+	    // 1️⃣ Validate inputs
+	    validateInputs(groupId, branch, departCode, userName);
+	    
+	    // 2️⃣ Change status
+	    changeGroupAssetStatus(con, groupId, "PENDING");
 
-// 2️⃣ Load approval data
-List<?> approvalList = ad.getApprovalsId(con, branch, departCode, userName);
-String[] approvalData = ad.setApprovalDataGroup(con, Long.parseLong(groupId));
+	    // 3️⃣ Load approval data
+	    List<User> approvalList = fetchApprovalList(con, branch, departCode, userName);
+	    System.out.println("approvalList.size: " + approvalList.size());
+	    String[] approvalData = fetchApprovalData(con, groupId);
 
-if (approvalData == null || approvalData.length == 0) {
-throw new IllegalStateException("Approval data not found for groupId: " + groupId);
-}
+	    int assetCode = parseAssetCode(approvalData);
 
-int assetCode = Integer.parseInt(approvalData[0]);
+	    // 4️⃣ Process based on approval type
+	    return isSingleApproval(singleApproval) 
+	        ? processSingleApproval(con, approvalData, assetCode)
+	        : processMultipleApproval(con, approvalData, assetCode, approvalList, groupId);
+	}
 
-// 3️⃣ Single Approval Flow
-if ("Y".equalsIgnoreCase(singleApproval)) {
+	private boolean isSingleApproval(String singleApproval) {
+	    return SINGLE_APPROVAL_YES.equalsIgnoreCase(singleApproval);
+	}
 
-setGroupPendingTrans(con, approvalData, "3", assetCode);
+	private void validateInputs(String groupId, String branch, String departCode, String userName) {
+	    Objects.requireNonNull(groupId, "GroupId must not be null");
+	    Objects.requireNonNull(branch, "Branch must not be null");
+	    // Add other validations as needed
+	}
 
-ad.setPendingTransArchive(con,
-approvalData,
-"3",
-assetCode,
-assetCode);
+	private String[] fetchApprovalData(Connection con, String groupId) throws Exception {
+	    String[] approvalData = ad.setApprovalDataGroup(con, Long.parseLong(groupId));
+	    if (approvalData == null || approvalData.length == 0) {
+	        throw new IllegalStateException("Approval data not found for groupId: " + groupId);
+	    }
+	    return approvalData;
+	}
 
-return Collections.emptyList(); // no mail list
-}
+	private List<User> fetchApprovalList(Connection con, String branch, String departCode, String userName) throws Exception {
+	    List<?> approvalList = ad.getApprovalsId(con, branch, departCode, userName);
+	    return approvalList.stream()
+	            .map(obj -> (User) obj)
+	            .collect(Collectors.toList());
+	}
 
-// 4️⃣ Multiple Approval Flow
-List<String> mailList = new ArrayList<>();
+	private int parseAssetCode(String[] approvalData) {
+	    return Integer.parseInt(approvalData[0]);
+	}
 
-for (Object obj : approvalList) {
+	private List<String> processSingleApproval(Connection con, String[] approvalData, int assetCode) throws Exception {
+	    setGroupPendingTrans(con, approvalData, APPROVAL_STATUS_CODE, assetCode);
+	    ad.setPendingTransArchive(con, approvalData, APPROVAL_STATUS_CODE, assetCode, assetCode);
+	    return Collections.emptyList();
+	}
 
-legend.admin.objects.User usr =
-(legend.admin.objects.User) obj;
+	private List<String> processMultipleApproval(Connection con, 
+	        String[] approvalData, 
+	        int assetCode, 
+	        List<User> approvalList,
+	        String groupId) throws Exception {
+	    
+	    List<String> mailList = new ArrayList<>();
+	    
+	    for (User usr : approvalList) {
+	        setGroupPendingMultipleTrans(con, approvalData, APPROVAL_STATUS_CODE, 
+	                                   assetCode, usr.getUserId(), groupId);
+	        
+	        if (isValidEmail(usr.getEmail())) {
+	            mailList.add(usr.getEmail());
+	        }
+	    }
+	    
+	    return mailList;
+	}
 
-setGroupPendingMultipleTrans(con,
-approvalData,
-"3",
-assetCode,
-usr.getUserId(),
-groupId);
-
-if (usr.getEmail() != null && !usr.getEmail().isEmpty()) {
-mailList.add(usr.getEmail());
-}
-}
-
-// ⚠ NO COMMIT HERE
-return mailList;
-}
+	private boolean isValidEmail(String email) {
+	    return email != null && !email.trim().isEmpty();
+	}
 	
     public long [] insertGroupAssetRecordUnclassified(String groupAssetByAsset,String singleApproval,String branch,String departCode,String userName) throws Exception, Throwable {
 		//System.out.println("INSIDE INSERT GROUP ASSET RECORD OF GROUP ASSET BEAN");
@@ -8449,11 +8606,12 @@ public String setGroupPendingMultipleTrans(String[] a, String code, int assetCod
 
 
 
-public String setGroupPendingMultipleTrans(Connection con, String[] a, String code, int assetCode, String supervisorId, String mtid) throws SQLException {
+public String setGroupPendingMultipleTrans2(Connection con, String[] a, String code, int assetCode, String supervisorId, String mtid) throws SQLException {
 	 System.out.println("Starting to call setGroupPendingMultipleTrans:  ");
     int transactionLevel = 0;
     String transactionType = "";
     
+    System.out.println("a[0]: " + a[0]  + " a[1]: " +a[1] + " supervisorId: " + supervisorId);
     
     String tranLevelQuery = "SELECT level, transaction_type FROM approval_level_setup WHERE code = ?";
     System.out.println("tranLevelQuery " + tranLevelQuery );
@@ -8505,6 +8663,99 @@ public String setGroupPendingMultipleTrans(Connection con, String[] a, String co
     }
 
     return mtid;
+}
+
+public String setGroupPendingMultipleTrans(Connection con,
+        String[] a,
+        String code,
+        int assetCode,
+        String supervisorId,
+        String mtid) throws SQLException {
+
+System.out.println("Starting setGroupPendingMultipleTrans");
+
+int transactionLevel = 0;
+String transactionType = null;
+
+//System.out.println("a[0]: " + a[0]  + " a[1]: " +a[1] + " supervisorId: " + supervisorId);
+
+String tranLevelQuery =
+"SELECT level, transaction_type FROM approval_level_setup WHERE code = ?";
+
+String insertQuery =
+"INSERT INTO am_asset_approval (" +
+"asset_id, user_id, super_id, amount, posting_date, description, effective_date, branchCode, " +
+"asset_status, tran_type, process_status, tran_sent_time, transaction_id, batch_id, transaction_level, asset_code) " +
+"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+/* -------------------------------------------------------
+1️⃣ Get transaction level and transaction type
+------------------------------------------------------- */
+try (PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+
+psLevel.setString(1, code);
+
+try (ResultSet rs = psLevel.executeQuery()) {
+if (rs.next()) {
+transactionLevel = rs.getInt("level");
+transactionType = rs.getString("transaction_type");
+} else {
+throw new SQLException("No approval level found for code: " + code);
+}
+}
+}
+
+//System.out.println("transactionType: " + transactionType);
+//System.out.println("transactionLevel: " + transactionLevel);
+
+/* -------------------------------------------------------
+2️⃣ Generate Transaction ID
+------------------------------------------------------- */
+mtid = new ApplicationHelper().getGeneratedId(con, "am_asset_approval");
+
+//System.out.println("mtid: " + mtid);
+
+/* -------------------------------------------------------
+3️⃣ Insert Approval Record
+------------------------------------------------------- */
+try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+
+SimpleDateFormat timer = new SimpleDateFormat("HH:mm:ss");
+
+psInsert.setString(1, safe(a, 0));
+psInsert.setString(2, safe(a, 1));
+psInsert.setString(3, supervisorId);
+
+psInsert.setDouble(4, parseDoubleSafe(a, 3));
+
+psInsert.setDate(5, convertDateSafe(a, 4));
+psInsert.setString(6, safe(a, 5));
+psInsert.setDate(7, convertDateSafe(a, 6));
+psInsert.setString(8, safe(a, 7));
+
+psInsert.setString(9, safe(a, 8));
+psInsert.setString(10, transactionType);
+psInsert.setString(11, safe(a, 10));
+
+psInsert.setString(12, timer.format(new java.util.Date()));
+
+psInsert.setString(13, mtid);
+psInsert.setString(14, mtid);
+
+psInsert.setInt(15, transactionLevel);
+psInsert.setInt(16, assetCode);
+
+psInsert.executeUpdate();
+}
+
+return mtid;
+}
+
+private java.sql.Date convertDateSafe(String[] arr, int index) {
+    if (arr == null || index >= arr.length || arr[index] == null) {
+        return null;
+    }
+    return dateConvert(arr[index]);
 }
 
 // --- Helpers ---

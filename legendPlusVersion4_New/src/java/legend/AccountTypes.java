@@ -1,6 +1,10 @@
 package legend;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountTypes extends ConnectionClass {
     private String acct_types[] = null;
@@ -18,7 +22,7 @@ public class AccountTypes extends ConnectionClass {
 
     }
 
-    public String[] getAccountTypes() {
+    public String[] getAccountTypesOld() {
     	ResultSet rs = null;
     	ResultSet rsc = null;
         try {
@@ -43,7 +47,7 @@ public class AccountTypes extends ConnectionClass {
             if (rs != null) {
                 rs.close();
             }
-            freeResource();
+           
             return result;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -54,7 +58,7 @@ public class AccountTypes extends ConnectionClass {
                 if (rs != null) {
                     rs.close();
                 }
-                freeResource();
+              
             } catch (Exception exs) {
                 exs.printStackTrace();
 
@@ -62,8 +66,29 @@ public class AccountTypes extends ConnectionClass {
         }
         return null;
     }
+    
+    public String[] getAccountTypes() {
+        String query = "SELECT acct_type FROM am_ad_account_type";
+        List<String> resultList = new ArrayList<>();
 
-    public boolean acctRequired() {
+        try (Connection con = getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                resultList.add(rs.getString("acct_type"));
+            }
+
+            return resultList.toArray(new String[0]);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean acctRequiredold() {
         try {
             String query = "SELECT req_accttype FROM AM_AD_LEGACY_SYS_CONFIG";
             ResultSet rs = getStatement().executeQuery(query);
@@ -72,14 +97,14 @@ public class AccountTypes extends ConnectionClass {
                 if (rs.getString("req_accttype").equalsIgnoreCase("Y")) {
                     result = true;
                 }
-                freeResource();
+               
 
                 return result;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
             try {
-                freeResource();
+               
             } catch (Exception exs) {
                 exs.printStackTrace();
 
@@ -88,6 +113,22 @@ public class AccountTypes extends ConnectionClass {
         
         return false;
     }
+    public boolean acctRequired() {
+        String query = "SELECT req_accttype FROM AM_AD_LEGACY_SYS_CONFIG";
 
+        try (Connection con = getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                return "Y".equalsIgnoreCase(rs.getString("req_accttype"));
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
 
 }

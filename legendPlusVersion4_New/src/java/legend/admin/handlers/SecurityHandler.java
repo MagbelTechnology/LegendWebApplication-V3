@@ -5678,46 +5678,7 @@ public class SecurityHandler
             try (ResultSet rs = cstmt.executeQuery()) {
 
                 while (rs.next()) {
-
-                    User user = new User();
-
-                    user.setUserId(rs.getString("userId"));
-                    user.setUserName(rs.getString("userName"));
-                    user.setUserFullName(rs.getString("fullName"));
-                    user.setLegacySystemId(rs.getString("legacySysId"));
-                    user.setUserClass(rs.getString("class"));
-                    user.setBranch(rs.getString("branch"));
-                    user.setPassword(rs.getString("password"));
-                    user.setPhoneNo(rs.getString("phoneNo"));
-                    user.setIsSupervisor(rs.getString("isSupervisor"));
-                    user.setMustChangePwd(rs.getString("mustChangePwd"));
-                    user.setLoginStatus(rs.getString("loginStatus"));
-                    user.setUserStatus(rs.getString("userStatus"));
-                    user.setCreatedBy(rs.getString("createdBy"));
-                    user.setCreateDate(rs.getString("createDate"));
-                    user.setPwdExpiry(rs.getString("passwordExpiry"));
-                    user.setLastLogindate(rs.getString("loginDate"));
-                    user.setLoginSystem(rs.getString("loginSystem"));
-                    user.setFleetAdmin(rs.getString("fleetAdmin"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPwdChanged(rs.getString("pwdChanged"));
-                    user.setApprvLimit(rs.getString("apprvLimit"));
-                    user.setBranchRestrict(rs.getString("branchRestriction"));
-                    user.setApprvLevel(rs.getString("apprvLevel"));
-                    user.setExpDate(rs.getDate("expiryDate"));
-                    user.setRegionCode(rs.getString("regionCode"));
-                    user.setRegionRestrict(rs.getString("regionRestrict"));
-                    user.setZoneCode(rs.getString("zoneCode"));
-                    user.setZoneRestrict(rs.getString("zoneRestrict"));
-                    user.setIsFacilityAdministrator(
-                            rs.getString("isFacilityAdministrator"));
-                    user.setIsStoreAdministrator(
-                            rs.getString("isStoreAdministrator"));
-
-                    user.setTokenRequired(
-                            "Y".equalsIgnoreCase(
-                                    rs.getString("tokenRequired")));
-
+                	 User user = mapResultSetToUser(rs);     
                     list.add(user);
                 }
             }
@@ -5728,6 +5689,50 @@ public class SecurityHandler
         }
 
         return list;
+    }
+    
+    private User mapResultSetToUser(ResultSet rs) throws SQLException {
+        User user = new legend.admin.objects.User();
+        
+        user.setUserId(rs.getString(1));
+        user.setUserName(rs.getString(2));
+        user.setUserFullName(rs.getString(3));
+        user.setLegacySystemId(rs.getString(4));
+        user.setUserClass(rs.getString(5));
+        user.setBranch(rs.getString(6));
+        user.setPassword(rs.getString(7));
+        user.setPhoneNo(rs.getString(8));
+        user.setIsSupervisor(rs.getString(9));
+        user.setMustChangePwd(rs.getString(10));
+        user.setLoginStatus(rs.getString(11));
+        user.setUserStatus(rs.getString(12));
+        user.setCreatedBy(rs.getString(13));
+        user.setCreateDate(rs.getString(14));
+        user.setPwdExpiry(rs.getString(15));
+        user.setLastLogindate(rs.getString(16));
+        user.setLoginSystem(rs.getString(17));
+        user.setFleetAdmin(rs.getString(18));
+        user.setEmail(rs.getString(19));
+        user.setBranch(rs.getString(20));
+        user.setPwdChanged(rs.getString(21));
+        user.setExpDate(rs.getDate(22));
+        user.setBranchRestrict(rs.getString(23));
+        user.setApprvLimit(rs.getString(24));
+        user.setApprvLevel(rs.getString(25));
+        
+        // Handle tokenRequired safely
+        String tokenRequired = rs.getString(26);
+        user.setTokenRequired(tokenRequired != null && 
+                             tokenRequired.trim().equalsIgnoreCase("Y"));
+        
+        user.setRegionCode(rs.getString(27));
+        user.setZoneCode(rs.getString(28));
+        user.setRegionRestrict(rs.getString(29));
+        user.setZoneRestrict(rs.getString(30));
+        user.setIsFacilityAdministrator(rs.getString(31));
+        user.setIsStoreAdministrator(rs.getString(32));
+        
+        return user;
     }
 
     public String getTokenUserIdOld(String userName) throws SQLException {
@@ -7111,73 +7116,163 @@ public class SecurityHandler
     }
 
 
-    public List<Staffs> getStaffsList(String filter) {
-
-        List<Staffs> staffList = new ArrayList<>();
+    public ArrayList<Staffs> getStaffsListOld(String filter)
+    {
+    	System.out.println("filter: " + filter);
+        ArrayList<Staffs> _list =  new ArrayList<Staffs>();
         HtmlUtility html = new HtmlUtility();
-
-        StringBuilder query = new StringBuilder(
-            "SELECT StaffId, Full_Name, dept_code, branch_code " +
-            "FROM am_gb_Staff "
-        );
-
-        if (filter != null && !filter.trim().isEmpty()) {
-            query.append("WHERE StaffId LIKE ? OR Full_Name LIKE ? ");
+        Connection c = null;
+        ResultSet rs = null;
+        PreparedStatement s = null;
+        String query = "";
+        
+        try {
+        
+        if(filter.equals("")) {
+        	query= "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff \r\n" + 
+        			"union select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff";
+        	 c = getConnection();
+             System.out.println("query: " + query);
+             s = c.prepareStatement(query);
+        }
+        
+        if(!filter.equals("")) {
+         query = "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff where StaffId like ? \r\n" + 
+        		"union\r\n" + 
+        		"select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff where Full_Name like ? ";
+         c = getConnection();
+        System.out.println("query: " + query);
+         s = c.prepareStatement(query);
+         s.setString(1, "%"+filter+"%");
+         s.setString(2,  "%"+filter+"%");
         }
 
-        try (Connection con = getConnection();
-             PreparedStatement ps = con.prepareStatement(query.toString())) {
+            rs = s.executeQuery();
+        while(rs.next()){
+        	String staffId = rs.getString("StaffId");
+        	String fullName = rs.getString("Full_Name");
+        	String deptCode = rs.getString("dept_code");
+        	String branchCode = rs.getString("branch_code");
+        	
+        	String deptName = html.findObject("select Dept_name from am_ad_department where dept_id = '"+deptCode+"'");
+        	String branchName = html.findObject("select BRANCH_NAME from am_ad_branch where BRANCH_id = '"+branchCode+"'");
+        	
+           // System.out.println("staffId: "+ staffId + " fullName: " + fullName + " deptCode: " + deptCode + " branchCode: " + branchCode);
+            Staffs staffDetails = new Staffs();
+        	staffDetails.setStaffId(staffId);
+        	staffDetails.setFullName(fullName);
+        	staffDetails.setDeptName(deptName);
+        	staffDetails.setBranchName(branchName);
+        	
+        	_list.add(staffDetails);
+        
+        }
+        }catch(Exception e) {
+        	e.getMessage();
+        }
+        
+        
+        return _list;
+    }
+    
+    
+    public ArrayList getStaffListDetailsOld(String staffId) {
+    	Connection c = null;
+        ResultSet rs = null;
+        PreparedStatement s = null;
+        String query = "";
+        ArrayList<Staffs> list = new ArrayList<Staffs>();
+        HtmlUtility html = new HtmlUtility();
+        
+        try {
+        	query = "select StaffId, Full_Name, dept_code, branch_code from am_gb_Staff where StaffId = ? ";
+        	 c = getConnection();
+              s = c.prepareStatement(query);
+              s.setString(1, staffId);
+              rs = s.executeQuery();
+              while(rs.next()) {
+            	String staff_Id = rs.getString("StaffId");
+              	String fullName = rs.getString("Full_Name");
+              	String deptCode = rs.getString("dept_code");
+              	String branchCode = rs.getString("branch_code");
+              	
+              	String deptName = html.findObject("select Dept_name from am_ad_department where dept_code = ? ", deptCode);
+            	String branchName = html.findObject("select BRANCH_NAME from am_ad_branch where BRANCH_code = ?", branchCode);
+              	
+              	Staffs staffDetails = new Staffs();
+            	staffDetails.setStaffId(staff_Id);
+            	staffDetails.setFullName(fullName);
+            	staffDetails.setDeptCode(deptCode);
+            	staffDetails.setBranchCode(branchCode);
+            	staffDetails.setBranchName(branchName);
+            	staffDetails.setDeptName(deptName);
+            	
+            	list.add(staffDetails);
+            
+              }
+        	
+        	
+        }catch(Exception e) {
+        	e.getMessage();
+        }
+        
+        return list;
+    	
+    }
+    
+    public ArrayList<Staffs> getStaffsList(String filter) {
+        ArrayList<Staffs> _list = new ArrayList<>();
+        String query;
 
-            ps.setQueryTimeout(30);
+        try (Connection c = getConnection()) {
 
-            if (filter != null && !filter.trim().isEmpty()) {
-                ps.setString(1, "%" + filter + "%");
-                ps.setString(2, "%" + filter + "%");
+            if (filter == null || filter.isEmpty()) {
+                query = "SELECT s.StaffId, s.Full_Name, d.Dept_name, b.BRANCH_NAME " +
+                        "FROM am_gb_Staff s " +
+                        "LEFT JOIN am_ad_department d ON s.dept_code = d.dept_code " +
+                        "LEFT JOIN am_ad_branch b ON s.branch_code = b.BRANCH_code";
+            } else {
+                query = "SELECT s.StaffId, s.Full_Name, d.Dept_name, b.BRANCH_NAME " +
+                        "FROM am_gb_Staff s " +
+                        "LEFT JOIN am_ad_department d ON s.dept_code = d.dept_code " +
+                        "LEFT JOIN am_ad_branch b ON s.branch_code = b.BRANCH_code " +
+                        "WHERE s.StaffId LIKE ? OR s.Full_Name LIKE ?";
             }
 
-            try (ResultSet rs = ps.executeQuery()) {
+            try (PreparedStatement ps = c.prepareStatement(query)) {
+                if (filter != null && !filter.isEmpty()) {
+                    ps.setString(1, "%" + filter + "%");
+                    ps.setString(2, "%" + filter + "%");
+                }
 
-                while (rs.next()) {
-
-                    Staffs staff = new Staffs();
-                    staff.setStaffId(rs.getString("StaffId"));
-                    staff.setFullName(rs.getString("Full_Name"));
-                    staff.setDeptCode(rs.getString("dept_code"));
-                    staff.setBranchCode(rs.getString("branch_code"));
-                    
-                    String deptName = html.findObject("select Dept_name from am_ad_department where dept_code = ? ", rs.getString("dept_code"));
-                	String branchName = html.findObject("select BRANCH_NAME from am_ad_branch where BRANCH_code = ?", rs.getString("branch_code"));
-                  	
-                  	Staffs staffDetails = new Staffs();
-                	staffDetails.setStaffId(rs.getString("StaffId"));
-                	staffDetails.setFullName(rs.getString("Full_Name"));
-                	staffDetails.setDeptCode(rs.getString("dept_code"));
-                	staffDetails.setBranchCode(rs.getString("branch_code"));
-                	staffDetails.setBranchName(branchName);
-                	staffDetails.setDeptName(deptName);
-
-                    staffList.add(staff);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        Staffs staffDetails = new Staffs();
+                        staffDetails.setStaffId(rs.getString("StaffId"));
+                        staffDetails.setFullName(rs.getString("Full_Name"));
+                        staffDetails.setDeptName(rs.getString("Dept_name"));
+                        staffDetails.setBranchName(rs.getString("BRANCH_NAME"));
+                        _list.add(staffDetails);
+                    }
                 }
             }
 
-        } catch (SQLException e) {
-            throw new RuntimeException("Error fetching staff list", e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        return staffList;
+        return _list;
     }
     
-    public List<Staffs> getStaffListDetails(String staffId) {
-
-        List<Staffs> list = new ArrayList<>();
-
-        String query =
-            "SELECT s.StaffId, s.Full_Name, s.dept_code, s.branch_code, " +
-            "       d.Dept_name, b.BRANCH_NAME " +
-            "FROM am_gb_Staff s " +
-            "LEFT JOIN am_ad_department d ON s.dept_code = d.dept_code " +
-            "LEFT JOIN am_ad_branch b ON s.branch_code = b.BRANCH_code " +
-            "WHERE s.StaffId = ?";
+    
+    public ArrayList<Staffs> getStaffListDetails(String staffId) {
+        ArrayList<Staffs> list = new ArrayList<>();
+        String query = "SELECT s.StaffId, s.Full_Name, s.dept_code, s.branch_code, " +
+                       "d.Dept_name, b.BRANCH_NAME " +
+                       "FROM am_gb_Staff s " +
+                       "LEFT JOIN am_ad_department d ON s.dept_code = d.dept_code " +
+                       "LEFT JOIN am_ad_branch b ON s.branch_code = b.BRANCH_code " +
+                       "WHERE s.StaffId = ?";
 
         try (Connection c = getConnection();
              PreparedStatement ps = c.prepareStatement(query)) {
@@ -7185,11 +7280,8 @@ public class SecurityHandler
             ps.setString(1, staffId);
 
             try (ResultSet rs = ps.executeQuery()) {
-
                 while (rs.next()) {
-
                     Staffs staffDetails = new Staffs();
-
                     staffDetails.setStaffId(rs.getString("StaffId"));
                     staffDetails.setFullName(rs.getString("Full_Name"));
                     staffDetails.setDeptCode(rs.getString("dept_code"));
@@ -7201,13 +7293,14 @@ public class SecurityHandler
                 }
             }
 
-        } catch (SQLException e) {
-            throw new RuntimeException("Error fetching staff details", e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return list;
     }
-
+    
+    
     public static String decrypt(String strToDecrypt, String secret) {
 		try {
 		Key key = generateKey(secret);

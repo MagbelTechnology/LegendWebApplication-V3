@@ -3541,7 +3541,7 @@ public legend.admin.objects.AssetManagerInfo getAssetManagerInfoFed() {
     try (Connection c = getConnection();
             PreparedStatement ps = c.prepareStatement(query)) {
 
-       try(ResultSet rs = ps.executeQuery(query);){
+       try(ResultSet rs = ps.executeQuery();){
 
        while(rs.next()) {
           String processingDate = this.sdf.format(rs.getDate("Processing_Date"));
@@ -3627,7 +3627,7 @@ public legend.admin.objects.AssetManagerInfo getAssetManagerInfoFed2() {
     try (Connection c = getConnection();
             PreparedStatement ps = c.prepareStatement(query)) {
 
-       try(ResultSet rs = ps.executeQuery(query);){
+       try(ResultSet rs = ps.executeQuery();){
 
        while(rs.next()) {
           String processingDate = this.sdf.format(rs.getDate("Processing_Date"));
@@ -3990,7 +3990,7 @@ public java.util.ArrayList getNewAssetSqlRecordsForCapitalised()
 
 		 try (Connection con = getConnection();
 		         PreparedStatement s = con.prepareStatement(query)) {
-			 ps.setQueryTimeout(30);
+			// ps.setQueryTimeout(30);
 		try(ResultSet rs = s.executeQuery(query);){
 			while (rs.next())
 			   {
@@ -7224,7 +7224,7 @@ AssetPaymentManager payment = null;
                           "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     try (Connection c = getConnection();
 	         PreparedStatement ps = c.prepareStatement(createQuery)) {
-    	ps.setQueryTimeout(30);
+    //	ps.setQueryTimeout(30);
         ps.setString(1, assetId);
         ps.setString(2, RegistrationNo);
         ps.setInt(3, Integer.parseInt(branch_id));
@@ -11796,14 +11796,14 @@ public java.util.ArrayList getUsernotSignOutRecords(String sessionTimeOut)
 //	 	System.out.println("<<<<<<notSignOutquery in getUsernotSignOutRecords: "+notSignOutquery+"   <<<<<<sessionTimeOut is : "+sessionTimeOut);
 		
 		try(Connection con = getConnection();
-         PreparedStatement ps = con.prepareStatement(notSignOutquery);
-         ResultSet rs = ps.executeQuery()){
+         PreparedStatement ps = con.prepareStatement(notSignOutquery)){
 		
 		   // System.out.println("<<<<<<statement is : "+s);
 	        ps.setString(1, sessionTimeOut);
 			//rs = s.executeQuery(notSignOutquery);
 
 //		    System.out.println("<<<<<<result set is : "+rs);
+	        try( ResultSet rs = ps.executeQuery()){
 			while (rs.next())
 			   {
 				String notSignoutuserId = rs.getString("user_id");
@@ -11814,6 +11814,7 @@ public java.util.ArrayList getUsernotSignOutRecords(String sessionTimeOut)
 				String difference = rs.getString("difference");
 				list.add(notSignoutuserId);
 			   }
+		}
 	 }
 				 catch (Exception e)
 					{
@@ -12059,9 +12060,9 @@ public java.util.ArrayList getSqlAssetFullyDeprOld(String alertperiod)
 }
 
 
-public List<newAssetTransaction> getSqlAssetFullyDepr(String alertperiod) {
+public java.util.ArrayList getSqlAssetFullyDepr(String alertperiod) {
 
-    List<newAssetTransaction> list = new ArrayList<>();
+	java.util.ArrayList list = new ArrayList();
 
     String query =
         "SELECT (SELECT MONTH(GETDATE())), " +

@@ -2952,7 +2952,7 @@ if (full_status.equalsIgnoreCase("WIP"))
       //                  System.out.println("Value of Q1 is >>>>>> " + q1);
                         arb.updateAssetStatusChange(q1);
 
-                        String q2 = "update am_AssetDisposal set disposal_status='R' where asset_id = '" + asset_id + "' and disposal_status='P'";
+                        String q2 = "update am_AssetDisposal set disposal_status='R' where disposal_id = '" + batchId + "' and disposal_status='P'";
                         arb.updateAssetStatusChange(q2);
                         alertmessage = "Transaction Rejected";
                         approvalRemark.setApprovalLevel(approvalCount += 1);

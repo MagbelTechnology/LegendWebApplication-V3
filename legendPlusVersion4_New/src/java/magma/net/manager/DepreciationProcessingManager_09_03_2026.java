@@ -31,7 +31,7 @@ import magma.util.Codes;
 // Referenced classes of package magma.net.manager:
 //            FleetHistoryManager, DepreciationChecks
 
-public class DepreciationProcessingManager extends MagmaDBConnection
+public class DepreciationProcessingManager_09_03_2026 extends MagmaDBConnection
 {
 
     private FleetHistoryManager historyManager;
@@ -47,7 +47,7 @@ public class DepreciationProcessingManager extends MagmaDBConnection
     private HtmlUtility htmlCombo;
     ArrayList Alist;
 
-    public DepreciationProcessingManager()
+    public DepreciationProcessingManager_09_03_2026()
     {
         Alist = new ArrayList();
         System.out.println("INFO:Enter Depreciation Transaction Processing ..");

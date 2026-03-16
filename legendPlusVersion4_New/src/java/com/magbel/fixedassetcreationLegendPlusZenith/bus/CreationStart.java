@@ -34,7 +34,7 @@ public class CreationStart {
                 "triggerJobs3", "0 0 0/3 * * ?");
 
         scheduleJob("Jobs4", "group4", Jobs4.class,
-                "triggerJobs4", "0 0/5 * * * ?");
+                "triggerJobs4", "0 0/2 * * * ?");
 
         scheduleJob("Jobs6", "group6", Jobs6.class,
                 "triggerJobs6", "0 0/10 * * * ?");

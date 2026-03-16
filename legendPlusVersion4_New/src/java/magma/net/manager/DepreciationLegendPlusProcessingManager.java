@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -322,27 +323,20 @@ public class DepreciationLegendPlusProcessingManager extends MagmaDBConnection
     public void WrongTotalLife(String FirstDayProcessDate, String endProcessDate)
     {
 
-        Connection con;
-        ResultSet rs;
-        PreparedStatement ps;
+      
         String query;
-        con = null;
-        rs = null; 
-        ps = null;  
+       
 //        System.out.println("FirstDayProcessDate in FirstDayProcessDate: "+FirstDayProcessDate+"  endProcessDate: "+endProcessDate);
         query = "UPDATE a SET a.Total_Life = FLOOR((100/c.Dep_Rate)*12),a.Remaining_Life = FLOOR((100/c.Dep_Rate)*12) " +
         		 "FROM am_asset a,am_ad_category c WHERE a.Category_ID = c.category_ID " +
                 "and a.total_life != (100/c.Dep_Rate)*12 and a.Posting_Date between '"+FirstDayProcessDate+"' and '"+endProcessDate+"' AND c.Dep_Rate > 0";
 //        System.out.println("query in OldAssetDepreciation: "+query);
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+        try (Connection c = getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(query)) {
         ps.execute();
     } catch (Exception ex) {  
         System.out.println("WARN: Computing Correct Total Life and Remaining_Life in WrongTotalLife ->" +
                 ex.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
     }        
     }
 /*
@@ -378,7 +372,7 @@ try {
         return exists;
     }
     
-    public void changeFinancialDate(String date)
+    public void changeFinancialDateOld(String date)
     {
         String newStartDate;
         String newEndDate;
@@ -409,15 +403,38 @@ try {
     }        
     }
     
+    public void changeFinancialDate(String date) {
+        try {
+            // Compute new start and end dates
+            String newStartDate = incrementDateYear(date);
+            int finMonths = process.getNoOfMonths();
+            String newEndDate = addMonthToDate(newStartDate, finMonths);
+
+            String query = "UPDATE AM_GB_COMPANY SET FINANCIAL_START_DATE = ?, FINANCIAL_END_DATE = ?";
+
+            // Use try-with-resources to auto-close
+            try (Connection con = getConnection("legendPlus");
+                 PreparedStatement ps = con.prepareStatement(query)) {
+
+                ps.setDate(1, dateConvert(newStartDate));
+                ps.setDate(2, dateConvert(newEndDate));
+                ps.executeUpdate();
+
+                // Update process object
+                process.setFinancialStartDate(newStartDate);
+                process.setFinancialEndDate(newEndDate);
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARN: Changing financial date -> " + ex.getMessage());
+        }
+    }
+    
     public void changeFinancialDate(String startDate,String endDate)
     {
-        Connection con;
-        ResultSet rs;
-        PreparedStatement ps;
+       
         String query;
-        con = null;
-        rs = null;
-        ps = null; 
+        
         String sDay = startDate.substring(0,2);
         String sMonth = startDate.substring(3,5);
         String sYear = startDate.substring(6,10); 
@@ -433,9 +450,9 @@ try {
         endDate = htmlCombo.findObject("SELECT DATEADD(MM, 12, '"+endDate+"')");
 //        System.out.println("WARN====: startDate: "+startDate+"   endDate: "+endDate);
         query = "UPDATE AM_GB_COMPANY SET FINANCIAL_START_DATE = ?,FINANCIAL_END_DATE = ?";
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+        try (Connection c = getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(query)) {
+       
 //        ps.setDate(1, dateConvert(startDate));
 //        ps.setDate(2, dateConvert(endDate));
         ps.setString(1, startDate);
@@ -444,8 +461,6 @@ try {
     } catch (Exception ex) {  
         System.out.println("WARN: Changing financial Date ->" +
                 ex.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
     }        
     }
 
@@ -507,7 +522,7 @@ try {
         return added;
     }
 
-    public ProcesingInfo getProcessingInfo(){
+    public ProcesingInfo getProcessingInfoOld(){
         ProcesingInfo processingInfo;
         Connection con;
         ResultSet rs;
@@ -544,20 +559,49 @@ try {
         closeConnection(con, ps, rs);
 		return processingInfo;
     }
+    
+    public ProcesingInfo getProcessingInfo() {
+        ProcesingInfo processingInfo = null;
+        String query = "SELECT PROCESSING_DATE, PROCESSING_FREQUENCY, NEXT_PROCESSING_DATE, RESIDUAL_VALUE, "
+                     + "FINANCIAL_START_DATE, FINANCIAL_END_DATE, FINANCIAL_NO_OFMONTHS "
+                     + "FROM AM_GB_COMPANY";
+
+        try (Connection con = getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                int frequency = rs.getInt("PROCESSING_FREQUENCY");
+                double residual = rs.getDouble("RESIDUAL_VALUE");
+                Date processingDate = rs.getDate("PROCESSING_DATE");
+                Date nextProcessingDate = rs.getDate("NEXT_PROCESSING_DATE");
+                String financialStartDate = sdf.format(rs.getDate("FINANCIAL_START_DATE"));
+                String financialEndDate = sdf.format(rs.getDate("FINANCIAL_END_DATE"));
+                int noOfMonths = rs.getInt("FINANCIAL_NO_OFMONTHS");
+
+                processingInfo = new ProcesingInfo(
+                    frequency, residual, processingDate, nextProcessingDate,
+                    financialStartDate, financialEndDate, noOfMonths
+                );
+            }
+
+        } catch (Exception ex) {
+            System.out.println("WARNING: Error getting Processing Info -> " + ex.getMessage());
+        }
+
+        return processingInfo;
+    }
 
     public void logDeprecitionTransaction(AssetTransaction assetTran, String nextdate, String userid)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         String query;
-        con = null;
-        ps = null;
+      
         query = "INSERT INTO monthly_depreciation_processing (ASSET_ID,MONTHLY_DEP,TRAN_DATE, DEP" +
 "_DATE, userid,no_of_month)  VALUES (?,?,?,?,?,?)"
 ;
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+        try (Connection c = getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(query)) {
         ps.setString(1, assetTran.getAssetId());
         ps.setDouble(2, assetTran.getMonthlyDepreciation());
         ps.setDate(3, dateConvert(getCompSystemDate()));
@@ -568,27 +612,23 @@ try {
         }
         catch (Exception ex){
         System.out.println((new StringBuilder()).append("WARNING: Error logging Depreciation transaction->").append(ex.getMessage()).toString());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     public String executeNbvResidual(AssetTransaction assetTran)
     {
         String output;
-        Connection con;
-        PreparedStatement ps;
+       
         String query;
 //        System.out.println(" in executeNbvResidual method >> ");
         double month = 0.0D;
         output = "fail";
-        con = null;
-        ps = null;
+       
         query = (new StringBuilder()).append("UPDATE AM_ASSET SET  MONTHLY_DEP =").append(month).append(" ,NBV=RESIDUAL_VALUE WHERE ASSET_ID = ? ").toString();
-        try {
+        try (Connection c = getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query)) {
         System.out.println(query);
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+      
         ps.setString(1, assetTran.getAssetId());
         ps.executeUpdate();
         setSucessful(true);
@@ -596,9 +636,7 @@ try {
     } catch (Exception ex) {  
         System.out.println("WARNING: Error executing update on NBV ->" +
                 ex.getMessage());
-    } finally {
-        closeConnection(con, ps);
-    }
+    } 
         return output;
     }
 
@@ -780,20 +818,138 @@ try {
  //       closeConnection(con, ps4);
         closeConnection(con, ps5);
     }
+    
+    public void executeProcessDepreciation2(AssetTransaction assetTran, String nextDate, String userId,
+            int remainLife, boolean isImprovement, int usefulLifeFromAmAsset,
+            double oldAccumDep, int improveUsefulLife, double oldImprovAccumDep,
+            int improvUsefulLifeFromAsset, int improvRemainLife,
+            double improvCost, double improvNBV, String isImproved,
+            double newMonthlyDep) {
+
+double depreciationMonthly = "P".equalsIgnoreCase(isImproved) && improvRemainLife > 0
+      ? improvNBV / improvRemainLife
+      : 0.0;
+
+if (remainLife <= 0) return;
+
+try (Connection con = getConnection("legendPlus")) {
+
+if (improvRemainLife == 0) {
+updateAssetWithoutImprovement(con, assetTran, oldAccumDep, newMonthlyDep, isImprovement);
+resetImprovementMonthlyDep(con, assetTran);
+} else {
+updateAssetWithImprovement(con, assetTran, oldAccumDep, oldImprovAccumDep, depreciationMonthly,
+            isImproved, isImprovement);
+}
+
+if ("P".equalsIgnoreCase(isImproved)) {
+markImprovementProcessed(con, assetTran.getAssetId());
+}
+
+notifyLastDepAsset(assetTran.getAssetId(), nextDate);
+logDeprecitionTransaction(assetTran, nextDate, userId);
+setSucessful(true);
+
+} catch (Exception ex) {
+System.out.println("WARNING: Error executing Processed Depreciation -> " + ex.getMessage());
+}
+}
+
+//Example helper methods
+
+private void updateAssetWithoutImprovement(Connection con, AssetTransaction assetTran,
+                double oldAccumDep, double newMonthlyDep, boolean isImprovement) throws SQLException {
+String query = "UPDATE AM_ASSET SET ACCUM_DEP = ACCUM_DEP + ?, MONTHLY_DEP = ?, NBV = COST_PRICE - ?, "
++ "USEFUL_LIFE = USEFUL_LIFE + ?, REMAINING_LIFE = REMAINING_LIFE - ?, "
++ "dep_ytd = dep_ytd + ?, TOTAL_NBV = (COST_PRICE - (ACCUM_DEP + ?)) + COALESCE(IMPROV_NBV,0) "
++ "WHERE ASSET_ID = ?";
+try (PreparedStatement ps = con.prepareStatement(query)) {
+double dep = isImprovement ? oldAccumDep + newMonthlyDep : assetTran.getMonthlyDepreciation();
+int freq = assetTran.getFrequency();
+
+ps.setDouble(1, dep);
+ps.setDouble(2, dep);
+ps.setDouble(3, dep);
+ps.setInt(4, freq);
+ps.setInt(5, freq);
+ps.setDouble(6, dep);
+ps.setDouble(7, dep);
+ps.setString(8, assetTran.getAssetId());
+ps.executeUpdate();
+}
+}
+
+private void resetImprovementMonthlyDep(Connection con, AssetTransaction assetTran) throws SQLException {
+String query = "UPDATE AM_ASSET SET IMPROV_MONTHLYDEP = 0.00 WHERE ASSET_ID = ?";
+try (PreparedStatement ps = con.prepareStatement(query)) {
+ps.setString(1, assetTran.getAssetId());
+ps.executeUpdate();
+}
+}
+
+private void markImprovementProcessed(Connection con, String assetId) throws SQLException {
+String query = "UPDATE am_asset_improvement SET IMPROVED = 'N' WHERE ASSET_ID = ?";
+try (PreparedStatement ps = con.prepareStatement(query)) {
+ps.setString(1, assetId);
+ps.executeUpdate();
+}
+}
+
+private void updateAssetWithImprovement(Connection con, AssetTransaction assetTran,
+        double oldAccumDep, double oldImprovAccumDep,
+        double depreciationMonthly, String isImproved,
+        boolean isImprovement) throws SQLException {
+
+String query = "UPDATE AM_ASSET SET "
++ "ACCUM_DEP = ACCUM_DEP + ?, "
++ "MONTHLY_DEP = ?, "
++ "NBV = COST_PRICE - (ACCUM_DEP + ?), "
++ "USEFUL_LIFE = USEFUL_LIFE + ?, "
++ "REMAINING_LIFE = REMAINING_LIFE - ?, "
++ "dep_ytd = dep_ytd + ?, "
++ "IMPROV_ACCUMDEP = COALESCE(IMPROV_ACCUMDEP,0) + ?, "
++ "IMPROV_MONTHLYDEP = ?, "
++ "IMPROV_NBV = IMPROV_COST - (COALESCE(IMPROV_ACCUMDEP,0) + ?), "
++ "IMPROV_USEFULLIFE = COALESCE(IMPROV_USEFULLIFE,0) + ?, "
++ "IMPROV_REMAINLIFE = IMPROV_REMAINLIFE - ?, "
++ "TOTAL_NBV = (COST_PRICE - (ACCUM_DEP + ?)) + (IMPROV_COST - (COALESCE(IMPROV_ACCUMDEP,0) + ?)) "
++ "WHERE ASSET_ID = ?";
+
+try (PreparedStatement ps = con.prepareStatement(query)) {
+int freq = assetTran.getFrequency();
+double monthlyDep = isImprovement ? assetTran.getMonthlyDepreciation() * freq : assetTran.getMonthlyDepreciation() * freq;
+double improvDep = "P".equalsIgnoreCase(isImproved) ? oldImprovAccumDep + assetTran.getImprovMonthlyDepreciation() : depreciationMonthly * freq;
+
+ps.setDouble(1, monthlyDep);            // ACCUM_DEP
+ps.setDouble(2, assetTran.getMonthlyDepreciation()); // MONTHLY_DEP
+ps.setDouble(3, monthlyDep);            // NBV calculation
+ps.setInt(4, freq);                     // USEFUL_LIFE increment
+ps.setInt(5, freq);                     // REMAINING_LIFE decrement
+ps.setDouble(6, monthlyDep);            // dep_ytd increment
+ps.setDouble(7, improvDep);             // IMPROV_ACCUMDEP
+ps.setDouble(8, depreciationMonthly * freq); // IMPROV_MONTHLYDEP
+ps.setDouble(9, improvDep);             // IMPROV_NBV calculation
+ps.setInt(10, assetTran.getFrequency()); // IMPROV_USEFULLIFE increment
+ps.setInt(11, assetTran.getFrequency()); // IMPROV_REMAINLIFE decrement
+ps.setDouble(12, monthlyDep);           // TOTAL_NBV ACCUM
+ps.setDouble(13, improvDep);            // TOTAL_NBV IMPROV
+ps.setString(14, assetTran.getAssetId());// WHERE ASSET_ID
+
+ps.executeUpdate();
+}
+}
 
     private void notifyNextProcessingDate(Date nextProcessingDate, Date dd)
     {
-        Connection con;
-        PreparedStatement ps;
+      
         String SLIPT_QUERY;
-        con = null;
-        ps = null;
+       
         SLIPT_QUERY = "UPDATE AM_GB_COMPANY SET PROCESSING_DATE = ?,NEXT_PROCESSING_DATE = ?    ";
         dd = nextProcessingDate;
         nextProcessingDate = df.getDateAddByMonth(this.nextProcessingDate, process.getFrequency());
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(SLIPT_QUERY);
+        try (Connection c = getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(SLIPT_QUERY)) {
+    
         ps.setDate(1, dateConvert(dd));
         ps.setDate(2, dateConvert(nextProcessingDate));
         ps.executeUpdate();
@@ -801,50 +957,39 @@ try {
             System.out.println(
                     "WARNING: Error notifing processing Date ->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
 
     }
 
     public void AdditionOfNBVBalanceToMonthlyDepr(String FirstDayProcessDate, String endProcessDate, int frequency,String nextdate, double thresholdcost,String nextProcessingDate)
     {
         String newStartDate;
-        String newEndDate;
-        Connection con;
-        ResultSet rs;
-        PreparedStatement ps;
+        String newEndDate;  
         String query;
-        con = null;
-        rs = null;  
-        ps = null;
+     
         query = "UPDATE AM_ASSET SET Monthly_Dep = Monthly_Dep + NBV, NBV = RESIDUAL_VALUE " +
                 "WHERE Dep_End_Date between '"+FirstDayProcessDate+"' AND '"+endProcessDate+"'  AND USEFUL_LIFE = TOTAL_LIFE AND REMAINING_LIFE = 0" ;
    
 //        System.out.println("<<<<<<query in AdditionOfNBVBalanceToMonthlyDepr: "+query);
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+        try (Connection c = getConnection("legendPlus");
+     	         PreparedStatement ps = c.prepareStatement(query)) {
+      
         ps.execute();
     } catch (Exception ex) {  
         System.out.println("WARN: Computing Monthly Depreciation and NBV in AdditionOfNBVBalanceToMonthlyDepr ->" +
                 ex.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
     }        
     }
 
     public void notifyProcessedAsset(String assetid, String status)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         String NOTIFY_QUERY;
-        con = null;
-        ps = null;
+       
         NOTIFY_QUERY = "UPDATE AM_ASSET SET ASSET_STATUS = ? WHERE ASSET_ID = ?  ";
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(NOTIFY_QUERY);
+        try (Connection c = getConnection("legendPlus");
+    	         PreparedStatement ps = c.prepareStatement(NOTIFY_QUERY)) {
+      
         ps.setString(1, status);
         ps.setString(2, assetid);
         ps.executeUpdate();
@@ -854,9 +999,7 @@ try {
         			"WARNING: Error notifying processed asset - " + assetid +
         			"->" +
         			ex.getMessage());
-        } finally {
-        	closeConnection(con, ps);
-        }
+        } 
 
     }
 
@@ -864,38 +1007,31 @@ try {
     {
         String newStartDate;
         String newEndDate;
-        Connection con;
-        ResultSet rs;
-        PreparedStatement ps;
+       
         String query;
-        con = null;
-        rs = null;  
-        ps = null;
+       
         query = "UPDATE AM_ASSET SET TOTAL_NBV = NBV + IMPROV_NBV ";
 //        System.out.println("<<<<<<query in AdditionOfNBVBalanceToIMPROV_NBV: "+query);
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(query);
+        try (Connection c = getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(query)) {
+      
         ps.execute();
     } catch (Exception ex) {  
         System.out.println("WARN: Computing TOTAL NBV in AdditionOfNBVBalanceToIMPROV_NBV ->" +
                 ex.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
-    }        
+    } 
+        
     }
 
     public void notifyRaisedClassifiedAsset(String assetid)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         String NOTIFY_QUERY;
-        con = null;
-        ps = null;
+      
         NOTIFY_QUERY = "UPDATE  AM_ASSETRECLASSIFICATION SET RAISE_ENTRY = ? WHERE ASSET_ID = ?  ";
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(NOTIFY_QUERY);
+        try (Connection c = getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(NOTIFY_QUERY)) {
+       
         ps.setString(1, "R");
         ps.setString(2, assetid);
         ps.executeUpdate();
@@ -904,22 +1040,17 @@ try {
                     "WARNING: Error notifying classified asset - " + assetid +
                     "->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     public void notifyRaisedAsset(String assetid)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         String NOTIFY_QUERY;
-        con = null;
-        ps = null;
+       
         NOTIFY_QUERY = "UPDATE  AM_ASSET SET RAISE_ENTRY = ? WHERE ASSET_ID = ?  ";
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(NOTIFY_QUERY);
+        try (Connection c = getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(NOTIFY_QUERY)) {
         ps.setString(1, "R");
         ps.setString(2, assetid);
         ps.executeUpdate();
@@ -928,22 +1059,17 @@ try {
                     "WARNING: Error notifying classified asset - " + assetid +
                     "->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
     }
 
     public void notifyProcessedAsset(String assetid)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         String NOTIFY_QUERY;
-        con = null;
-        ps = null;
+       
         NOTIFY_QUERY = "UPDATE AM_ASSET SET ASSET_STATUS = ? WHERE ASSET_ID = ?  ";
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(NOTIFY_QUERY);
+        try (Connection c = getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(NOTIFY_QUERY)) {
         ps.setString(1, "ACTIVE");
         ps.setString(2, assetid);
         ps.executeUpdate();
@@ -953,44 +1079,37 @@ try {
                     "WARNING: Error notifying processed asset - " + assetid +
                     "->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
 
     }
 
     public boolean isAlreadyProcessedDistribution(String distCode)
     {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
         boolean alreadyProcessed;
         String PROCESS_QUERY;
-        con = null;
-        ps = null;
-        rs = null;
+       
         alreadyProcessed = false;
         PROCESS_QUERY = "SELECT count(DIST_ID) FROM AM_DEPR_DIST WHERE DIST_ID  = ?";
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(PROCESS_QUERY);
+        try (Connection c = getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(PROCESS_QUERY)) {
+    
         ps.setString(1, distCode);
-        rs = ps.executeQuery();
+     try(ResultSet rs = ps.executeQuery()){
 
         while (rs.next()) {
             if (rs.getInt(1) > 0) {
                 alreadyProcessed = true;
             }
         }
+     }
 
     } catch (Exception ex) {
         System.out.println(
                 "WARNING: Error isAlreadyProcessedDistribution - " +
                 distCode + "->" +
                 ex.getMessage());
-    } finally {
-        closeConnection(con, ps, rs);
-    }
+    } 
     return alreadyProcessed;
 }        
         
@@ -998,15 +1117,13 @@ try {
 
     public void clearDistributionEntry(String distCode)
     {
-        Connection con;
-        PreparedStatement ps;
+       
         String CLEAR_QUERY;
-        con = null;
-        ps = null;
+       
         CLEAR_QUERY = "DELETE FROM AM_DEPR_DIST WHERE DIST_ID = ?";
-        try {
-        con = getConnection("legendPlus");
-        ps = con.prepareStatement(CLEAR_QUERY);
+        try (Connection c = getConnection("legendPlus");
+     	         PreparedStatement ps = c.prepareStatement(CLEAR_QUERY)) {
+   
         ps.setString(1, distCode);
         ps.execute();
         } catch (Exception ex) {
@@ -1014,9 +1131,7 @@ try {
                     "WARNING: Error clearDistributionEntry  - " + distCode +
                     "->" +
                     ex.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
 
     }
 
@@ -2117,7 +2232,7 @@ try {
         }
     }
     
-    public boolean getSapAMASSET_MONTHLY(){
+    public boolean getSapAMASSET_MONTHLY() throws SQLException{
         Connection con;
         ResultSet rs;
         PreparedStatement ps;
@@ -2590,7 +2705,7 @@ try {
         query3 = "update a SET a.IMPROV_COST = b.IMPROV_COST,a.IMPROV_MONTHLYDEP = b.IMPROV_MONTHLYDEP, "+
         		 "a.IMPROV_ACCUMDEP = b.IMPROV_ACCUMDEP,a.IMPROV_NBV = b.IMPROV_NBV,a.TOTAL_NBV = a.TOTAL_NBV+b.TOTAL_NBV, "+
         		 "last_dep_date = '"+lastProcessingDate+"' "+
-        		 "from AM_ASSET a, Asset_Improvement_Depreciation b where a.Asset_Id = b.Asset_Id and b.IMPROV_COST != b.IMPROV_ACCUMDEP ";
+        		 "from AM_ASSET a, Am_Improvement_Depreciation b where a.Asset_Id = b.Asset_Id and b.IMPROV_TOTALLIFE != b.IMPROV_REMAINLIFE ";
         
         query4 = "UPDATE AM_ASSET SET NBV = RESIDUAL_VALUE WHERE NBV < RESIDUAL_VALUE AND ASSET_STATUS = 'ACTIVE' ";
 //       System.out.println("query in executeNbvResidual: "+query);
@@ -3045,7 +3160,7 @@ public boolean extractMonthlyImprovementSingleTransactions(String startDate, Str
 public boolean extractMonthlyUploadImprovementTransactions(String startDate, String endDate)
 {
     boolean exists;
-    System.out.println("About to Insert Improved Asset records have NBV Ten(10) naira into file Am_Improvement_Depreciation ");
+    System.out.println("About to Insert Improved Asset records have NBV Ten(10) naira into file Am_Improvement_Depreciation from Upload ");
     String qw = "insert into Am_Improvement_Depreciation(BRANCH_CODE,CATEGORY_CODE,Asset_id,Description,cost_increase,vatable_cost,vat_amount,wht_amount,Posting_Date,LPO,"+
     		 "IMPROV_COST,IMPROV_NBV,"+
     		 "IMPROV_TOTALLIFE,IMPROV_REMAINLIFE,IMPROV_EffectiveDate,ASSET_STATUS,IMPROVED) "+
@@ -3106,70 +3221,70 @@ public boolean pendingTrancations(){
 	System.out.println("About to Remove Pending Transactions Before Depreciation for the new month ");
 	//AssetRecordsBean arb = new AssetRecordsBean();
     String queryBooking= "update a set a.Asset_Status = 'REJECTED-SYSTEM' from am_asset a, am_asset_approval b where a.asset_id = b.Asset_id "
-    		+ "and a.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and a.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.Asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Creation'";
     updateAssetStatusChange(queryBooking);
     String queryBooking1= "update a set a.asset_status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, am_asset b where a.asset_id = b.Asset_id "
-    		+ "and b.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and b.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.Asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Creation'";
     updateAssetStatusChange(queryBooking1);	
-    String queryGrpAsset= "update a set a.Asset_Status = 'REJECTED-SYSTEM' from AM_GROUP_ASSET a, am_asset_approval b where CONVERT(VARCHAR,a.GROUP_ID) = b.Asset_id and a.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String queryGrpAsset= "update a set a.Asset_Status = 'REJECTED-SYSTEM' from AM_GROUP_ASSET a, am_asset_approval b where CONVERT(VARCHAR,a.GROUP_ID) = b.Asset_id and a.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Group Asset Creation' ";
     updateAssetStatusChange(queryGrpAsset);
-    String queryGrpAsset2= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, AM_GROUP_ASSET b where a.Asset_id = CONVERT(VARCHAR,b.GROUP_ID) and b.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String queryGrpAsset2= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, AM_GROUP_ASSET b where a.Asset_id = CONVERT(VARCHAR,b.GROUP_ID) and b.Posting_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Group Asset Creation' ";
     updateAssetStatusChange(queryGrpAsset2);    
     String query= "update a set a.approval_status = 'REJECTED-SYSTEM' from am_asset_improvement a, am_asset_approval b where a.asset_id = b.Asset_id "
-    		+ "and a.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and a.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.approval_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Improvement'";
     updateAssetStatusChange(query);
     String query1= "update a set a.asset_status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, am_asset_improvement b where a.asset_id = b.Asset_id "
-    		+ "and b.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and b.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.approval_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Improvement'";
     updateAssetStatusChange(query1);
-    String query2= "update a set a.approval_status = 'R' from AM_GROUP_IMPROVEMENT a, am_asset_approval b where CONVERT(VARCHAR,a.Revalue_ID) = b.Asset_id and a.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query2= "update a set a.approval_status = 'R' from AM_GROUP_IMPROVEMENT a, am_asset_approval b where CONVERT(VARCHAR,a.Revalue_ID) = b.Asset_id and a.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Improve Upload' ";
     updateAssetStatusChange(query2);
-    String query3= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, AM_GROUP_IMPROVEMENT b where a.Asset_id = CONVERT(VARCHAR,b.Revalue_ID) and b.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query3= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, AM_GROUP_IMPROVEMENT b where a.Asset_id = CONVERT(VARCHAR,b.Revalue_ID) and b.revalue_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Improve Upload' ";
     updateAssetStatusChange(query3);
-    String query4= "update a set a.Asset_Status = 'REJECT-SYSTEM' from am_assetUpdate a, am_asset_approval b where a.asset_id = b.Asset_id and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query4= "update a set a.Asset_Status = 'REJECT-SYSTEM' from am_assetUpdate a, am_asset_approval b where a.asset_id = b.Asset_id and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'CloseAsset' ";
     updateAssetStatusChange(query4);
-    String query5= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, am_assetUpdate b where a.asset_id = b.Asset_id and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query5= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, am_assetUpdate b where a.asset_id = b.Asset_id and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'CloseAsset' ";
     updateAssetStatusChange(query5);
-    String query6= "update a set a.Asset_Status = 'ACTIVE' from am_asset a, am_asset_approval b where a.asset_id = b.Asset_id and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query6= "update a set a.Asset_Status = 'ACTIVE' from am_asset a, am_asset_approval b where a.asset_id = b.Asset_id and b.posting_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'CloseAsset' ";
     updateAssetStatusChange(query6);
-    String query7= "update a set a.disposal_status = 'R' from am_AssetDisposal a, am_asset_approval b where a.asset_id = b.Asset_id and a.Disposal_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query7= "update a set a.disposal_status = 'R' from am_AssetDisposal a, am_asset_approval b where a.asset_id = b.Asset_id and a.Disposal_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Disposal' ";
     updateAssetStatusChange(query7);
-    String query8= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, am_AssetDisposal b where a.asset_id = b.Asset_id and b.Disposal_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query8= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, am_AssetDisposal b where a.asset_id = b.Asset_id and b.Disposal_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Disposal' ";
     updateAssetStatusChange(query8);
-    String query9= "update a set a.approval_status = 'R' from AM_GROUP_DISPOSAL a, am_asset_approval b where CONVERT(VARCHAR,a.disposal_ID) = b.Asset_id and a.Disposal_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query9= "update a set a.approval_status = 'R' from AM_GROUP_DISPOSAL a, am_asset_approval b where CONVERT(VARCHAR,a.disposal_ID) = b.Asset_id and a.Disposal_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Disposal Upload' ";
     updateAssetStatusChange(query9);
-    String query10= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, AM_GROUP_DISPOSAL b where a.Asset_id = CONVERT(VARCHAR,b.disposal_ID) and b.Disposal_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query10= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, AM_GROUP_DISPOSAL b where a.Asset_id = CONVERT(VARCHAR,b.disposal_ID) and b.Disposal_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Disposal Upload' ";
     updateAssetStatusChange(query10);
-    String query11= "update a set a.status = 'REJECT-SYSTEM' from am_assetReclassification a, am_asset_approval b where a.asset_id = b.Asset_id and a.reclassify_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query11= "update a set a.status = 'REJECT-SYSTEM' from am_assetReclassification a, am_asset_approval b where a.asset_id = b.Asset_id and a.reclassify_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Reclassification' ";
     updateAssetStatusChange(query11);
-    String query12= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, am_assetReclassification b where a.asset_id = b.Asset_id and b.reclassify_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query12= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, am_assetReclassification b where a.asset_id = b.Asset_id and b.reclassify_date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Reclassification' ";
     updateAssetStatusChange(query12);
-    String query13= "update a set a.approval_status = 'REJECTED-SYSTEM' from am_assetTransfer a, am_asset_approval b where a.asset_id = b.Asset_id and a.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query13= "update a set a.approval_status = 'REJECTED-SYSTEM' from am_assetTransfer a, am_asset_approval b where a.asset_id = b.Asset_id and a.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Transfer' ";
     updateAssetStatusChange(query13);
-    String query14= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, am_assetTransfer b where a.asset_id = b.Asset_id and b.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query14= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, am_assetTransfer b where a.asset_id = b.Asset_id and b.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Asset Transfer' ";
     updateAssetStatusChange(query14);
-    String query15= "update a set a.status = 'REJECTED-SYSTEM' from am_gb_bulkTransfer a, am_asset_approval b where a.Batch_id = b.Asset_id and a.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query15= "update a set a.status = 'REJECTED-SYSTEM' from am_gb_bulkTransfer a, am_asset_approval b where a.Batch_id = b.Asset_id and a.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Bulk Asset Transfer' ";
     updateAssetStatusChange(query15);
-    String query16= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, am_gb_bulkTransfer b where a.asset_id = b.Asset_id and b.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-1))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    String query16= "update a set a.Asset_Status = 'REJECTED-SYSTEM',process_status = 'R' from am_asset_approval a, am_gb_bulkTransfer b where a.asset_id = b.Asset_id and b.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Bulk Asset Transfer' ";
     updateAssetStatusChange(query16);
     exists = true;

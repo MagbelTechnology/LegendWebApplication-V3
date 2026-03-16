@@ -5,6 +5,7 @@ import java.util.*;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Connection;
 
 import com.magbel.legend.bus.ApprovalRecords;
@@ -3179,7 +3180,7 @@ catch (Exception r) {
 		return allocation;
 	}
 
-	public void updateBudget(String quarter, String[] bugdetinfo) {
+	public void updateBudget(String quarter, String[] bugdetinfo) throws SQLException {
 
 		String fisdate = "";
 		int finomonth = 0;
@@ -4149,7 +4150,7 @@ catch (Exception r) {
 
 
 	//ADD RAISE ENTRY
-	private void  updateCreatedGroupAsset()
+	private void  updateCreatedGroupAsset() throws SQLException
 	{
 		String update_created_asset_qry ="update am_group_asset set process_flag= ?, " +
 	    " DATE_PURCHASED=?, DEP_RATE=?, "+

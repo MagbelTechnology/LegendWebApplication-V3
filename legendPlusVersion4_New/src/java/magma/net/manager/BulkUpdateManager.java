@@ -24,6 +24,8 @@ import com.magbel.util.ApplicationHelper;
 import com.magbel.util.DatetimeFormat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import magma.net.vao.Asset;
 import magma.net.vao.BranchVisit;
@@ -62,7 +64,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
     public BulkUpdateManager() throws Exception {
 
         try {  
-            freeResource();
+           
             sdf = new java.text.SimpleDateFormat("dd-MM-yyyy hh:mm:ss.SSS");
             dbConnection = new MagmaDBConnection();
             dateFormat = new DatetimeFormat();
@@ -78,7 +80,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
         }
     }
 
-    public boolean insertBulkUpdate(ArrayList list, int bacthId) {
+    public boolean insertBulkUpdateOld(ArrayList list, int bacthId) {
         boolean re = false;
 
         String query = "insert into am_gb_bulkupdate ( " +
@@ -242,6 +244,87 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
         return (d.length > 0);
     }
+    
+    
+    public boolean insertBulkUpdate(ArrayList list, int batchId) {
+
+        String query = "INSERT INTO am_gb_bulkupdate (" +
+                "REGISTRATION_NO,Description,VENDOR_AC," +
+                "ASSET_MODEL,ASSET_SERIAL_NO," +
+                "ASSET_ENGINE_NO,SUPPLIER_NAME," +
+                "ASSET_USER,ASSET_MAINTENANCE," +
+                "AUTHORIZED_BY,PURCHASE_REASON,SBU_CODE," +
+                "SPARE_1,SPARE_2,SPARE_3,SPARE_4,SPARE_5,SPARE_6," +
+                "BAR_CODE, ASSET_ID,BATCH_ID,BRANCH_ID,DEPT_ID,SUB_CATEGORY_ID,LOCATION)" +
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        int[] result = null;
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            con.setAutoCommit(false);
+
+            for (int i = 0; i < list.size(); i++) {
+
+                AssetRecordsBean bd = (AssetRecordsBean) list.get(i);
+
+                ps.setString(1, defaultValue(bd.getRegistration_no(), "0"));
+                ps.setString(2, defaultValue(bd.getDescription(), ""));
+                ps.setString(3, defaultValue(bd.getVendor_account(), "0"));
+                ps.setString(4, defaultValue(bd.getModel(), "0"));
+                ps.setString(5, defaultValue(bd.getSerial_number(), "0"));
+                ps.setString(6, defaultValue(bd.getEngine_number(), "0"));
+                ps.setInt(7, parseIntSafe(bd.getSupplied_by()));
+                ps.setString(8, defaultValue(bd.getUser(), "0"));
+                ps.setInt(9, parseIntSafe(bd.getMaintained_by()));
+                ps.setString(10, defaultValue(bd.getAuthorized_by(), "0"));
+                ps.setString(11, defaultValue(bd.getReason(), "0"));
+                ps.setString(12, defaultValue(bd.getSbu_code(), "0"));
+                ps.setString(13, defaultValue(bd.getSpare_1(), "0"));
+                ps.setString(14, defaultValue(bd.getSpare_2(), "0"));
+                ps.setString(15, defaultValue(bd.getSpare_3(), "0"));
+                ps.setString(16, defaultValue(bd.getSpare_4(), "0"));
+                ps.setString(17, defaultValue(bd.getSpare_5(), "0"));
+                ps.setString(18, defaultValue(bd.getSpare_6(), "0"));
+                ps.setString(19, defaultValue(bd.getBar_code(), "0"));
+                ps.setString(20, defaultValue(bd.getAsset_id(), "0"));
+                ps.setInt(21, batchId);
+                ps.setString(22, defaultValue(bd.getBranch_id(), "0"));
+                ps.setString(23, defaultValue(bd.getDepartment_id(), "0"));
+                ps.setString(24, defaultValue(bd.getSub_category_id(), "0"));
+                ps.setInt(25, parseIntSafe(bd.getLocation()));
+
+                ps.addBatch();
+
+                if (i % 500 == 0) {
+                    ps.executeBatch();
+                }
+            }
+
+            result = ps.executeBatch();
+            con.commit();
+
+        } catch (Exception ex) {
+
+            System.out.println("Error insertBulkUpdate -> " + ex);
+
+        }
+
+        return result != null && result.length > 0;
+    }
+    
+    private String defaultValue(String value, String def) {
+        return (value == null || value.trim().isEmpty()) ? def : value;
+    }
+
+    private int parseIntSafe(String value) {
+        try {
+            return (value == null || value.trim().isEmpty()) ? 0 : Integer.parseInt(value);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 
     public int insertBulkTransfer(ArrayList list, int bacthId,int categoryId,String newassetId) {
         boolean re = false;
@@ -260,9 +343,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
         //ResultSet rs = null;
         magma.AssetRecordsBean bd = null;
         int[] d = null;
-        try {
-        	Connection con = dbConnection.getConnection("legendPlus");
-            PreparedStatement ps = con.prepareStatement(query);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query);) {
+        	
 
             for (int i = 0; i < list.size(); i++) {
                 bd = (magma.AssetRecordsBean) list.get(i);
@@ -403,15 +486,15 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
         
 
-        ResultSet rs = null;
+       
         ArrayList listNew = new ArrayList();
         ArrayList listOld = new ArrayList();
         ArrayList[] listNewOld = new ArrayList[2];
-        try {
-        	Connection con = dbConnection.getConnection("legendPlus");
-            PreparedStatement ps = con.prepareStatement(selectQuery);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery)) {
+        	
             ps.setString(1, tranId);
-            rs = ps.executeQuery();
+         try(ResultSet rs = ps.executeQuery()){
 
             Asset aset = null;
             while (rs.next()) {
@@ -479,6 +562,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             assetFilter = assetFilter + ")";
 //            System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
             listOld = findAssetByID(assetFilter+" order by ASSET_ID");
+         }
         } catch (Exception e) {
             System.out.println("INFO:Error findAssetByBatchId() in BulkUpdateManager-> " +
                     e.getMessage());
@@ -507,15 +591,15 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 //        System.out.println("the selectQuery  in findAssetByID is <<<<<<<<<<<<< " + selectQuery);
 
        
-        ResultSet rs = null;
+       
 
         ArrayList listOld = new ArrayList();
 
-        try {
-        	Connection con = dbConnection.getConnection("legendPlus");
-            PreparedStatement ps = con.prepareStatement(selectQuery);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery)) {
+        	
 
-            rs = ps.executeQuery();
+          try(ResultSet rs = ps.executeQuery()){
             Asset aset =null;
             while (rs.next()) {
                 String id = rs.getString("ASSET_ID");
@@ -592,7 +676,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
             }
 
-
+          }
 
         } catch (Exception e) {
             System.out.println("INFO:Error findAssetByID() in BulkUpdateManager-> " +
@@ -624,11 +708,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
         ArrayList listOld = new ArrayList();
 
-        try {
-        	Connection con = dbConnection.getConnection("legendPlus");
-            PreparedStatement ps = con.prepareStatement(selectQuery);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery)) {
+        	
 
-            ResultSet rs = ps.executeQuery();
+          try(  ResultSet rs = ps.executeQuery()){
             Asset aset =null;
             while (rs.next()) {
                 String id = rs.getString("ASSET_ID");
@@ -731,6 +815,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 aset = null;
 
             }
+          }
 /*            ps = con.prepareStatement(groupNoQuery);
             ps.setString(1, tranId);
             rs = ps.executeQuery();
@@ -858,9 +943,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 "SBU_CODE=?,Spare_1=?,Spare_2=?,Spare_3=?,Spare_4=?,Spare_5=?,Spare_6=?," +
                 "BAR_CODE=?, DEPT_ID=?, DEPT_CODE=?, SUB_CATEGORY_ID=?, SUB_CATEGORY_CODE=? WHERE ASSET_ID=?" ;
 
-        try {
-        	 Connection con = dbConnection.getConnection("legendPlus");
-             PreparedStatement ps = con.prepareStatement(query);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+        	 
              
              for (int i = 0; i < list.size(); ++i) {
         asset = (Asset)list.get(i);
@@ -945,9 +1030,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 "SBU_CODE=?,Spare_1=?,Spare_2=?,Spare_3=?,Spare_4=?,Spare_5=?,Spare_6=?," +
                 "BAR_CODE=?, DEPT_ID=?, DEPT_CODE=?, SUB_CATEGORY_ID=?, SUB_CATEGORY_CODE=? WHERE ASSET_ID=?" ;
 
-        try {
-        	Connection con = dbConnection.getConnection("legendPlus");
-            PreparedStatement ps = con.prepareStatement(query);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(query)) {
+        	
 
              for (int i = 0; i < list.size(); ++i) {
         asset = (Asset)list.get(i);
@@ -1028,15 +1113,15 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
        
 
-        ResultSet rs = null;
+      
         ArrayList listNew = new ArrayList();
        // ArrayList listOld = new ArrayList();
        // ArrayList[] listNewOld = new ArrayList[2];
-        try {
-        	Connection con = dbConnection.getConnection("legendPlus");
-            PreparedStatement ps = con.prepareStatement(selectQuery);
+        try(Connection con = dbConnection.getConnection("legendPlus");
+            PreparedStatement ps = con.prepareStatement(selectQuery)) {
+        	
             ps.setString(1, tranId);
-            rs = ps.executeQuery();
+          try(ResultSet rs = ps.executeQuery()){
             Asset aset = null;
             while (rs.next()) {
                 String id = rs.getString("ASSET_ID");
@@ -1098,6 +1183,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                // assetFilter = assetFilter + "'" + id + "',";
 
             }
+          }
 
         } catch (Exception e) {
             System.out.println("INFO:Error findAssetsByBatchId() in BulkUpdateManager-> " +
@@ -1108,7 +1194,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
     }
 
-        public double[] findMinMaxAssetCost(String assetId, double minAssetCost, double maxAssetCost) {
+        public double[] findMinMaxAssetCostOld(String assetId, double minAssetCost, double maxAssetCost) {
         double costPrice = 0.0;
         double[] result = new double[2];
         String selectQuery =  "select cost_price from am_asset where asset_id=?";
@@ -1138,6 +1224,40 @@ public class BulkUpdateManager extends legend.ConnectionClass {
         return result;  
 
     }
+        
+        public double[] findMinMaxAssetCost(String assetId, double minAssetCost, double maxAssetCost) {
+
+            double[] result = new double[2];
+            String query = "SELECT cost_price FROM am_asset WHERE asset_id = ?";
+
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement ps = con.prepareStatement(query)) {
+
+                ps.setQueryTimeout(30);
+                ps.setString(1, assetId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+
+                    if (rs.next()) {
+
+                        double costPrice = rs.getDouble("cost_price");
+
+                        if (costPrice > maxAssetCost) {
+                            result[0] = costPrice;
+                        }
+
+                        if (costPrice < minAssetCost) {
+                            result[1] = costPrice;
+                        }
+                    }
+                }
+
+            } catch (SQLException e) {
+                System.out.println("Error findMinMaxAssetCost() -> " + e.getMessage());
+            }
+
+            return result;
+        }
 
         public ArrayList[] findAssetTransferByBatchId(String tranId) {
 
@@ -1150,11 +1270,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)){
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+               try( ResultSet rs = ps.executeQuery()){
 
                 AssetRecordsBean aset = null;
                 while (rs.next()) {
@@ -1211,6 +1331,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter +  ")  order by ASSET_ID";
             //    System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
                 listOld = findAssetByID(assetFilter);
+               }
 
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetTransferByBatchId() in BulkUpdateManager-> " +
@@ -1239,9 +1360,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                     " OLD_ASSET_ID=?,ASSET_USER=?,Branch_ID=?,Dept_ID=?,Section_id=?," +
                     "SBU_CODE=?,BRANCH_CODE=?,DEPT_CODE=?,SECTION_CODE=? WHERE ASSET_ID=?" ;
 //            System.out.println("I am in bulk Transfer manager is >>>>>>>>>>> "+list.size());
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement  ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement  ps = con.prepareStatement(query)) {
+            	
 
                  for (int i = 0; i < list.size(); ++i) {
             asset = (magma.AssetRecordsBean) list.get(i);
@@ -1301,9 +1422,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -1361,11 +1482,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)){
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try(  ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -1404,6 +1525,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter + ")";
 //                System.out.println("the filter that will be sent to BulkUpdateManager is >>>>> " + assetFilter);
                 listOld = findAssetByID(assetFilter);
+              }
 
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetWorkBookByBatchId() in BulkUpdateManager-> " +
@@ -1432,9 +1554,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                     " DESCRIPTION=?,ASSET_USER=?," +
                     "BAR_CODE=? WHERE ASSET_ID=?" ;
 
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement   ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement   ps = con.prepareStatement(query)) {
+            	
                 
                  for (int i = 0; i < list.size(); ++i) {
             asset = (Asset)list.get(i);
@@ -1474,9 +1596,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -1535,11 +1657,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try( ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -1579,6 +1701,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 //                System.out.println("the filter that will be sent From findAssetVerificationSelectionBatchIds is >>>>> " + assetFilter);
                 listOld = findAssetByID(assetFilter);
 
+              }
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetVerificationSelectionBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -1605,9 +1728,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)) {
+            	
                 ps.setString(1, tranId);
                 ResultSet rs = ps.executeQuery();
 
@@ -1675,9 +1798,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)){ 
+            	
  //               System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -1714,7 +1837,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
         }
 
 
-        public boolean insertAssetProofInsert(ArrayList list, String bacthId, String processExport) {
+        public boolean insertAssetProofInsertOld(ArrayList list, String bacthId, String processExport) {
             boolean re = false;
             String tableName = "Temp"+bacthId;
 //            System.out.println("<<<<<<<tableName in insertAssetProofInsert: "+tableName+"   bacthId: "+bacthId);
@@ -2036,6 +2159,344 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
             return re;
         }
+        
+        public boolean insertAssetProofInsert(ArrayList list, String bacthId, String processExport) {
+
+            boolean re = false;
+            String tableName = "Temp" + bacthId;
+
+            String createquery = "IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].["+tableName+"]') AND type in (N'U')) BEGIN " +
+                    "CREATE TABLE "+tableName+"( " +
+                    "[ASSET_ID] [varchar](50) NULL,	[Description] [varchar](255) NULL,	[BAR_CODE] [varchar](50) NULL,"+
+                    "[Cost_Price] [decimal](18, 2) NULL,	[Registration_No] [varchar](50) NULL,	[Asset_Make] [nvarchar](50) NULL,"+
+                    "[Asset_Model] [varchar](255) NULL,	[Asset_Serial_No] [varchar](255) NULL,	[Asset_Engine_No] [varchar](255) NULL,"+
+                    "[SBU_CODE] [varchar](50) NULL, [SuppliedBy] [varchar](50) NULL, [Vendor_AC] [varchar](50) NULL, [MaintainedBy] [varchar](50) NULL, [Date_purchased] [datetime] NULL,"+
+                    "[Spare_1] [varchar](150) NULL,	[Spare_2] [varchar](150) NULL,[Spare_3] [varchar](150) NULL,[Spare_4] [varchar](150) NULL,"+
+                    "[Spare_5] [varchar](150) NULL,	[Spare_6] [varchar](150) NULL,[ASSET_USER] [varchar](255) NULL,"+
+                    "[COMMENTS] [varchar](255) NULL,	[ASSETSIGHTED] [nchar](1) NULL,	[ASSETFUNCTION] [nchar](1) NULL,"+
+                    "[State] [int] NULL,[OLD_ASSET_ID] [varchar](50) NULL,[GROUP_NO] [int] NULL,[GROUP_ID] [varchar](50) NULL,"+
+                    "[Section_id] [int] NULL,[Accum_Dep] [decimal](18, 2) NULL,[Monthly_Dep] [decimal](18, 2) NULL,[NBV] [decimal](18, 2) NULL,"+
+                    "[Dept_ID] [int] NULL,	[Location] [int] NULL,[LPO] [varchar](50) NULL,[IMPROV_NBV] [decimal](18, 2),[IMPROV_VATABLECOST] [decimal](18, 2),"+
+                    "[IMPROV_COST] [decimal](18, 2) NULL,	[IMPROV_MONTHLYDEP] [decimal](18, 2) NULL,[IMPROV_ACCUMDEP] [decimal](18, 2) NULL,[PROOF_DATE] [date] NULL,"+
+                   "[Dep_End_Date] [varchar](50) NULL,	[Effective_Date] [varchar](50) NULL,[TOTAL_NBV] [decimal](18, 2) NULL,[SUB_CATEGORY_ID] [int] NULL,"+
+                    "[ASSET_CODE] [int] NULL,	[BRANCH_ID] [varchar](50) NULL,	[CATEGORY_ID] [int] NULL,"+
+                    "[BATCH_ID] [varchar](50) NULL,	[PROCESS_STATUS] [varchar](50) NULL,[SELECT_DATE] [date] NULL,"+
+                    "[PROOFED_BY] [int] NULL, [INITIATEDBRANCHCODE] [varchar](50) NULL) ON [PRIMARY]  END";
+
+            ad.updateAssetStatusChange(createquery);
+
+            String insertquery = "insert into "+tableName+" ( " +
+                    "ASSET_ID,Description,BAR_CODE,Registration_No,Asset_Make,Asset_Model,Asset_Serial_No,"+  //7
+                    "Asset_Engine_No,Date_purchased,Spare_1,Spare_2,Spare_3,Spare_4,Spare_5,Spare_6,SBU_CODE,ASSET_USER," + //17
+                    "COMMENTS,ASSETSIGHTED,ASSETFUNCTION, ASSET_CODE,BRANCH_ID,CATEGORY_ID,BATCH_ID,PROOF_DATE,GROUP_NO,GROUP_ID," +  //27
+                    "Cost_Price,Accum_Dep,Monthly_Dep,NBV,IMPROV_COST,IMPROV_MONTHLYDEP,IMPROV_ACCUMDEP,IMPROV_NBV,TOTAL_NBV,"+  //36
+                    "OLD_ASSET_ID,SuppliedBy,Vendor_AC,MaintainedBy,Dep_End_Date,Effective_Date,SUB_CATEGORY_ID,Dept_ID,Section_id,Location,State,LPO,PROOFED_BY,INITIATEDBRANCHCODE )" +  //50
+                    " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+            String query = "insert into am_Asset_Proof ( " +
+                    "ASSET_ID,Description,BAR_CODE,Cost_Price,Registration_No,Asset_Make,Asset_Model,Asset_Serial_No,"+
+                    "Asset_Engine_No,Date_purchased,Spare_1,Spare_2,Spare_3,Spare_4,Spare_5,Spare_6,SBU_CODE,ASSET_USER," +
+                    "COMMENTS,ASSETSIGHTED,ASSETFUNCTION, ASSET_CODE,BRANCH_ID,CATEGORY_ID,BATCH_ID,PROOF_DATE,GROUP_NO,GROUP_ID,"+
+                    "Effective_Date, Dep_End_Date,Supplier_Name,Vendor_AC,LPO,Purchase_Reason,Asset_Maintenance,Accum_Dep,Monthly_Dep,NBV,"+
+                    "IMPROV_COST,IMPROV_MONTHLYDEP,IMPROV_ACCUMDEP,IMPROV_NBV,TOTAL_NBV,OLD_ASSET_ID,SUB_CATEGORY_ID,Dept_ID,Section_id,Location,State,REC_ADD,USER_ID,INITIATEDBRANCHCODE)"+
+                    " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            
+
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement ps = con.prepareStatement(query);
+                 PreparedStatement ps1 = con.prepareStatement(insertquery)) {
+
+                for (int i = 0; i < list.size(); i++) {
+
+                    magma.AssetRecordsBean bd = (magma.AssetRecordsBean) list.get(i);
+
+                    String assetId = bd.getAsset_id();
+                    String description = bd.getDescription();
+                    String barcode = bd.getBar_code();
+
+                    if (assetId == null || assetId.isEmpty()) {
+                        assetId = "0";
+                    }
+
+                    if (barcode == null || barcode.isEmpty()) {
+                        barcode = "0";
+                    }
+
+                    String groupId = bd.getProjectCode();
+
+                    String recNo = approvalRec.getCodeName(
+                            "SELECT count(*) FROM am_Asset_Proof WHERE Asset_Id = '" +
+                                    assetId + "' and group_id = '" + groupId + "'");
+                    
+                
+                  String comments = bd.getComments();
+                  String sighted = bd.getAssetsighted();
+                  String functional = bd.getAssetfunction();
+                  String assetuser = bd.getNewuser();
+                  String branchCode = bd.getBranch_Code();
+                  String categoryId = bd.getCategory_id();
+                  String deptId = bd.getDepartment_id();
+                  String sectionId = bd.getSection_id();
+                  String locationId = bd.getLocation();
+                  String stateId = bd.getState();
+                  String subCategoryId = bd.getSub_category_id();
+                  if(categoryId.equalsIgnoreCase("")){categoryId = "0";}
+                  if(subCategoryId.equalsIgnoreCase("")){subCategoryId = "0";}
+                  if(deptId.equalsIgnoreCase("")){deptId = "0";}
+                  if(sectionId.equalsIgnoreCase("")){sectionId = "0";}
+                  if(locationId.equalsIgnoreCase("")){locationId = "0";}
+                  if(stateId.equalsIgnoreCase("")){stateId = "0";}
+//                  System.out.println("<<<<<<=====deptId: "+deptId+"  sectionId: "+sectionId+"  locationId: "+locationId+"  stateId: "+stateId+"  subCategoryId: "+subCategoryId+"   categoryId: "+categoryId);
+                  String costprice = bd.getCost_price();
+                  if(costprice.equals("")){costprice = "0";}
+//                  System.out.println("<<<<<costprice: "+costprice);
+                  String model = bd.getModel();
+                  String make = bd.getMake();
+                  String depreciation_start_date = bd.getDepreciation_start_date();
+//                  System.out.println("<<<<<depreciation_start_date 1: "+depreciation_start_date);
+              	if(depreciation_start_date!=""){
+              	String dd = depreciation_start_date.substring(0,2);
+              	String mm = depreciation_start_date.substring(3,5);
+              	String yyyy = depreciation_start_date.substring(6,10);
+              	depreciation_start_date = yyyy+"-"+mm+"-"+dd;
+              	}                    
+//                  System.out.println("<<<<<depreciation_start_date 2: "+depreciation_start_date);
+                  String depreciation_end_date = bd.getDepreciation_end_date();
+//                  System.out.println("<<<<<depreciation_end_date 1: "+depreciation_end_date);
+                  String userId = bd.getUser_id();
+              	if(!depreciation_end_date.equalsIgnoreCase("")){
+//              		System.out.println("<<<<<depreciation_end_date 2: "+depreciation_end_date+"   userId: "+userId);
+              	String dd = depreciation_end_date.substring(0,2);
+              	String mm = depreciation_end_date.substring(3,5);
+              	String yyyy = depreciation_end_date.substring(6,10);
+              	depreciation_end_date = yyyy+"-"+mm+"-"+dd;
+              	}
+              	if(depreciation_end_date.equalsIgnoreCase("")){depreciation_end_date = depreciation_start_date;}
+//                  System.out.println("<<<<<depreciation_end_date 3: "+depreciation_end_date);
+                  String monthlyDep = bd.getMonthlydep() == null ? "0" : bd.getMonthlydep();
+                  if(monthlyDep.equals("")){monthlyDep = "0";}
+                  String accumdep = bd.getAccumdep() == null ? "0" : bd.getAccumdep();
+                  if(accumdep.equals("")){accumdep = "0";}
+                  String nbv = bd.getNbv() == null ? "0" : bd.getNbv();
+                  if(nbv.equals("")){nbv = "0";}
+//                  System.out.println("<<<<<accumdep: "+accumdep+"   nbv: "+nbv);
+               //   String improveCost = bd.getImproveCost();
+//                  System.out.println("<<<<<costprice: "+costprice+"  monthlyDep: "+monthlyDep+"   accumdep: "+accumdep+"   nbv: "+nbv);
+                  String improveCost = bd.getImproveCost() == null ? "0" : bd.getImproveCost();
+                  if(improveCost.equals("")){improveCost = "0";}
+               //   String improveMonthlydep = bd.getImproveMonthlydep();
+                  String improveMonthlydep = bd.getImproveMonthlydep() == null ? "0" : bd.getImproveMonthlydep();
+                  String improveAccumdep = bd.getImproveAccumdep() == null ? "0" : bd.getImproveAccumdep();
+                  if(improveAccumdep.equals("")){improveAccumdep = "0";}
+                  String improveNBV =  bd.getImproveNbv() == null ? "0" : bd.getImproveNbv();
+                  if(improveNBV.equals("")){improveNBV = "0";}
+                  String improvetotalnbv = bd.getImproveTotalNbv() == null ? "0" : bd.getImproveTotalNbv();
+//                  System.out.println("<<<<<improveCost: "+improveCost+"  improveMonthlydep: "+improveMonthlydep+"   improveAccumdep: "+improveAccumdep+"   improveNBV: "+improveNBV+"  improvetotalnbv: "+improvetotalnbv);
+                  String supplied_by = bd.getSupplied_by();
+                  String vendor_account = bd.getVendor_account();
+                  String lpo = bd.getLpo();
+              	String sbucode = bd.getSbu_code();
+              	String spare1 = bd.getSpare_1();
+              	String spare2 = bd.getSpare_2();
+              	String spare3 = bd.getSpare_3();
+              	String spare4 = bd.getSpare_4();
+              	String spare5 = bd.getSpare_5();
+              	String spare6 = bd.getSpare_6();  
+//              	System.out.println("<<<<<supplied_by: "+supplied_by);
+              	String registrationNo = bd.getRegistration_no();
+              	String serialNo = bd.getSerial_number();
+              	String engineNo = bd.getEngine_number();
+              	String suppliedBy = bd.getSupplied_by();
+              	String maintianedBy = bd.getMaintained_by();
+              	String authorized = bd.getAuthorized_by();
+              	String purchaseReason = bd.getReason();	
+              	String purchaseDate = bd.getDate_of_purchase();	
+              	String itemType = bd.getItemType();
+              	String user_Id = bd.getUser_id();
+              	String intiatedbranchCode = approvalRec.getCodeName("select b.BRANCH_CODE from am_gb_User a, am_ad_branch b where a.Branch = b.BRANCH_ID and a.user_id = "+user_Id+" ");
+//              	if(maintianedBy==""){maintianedBy = "0";}
+//              	System.out.println("<<<<<intiatedbranchCode: "+intiatedbranchCode);
+              	int groupNo = bd.getQuantity();
+           
+              	String oldAssetId = bd.getOld_asset_id();
+//              	System.out.println("<<<<<purchaseDate: "+purchaseDate);
+//               	if(purchaseDate!=""){
+              	if(!purchaseDate.equalsIgnoreCase("")){
+              	String dd = purchaseDate.substring(0,2);
+              	String mm = purchaseDate.substring(3,5);
+              	String yyyy = purchaseDate.substring(6,10);
+              	purchaseDate = yyyy+"-"+mm+"-"+dd;
+              	}
+              	if(purchaseDate.equalsIgnoreCase("")){purchaseDate = depreciation_start_date;}
+//              	System.out.println("<<<<<bd.getAssetCode(): "+bd.getAssetCode());
+                  int assetcode = bd.getAssetCode();    
+//                  System.out.println("<<<<<<assetId: "+assetId+"  description: "+description+"  barcode: "+barcode+"  comments: "+comments+"  sighted: "+sighted+"  functional: "+functional+"  branchCode: "+branchCode+"  categoryId: "+categoryId+"  assetcode: "+assetcode+"  assetuser: "+assetuser);
+//                  System.out.println("<<<<<<costprice: "+costprice+"  registrationNo: "+registrationNo+"  make: "+make+"  model: "+model+"  serialNo: "+serialNo+"  engineNo: "+engineNo+"  purchaseDate: "+purchaseDate+"  spare1: "+spare1+"  spare2: "+spare2+"  spare3: "+spare3+"  spare4: "+spare4+"  spare5: "+spare5+"  spare6: "+spare6+"  sbucode: "+sbucode+"  categoryId: "+categoryId);
+                  if (assetId == null || assetId.equals("")) {
+                  	assetId = "0";
+                  }
+                  if (barcode == null || barcode.equals("")) {
+                      barcode = "0";
+                  }
+
+                    // =========================
+                    // Insert into am_Asset_Proof
+                    // =========================
+
+                    ps.setString(1, assetId.toUpperCase());
+                    ps.setString(2, description.toUpperCase());
+                    ps.setString(3, barcode.toUpperCase());
+//                    System.out.println("<<<<<costprice: "+costprice);
+                    ps.setDouble(4, Double.parseDouble(costprice));
+//                    System.out.println("<<<<<assetcode: "+assetcode);
+                    ps.setString(5, registrationNo.toUpperCase());
+                    ps.setString(6, make);
+                    ps.setString(7, model);
+                    ps.setString(8, serialNo);
+                    ps.setString(9, engineNo);
+                    ps.setString(10, purchaseDate);
+                    ps.setString(11, spare1.toUpperCase());
+                    ps.setString(12, spare2.toUpperCase());
+                    ps.setString(13, spare3.toUpperCase());
+                    ps.setString(14, spare4.toUpperCase());
+                    ps.setString(15, spare5.toUpperCase());
+                    ps.setString(16, spare6.toUpperCase());                    
+                    ps.setString(17, sbucode);
+                    ps.setString(18, assetuser.toUpperCase());
+                    ps.setString(19, comments);
+                    ps.setString(20, sighted);
+                    ps.setString(21, functional);
+                    ps.setInt(22, assetcode);
+                    ps.setString(23, branchCode);
+//                    System.out.println("<<<<<branchCode: "+branchCode);
+//                    System.out.println("<<<<<categoryId: "+categoryId);
+                    ps.setInt(24, Integer.parseInt(categoryId));
+                    ps.setString(25, bacthId);
+                    ps.setTimestamp(26, dbConnection.getDateTime(new java.util.Date()));
+                    ps.setInt(27, groupNo); 
+//                    System.out.println("<<<<<groupId: "+groupId);
+                    ps.setString(28, groupId);
+                    ps.setString(29, depreciation_start_date);
+                    ps.setString(30, depreciation_end_date);
+                    ps.setString(31, suppliedBy);
+                    ps.setString(32, vendor_account);
+//                    System.out.println("<<<<<vendor_account: "+vendor_account);
+                    ps.setString(33, lpo);
+                    ps.setString(34, purchaseReason.toUpperCase());
+                    ps.setString(35, maintianedBy);
+//                    System.out.println("<<<<<accumdep: "+accumdep);
+                    ps.setDouble(36, Double.parseDouble(accumdep));
+//                    System.out.println("<<<<<monthlyDep: "+monthlyDep);
+                    ps.setDouble(37, Double.parseDouble(monthlyDep));
+//                    System.out.println("<<<<<nbv: "+nbv);
+                    ps.setDouble(38, Double.parseDouble(nbv));
+//                    System.out.println("<<<<<improveCost: "+improveCost);
+                    ps.setDouble(39, Double.parseDouble(improveCost));
+//                    System.out.println("<<<<<improveMonthlydep: "+improveMonthlydep);
+                    ps.setDouble(40, Double.parseDouble(improveMonthlydep));
+//                    System.out.println("<<<<<improveAccumdep: "+improveAccumdep);
+                    ps.setDouble(41, Double.parseDouble(improveAccumdep));
+//                    System.out.println("<<<<<improveNBV: "+improveNBV);
+                    ps.setDouble(42, Double.parseDouble(improveNBV));
+//                    System.out.println("<<<<<accumdep: "+accumdep+"  monthlyDep: "+monthlyDep+"  nbv: "+nbv+"   improveCost: "+improveCost+"  improveMonthlydep: "+improveMonthlydep+"   improveAccumdep: "+improveAccumdep+"  improveNBV: "+improveNBV+"  improvetotalnbv: "+improvetotalnbv);
+                    ps.setDouble(43, Double.parseDouble(improveNBV)+Double.parseDouble(nbv));
+                    ps.setString(44, oldAssetId);
+//                    System.out.println("<<<<<<subCategoryId: "+subCategoryId+"  deptId: "+deptId+"  sectionId: "+sectionId+"  locationId: "+locationId+"  stateId: "+stateId+"  functional: "+functional+"  branchCode: "+branchCode+"  categoryId: "+categoryId+"  assetcode: "+assetcode+"  assetuser: "+assetuser);
+                    ps.setInt(45, Integer.parseInt(subCategoryId));
+//                    System.out.println("<<<<<deptId: "+deptId);
+                    ps.setInt(46, Integer.parseInt(deptId));
+//                    System.out.println("<<<<<sectionId: "+sectionId);
+                    ps.setInt(47, Integer.parseInt(sectionId));
+//                    System.out.println("<<<<<locationId: "+locationId);
+                    ps.setInt(48, Integer.parseInt(locationId));
+//                    System.out.println("<<<<<stateId: "+stateId);
+                    ps.setInt(49, Integer.parseInt(stateId));
+//                    System.out.println("<<<<<assetcode: "+assetcode);
+                    ps.setString(50, itemType);
+//                    System.out.println("<<<<<userId: "+userId);
+                    ps.setInt(51, Integer.parseInt(userId));
+                    ps.setString(52, intiatedbranchCode);
+                    // set other parameters exactly as you already do...
+
+                    if ("0".equals(recNo)) {
+                        ps.execute();
+                    }
+
+                    // =========================
+                    // Insert into Temp Table
+                    // =========================
+
+                    ps1.setString(1, assetId.toUpperCase());
+                    ps1.setString(2, description.toUpperCase());
+                    ps1.setString(3, barcode.toUpperCase());
+         //           ps1.setDouble(4, Double.parseDouble(costprice));
+                    ps1.setString(4, registrationNo.toUpperCase());
+                    ps1.setString(5, make);
+                    ps1.setString(6, model);
+                    ps1.setString(7, serialNo);
+                    ps1.setString(8, engineNo);
+                    ps1.setString(9, purchaseDate);
+                    ps1.setString(10, spare1.toUpperCase());
+                    ps1.setString(11, spare2.toUpperCase());
+                    ps1.setString(12, spare3.toUpperCase());
+                    ps1.setString(13, spare4.toUpperCase());
+                    ps1.setString(14, spare5.toUpperCase());
+                    ps1.setString(15, spare6.toUpperCase());
+                    ps1.setString(16, sbucode);
+                    ps1.setString(17, assetuser.toUpperCase());
+                    ps1.setString(18, comments);
+                    ps1.setString(19, sighted);
+                    ps1.setString(20, functional);
+                    ps1.setInt(21, assetcode);
+                    ps1.setString(22, branchCode);
+                    ps1.setInt(23, Integer.parseInt(categoryId));
+                    ps1.setString(24, bacthId);
+                    ps1.setTimestamp(25, dbConnection.getDateTime(new java.util.Date()));
+                    ps1.setInt(26, groupNo);
+                    ps1.setString(27, groupId);
+//                    System.out.println("<<<<<groupId: "+groupId+"    groupNo: "+groupNo);
+                    ps1.setDouble(28, Double.parseDouble(costprice));
+
+					ps1.setDouble(29, Double.parseDouble(accumdep));
+					ps1.setDouble(30, Double.parseDouble(monthlyDep));
+					ps1.setDouble(31, Double.parseDouble(nbv));
+					ps1.setDouble(32, Double.parseDouble(improveCost));
+					ps1.setDouble(33, Double.parseDouble(improveMonthlydep));
+					ps1.setDouble(34, Double.parseDouble(improveAccumdep));
+					ps1.setDouble(35, Double.parseDouble(improveNBV));
+//					System.out.println("<<<<<accumdep: "+accumdep+"  monthlyDep: "+monthlyDep+"  nbv: "+nbv+"   improveCost: "+improveCost+"  improveMonthlydep: "+improveMonthlydep+"   improveAccumdep: "+improveAccumdep+"  improveNBV: "+improveNBV+"  improvetotalnbv: "+improvetotalnbv);
+					ps1.setDouble(36, Double.parseDouble(improveNBV)+Double.parseDouble(nbv));
+					ps1.setString(37, oldAssetId);
+					ps1.setString(38, suppliedBy);
+					ps1.setString(39, vendor_account);
+					ps1.setString(40, maintianedBy);
+					ps1.setString(41, depreciation_end_date);
+					ps1.setString(42, depreciation_start_date);
+//					System.out.println("<<<<<<subCategoryId: "+subCategoryId+"  deptId: "+deptId+"  sectionId: "+sectionId+"  locationId: "+locationId+"  stateId: "+stateId+"  functional: "+functional+"  branchCode: "+branchCode+"  categoryId: "+categoryId+"  assetcode: "+assetcode+"  assetuser: "+assetuser);
+					ps1.setInt(43, Integer.parseInt(subCategoryId));
+					ps1.setInt(44, Integer.parseInt(deptId));
+					ps1.setInt(45, Integer.parseInt(sectionId));
+					ps1.setInt(46, Integer.parseInt(locationId));
+//					System.out.println("<<<<<locationId: "+locationId);
+					ps1.setInt(47, Integer.parseInt(stateId));
+					ps1.setString(48, lpo);
+					ps1.setInt(49, Integer.parseInt(userId));
+					ps1.setString(50, intiatedbranchCode);
+                    // set other parameters exactly as you already do...
+
+                    if ("0".equals(recNo)) {
+                        ps1.execute();
+                    }
+                }
+
+                re = true;
+
+            } catch (Exception ex) {
+                System.out.println("Error insertAssetProofInsert() of BulkUpdateManager -> " + ex);
+            }
+
+            return re;
+        }
 
         public ArrayList findAddedAssetProofByBatchId(String tranId) {
 
@@ -2048,11 +2509,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             
             ArrayList listadd = new ArrayList();
             ArrayList listaddrec = new ArrayList(2);
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)) {
+            	
 //                ps.setInt(1, Integer.parseInt(tranId));
-                ResultSet rs = ps.executeQuery();
+              try(  ResultSet rs = ps.executeQuery()){
 //                System.out.println("<<<<<selectQuery in findAddedAssetProofByBatchId: "+selectQuery);
                 Asset aset = null;
                 while (rs.next()) {
@@ -2172,6 +2633,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                     aset=null;
 
                 }
+              }
 
             } catch (Exception e) {
                 System.out.println("INFO:Error findAddedAssetProofByBatchId() in BulkUpdateManager-> " +
@@ -2195,11 +2657,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try(ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -2315,6 +2777,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
              //   listOld = findAssetByID(assetFilter+" order by ASSET_ID");
                 listOld = findAssetProofByID(assetFilter+" order by ASSET_ID",tranId);
                 
+              }
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetProofByBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -2343,11 +2806,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listOld = new ArrayList();
             ArrayList listNewAdd = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try( ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -2448,6 +2911,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter + ")";
 ///                System.out.println("the filter that will be sent from findAssetProofRejectionByBatchId is >>>>> " + assetFilter);
                 listOld = findAssetProofByID(assetFilter+" order by ASSET_ID",tranId);
+              }
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetProofRejectionByBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -2477,11 +2941,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listOld = new ArrayList();
             ArrayList listNewAdd = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)){
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+             try(ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -2582,6 +3046,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter + ")";
 //                System.out.println("the filter that will be sent from findAssetProofRejectionByBatchId is >>>>> " + assetFilter);
                 listOld = findAssetProofByID(assetFilter+" order by ASSET_ID",tranId);
+             }
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetProofRejectionByBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -2613,11 +3078,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)){
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+               try( ResultSet rs = ps.executeQuery()){
                 Asset aset = null;
                 while (rs.next()) {
                     String id = rs.getString("ASSET_ID");
@@ -2728,6 +3193,8 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter + ")";
  //               System.out.println("the filter that will be sent to FleetHistoryManager from findAssetProofSelectionBatchId is >>>>> " + assetFilter);
                 listOld = findAssetProofByID(assetFilter+" order by ASSET_ID",tranId);
+               
+               }
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetProofSelectionBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -2761,9 +3228,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);) { 
+            	
  //               System.out.println("<<<<<List Size in insertAssetProofSelection: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -2984,11 +3451,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+                ResultSet rs = ps.executeQuery()) {
+            	
  //               ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -3125,11 +3593,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try (Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+            		ResultSet rs = ps.executeQuery()){
+            	
  //               ps.setString(1, tranId);
-               ResultSet rs = ps.executeQuery();
+               
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -3264,11 +3733,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
            
             ArrayList listadd = new ArrayList();
             ArrayList listaddrec = new ArrayList(2);
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try (Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+                		ResultSet rs = ps.executeQuery()){
+            	
               //  ps.setInt(1, Integer.parseInt(tranId));
-                ResultSet rs = ps.executeQuery();
+                
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -3411,11 +3881,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
            
             ArrayList listadd = new ArrayList();
             ArrayList listaddrec = new ArrayList(2);
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+            		 ResultSet rs = ps.executeQuery()) {
+            	
               //  ps.setInt(1, Integer.parseInt(tranId));
-                ResultSet rs = ps.executeQuery();
+               
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -3708,9 +4179,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -3844,11 +4315,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listOld = new ArrayList();
             ArrayList listNewAdd = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try( ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -3906,6 +4377,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter + ")";
  //               System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
                 listOld = findAssetProofByID(assetFilter+" order by ASSET_ID",tranId);
+              }
             } catch (Exception e) {
                 System.out.println("INFO:Error findBulkAssetProofRejectionByBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -3935,9 +4407,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -4024,9 +4496,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)){
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -4136,11 +4608,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try(  ResultSet rs = ps.executeQuery()){
 
                 AssetRecordsBean aset = null;
                 while (rs.next()) {
@@ -4194,6 +4666,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //    System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
                 listOld = findAsset2ByID(assetFilter);
 
+              }
             } catch (Exception e) {
                 System.out.println("INFO:Error findAsset2TransferByBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -4225,11 +4698,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
             ArrayList listOld = new ArrayList();
 
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+            		ResultSet rs = ps.executeQuery()) {
+            	
 
-                ResultSet rs = ps.executeQuery();
+                
                 Asset aset =null;
                 while (rs.next()) {
                     String id = rs.getString("ASSET_ID");
@@ -4315,9 +4789,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                     " OLD_ASSET_ID=?,ASSET_USER=?,Branch_ID=?,Dept_ID=?,Section_id=?," +
                     "SBU_CODE=?,BRANCH_CODE=?,DEPT_CODE=?,SECTION_CODE=? WHERE ASSET_ID=?" ;
             System.out.println("I am in bulk Transfer2 manager is >>>>>>>>>>> "+list.size());
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
+            	
 
                  for (int i = 0; i < list.size(); ++i) {
             asset = (magma.AssetRecordsBean) list.get(i);
@@ -4375,11 +4849,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
            // ArrayList listOld = new ArrayList();
            // ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+            		 ResultSet rs = ps.executeQuery()) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+               
                 Asset aset = null;
                 while (rs.next()) {
                     String id = rs.getString("ASSET_ID");
@@ -4469,9 +4944,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);) {
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -4626,11 +5101,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)){
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try(  ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -4696,6 +5171,8 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter + ")";
 //                System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
                 listOld = findAsset2ByID(assetFilter);
+                
+              }
 
             } catch (Exception e) {
                 System.out.println("INFO:Error findAsset2ByBatchId() in BulkUpdateManager-> " +
@@ -4722,11 +5199,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
              ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery)) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try(  ResultSet rs = ps.executeQuery()){
 
                 AssetRecordsBean aset = null;
                 while (rs.next()) {
@@ -4778,7 +5255,10 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 }
                 assetFilter = assetFilter +  ")  order by ASSET_ID";
             //    System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
+                
                 listOld = findAssetforDisplayByID(assetFilter);
+                
+              }
 
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetTransferDisplayByBatchId() in BulkUpdateManager-> " +
@@ -4808,11 +5288,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
             ArrayList listOld = new ArrayList();
 
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try (Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+            		ResultSet rs = ps.executeQuery()){
+            	
 
-                ResultSet rs = ps.executeQuery();
+                
                 Asset aset =null;
                 while (rs.next()) {
                     String id = rs.getString("ASSET_ID");
@@ -4878,12 +5359,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetforDisplayByID() in BulkUpdateManager-> " +
-                        e.getMessage());
+                         e.getMessage());
             } 
             return listOld;
 
         }
-
+ 
         
 
         /**
@@ -4891,7 +5372,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
          *
          * @return boolean
          */
-        public boolean insertStockDetails(ArrayList list,String histId,String invoiceNo,String warehouseCode) throws Exception, Throwable
+        public boolean insertStockDetailsOld(ArrayList list,String histId,String invoiceNo,String warehouseCode) throws Exception, Throwable
         {
         	//subcategory_id =approvalRec.getCodeName(" SELECT full_name from am_gb_user where user_id='"+group_id+"'");
     /*    	System.out.println("branch_id ::::::::: " + branch_id);
@@ -5369,7 +5850,522 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                      } 
 
                      return result;
-                 }            
+                 }           
+        
+        
+        public boolean insertStockDetails(ArrayList list, String histId, String invoiceNo, String warehouseCode) throws Exception {
+
+            boolean result = true;
+            magma.AssetRecordsBean bd;
+
+            String lpo = "";
+            String branch_id = "";
+            String user_id = "";
+            int assetCode = 0;
+
+            String create_Query = "INSERT INTO ST_STOCK        " +
+                    "(" +
+                    "ASSET_ID, REGISTRATION_NO, BRANCH_ID, DEPT_ID," +
+                    "SECTION_ID, CATEGORY_ID, [DESCRIPTION], VENDOR_AC," +
+                    "DATE_PURCHASED, DEP_RATE, ASSET_MAKE, ASSET_MODEL," +
+                    "ASSET_SERIAL_NO, ASSET_ENGINE_NO, SUPPLIER_NAME," +
+                    "ASSET_USER, ASSET_MAINTENANCE, ACCUM_DEP, MONTHLY_DEP," +
+                    "COST_PRICE, NBV, DEP_END_DATE, RESIDUAL_VALUE," +
+                    "AUTHORIZED_BY, POSTING_DATE, EFFECTIVE_DATE, PURCHASE_REASON," +
+                    "USEFUL_LIFE, TOTAL_LIFE, LOCATION, REMAINING_LIFE," +
+                    "VATABLE_COST,VAT, WH_TAX, WH_TAX_AMOUNT, REQ_DEPRECIATION," +
+                    "REQ_REDISTRIBUTION, SUBJECT_TO_VAT, WHO_TO_REM, EMAIL1," +
+                    "WHO_TO_REM_2, EMAIL2, RAISE_ENTRY, DEP_YTD, [SECTION]," +
+                    "STATE, DRIVER, SPARE_1, SPARE_2, ASSET_STATUS, [USER_ID]," +
+                    "MULTIPLE,PROVINCE, WAR_START_DATE, WAR_MONTH, " +
+                    "WAR_EXPIRY_DATE,LPO,BAR_CODE ,BRANCH_CODE,CATEGORY_CODE ," +
+                    "GROUP_ID,PART_PAY,FULLY_PAID,DEFER_PAY,SBU_CODE,SECTION_CODE,DEPT_CODE,system_ip,asset_code," +
+                    "memo,memoValue,INTEGRIFY,SUB_CATEGORY_ID,SUB_CATEGORY_CODE, SPARE_3, SPARE_4, SPARE_5, SPARE_6,QUANTITY,WAREHOUSE_CODE,ITEM_CODE,ZONE_CODE, REGION_CODE,PROJECT_CODE,UNIT_PRICE,ITEMTYPE) " +
+
+                    "VALUES" +
+                    "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
+                    "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+                    String create_Archive_Query = "INSERT INTO ST_STOCK_ARCHIVE         " +
+                    "(" +
+                    "ASSET_ID, REGISTRATION_NO, BRANCH_ID, DEPT_ID," +
+                    "SECTION_ID, CATEGORY_ID, [DESCRIPTION], VENDOR_AC," +
+                    "DATE_PURCHASED, DEP_RATE, ASSET_MAKE, ASSET_MODEL," +
+                    "ASSET_SERIAL_NO, ASSET_ENGINE_NO, SUPPLIER_NAME," +
+
+                    "ASSET_USER, ASSET_MAINTENANCE, ACCUM_DEP, MONTHLY_DEP," +
+                    "COST_PRICE, NBV, DEP_END_DATE, RESIDUAL_VALUE," +
+                    "AUTHORIZED_BY, POSTING_DATE, EFFECTIVE_DATE, PURCHASE_REASON," +
+                    "USEFUL_LIFE, TOTAL_LIFE, LOCATION, REMAINING_LIFE," + 
+
+                    "VATABLE_COST,VAT, WH_TAX, WH_TAX_AMOUNT, REQ_DEPRECIATION," +
+                    "REQ_REDISTRIBUTION, SUBJECT_TO_VAT, WHO_TO_REM, EMAIL1," +
+                    "WHO_TO_REM_2, EMAIL2, RAISE_ENTRY, DEP_YTD, [SECTION]," +
+                    "STATE, DRIVER, SPARE_1, SPARE_2, ASSET_STATUS, [USER_ID]," + 
+                    "MULTIPLE,PROVINCE, WAR_START_DATE, WAR_MONTH, " +
+                    "WAR_EXPIRY_DATE,LPO,BAR_CODE ,BRANCH_CODE,CATEGORY_CODE ," + 
+                    "GROUP_ID,PART_PAY,FULLY_PAID,DEFER_PAY,SBU_CODE,SECTION_CODE,DEPT_CODE,system_ip,asset_code," +
+                    "SUB_CATEGORY_ID,SUB_CATEGORY_CODE, SPARE_3, SPARE_4, SPARE_5, SPARE_6,ZONE_CODE, REGION_CODE,PROJECT_CODE,ITEMTYPE ) " +
+                    "VALUES" +
+                    "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
+                    "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    
+                    // -------- Lookup caches for repeated DB calls --------
+                    Map<String,String> categoryCache = new HashMap<>();
+                    Map<String,String> deptCache = new HashMap<>();
+                    Map<String,String> sectionCache = new HashMap<>();
+                    Map<String,String> itemDescCache = new HashMap<>();
+                    Map<String,Integer> packQtyCache = new HashMap<>();
+
+                    
+            try (
+                Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(create_Query);
+                PreparedStatement ps1 = con.prepareStatement(create_Archive_Query)
+            ) {
+
+                System.out.println("list size in insertStockDetails: " + list.size());
+
+                for (int i = 0; i < list.size(); i++) {
+
+                    bd = (magma.AssetRecordsBean) list.get(i);
+
+                    String itemTypeCode = bd.getDescription();
+                    String itemType = bd.getItemType();
+                    int qty = Integer.parseInt(bd.getQty());
+
+                    branch_id = bd.getBranch_id();
+                    String AssetMake = bd.getMake();
+                    String dept_id = bd.getDepartment_id();
+                    String section_id = bd.getSection_id();
+                    String categoryCode = bd.getCategory_id();
+                    String Datepurchased = bd.getDate_of_purchase();
+
+                    // ----------- Caches for repeated queries -----------
+                    String category_id = categoryCache.computeIfAbsent(categoryCode, k -> approvalRec.getCodeName(
+                            "SELECT CATEGORY_ID FROM ST_STOCK_CATEGORY WHERE CATEGORY_CODE='" + k + "'"));
+
+                    String deptCode = deptCache.computeIfAbsent(dept_id, k -> approvalRec.getCodeName(
+                            "SELECT Dept_code FROM am_ad_department WHERE Dept_Id=" + k));
+
+                    String sectionCode = sectionCache.computeIfAbsent(section_id, k -> approvalRec.getCodeName(
+                            "SELECT Section_Code FROM am_ad_section WHERE Section_ID=" + k));
+
+                    String Description = itemDescCache.computeIfAbsent(itemTypeCode, k -> approvalRec.getCodeName(
+                            "SELECT DESCRIPTION FROM ST_INVENTORY_ITEMS WHERE ITEM_CODE='" + k + "'"));
+
+                    int packQuantity = packQtyCache.computeIfAbsent(itemTypeCode, k -> {
+                        String val = approvalRec.getCodeName(
+                                "SELECT COALESCE(b.PACK_QUANTITY,0) FROM ST_INVENTORY_ITEMS a, ST_MEASURING_UNIT b " +
+                                "WHERE a.MEASURING_CODE=b.UNIT_CODE AND ITEM_CODE='" + k + "'");
+                        return Integer.parseInt(val);
+                    });
+
+                    if (packQuantity > 0) {
+                        qty = qty / packQuantity;
+                    }
+
+                    String VatableCost = bd.getVatable_cost();
+                    String vatrate = bd.getVatRate();
+                    String whtrate = bd.getWhtRate();
+
+                    double vatamount = Double.parseDouble(VatableCost) * (Double.parseDouble(vatrate) / 100);
+                    double CostPrice = Double.parseDouble(VatableCost) + vatamount;
+                    double whtaxamount = Double.parseDouble(VatableCost) * (Double.parseDouble(whtrate) / 100);
+
+                    assetCode = Integer.parseInt(new ApplicationHelper().getGeneratedId("ST_STOCK"));
+
+                    String asset_id_new = new legend.AutoIDSetup().getIdentityforStock(
+                            branch_id, dept_id, section_id, category_id);
+
+                    String SubjectTOVat = !"0".equals(vatrate) ? "Y" : "N";
+                    String WhTax = !"0".equals(whtrate) ? "Y" : "N";
+
+                    lpo = bd.getLpo();
+                    
+                    if(packQuantity>0 ){qty = qty/packQuantity;}
+//                  System.out.println("<<<<<<qty " +qty+"   branch_id: "+branch_id+"  costprice: "+costprice+"  Description: "+Description+"  category_id: "+category_id+"   vatrate: "+vatrate+"  warehouseCode: "+warehouseCode+"  itemTypeCode: "+itemTypeCode);
+//                    System.out.println("<<<<<<section_id " +section_id+"   dept_id: "+dept_id+"  itemTypeCode: "+itemTypeCode+"  Description: "+Description+"  category_id: "+category_id+"   vatrate: "+vatrate+"  warehouseCode: "+warehouseCode+"  itemType: "+itemType);
+//                    asset_id_new = new legend.AutoIDSetup().getIdentity(branch_id,dept_id, section_id, category_id);
+                   
+                    lpo = bd.getLpo();
+                    String barCode = "0";
+                    String branchCode = bd.getBranch_Code();
+                    String groupid = bd.getGroup_id();
+                    String sbuCode = bd.getSbu_code();
+                    String AssetMaintenance = bd.getMaintained_by();
+                    String SupplierName = bd.getSupplied_by();
+                    String AssetUser = bd.getUser();
+                    String Driver = bd.getDriver();
+                    String State = bd.getState();
+                    String location = bd.getLocation();
+                    String sub_category_id = bd.getSub_category_id();
+//                    String sectionCode = bd.getSection();
+//                    String deptCode = bd.getDepartment_code();
+                    String systemIp = "0";
+                    String integrifyId = "0";
+                    String supervisor = bd.getSupervisor();
+                    String subcategoryCode = bd.getSubcatCode();
+                    String projectCode = bd.getProjectCode();
+                    String spare_1 = "";
+                    String spare_2 = "";
+                    String spare_3 = "";
+                    String spare_4 = ""; 
+                    String spare_5 = "";
+                    String spare_6 = "";
+                    String zoneCode = "";
+                    String regionCode = "";
+                    String AssetStatus = "PENDING";
+                    if(vatrate!="0"){SubjectTOVat = "Y";}
+                    if(whtrate!="0"){WhTax = "Y";}
+     //               System.out.print("=====>VatableCost: "+VatableCost+"   vatrate: "+vatrate);
+                  
+//                    System.out.print("=====>CostPrice: "+CostPrice+"  vatamount: "+vatamount+"  whtaxamount: "+whtaxamount+"  vatrate: "+vatrate+"  whtrate: "+whtrate);
+                    String residualvalue = "0";
+                    String VendorAC = "0";
+                    String AssetModel = "0"; 
+                    String AssetSerialNo = "0";
+                    String AssetEngineNo = "0";
+                    String AuthorizedBy = "0";
+                    String PurchaseReason = "";
+    				String province = "0";
+    				String noOfMonths = "0";
+    				String residual_value = "0";
+    				String warrantyStartDate = null;   
+    				String expiryDate = null;
+    				String memo = "N";
+    				String memoValue = "0";			
+    				String amountPTD = "0.0";
+    				String require_depreciation = "Y";
+    			    String require_redistribution = "N";
+    			    String who_to_remind = "";
+    			    String email_1 = "";
+    			    String who_to_remind_2 = "";
+    			    String email2 = "";
+    			    String raise_entry = "N";    
+//            			    String spare_1 = "";
+    			   // String status = "";   
+    			    
+    			    String multiple = "N";
+//            			    String spare_2 = "";
+    			    String partPAY = "N";
+    			    String fullyPAID = "Y";
+    			    String deferPay = "N";
+    			    int selectTax = 0;
+    			    String MacAddress = "";
+    			    String SystemIp = "";
+    			    String section = "";  
+    			    String strnewDateMonth = "";
+    			    String createQuery = "";
+    			    String RegistrationNo = "0";
+    			    String rate = "0";
+                assetCode = Integer.parseInt(new ApplicationHelper().getGeneratedId("ST_STOCK"));
+//                System.out.println("New Asset_ID ::::::::: " + asset_id_new);
+
+                if (AssetMake == null || AssetMake.equals("")) {
+                	AssetMake = "0";
+                }
+                if (AssetMaintenance == null || AssetMaintenance.equals("")) {
+                	AssetMaintenance = "0";
+                }
+                if (SupplierName == null || SupplierName.equals("")) {
+                	SupplierName = "0";
+                }
+                if (AssetUser == null || AssetUser.equals("")) {
+                	AssetUser = "";
+                }
+                if (location == null || location.equals("")) {
+                    location = "0";
+                }
+                if (Driver == null || Driver.equals("")) {
+                	Driver = "0";
+                }
+                if (State == null || State.equals("")) {
+                	State = "0";
+                }
+                
+                if (dept_id == null || dept_id.equals("")) {
+                	dept_id = "0";
+                }
+
+                if (branch_id == null || branch_id.equals("")) {
+                    branch_id = "0";
+                }
+                if (category_id == null || category_id.equals("")) {
+                    category_id = "0";
+                }
+                
+                if (sub_category_id == null || sub_category_id.equals("")) {
+                    sub_category_id = "0";
+                }
+                
+                if (residualvalue == null || residualvalue.equals("")) {
+                	residualvalue = "0";
+                }
+                if (noOfMonths == null || noOfMonths.equals("")) {
+                    noOfMonths = "0";
+                }
+                if (warrantyStartDate == null || warrantyStartDate.equals("")) {
+                    warrantyStartDate = null;
+                }
+                if (expiryDate == null || expiryDate.equals("")) {
+                    expiryDate = null;
+                }
+//                System.out.println("======category_id: "+category_id);
+                       asset_id_new = new legend.AutoIDSetup().getIdentityforStock(branch_id,
+                    		   dept_id, section_id, category_id);
+
+                      
+
+                    // -------- MAIN STOCK INSERT --------
+                    ps.setString(1, asset_id_new);
+                    ps.setString(2, RegistrationNo);
+                    ps.setInt(3, Integer.parseInt(branch_id));
+                    ps.setInt(4, Integer.parseInt(dept_id));
+                    ps.setInt(5, Integer.parseInt(section_id));
+                    ps.setInt(6, Integer.parseInt(category_id));
+                    ps.setString(7, Description);
+                    ps.setString(8, VendorAC);
+                    ps.setString(9, Datepurchased);
+                    ps.setString(10, rate);
+                    ps.setString(11, AssetMake);
+                    ps.setString(12, AssetModel);
+                    ps.setString(13, AssetSerialNo);
+                    ps.setString(14, AssetEngineNo);
+                    ps.setInt(15, Integer.parseInt(SupplierName));
+                    ps.setString(16, AssetUser);
+                    ps.setInt(17, Integer.parseInt(AssetMaintenance));
+                    ps.setInt(18, 0);
+                    ps.setInt(19, 0);
+                    ps.setDouble(20, CostPrice);
+                    ps.setDouble(21, CostPrice-CostPrice-Double.parseDouble(residualvalue));
+                    ps.setString(22, Datepurchased);
+                    ps.setDouble(23, Double.parseDouble(residualvalue));
+                    ps.setString(24, AuthorizedBy);
+                    ps.setString(25, Datepurchased);
+                    ps.setString(26, Datepurchased);
+                    ps.setString(27, PurchaseReason);
+                    ps.setString(28, "0");       
+                    ps.setString(29, "0");
+                    ps.setInt(30, Integer.parseInt(location));
+                    ps.setString(31, "0");;
+                    ps.setDouble(32, Double.parseDouble(VatableCost));
+                    ps.setDouble(33, vatamount);
+                    ps.setString(34, WhTax);
+                    ps.setDouble(35, whtaxamount);
+                    ps.setString(36, require_depreciation);
+                    ps.setString(37, require_redistribution);
+                    ps.setString(38, SubjectTOVat);
+                    ps.setString(39, who_to_remind);
+                    ps.setString(40, email_1);
+                    ps.setString(41, who_to_remind_2);
+                    ps.setString(42, email2);
+                    ps.setString(43, "N");
+                    ps.setString(44, "0");
+                    ps.setString(45, section);
+                    ps.setInt(46, Integer.parseInt(State));
+                    ps.setInt(47, Integer.parseInt(Driver));
+                    ps.setString(48, spare_1);
+                    ps.setString(49, spare_2);
+                    ps.setString(50, AssetStatus);
+                    ps.setString(51, user_id);
+                    ps.setString(52, multiple);
+                    ps.setString(53, province);
+                    ps.setString(54, Datepurchased);
+                    ps.setInt(55, Integer.parseInt(noOfMonths));
+                    ps.setString(56, Datepurchased);
+                    ps.setString(57,lpo);   
+                    ps.setString(58,barCode);
+                    ps.setString(59,branchCode);
+                    ps.setString(60,categoryCode);
+                    ps.setString(61,histId);
+                    ps.setString(62, "N");
+                    ps.setString(63, "Y");
+                    ps.setString(64, "N");
+                    ps.setString(65,sbuCode);
+                    ps.setString(66,sectionCode);
+                    ps.setString(67,deptCode);
+                    ps.setString(68,systemIp);
+                    ps.setInt(69, assetCode);
+                    ps.setString(70,memo);
+                    ps.setString(71, memoValue);
+                    ps.setString(72, integrifyId);
+                    ps.setInt(73, Integer.parseInt(sub_category_id));
+                    ps.setString(74, subcategoryCode);
+                    ps.setString(75, spare_3);
+                    ps.setString(76, spare_4);
+                    ps.setString(77, spare_5);
+                    ps.setString(78, spare_6);
+                    ps.setInt(79, qty);
+                    ps.setString(80, warehouseCode);  
+                    ps.setString(81, itemTypeCode);
+                    ps.setString(82, zoneCode);
+                    ps.setString(83,regionCode);
+                    ps.setString(84, projectCode);
+                    ps.setDouble(85, CostPrice/qty);
+                    ps.setString(86, itemType);
+
+                    ps.addBatch();
+
+                    // -------- ARCHIVE INSERT --------
+                    ps1.setString(1, asset_id_new);
+                    ps1.setString(2, "0");
+                    ps1.setInt(3, Integer.parseInt(branch_id));
+                    ps1.setInt(4, Integer.parseInt(dept_id));
+                    ps1.setInt(5, Integer.parseInt(section_id));
+                    ps1.setInt(6, Integer.parseInt(category_id));
+                    ps1.setString(7, Description);
+                    ps1.setString(8, VendorAC);
+                    ps1.setString(9, Datepurchased);
+                    ps1.setString(10, rate);
+                    ps1.setString(11, AssetMake);
+                    ps1.setString(12, AssetModel);
+                    ps1.setString(13, AssetSerialNo);
+                    ps1.setString(14, AssetEngineNo);
+                    ps1.setInt(15, Integer.parseInt(SupplierName));
+                    ps1.setString(16, AssetUser);
+                    ps1.setInt(17, Integer.parseInt(AssetMaintenance));
+                    ps1.setInt(18, 0);
+                    ps1.setInt(19, 0);
+                    ps1.setDouble(20, CostPrice);
+                    ps1.setDouble(21, (CostPrice-10.00));
+                    ps1.setString(22, Datepurchased);
+                    ps1.setDouble(23, Double.parseDouble(residual_value));
+                    ps1.setString(24, AuthorizedBy);
+                    ps1.setString(25, Datepurchased);
+                    ps1.setString(26, Datepurchased);
+                    ps1.setString(27, PurchaseReason);
+                    ps1.setString(28, "0");
+                    ps1.setString(29, "0");
+                    ps1.setInt(30, Integer.parseInt(location));
+                    ps1.setString(31, "0");
+                    ps1.setDouble(32, Double.parseDouble(VatableCost));
+                    ps1.setDouble(33, vatamount);
+     //               System.out.println("Group Creation5 "+vatamount);
+                    ps1.setString(34, WhTax);
+                    ps1.setDouble(35, whtaxamount);
+                    ps1.setString(36, require_depreciation);
+                    ps1.setString(37, require_redistribution);
+                    ps1.setString(38, SubjectTOVat);
+                    ps1.setString(39, who_to_remind);
+                    ps1.setString(40, email_1);
+                    ps1.setString(41, who_to_remind_2);
+                    ps1.setString(42, email2);
+                    ps1.setString(43, "N");
+                    ps1.setString(44, "0");
+                    ps1.setString(45, section);
+                    ps1.setInt(46, Integer.parseInt(State));
+                    ps1.setInt(47, Integer.parseInt(Driver));
+                    ps1.setString(48, spare_1);
+                    ps1.setString(49, spare_2);
+                    ps1.setString(50, AssetStatus);
+                    ps1.setString(51, user_id);
+                    ps1.setString(52, multiple);
+                    ps1.setString(53, province);
+                    ps1.setString(54, Datepurchased);
+                    ps1.setInt(55, Integer.parseInt(noOfMonths));
+                    ps1.setString(56, Datepurchased);
+                    ps1.setString(57,lpo);
+                    ps1.setString(58,barCode);
+                    ps1.setString(59,branchCode);
+                    ps1.setString(60,categoryCode);
+                    ps1.setString(61,histId);
+                    ps1.setString(62, "N");
+                    ps1.setString(63, "Y");
+                    ps1.setString(64, "N");
+                    ps1.setString(65,sbuCode);
+                    ps1.setString(66,sectionCode);
+                    ps1.setString(67,deptCode);
+                    ps1.setString(68,systemIp);
+                    ps1.setInt(69, assetCode);
+                    ps1.setInt(70, Integer.parseInt(sub_category_id));
+                    ps1.setString(71,subcategoryCode);
+                    ps1.setString(72, spare_3);
+                    ps1.setString(73, spare_4);
+                    ps1.setString(74, spare_5);
+                    ps1.setString(75, spare_6);  
+                    ps1.setString(76, zoneCode);  
+                    ps1.setString(77, regionCode);  
+                    ps1.setString(78, projectCode);
+                    ps1.setString(79, itemType);
+
+                    ps1.addBatch();
+                    
+                    if (i % 200 == 0 && i > 0) {
+                        ps.executeBatch();
+                        ps1.executeBatch();
+                    }
+
+                    htmlUtil.insGrpToAm_Invoice_No(asset_id_new, lpo, invoiceNo, "Stock Creation", histId);
+                }
+                // Execute batch once
+                ps.executeBatch();
+                ps1.executeBatch();
+                
+
+                String page1 = "STOCK CREATION RAISE ENTRY";
+                String flag= "";
+          	  	String partPay="";
+          	  	String qryBranch =" SELECT branch_name from am_ad_branch where branch_id='"+branch_id+"'";
+          	   	String Branch = approvalRec.getCodeName(qryBranch);
+          	   	String subjectT= adGroup.subjectToVat(histId);
+          	   	String whT= adGroup.whTax(histId);
+          	   	String Name =approvalRec.getCodeName(" SELECT full_name from am_gb_user where user_id='"+user_id+"'");
+          	   	String url = "DocumentHelp.jsp?np=groupAssetPosting&amp;id=" + histId + "&pageDirect=Y";
+          	   	boolean approval_level_val =checkApprovalStatus("57");
+          	//  	boolean status = updateCreatedAssetStatus(asset_id,histId,asset_id_new,assetCode);
+          	  	
+          	  	if (!approval_level_val)
+    	      	  	{
+//          	  			System.out.println(">>>>>>>>>>>> Inserting Into RaiseEntry <<<<<<<<<<");
+          	  			String [] approvalResult=ad.setApprovalStockDataGroup(Long.parseLong(histId));
+          	  			approvalResult[10]="A";
+          	  		//	String trans_id = adGroup.setGroupPendingTrans(approvalResult,"57",assetCode);
+
+                                   ad.setPendingTransArchive(approvalResult,"57",Integer.parseInt(approvalResult[0]),assetCode);
+
+                                    String assetRaiseEntry =approvalRec.getCodeName(" SELECT raise_entry from am_gb_company ");
+          	  			if(assetRaiseEntry != null && assetRaiseEntry.equalsIgnoreCase("Y")){
+                                    approvalRec.insertApprovalx2
+    	      	  		(histId, approvalResult[5], page1, flag, partPay,Name, Branch, subjectT,
+                                            whT, url,Integer.parseInt(approvalResult[0]),assetCode);
+                                    }
+          	  			 
+          	  			String qry = upd_am_stock_status_RaiseEntry + histId;
+          	  			String qry2 = upd_am_grp_stock_RaiseEntry + histId;
+          	  			String qry3 = upd_am_grp_stock_main_RaiseEntry +  histId;
+                                    String qry4 = upd_am_stock_status_RaiseEntry_Archive + histId;
+          	  			String qry5 = upd_am_grp_stock_RaiseEntry_Archive + histId;
+          	  			String qry6 = upd_am_grp_stock_main_RaiseEntry_Archive +  histId;
+    	      	  		updateStatusUtil(qry);
+    	      	  		updateStatusUtil(qry2);
+    	      	  		updateStatusUtil(qry3);
+                                    updateStatusUtil(qry4);
+    	      	  		updateStatusUtil(qry5);
+    	      	  		updateStatusUtil(qry6);
+    	      	  	}
+          	  	
+    	      	if(approval_level_val)
+    		      	{
+//    		      	 System.out.println("====== Inserting into Approval ======");
+    		      	 changeGroupAssetStatus(histId,"PENDING");
+    		        String trans_id = adGroup.setGroupPendingTrans(ad.setApprovalStockDataGroup(Long.parseLong(histId)),"57",assetCode);
+    		      	String [] approvalResult=ad.setApprovalStockDataGroup(Long.parseLong(histId));
+                             ad.setPendingTransArchive(ad.setApprovalStockDataGroup(Long.parseLong(histId)),"57",Integer.parseInt(approvalResult[0]),assetCode);
+    		      	 //write a method to change status to pending
+    		      	}	
+
+            } catch (Exception ex) {
+                result = false;
+                System.out.println("Error insertStockDetails() -> " + ex.getMessage());
+                throw ex;
+            }
+
+            return result;
+        }
+        
+        
+        
 /*
             catch (Exception ex)
             {
@@ -5401,10 +6397,10 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             String query = "SELECT DEP_RATE FROM ST_STOCK_CATEGORY " +
                            "WHERE CATEGORY_ID = " + category_id;
 //            System.out.println("<<<<<query: "+query);
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(query);
-                ResultSet rs = ps.executeQuery();
+                ResultSet rs = ps.executeQuery()) {
+            	
                 while (rs.next()) {
                     rate = rs.getString(1);
                 }
@@ -5424,10 +6420,10 @@ public class BulkUpdateManager extends legend.ConnectionClass {
     		
     	    int level = 0;
     	    try
-    	    {
-    	    	Connection con = dbConnection.getConnection("legendPlus");
+    	    (Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(approval_status_qry);
-    	    	ResultSet rs = ps.executeQuery();
+    	    	ResultSet rs = ps.executeQuery()){
+    	    	
     	    	if(rs.next())
     	    	{
     	    		level= rs.getInt(1);
@@ -5446,7 +6442,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
     	}
         
 
-    	public void changeGroupAssetStatus(String id,String status) 
+    	public void changeGroupAssetStatusOld(String id,String status) 
     	{
     		// TODO Auto-generated method stub
     		
@@ -5476,9 +6472,37 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
     		
     	}
+    	
+    	public void changeGroupAssetStatus(String id, String status) {
+    	    String query_r = "UPDATE am_group_asset SET asset_status=? WHERE Group_id = ?";
+    	    String query_archive = "UPDATE am_group_asset_archive SET asset_status=? WHERE Group_id = ?";
+
+    	    try (Connection con = dbConnection.getConnection("legendPlus")) {
+
+    	        // Update am_group_asset
+    	        try (PreparedStatement ps = con.prepareStatement(query_r)) {
+    	            ps.setString(1, status);
+    	            ps.setString(2, id);
+    	            ps.executeUpdate();
+    	        }
+
+    	        // Update am_group_asset_archive
+    	        try (PreparedStatement ps = con.prepareStatement(query_archive)) {
+    	            ps.setString(1, status);
+    	            ps.setString(2, id);
+    	            ps.executeUpdate();
+    	        }
+
+    	        // Update main asset status
+    	        changeGroupAssetMainStatus(id, status);
+
+    	    } catch (Exception ex) {
+    	        System.out.println("GroupAssetToAssetBean: Error Updating am_group_asset " + ex);
+    	    }
+    	}
 
 
-    	public void changeGroupAssetMainStatus(String id, String status2)
+    	public void changeGroupAssetMainStatusOld(String id, String status2)
     	{
     		// TODO Auto-generated method stub
     		String query_r ="update am_group_asset_main set asset_status=? " +
@@ -5507,14 +6531,39 @@ public class BulkUpdateManager extends legend.ConnectionClass {
     	    
     	}
 
+    	
+    	public void changeGroupAssetMainStatus(String id, String status) {
+    	    String query_r = "UPDATE am_group_asset_main SET asset_status=? WHERE Group_id = ?";
+    	    String query_archive = "UPDATE am_group_asset_main_archive SET asset_status=? WHERE Group_id = ?";
+
+    	    try (Connection con = dbConnection.getConnection("legendPlus")) {
+
+    	        // Update am_group_asset_main
+    	        try (PreparedStatement ps = con.prepareStatement(query_r)) {
+    	            ps.setString(1, status);
+    	            ps.setString(2, id);
+    	            ps.executeUpdate();
+    	        }
+
+    	        // Update am_group_asset_main_archive
+    	        try (PreparedStatement ps = con.prepareStatement(query_archive)) {
+    	            ps.setString(1, status);
+    	            ps.setString(2, id);
+    	            ps.executeUpdate();
+    	        }
+
+    	    } catch (Exception ex) {
+    	        System.out.println("GroupAssetToAssetBean: Error Updating am_group_asset_main: " + ex);
+    	    }
+    	}
 
     	public void updateStatusUtil(String query) 
         {
         	
             try 
-            {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            (Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(query);){
+            	
                 int i =ps.executeUpdate();
              } 
             catch (Exception ex)
@@ -5538,11 +6587,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
            
             ArrayList listadd = new ArrayList();
             ArrayList listaddrec = new ArrayList(2);
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try (Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+            		 ResultSet rs = ps.executeQuery()){
+            	
               //  ps.setInt(1, Integer.parseInt(tranId));
-                ResultSet rs = ps.executeQuery();
+               
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -5684,9 +6734,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(insertquery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(insertquery)) { 
+            	
  //               System.out.println("<<<<<List Size in insertAssetProofSelectionTemp: "+list.size());
 
                 for (int i = 0; i < list.size(); i++) {
@@ -5890,7 +6940,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             return (d.length > 0);
         }
         
-        public boolean AssetProofSelectionRejectionToInitiator(String bacthId, String rejectReason,int tranIdApproval,String userId) {
+        public boolean AssetProofSelectionRejectionToInitiatorOld(String bacthId, String rejectReason,int tranIdApproval,String userId) {
         	boolean done = false;
             
         	try 
@@ -5922,6 +6972,55 @@ public class BulkUpdateManager extends legend.ConnectionClass {
            
             return done;
         }
+        
+        public boolean AssetProofSelectionRejectionToInitiator(
+                String batchId, String rejectReason, int tranIdApproval, String userId) {
+
+            boolean done = false;
+
+            String updateApprovalQuery = "UPDATE am_asset_approval " +
+                    "SET process_status='R', asset_status='Asset Proof Rejected', reject_reason=?, DATE_APPROVED=?, PROCESSING='Processing Rejection' " +
+                    "WHERE transaction_id=?";
+
+            String updateProofQuery = "UPDATE am_Asset_Proof SET PROCESS_STATUS=NULL WHERE BATCH_ID=?";
+
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement psApproval = con.prepareStatement(updateApprovalQuery);
+                 PreparedStatement psProof = con.prepareStatement(updateProofQuery)) {
+
+                // Set parameters for am_asset_approval
+                Timestamp approvedDate = dbConnection.getDateTime(new java.util.Date());
+                psApproval.setString(1, rejectReason);
+                psApproval.setTimestamp(2, approvedDate);
+                psApproval.setInt(3, tranIdApproval);
+                psApproval.executeUpdate();
+
+                // Set parameters for am_Asset_Proof
+                psProof.setString(1, batchId);
+                psProof.executeUpdate();
+
+                // Send notification email
+                String createdUserId = approvalRec.getCodeName(
+                        "SELECT User_Id FROM am_asset_approval WHERE asset_id='" + batchId + "'");
+                String createdBy = approvalRec.getCodeName(
+                        "SELECT email FROM am_gb_User WHERE user_id=" + createdUserId);
+
+                String subject = "Branch Asset Proof Rejected";
+                String msgText = "Your Branch Asset Proof with Batch Id: " + batchId +
+                        " has been rejected. Reasons: " + rejectReason;
+
+                mail.sendMail(createdBy, subject, msgText);
+
+                done = true;
+
+            } catch (Exception ex) {
+                System.out.println("WARN: Error rejecting asset proof -> " + ex);
+                done = false;
+            }
+
+            return done;
+        }
+        
         public boolean updateAssetProofSelectionInsert(ArrayList list, String bacthId, String tranStatus) {
             boolean re = false;
             String query = "";
@@ -5941,9 +7040,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)){ 
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -6111,11 +7210,12 @@ public class BulkUpdateManager extends legend.ConnectionClass {
            
             ArrayList listadd = new ArrayList();
             ArrayList listaddrec = new ArrayList(2);
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
+            		ResultSet rs = ps.executeQuery()) {
+            	
               //  ps.setInt(1, Integer.parseInt(tranId));
-               ResultSet rs = ps.executeQuery();
+               
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -6232,10 +7332,10 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             int[] d =null;
             String query= "UPDATE am_Asset_Proof SET COMMENTS=? WHERE ASSET_ID=?" ;
             
-            try {
+            try( Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement ps = con.prepareStatement(query)) {
 
-            	 Connection con = dbConnection.getConnection("legendPlus");
-                 PreparedStatement ps = con.prepareStatement(query);
+            	
                  
                  for (int i = 0; i < list.size(); ++i) {
             asset = (Asset)list.get(i);
@@ -6330,9 +7430,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);){ 
+            	
    //             System.out.println("<<<<<<<LIST SIZE: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -6389,9 +7489,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
    //             System.out.println("<<<<<<<LIST SIZE: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -6498,9 +7598,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -6552,11 +7652,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery);) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try(  ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {
@@ -6587,6 +7687,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 //                System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
                 listOld = findAssetByID(assetFilter);
 
+              }
             } catch (Exception e) {
                 System.out.println("INFO:Error findAssetSbuByBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -6612,9 +7713,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             String branchId = "";
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {  
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);) {  
+            	
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
                     String assetId = bd.getAsset_id();
@@ -6702,7 +7803,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             return (d.length > 0);
         }
 
-        public boolean insertAssetFleetRenewalInsert(ArrayList list, String bacthId, String processExport) {
+        public boolean insertAssetFleetRenewalInsertOld(ArrayList list, String bacthId, String processExport) {
             boolean re = false;
             String tableName = "Temp"+bacthId;
             String q1 = "IF EXISTS(select * from "+tableName+" where ASSET_ID is not null) drop table "+tableName+" ";
@@ -6775,6 +7876,66 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
             return (d.length > 0);
         }
+        
+        public boolean insertAssetFleetRenewalInsert(ArrayList list, String batchId, String processExport) {
+            boolean re = false;
+            String tableName = "Temp" + batchId;
+
+            String dropQuery = "IF EXISTS (SELECT * FROM " + tableName + " WHERE ASSET_ID IS NOT NULL) DROP TABLE " + tableName;
+            ad.updateAssetStatusChange(dropQuery);
+
+            String createquery = "CREATE TABLE "+tableName+"( " +
+                    "[ASSET_ID] [varchar](50) NULL,	[Description] [varchar](255) NULL,	[BAR_CODE] [varchar](50) NULL,"+
+                    "[Registration_No] [varchar](50) NULL,	[Asset_Make] [nvarchar](50) NULL, [SBU_CODE] [varchar](50) NULL,"+
+                    "[ASSET_USER] [varchar](255) NULL,[COMMENTS] [varchar](255),[INSURANCE_CODE] [varchar](50) NULL) ON [PRIMARY]";
+                     
+            ad.updateAssetStatusChange(createquery);
+
+            String insertQuery = "INSERT INTO " + tableName + " (" +
+                    "ASSET_ID, Description, BAR_CODE, Registration_No, Asset_Make, " +
+                    "SBU_CODE, ASSET_USER, COMMENTS, INSURANCE_CODE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            int[] result = new int[0];
+
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                 PreparedStatement ps = con.prepareStatement(insertQuery)) {
+
+                for (Object obj : list) {
+                    magma.AssetRecordsBean bd = (magma.AssetRecordsBean) obj;
+
+                    String assetId = bd.getAsset_id();
+                    String description = bd.getDescription();
+                    String barcode = bd.getBar_code();
+                    String comments = bd.getComments();
+                    String assetUser = bd.getNewuser();
+                    String make = bd.getMake();
+                    String sbucode = bd.getSbu_code();
+                    String vendorCode = bd.getVendorCode();
+                    String registrationNo = bd.getRegistration_no();
+
+                    // Default values
+                    ps.setString(1, (assetId == null || assetId.isEmpty()) ? "0" : assetId.toUpperCase());
+                    ps.setString(2, (description == null ? "" : description).toUpperCase());
+                    ps.setString(3, (barcode == null || barcode.isEmpty()) ? "0" : barcode.toUpperCase());
+                    ps.setString(4, (registrationNo == null ? "" : registrationNo).toUpperCase());
+                    ps.setString(5, (make == null ? "" : make));
+                    ps.setString(6, (sbucode == null ? "" : sbucode));
+                    ps.setString(7, (assetUser == null ? "" : assetUser.toUpperCase()));
+                    ps.setString(8, (comments == null ? "" : comments));
+                    ps.setString(9, (vendorCode == null ? "" : vendorCode));
+
+                    ps.addBatch();
+                }
+
+                // Execute batch once after all rows are added
+                result = ps.executeBatch();
+
+            } catch (Exception ex) {
+                System.out.println("Error insertAssetFleetRenewalInsert() of BulkUpdateManager -> " + ex);
+            }
+
+            return result.length > 0;
+        }
 
         public boolean updateAssetFleetRenewal(ArrayList list) {
 
@@ -6786,9 +7947,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             int[] d =null;
             String query= "UPDATE FLEET_SUMINSURED SET SUM_INSURED=?,EFFECTIVE_DATE=? WHERE ASSET_ID=?" ;
             magma.AssetRecordsBean bd = null;
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);) {
+            	
 
                  for (int i = 0; i < list.size(); ++i) {
                      bd = (magma.AssetRecordsBean) list.get(i);
@@ -6842,9 +8003,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {   
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                    PreparedStatement ps = con.prepareStatement(query);) {   
+            	
 //                System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -6891,9 +8052,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
+            	
 
  //                   System.out.println("insertScheduleDetails branchId: "+branchCode);
                     ps.setString(1, branchCode);
@@ -6939,11 +8100,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
             
             ArrayList listNew = new ArrayList();
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery);) {
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+              try(  ResultSet rs = ps.executeQuery()){
                 FMppmAllocation ppm = null;
                 while (rs.next()) {
                     String id = rs.getString("ID");
@@ -6998,6 +8159,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                    // assetFilter = assetFilter + "'" + id + "',";
 
                 }
+              }
 
             } catch (Exception e) {
                 System.out.println("INFO:Error findPPMByBatchId() in BulkUpdateManager-> " +
@@ -7017,10 +8179,10 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //declare DTO object
             FMppmAllocation schedule = null;
 
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(query);
-               ResultSet rs = ps.executeQuery();
+               ResultSet rs = ps.executeQuery()) {
+            	
 
                 while (rs.next()) {
                     String id = rs.getString("ID");
@@ -7076,9 +8238,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
   //          System.out.println("<<<<<<groupId: "+groupId+"  reqnID: "+reqnID);
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
  //               System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -7167,9 +8329,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.net.vao.VendorAssessment bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
  //               System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.net.vao.VendorAssessment) list.get(i);
@@ -7213,9 +8375,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             BranchVisit bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
 //                System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.net.vao.BranchVisit) list.get(i);
@@ -7260,9 +8422,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {   
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)){   
+            	
 //                System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -7307,9 +8469,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.net.vao.VendorAssessment bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) { 
+            	
  //               System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.net.vao.VendorAssessment) list.get(i);
@@ -7354,9 +8516,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {   
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);) {   
+            	
 //                System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -7398,11 +8560,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listNew = new ArrayList();
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery);) {
+            	
                 ps.setInt(1, Integer.parseInt(tranId));
-                ResultSet rs = ps.executeQuery();
+              try(  ResultSet rs = ps.executeQuery()){
 
                 StockRecordsBean aset = null;
                 while (rs.next()) {
@@ -7455,6 +8617,8 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter + ")";
 //                System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
                 listOld = findAssetByIDforAcceptance(assetFilter);
+                
+              }
 
             } catch (Exception e) {
                 System.out.println("INFO:Error () in BulkUpdateManager-> " +
@@ -7494,11 +8658,10 @@ public class BulkUpdateManager extends legend.ConnectionClass {
 
             ArrayList listOld = new ArrayList();
 
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(	Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
-
-               ResultSet  rs = ps.executeQuery();
+               ResultSet  rs = ps.executeQuery()) {
+            
                 Asset aset =null;
                 while (rs.next()) {
                     String id = rs.getString("ASSET_ID");
@@ -7573,9 +8736,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)){ 
+            	
                     ps.setString(1, batchId);
                     ps.setString(2, userId);
                     ps.setTimestamp(3, dbConnection.getDateTime(new java.util.Date()));
@@ -7606,9 +8769,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try { 
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query);) { 
+            	
  //               System.out.println("<<<<<<List Size: "+list.size());
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -7652,9 +8815,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)){
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);
@@ -7766,9 +8929,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             String query= "UPDATE FT_MAINTENANCE_DETAILS SET RET_SERIAL_NO = ?," +
                     "RET_MAKE = ?,RET_QUANTITY = ? WHERE LT_ID = ? AND HIST_ID = ? " ;
 
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)){
+            	
                  for (int i = 0; i < list.size(); ++i) {
                 	 
                      bd = (magma.net.vao.Asset) list.get(i);
@@ -7811,11 +8974,11 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             ArrayList listOld = new ArrayList();
             ArrayList[] listNewOld = new ArrayList[2];
 //            System.out.println("=====>>>>selectQuery: "+selectQuery);
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(selectQuery);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(selectQuery);){
+            	
                 ps.setString(1, tranId);
-                ResultSet rs = ps.executeQuery();
+             try(  ResultSet rs = ps.executeQuery()){
 
                 Asset aset = null;
                 while (rs.next()) {                   
@@ -7883,6 +9046,7 @@ public class BulkUpdateManager extends legend.ConnectionClass {
                 assetFilter = assetFilter + ")";
 //                System.out.println("the filter that will be sent to FleetHistoryManager is >>>>> " + assetFilter);
                 listOld = findMateriaRetrievalByID(assetFilter+" order by LT_ID");
+             }
             } catch (Exception e) {
                 System.out.println("INFO:Error findMaterialRetrievalByBatchId() in BulkUpdateManager-> " +
                         e.getMessage());
@@ -7908,11 +9072,10 @@ public class BulkUpdateManager extends legend.ConnectionClass {
            
             ArrayList listOld = new ArrayList();
 
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
+            try(Connection con = dbConnection.getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
-
-                ResultSet rs = ps.executeQuery();
+                ResultSet rs = ps.executeQuery()) {
+            	
                 Asset aset =null;
                 while (rs.next()) {
                     String id = rs.getString("LT_ID");
@@ -7971,10 +9134,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             String query= "UPDATE FT_MAINTENANCE_DETAILS SET " +
                     "QUANTITY_SOLD = ?,AMOUNT_SOLD = ? WHERE LT_ID = ? AND HIST_ID = ? " ;
 
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
-
+            try(Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
+            	
                  for (int i = 0; i < list.size(); ++i) {
                 	 
                      bd = (magma.AssetRecordsBean) list.get(i);
@@ -8016,9 +9178,9 @@ public class BulkUpdateManager extends legend.ConnectionClass {
             //ResultSet rs = null;
             magma.AssetRecordsBean bd = null;
             int[] d = null;
-            try {
-            	Connection con = dbConnection.getConnection("legendPlus");
-                PreparedStatement ps = con.prepareStatement(query);
+            try (Connection con = dbConnection.getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)){
+            	
 
                 for (int i = 0; i < list.size(); i++) {
                     bd = (magma.AssetRecordsBean) list.get(i);

@@ -887,6 +887,24 @@ public String getResourcesCheck(String select, String query) {
 }
 
 
+public String getYesNoForCombo(String selected) {
+
+    if (selected == null) {
+        selected = "";
+    }
+
+    StringBuilder html = new StringBuilder();
+
+    html.append("<option value='N'")
+        .append("N".equals(selected) ? " selected='selected'" : "")
+        .append(">No</option>");
+
+    html.append("<option value='Y'")
+        .append("Y".equals(selected) ? " selected='selected'" : "")
+        .append(">Yes</option>");
+
+    return html.toString();
+}
 
 
 }

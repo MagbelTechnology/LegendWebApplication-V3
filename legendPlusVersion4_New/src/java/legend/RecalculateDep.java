@@ -1,10 +1,14 @@
 package legend;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 import magma.*;
 import magma.net.manager.RaiseEntryManager;
 import java.util.*;
+import java.util.Date;
+import javax.sql.rowset.CachedRowSet;
+import com.sun.rowset.CachedRowSetImpl;
 
 /**
  *
@@ -33,7 +37,7 @@ public class RecalculateDep extends ConnectionClass {
      */
     public RecalculateDep() throws Exception {
         //  con.setAutoCommit(false);
-    	freeResource();
+    	
     }
 
     /**
@@ -111,7 +115,7 @@ public class RecalculateDep extends ConnectionClass {
      */
 
 
-    public void updateAssetDep(String catid, String oldrate, String newrate,
+    public void updateAssetDepOld(String catid, String oldrate, String newrate,
                                String userid,
                                String rd, String uea, String ccode) throws
             Throwable {
@@ -126,7 +130,7 @@ public class RecalculateDep extends ConnectionClass {
             UpdateDeprateHistory(catid, oldrate, newrate, userid, rd, uea,
                                  ccode);
         }
-        con = getConnection();
+        
         String query =
                 "SELECT Asset_id, Accum_dep,Cost_Price, useful_life, dep_rate FROM am_ASSET " +
                 "WHERE Category_ID = " + catid +
@@ -151,10 +155,57 @@ public class RecalculateDep extends ConnectionClass {
         }
         updateGAssetDep(catid, oldrate, newrate, userid, rd, uea, ccode);
 
-//        freeResource();
+//        
     }
+    
+    
+    public void updateAssetDep(String catid, String oldrate, String newrate,
+            String userid, String rd, String uea, String ccode) throws Throwable {
 
-    public void updateGAssetDep(String catid, String oldrate, String newrate,
+// Handle depreciation history
+if (!recentDephistoryExist(newrate, catid)) {
+insertIntoDeprateHistory(catid, oldrate, newrate, userid, rd, uea, ccode);
+} else {
+System.out.println("=====uea B1===:" + uea +
+ " rd: " + rd +
+ " catid: " + catid +
+ " oldrate: " + oldrate +
+ " newrate: " + newrate +
+ " ccode: " + ccode);
+
+UpdateDeprateHistory(catid, oldrate, newrate, userid, rd, uea, ccode);
+}
+
+String selectQuery =
+"SELECT Asset_id, Accum_dep, Cost_Price, useful_life, dep_rate " +
+"FROM am_ASSET " +
+"WHERE Category_ID = " + catid +
+" AND Asset_Status NOT IN ('C', 'D')";
+
+String updateQuery = "UPDATE am_ASSET SET dep_rate = ? WHERE Asset_id = ?";
+
+try (Connection con = getConnection();
+PreparedStatement selectPs = con.prepareStatement(selectQuery);
+ResultSet rs = selectPs.executeQuery();
+PreparedStatement updatePs = con.prepareStatement(updateQuery)) {
+
+while (rs.next()) {
+
+String assetId = rs.getString("Asset_id");
+
+updatePs.setString(1, newrate);
+updatePs.setString(2, assetId);
+
+updatePs.executeUpdate();
+}
+}
+
+updateGAssetDep(catid, oldrate, newrate, userid, rd, uea, ccode);
+}
+    
+    
+
+    public void updateGAssetDepOld(String catid, String oldrate, String newrate,
                                 String userid,
                                 String rd, String uea, String ccode) throws
             Throwable {
@@ -185,8 +236,39 @@ public class RecalculateDep extends ConnectionClass {
     		ps = con.prepareStatement(query);
     		int i = ps.executeUpdate();
         }
-//        freeResource();
+//        
     }
+    
+    public void updateGAssetDep(String catid, String oldrate, String newrate,
+            String userid, String rd, String uea, String ccode) throws Throwable {
+
+SimpleDateFormat sd = new SimpleDateFormat("dd/MM/yyyy");
+
+String selectQuery = "SELECT * FROM am_group_asset WHERE Category_ID = " + catid;
+
+String updateQuery = "UPDATE am_group_asset SET dep_rate = ?, DEP_END_DATE = ? WHERE Asset_id = ?";
+
+try (Connection con = getConnection();
+PreparedStatement selectPs = con.prepareStatement(selectQuery);
+ResultSet rs = selectPs.executeQuery();
+PreparedStatement updatePs = con.prepareStatement(updateQuery)) {
+
+while (rs.next()) {
+
+String assetId = rs.getString("Asset_id");
+
+String depend = getDepEndDate(
+    newrate + "," + sd.format(rs.getDate("effective_date"))
+);
+
+updatePs.setString(1, newrate);
+updatePs.setString(2, depend);
+updatePs.setString(3, assetId);
+
+updatePs.executeUpdate();
+}
+}
+}
 
     /**
      *
@@ -194,7 +276,7 @@ public class RecalculateDep extends ConnectionClass {
      * @param newrate String
      * @throws Throwable
      */
-    public void updateAssetRecalDep(String catid, String oldrate,
+    public void updateAssetRecalDepOld(String catid, String oldrate,
                                     String newrate, String userid,
                                     String rd, String uea, String ccode) throws
             Throwable {
@@ -453,7 +535,220 @@ public class RecalculateDep extends ConnectionClass {
     		
         }
         updateGAssetDep(catid, oldrate, newrate, userid, rd, uea, ccode);
-        freeResource();
+        
+    }
+    
+    public void updateAssetRecalDep(String catid, String oldrate,
+            String newrate, String userid,
+            String rd, String uea, String ccode) throws Throwable {
+
+SimpleDateFormat sd = new SimpleDateFormat("dd/MM/yyyy");
+
+try (Connection con = getConnection()) {
+
+// -----------------------------
+// 1. Depreciation History
+// -----------------------------
+if (!recentDephistoryExist(newrate, catid)) {
+insertIntoDeprateHistory(catid, oldrate, newrate, userid, rd, uea, ccode);
+} else {
+UpdateDeprateHistory(catid, oldrate, newrate, userid, rd, uea, ccode);
+}
+
+updateGAssetDep(catid, oldrate, newrate, userid, rd, uea, ccode);
+
+// -----------------------------
+// 2. System Config
+// -----------------------------
+String processDate = null;
+String configQuery = "SELECT * FROM AM_AD_LEGACY_SYS_CONFIG";
+
+try (PreparedStatement ps = con.prepareStatement(configQuery);
+ResultSet rs = ps.executeQuery()) {
+
+if (rs.next()) {
+processDate = rs.getString("process_date");
+}
+}
+
+// -----------------------------
+// 3. Effective Date Check
+// -----------------------------
+Date effectiveDate = null;
+Date nextProcessingDate = null;
+
+String effQuery =
+"SELECT effective_date FROM am_dep_rate_history WHERE mtid = " +
+    "(SELECT MAX(mtid) FROM am_dep_rate_history WHERE category_ID = ?)";
+
+try (PreparedStatement ps = con.prepareStatement(effQuery)) {
+ps.setString(1, catid);
+ResultSet rs = ps.executeQuery();
+if (rs.next()) {
+effectiveDate = rs.getDate("effective_date");
+}
+}
+
+String nextQuery = "SELECT next_processing_date FROM am_gb_company";
+
+try (PreparedStatement ps = con.prepareStatement(nextQuery);
+ResultSet rs = ps.executeQuery()) {
+
+if (rs.next()) {
+nextProcessingDate = rs.getDate("next_processing_date");
+}
+}
+
+if (effectiveDate == null || nextProcessingDate == null) {
+return;
+}
+
+if (!effectiveDate.after(nextProcessingDate)) {
+
+// -----------------------------
+// 4. Process Assets
+// -----------------------------
+String assetQuery =
+"SELECT * FROM am_ASSET WHERE Category_ID=? AND Asset_Status NOT IN ('C','D')";
+
+try (PreparedStatement ps = con.prepareStatement(assetQuery)) {
+
+ps.setString(1, catid);
+
+ResultSet rs = ps.executeQuery();
+
+Statement batchStmt = con.createStatement();
+
+while (rs.next()) {
+
+double newacc = calculateDepValue(oldrate, newrate, rs.getString("Accum_dep"));
+
+double depytd = rs.getDouble("dep_ytd");
+
+if ("G".equals(option)) {
+    depytd += amount;
+} else if ("L".equals(option)) {
+    depytd -= amount;
+}
+
+if (newacc != 0.0) {
+
+    String depend = getDepEndDate(newrate + "," +
+            sd.format(rs.getDate("effective_date")));
+
+    String updateAsset =
+            "UPDATE am_ASSET SET dep_rate=" + newrate +
+                    ", DEP_END_DATE='" + depend + "'" +
+                    ", total_life=" + totalInstallment(newrate) +
+                    ", Accum_dep=" + newacc +
+                    ", NBV=" + (rs.getDouble("Cost_Price") - newacc) +
+                    ", remaining_life=" +
+                    (totalInstallment(newrate) - rs.getInt("useful_life")) +
+                    ", dep_ytd=" + depytd +
+                    " WHERE Asset_id='" + rs.getString("Asset_id") + "'";
+
+    batchStmt.addBatch(updateAsset);
+
+    String insertTran =
+            "INSERT INTO AM_DEPRECIATION_TRAN " +
+                    "(ASSET_ID,BRANCH_ID,AMOUNT,TRAN_DATE,DEPT_ID,SECTION_ID,USER_ID,ENTRY_DATE,NEWRATE_STATUS) " +
+                    "VALUES('" + rs.getString("Asset_id") + "'," +
+                    rs.getInt("branch_id") + "," +
+                    amount + ",'" +
+                    processDate + "'," +
+                    rs.getInt("dept_id") + "," +
+                    rs.getInt("section_id") + "," +
+                    userid + ",GETDATE(),'" +
+                    option + "')";
+
+    batchStmt.addBatch(insertTran);
+
+} else {
+
+    String simpleUpdate =
+            "UPDATE am_ASSET SET dep_rate=" + newrate +
+                    " WHERE Asset_id='" + rs.getString("Asset_id") + "'";
+
+    batchStmt.addBatch(simpleUpdate);
+}
+}
+
+batchStmt.executeBatch();
+}
+
+// -----------------------------
+// 5. GL Posting
+// -----------------------------
+processGLPosting(con, catid, oldrate, newrate, userid);
+
+// -----------------------------
+// 6. Update Transaction Status
+// -----------------------------
+String updQuery =
+"UPDATE AM_DEPRECIATION_TRAN SET TRAN_STATUS='P' " +
+        "WHERE USER_ID=? AND TRAN_STATUS='U'";
+
+try (PreparedStatement ps = con.prepareStatement(updQuery)) {
+ps.setString(1, userid);
+ps.executeUpdate();
+}
+}
+
+updateGAssetDep(catid, oldrate, newrate, userid, rd, uea, ccode);
+}
+}
+    
+    private void processGLPosting(Connection con, String catid, String oldrate, String newrate, String userid) throws Throwable {
+        SimpleDateFormat sd = new SimpleDateFormat("dd/MM/yyyy");
+
+        // 1. Get category info
+        String queryCat = "SELECT * FROM AM_AD_CATEGORY WHERE CATEGORY_ID = ?";
+        try (PreparedStatement psCat = con.prepareStatement(queryCat)) {
+            psCat.setString(1, catid);
+            try (ResultSet rsCat = psCat.executeQuery()) {
+                if (!rsCat.next()) return;
+
+                // 2. Get transaction codes
+                String crQuery = "SELECT TRAN_CODE FROM AM_AD_TRAN_CODE WHERE DEBIT_CREDIT='CR' AND GEN_ACCT_TYPE='GL'";
+                String drQuery = "SELECT TRAN_CODE FROM AM_AD_TRAN_CODE WHERE DEBIT_CREDIT='DR' AND GEN_ACCT_TYPE='GL'";
+
+                String crCode = "";
+                String drCode = "";
+
+                try (PreparedStatement psCR = con.prepareStatement(crQuery);
+                     ResultSet rsCR = psCR.executeQuery()) {
+                    if (rsCR.next()) crCode = rsCR.getString("TRAN_CODE");
+                }
+                try (PreparedStatement psDR = con.prepareStatement(drQuery);
+                     ResultSet rsDR = psDR.executeQuery()) {
+                    if (rsDR.next()) drCode = rsDR.getString("TRAN_CODE");
+                }
+
+                // 3. Process SUM for ledgers
+                ResultSet sum = getSUMforLedgers(userid); // keep your original method
+                while (sum.next()) {
+                    String depLedger = rem.processGLAccount(rsCat.getInt("CATEGORY_ID"), sum.getInt(1), "DEP");
+                    String accumDep = rem.processGLAccount(rsCat.getInt("CATEGORY_ID"), sum.getInt(1), "ACCUM_DEP");
+
+                    String batchid = "GL" + rem.getMaxNum(userid);
+                    String acctype = ""; // or "4" based on your logic
+                    String crtrancode = crCode;
+                    String drtrancode = drCode;
+
+                    if ("G".equalsIgnoreCase(option)) {
+                        rem.raiseEntry(depLedger, accumDep, acctype, acctype, drtrancode, crtrancode,
+                                drNarration + " " + oldrate + " to " + newrate,
+                                crNarration + " " + oldrate + " to " + newrate,
+                                sum.getDouble(2), userid, batchid, sd.format(new java.util.Date()), "");
+                    } else if ("L".equalsIgnoreCase(option)) {
+                        rem.raiseEntry(accumDep, depLedger, acctype, acctype, drtrancode, crtrancode,
+                                crNarration + " " + oldrate + " to " + newrate,
+                                drNarration + " " + oldrate + " to " + newrate,
+                                sum.getDouble(2), userid, batchid, sd.format(new java.util.Date()), "");
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -473,7 +768,7 @@ public class RecalculateDep extends ConnectionClass {
      * @return boolean
      * @throws Throwable
      */
-    public boolean recentDephistoryExist(String newrate, String catid) throws
+    public boolean recentDephistoryExistOld(String newrate, String catid) throws
             Throwable {
         String query = "SELECT * FROM am_dep_rate_history " +
                        " WHERE new_rate = " + newrate +
@@ -483,9 +778,27 @@ public class RecalculateDep extends ConnectionClass {
 
         ResultSet rs = getStatement().executeQuery(query);
         boolean result = rs.next();
-        freeResource();
+        
         return result;
 
+    }
+    
+    public boolean recentDephistoryExist(String newrate, String catid) throws Throwable {
+        String query = "SELECT 1 FROM am_dep_rate_history " +
+                       "WHERE new_rate = ? " +
+                       "AND recalculate_dep = 'N' " +
+                       "AND mtid = (SELECT MAX(mtid) FROM am_dep_rate_history WHERE category_ID = ?)";
+        
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+             
+            ps.setString(1, newrate);
+            ps.setString(2, catid);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 
     /**
@@ -506,7 +819,7 @@ public class RecalculateDep extends ConnectionClass {
 
         ResultSet rs = getStatement().executeQuery(query);
         // boolean result = rs.next();
-        // freeResource();
+        // 
         // return result;
         return rs;
     }
@@ -523,7 +836,7 @@ public class RecalculateDep extends ConnectionClass {
      * @throws Throwable
      */
 
-    public boolean insertIntoDeprateHistory(String catid, String oldrate,
+    public boolean insertIntoDeprateHistoryOld(String catid, String oldrate,
                                             String newrate, String userid,
                                             String rd, String uea, String ccode) throws
             Throwable {
@@ -549,9 +862,46 @@ public class RecalculateDep extends ConnectionClass {
             result = getStatement().executeUpdate(query)!=-1;
 
         }
-        freeResource();
+        
         return result;
     }
+    
+    
+    public boolean insertIntoDeprateHistory(String catid, String oldrate,
+            String newrate, String userid,
+            String rd, String uea, String ccode) throws Throwable {
+String processDateQuery = "SELECT process_date FROM AM_AD_LEGACY_SYS_CONFIG";
+
+try (Connection con = getConnection();
+PreparedStatement psDate = con.prepareStatement(processDateQuery);
+ResultSet rs = psDate.executeQuery()) {
+
+if (!rs.next()) {
+return false; // No process date found
+}
+
+String processDate = rs.getString("process_date");
+
+String insertQuery = "INSERT INTO am_dep_rate_history " +
+ "(category_ID, category_code, old_rate, new_rate, effective_date, " +
+ "entry_date, userid, recalculate_dep, update_asset) " +
+ "VALUES (?, ?, ?, ?, ?, GETDATE(), ?, ?, ?)";
+
+try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+psInsert.setString(1, catid);
+psInsert.setString(2, ccode);
+psInsert.setString(3, oldrate);
+psInsert.setString(4, newrate);
+psInsert.setString(5, processDate);
+psInsert.setString(6, userid);
+psInsert.setString(7, rd);
+psInsert.setString(8, uea);
+
+int rowsAffected = psInsert.executeUpdate();
+return rowsAffected > 0;
+}
+}
+}
 
 
     /**
@@ -565,7 +915,7 @@ public class RecalculateDep extends ConnectionClass {
      * @return boolean
      * @throws Throwable
      */
-    public boolean UpdateDeprateHistory(String catid, String oldrate,
+    public boolean UpdateDeprateHistoryOld(String catid, String oldrate,
                                         String newrate, String userid,
                                         String rd, String uea, String ccode) throws
             Throwable {
@@ -597,11 +947,59 @@ public class RecalculateDep extends ConnectionClass {
 //            result = getStatement().execute(query);
 
         }
-        freeResource();
+        
         return result;
     }
+    
+    public boolean UpdateDeprateHistory(String catid, String oldrate,
+            String newrate, String userid,
+            String rd, String uea, String ccode) throws Throwable {
 
-    public String[] getRecentDephistoryRecord(String catid, String newrate) throws
+String processDateQuery = "SELECT process_date FROM AM_AD_LEGACY_SYS_CONFIG";
+
+try (Connection con = getConnection();
+PreparedStatement psDate = con.prepareStatement(processDateQuery);
+ResultSet rs = psDate.executeQuery()) {
+
+if (!rs.next()) {
+return false; // No process date found
+}
+
+String processDate = rs.getString("process_date");
+
+String updateQuery = "UPDATE am_dep_rate_history SET " +
+     "category_ID = ?, " +
+     "category_code = ?, " +
+     "old_rate = ?, " +
+     "new_rate = ?, " +
+     "effective_date = ?, " +
+     "entry_date = GETDATE(), " +
+     "userid = ?, " +
+     "recalculate_dep = ?, " +
+     "update_asset = ? " +
+     "WHERE mtid = (" +
+     "SELECT MAX(mtid) FROM am_dep_rate_history " +
+     "WHERE category_ID = ? AND new_rate = ?)";
+
+try (PreparedStatement psUpdate = con.prepareStatement(updateQuery)) {
+psUpdate.setString(1, catid);
+psUpdate.setString(2, ccode);
+psUpdate.setString(3, oldrate);
+psUpdate.setString(4, newrate);
+psUpdate.setString(5, processDate);
+psUpdate.setString(6, userid);
+psUpdate.setString(7, rd);
+psUpdate.setString(8, uea);
+psUpdate.setString(9, catid);
+psUpdate.setString(10, newrate);
+
+int rowsUpdated = psUpdate.executeUpdate();
+return rowsUpdated > 0;
+}
+}
+}
+
+    public String[] getRecentDephistoryRecordOld(String catid, String newrate) throws
             Throwable {
         String query = "SELECT * FROM am_dep_rate_history " +
                        " WHERE new_rate = " + newrate +
@@ -616,12 +1014,37 @@ public class RecalculateDep extends ConnectionClass {
             result[1] = rs.getString("update_asset");
         }
         // boolean result = rs.next();
-        freeResource();
+        
         return result;
 
     }
+    
+    public String[] getRecentDephistoryRecord(String catid, String newrate) throws Throwable {
+        String query = "SELECT recalculate_dep, update_asset " +
+                       "FROM am_dep_rate_history " +
+                       "WHERE new_rate = ? AND recalculate_dep = 'N' " +
+                       "AND mtid = (SELECT MAX(mtid) FROM am_dep_rate_history WHERE category_ID = ?)";
 
-    public ResultSet getSUMforLedgers(String userid) throws Throwable {
+        String[] result = new String[2];
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, newrate);
+            ps.setString(2, catid);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    result[0] = rs.getString("recalculate_dep");
+                    result[1] = rs.getString("update_asset");
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public ResultSet getSUMforLedgersOld(String userid) throws Throwable {
         String[] compInfo = rem.getCompanyInfo();
         String sbuRequired = compInfo[4].trim();
         String sbuLevel = "";
@@ -674,6 +1097,43 @@ public class RecalculateDep extends ConnectionClass {
         //  return null;
 
     }
+    
+    public ResultSet getSUMforLedgers(String userid) throws Throwable {
+        String[] compInfo = rem.getCompanyInfo();
+        String sbuRequired = compInfo.length > 4 && compInfo[4] != null ? compInfo[4].trim() : "";
+        String sbuLevel = compInfo.length > 5 && compInfo[5] != null ? compInfo[5].trim() : "";
+
+        String query;
+
+        if ("Y".equalsIgnoreCase(sbuRequired)) {
+            if ("Department".equalsIgnoreCase(sbuLevel)) {
+                query = "SELECT DEPT_ID, SUM(amount) FROM AM_DEPRECIATION_TRAN " +
+                        "WHERE USER_ID=? AND TRAN_STATUS='U' GROUP BY DEPT_ID ORDER BY DEPT_ID";
+            } else if ("Sector/Units".equalsIgnoreCase(sbuLevel)) {
+                query = "SELECT SECTION_ID, SUM(amount) FROM AM_DEPRECIATION_TRAN " +
+                        "WHERE USER_ID=? AND TRAN_STATUS='U' GROUP BY SECTION_ID ORDER BY SECTION_ID";
+            } else {
+                query = "SELECT BRANCH_ID, SUM(amount) FROM AM_DEPRECIATION_TRAN " +
+                        "WHERE USER_ID=? AND TRAN_STATUS='U' GROUP BY BRANCH_ID ORDER BY BRANCH_ID";
+            }
+        } else {
+            query = "SELECT BRANCH_ID, SUM(amount) FROM AM_DEPRECIATION_TRAN " +
+                    "WHERE USER_ID=? AND TRAN_STATUS='U' GROUP BY BRANCH_ID ORDER BY BRANCH_ID";
+        }
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, userid);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                // Use CachedRowSet to make the ResultSet disconnected and leak-safe
+                CachedRowSet crs = new CachedRowSetImpl();
+                crs.populate(rs);
+                return crs;
+            }
+        }
+    }
   
     public static String getDepEndDate(String vals) {
         if (vals != null) {
@@ -714,7 +1174,7 @@ public class RecalculateDep extends ConnectionClass {
         return "Error";
     }
 
-    public void updateAssetResidual(String catid, String oldres,
+    public void updateAssetResidualOld(String catid, String oldres,
                                     String newresvalue, String changed) throws
             Throwable {
 
@@ -735,10 +1195,45 @@ public class RecalculateDep extends ConnectionClass {
                 stmt.addBatch(query2);
                 stmt.executeBatch();
 
-                freeResource();
+                
             }
         } else {
 
         }
     }
+    
+    public void updateAssetResidual(String catid, String oldres,
+            String newresvalue, String changed) throws Throwable {
+
+if (!"Y".equalsIgnoreCase(changed)) {
+return; // nothing to do
+}
+
+if (oldres.equalsIgnoreCase(newresvalue)) {
+return; // value didn't change
+}
+
+String query1 = "UPDATE am_ASSET SET residual_value = ? " +
+"WHERE Category_ID = ? AND Asset_Status NOT IN ('C','D')";
+String query2 = "UPDATE am_group_asset SET residual_value = ? " +
+"WHERE Category_ID = ? AND Asset_Status NOT IN ('C','D')";
+
+try (Connection con = getConnection();
+PreparedStatement ps1 = con.prepareStatement(query1);
+PreparedStatement ps2 = con.prepareStatement(query2)) {
+
+double newRes = Double.parseDouble(newresvalue);
+
+ps1.setDouble(1, newRes);
+ps1.setString(2, catid);
+ps1.addBatch();
+
+ps2.setDouble(1, newRes);
+ps2.setString(2, catid);
+ps2.addBatch();
+
+ps1.executeBatch();
+ps2.executeBatch();
+}
+}
 }

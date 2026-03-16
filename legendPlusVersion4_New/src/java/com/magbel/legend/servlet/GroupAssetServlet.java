@@ -389,12 +389,10 @@ public class GroupAssetServlet extends HttpServlet {
 
         handleFileUpload(request, status);
 
-        String assetId = groupAsset.getAsset_id();
-    
-        
-        long groupId = groupAsset.getGroupID(con, assetId);
-        
+        long groupId = status[1];
         String groupIdStr = Long.toString(groupId);
+
+        System.out.println("Generated Group ID >>>> " + groupIdStr);
 
         String invNumber =
                 params.suppliedBy + "-" + params.invoiceNum;
@@ -406,7 +404,7 @@ public class GroupAssetServlet extends HttpServlet {
                 "Group Asset Creation"
         );
 
-        sendCreationEmail(assetId, emailService, companyHandler);
+        sendCreationEmail(groupIdStr, emailService, companyHandler);
 
         showSuccessAlert(
                 out,
