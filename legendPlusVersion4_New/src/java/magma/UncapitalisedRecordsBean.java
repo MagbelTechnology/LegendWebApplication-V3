@@ -139,7 +139,7 @@ public class UncapitalisedRecordsBean extends legend.ConnectionClass
 
         //super();
         try {
-            freeResource();
+           
             sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
             dbConnection = new MagmaDBConnection();
             dateFormat = new DatetimeFormat();
@@ -158,8 +158,7 @@ public class UncapitalisedRecordsBean extends legend.ConnectionClass
     private boolean rinsertAssetRecord() throws Exception, Throwable {
         asset_id = new legend.AutoIDSetup().getIdentity(branch_id,
                 department_id, section_id, category_id);
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
 AssetPaymentManager payment = null;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
@@ -283,13 +282,13 @@ AssetPaymentManager payment = null;
             done = false;
             return done;
         }
-        try {
+        try (Connection  con = getConnection();
+           PreparedStatement  ps = con.prepareStatement(createQuery);){
 
             double costPrice = Double.parseDouble(vat_amount) +
                                Double.parseDouble(vatable_cost);
 
-            con = dbConnection.getConnection("fixedasset");
-            ps = con.prepareStatement(createQuery);
+           
             ps.setString(1, asset_id);
             ps.setString(2, registration_no);
             ps.setInt(3, Integer.parseInt(branch_id));
@@ -390,9 +389,7 @@ AssetPaymentManager payment = null;
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error creating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
 
         return done;
     }
@@ -424,8 +421,7 @@ AssetPaymentManager payment = null;
                        "SPARE_3 = ?,SPARE_4 = ?,SPARE_5 = ?,SPARE_6 = ?,sub_category_code = ?,CATEGORY_ID=? ,SUB_CATEGORY_ID=?  "+
                        "WHERE	ASSET_ID = '" + asset_id + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
         /*if (require_redistribution.equalsIgnoreCase("Y")) {
             status = "Z";
@@ -491,13 +487,13 @@ AssetPaymentManager payment = null;
         wh_tax_amount = wh_tax_amount.replaceAll(",", "");
         residual_value = residual_value.replaceAll(",", "");
 
-        try {
+        try (Connection  con = getConnection();
+                PreparedStatement  ps = con.prepareStatement(query)){
 
             double costPrice = Double.parseDouble(vat_amount) +
                                Double.parseDouble(vatable_cost);
 
-            con = dbConnection.getConnection("fixedasset");
-            ps = con.prepareStatement(query);
+           
             ps.setString(1, registration_no);
             ps.setString(2, description);
             ps.setString(3, vendor_account);
@@ -566,9 +562,7 @@ AssetPaymentManager payment = null;
         } catch (Exception ex) {
             done = false;
             System.out.println("WARN:Error updating asset->" + ex);
-        } finally {
-            dbConnection.closeConnection(con, ps);
-        }
+        } 
         return done;
 
     }
@@ -1770,12 +1764,12 @@ Date date = new Date();
         return allocation;
     }
 
-    public void updateBudget(String quarter, String[] bugdetinfo) {
+    public void updateBudget(String quarter, String[] bugdetinfo) throws SQLException {
 
         String fisdate = "";
         int finomonth = 0;
         String fiedate = "";
-        Connection conn = dbConnection.getConnection("fixedasset"); ;
+        Connection conn = getConnection();
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
@@ -9066,10 +9060,7 @@ done= ps.execute();
                     	r.printStackTrace();
                     	System.out.println("-------------------------------");
 		}
-                    finally
-                    {
-			freeResource();
-		   }
+                    
 
 
 

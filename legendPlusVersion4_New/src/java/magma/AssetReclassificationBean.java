@@ -120,8 +120,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
             user_id = "0";
         }
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         boolean done = true;
 
         int[] totalAndRemainingLife = getTotalAndRemainLife(asset_id);
@@ -200,8 +199,9 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
     }
 
 
-        try {
-            con = dbConnect.getConnection("legendPlus");
+        try (Connection c = getConnection();
+   	         PreparedStatement ps = c.prepareStatement(insertQuery)) {
+           
             /*
             if (recalculate_depreciation.equals("Y")) {
             ps = con.prepareStatement(updateQuery);
@@ -242,7 +242,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
              */
 
 
-            ps = con.prepareStatement(insertQuery);
+          
 //            System.out.println("<<<<<===asset_id: "+asset_id);
             ps.setString(1, asset_id);
 //            System.out.println("<<<<<===category: "+Integer.parseInt(category));
@@ -314,9 +314,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
 
             done = false;
             System.out.println("WARN:AssetReclassificationBean:insertAssetReclassification() Failed reclassifying asset ->" + ex);
-        } finally {
-            dbConnect.closeConnection(con, ps);
-        }
+        } 
 
         return done;
     }
@@ -475,7 +473,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
 
     */
     //This method will retreived already calculated reclassification details from table. 21-April-2010
-    public void updateAssetReclassification(String id) {
+    public void updateAssetReclassificationOld(String id) {
 
         int new_category = 0;
         double new_depr_rate = 0;
@@ -622,6 +620,113 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
     }
 
 
+    public void updateAssetReclassification(String id) {
+
+        int new_category = 0;
+        double new_depr_rate = 0;
+        double new_accum_dep = 0;
+        int total_life = 0;
+        int remaining_life = 0;
+        double recalc_difference = 0;
+        double new_monthly_dep = 0.0;
+        double netBookValue = 0.0;
+        java.sql.Date new_dep_end_date = null;
+
+        String updateQuery =
+                "UPDATE AM_ASSET SET CATEGORY_ID=?, DEP_RATE=?, TOTAL_LIFE=?, " +
+                "REMAINING_LIFE=?, DEP_YTD=?, DEP_END_DATE=?, NBV=?, ACCUM_DEP=?, " +
+                "CATEGORY_CODE=?, Monthly_Dep=? WHERE ASSET_ID=?";
+
+        String updateQuery2 =
+                "UPDATE AM_ASSET SET CATEGORY_ID=?, DEP_RATE=?, CATEGORY_CODE=?, " +
+                "ASSET_STATUS=?, POST_REJECT_REASON=?, Monthly_Dep=?, REMAINING_LIFE=?, TOTAL_LIFE=? " +
+                "WHERE ASSET_ID=?";
+
+        String updateFleetMaster =
+                "UPDATE FT_FLEET_MASTER SET CATEGORY_ID=?, CATEGORY_CODE=? WHERE ASSET_ID=?";
+
+        String query1 =
+                "SELECT NEW_CATEGORY_ID, NEW_DEPR_RATE, NEW_ACCUM_DEP, recalc_difference, recalc_depr, " +
+                "raise_entry, new_total_life, new_remaining_life, new_monthly_dep, NBV, new_dep_end_date " +
+                "FROM AM_ASSETRECLASSIFICATION WHERE asset_id = ?";
+
+        try (Connection con = dbConnect.getConnection("legendPlus");
+             PreparedStatement ps1 = con.prepareStatement(query1)) {
+
+            ps1.setString(1, id);
+
+            try (ResultSet rs = ps1.executeQuery()) {
+
+                if (rs.next()) {
+                    new_category = rs.getInt(1);
+                    new_depr_rate = rs.getDouble(2);
+                    new_accum_dep = rs.getDouble(3);
+                    recalc_difference = rs.getDouble(4);
+                    recalculate_depreciation = rs.getString(5);
+                    raise_entry = rs.getString(6);
+                    total_life = rs.getInt(7);
+                    remaining_life = rs.getInt(8);
+                    new_monthly_dep = rs.getDouble(9);
+                    netBookValue = rs.getDouble(10);
+                    new_dep_end_date = rs.getDate(11);
+                }
+            }
+
+            if ("Y".equalsIgnoreCase(recalculate_depreciation)) {
+
+                try (PreparedStatement ps2 = con.prepareStatement(updateQuery)) {
+
+                    ps2.setInt(1, new_category);
+                    ps2.setDouble(2, new_depr_rate);
+                    ps2.setInt(3, total_life);
+                    ps2.setInt(4, remaining_life);
+                    ps2.setDouble(5, recalc_difference);
+                    ps2.setDate(6, new_dep_end_date);
+                    ps2.setDouble(7, netBookValue);
+                    ps2.setDouble(8, new_accum_dep);
+                    ps2.setString(9, code.getCategoryCode(Integer.toString(new_category)));
+                    ps2.setDouble(10, new_monthly_dep);
+                    ps2.setString(11, id);
+
+                    ps2.executeUpdate();
+                }
+
+            } else {
+
+                try (PreparedStatement ps3 = con.prepareStatement(updateQuery2)) {
+
+                    ps3.setInt(1, new_category);
+                    ps3.setDouble(2, new_depr_rate);
+                    ps3.setString(3, code.getCategoryCode(Integer.toString(new_category)));
+                    ps3.setString(4, "ACTIVE");
+                    ps3.setString(5, "");
+                    ps3.setDouble(6, new_monthly_dep);
+                    ps3.setInt(7, remaining_life);
+                    ps3.setInt(8, total_life);
+                    ps3.setString(9, id);
+
+                    ps3.executeUpdate();
+                }
+            }
+
+            try (PreparedStatement ps4 = con.prepareStatement(updateFleetMaster)) {
+
+                ps4.setInt(1, new_category);
+                ps4.setString(2, code.getCategoryCode(Integer.toString(new_category)));
+                ps4.setString(3, id);
+
+                ps4.executeUpdate();
+            }
+
+            updateBudget();
+
+        } catch (Exception e) {
+            String warning = "WARNING: AssetReclassificationBean.updateAssetReclassification(): Error reclassifying asset -> "
+                    + e.getMessage();
+            System.out.println(warning);
+            e.printStackTrace();
+        }
+    }
 
 
     /**
@@ -636,7 +741,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
     /**
      * getAssetReclassifications
      */
-    public void getAssetReclassifications() throws Exception {
+    public void getAssetReclassificationsOld() throws Exception {
 
         Connection con = null;
          PreparedStatement ps = null;
@@ -742,6 +847,97 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         }
 
 
+    }
+    
+    
+    public void getAssetReclassifications() throws Exception {
+
+        String query =
+                "SELECT A.ASSET_ID,A.REGISTRATION_NO,B.BRANCH_NAME," +
+                "D.DEPT_NAME,C.CATEGORY_NAME,A.DESCRIPTION," +
+                "A.VENDOR_AC,A.DATE_PURCHASED,A.DEP_RATE," +
+                "A.ASSET_MAKE,A.ASSET_MODEL,A.ASSET_SERIAL_NO," +
+                "A.ASSET_ENGINE_NO,V.VENDOR_NAME,A.ASSET_USER," +
+                "M.MAINT_NAME,A.ACCUM_DEP,A.MONTHLY_DEP," +
+                "A.COST_PRICE,A.NBV,A.DEP_END_DATE,A.RESIDUAL_VALUE," +
+                "A.AUTHORIZED_BY,A.POSTING_DATE,A.EFFECTIVE_DATE," +
+                "A.PURCHASE_REASON,A.USEFUL_LIFE,A.TOTAL_LIFE," +
+                "L.LOCATION,A.REMAINING_LIFE,A.VATABLE_COST," +
+                "A.VAT,A.REQ_DEPRECIATION,A.SUBJECT_TO_VAT," +
+                "A.WHO_TO_REM,A.EMAIL1,A.EMAIL2,A.RAISE_ENTRY," +
+                "A.DEP_YTD,S.SECTION_NAME,A.ASSET_STATUS," +
+                "C.ASSET_LEDGER,A.DATE_DISPOSED,A.[USER_ID]," +
+                "A.WHO_TO_REM_2 " +
+                "FROM AM_ASSET A " +
+                "LEFT JOIN AM_AD_BRANCH B ON A.BRANCH_ID = B.BRANCH_ID " +
+                "LEFT JOIN AM_AD_CATEGORY C ON A.CATEGORY_ID = C.CATEGORY_ID " +
+                "LEFT JOIN AM_AD_DEPARTMENT D ON A.DEPT_ID = D.DEPT_ID " +
+                "LEFT JOIN AM_AD_VENDOR V ON A.SUPPLIER_NAME = V.VENDOR_ID " +
+                "LEFT JOIN AM_VW_MAINTNANCE_VENDORS M ON A.ASSET_MAINTENANCE = M.MAINT_ID " +
+                "LEFT JOIN AM_AD_SECTION S ON A.SECTION_ID = S.SECTION_ID " +
+                "LEFT JOIN AM_GB_LOCATION L ON A.LOCATION = L.LOCATION_ID " +
+                "WHERE A.ASSET_ID = ?";
+
+        if (asset_id == null || asset_id.trim().isEmpty()) {
+            return;
+        }
+
+        try (Connection con = dbConnect.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, asset_id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+
+                    date_of_purchase = dbConnect.formatDate(rs.getDate("DATE_PURCHASED"));
+                    depreciation_start_date = dbConnect.formatDate(rs.getDate("EFFECTIVE_DATE"));
+                    depreciation_end_date = dbConnect.formatDate(rs.getDate("DEP_END_DATE"));
+                    posting_date = dbConnect.formatDate(rs.getDate("POSTING_DATE"));
+
+                    make = rs.getString("ASSET_MAKE");
+                    subject_to_vat = rs.getString("SUBJECT_TO_VAT");
+                    accumulated_depreciation = rs.getString("ACCUM_DEP");
+                    monthly_depreciation = rs.getString("MONTHLY_DEP");
+                    maintained_by = rs.getString("MAINT_NAME");
+                    authorized_by = rs.getString("AUTHORIZED_BY");
+                    supplied_by = rs.getString("VENDOR_NAME");
+
+                    asset_id = rs.getString("ASSET_ID");
+                    description = rs.getString("DESCRIPTION");
+                    vendor_account = rs.getString("VENDOR_AC");
+
+                    cost_price = rs.getString("COST_PRICE");
+                    vatable_cost = rs.getString("VATABLE_COST");
+                    vat_amount = rs.getString("VAT");
+
+                    serial_number = rs.getString("ASSET_SERIAL_NO");
+                    engine_number = rs.getString("ASSET_ENGINE_NO");
+                    model = rs.getString("ASSET_MODEL");
+                    user = rs.getString("ASSET_USER");
+
+                    depreciation_rate = rs.getString("DEP_RATE");
+                    nbv = rs.getString("NBV");
+
+                    brought_forward = "0.00";
+                    scrap_value = rs.getString("RESIDUAL_VALUE");
+
+                    branch = rs.getString("BRANCH_NAME");
+                    department = rs.getString("DEPT_NAME");
+                    category = rs.getString("CATEGORY_NAME");
+                    registration_no = rs.getString("REGISTRATION_NO");
+                }
+            }
+
+        } catch (Exception e) {
+            String warning =
+                    "WARNING: AssetReclassificationBean.getAssetReclassifications(): Error -> "
+                            + e.getMessage();
+
+            System.out.println(warning);
+            e.printStackTrace();
+        }
     }
 
     public void setDate_of_purchase(String date_of_purchase) {
@@ -1175,31 +1371,25 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 categoryName + "')";
         String catID = "0";
 
-        Connection con = null;
-        PreparedStatement ps = null;
+       
         //ResultSet rs = null;
 
-        try {
+        try (Connection c = dbConnect.getConnection("legendPlus");
+    	         PreparedStatement ps = c.prepareStatement(query);
+      		 ResultSet rs = ps.executeQuery()) {
 
-            con = dbConnect.getConnection("legendPlus");
-
-            ps = con.prepareStatement(query);
-            //rs = ps.executeQuery();
-
-            ResultSet rs = getStatement().executeQuery(query);
             while (rs.next()) {
                 catID = rs.getString(1);
             }
-            freeResource();
+           
 
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: getCategoryId(): Error reclassifying asset ->" +
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            //dbConnect.closeConnection(con, ps, rs);
-        }
+        } 
+        
         return catID;
     }
 
@@ -1215,18 +1405,13 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 "WHERE CATEGORY_ID = " + categoryid;
         double catID = 0.00d;
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
 
-        try {
+        try (Connection c = dbConnect.getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(query);
+     		 ResultSet rs = ps.executeQuery()) {
 
-            rs = getStatement().executeQuery(query);
-
-            con = dbConnect.getConnection("legendPlus");
-
-            ps = con.prepareStatement(query);
             // rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -1239,13 +1424,12 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-             dbConnect.closeConnection(con, ps, rs);
-        }
+        } 
+        
         return catID;
     }
 
-    public int getUsedLife(String assetid) {
+    public int getUsedLifeOld(String assetid) {
 
         String query = "SELECT USEFUL_LIFE FROM AM_ASSET WHERE ASSET_ID = '" +
                 assetid + "'";
@@ -1263,7 +1447,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
             while (rs.next()) {
                 usedLife = rs.getInt(1);
             }
-            freeResource();
+           
 
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: getUsedLife(): Error reclassifying asset ->" +
@@ -1273,6 +1457,39 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         } finally {
             //dbConnect.closeConnection(con, ps,rs);
         }
+        return usedLife;
+    }
+    
+    
+    public int getUsedLife(String assetid) {
+
+        int usedLife = 0;
+
+        String query = "SELECT USEFUL_LIFE FROM AM_ASSET WHERE ASSET_ID = ?";
+
+        try (Connection con = dbConnect.getConnection("legendPlus");
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, assetid);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    usedLife = rs.getInt("USEFUL_LIFE");
+                }
+
+            }
+
+        } catch (Exception e) {
+
+            String warning =
+                    "WARNING: AssetReclassificationBean.getUsedLife(): Error -> "
+                            + e.getMessage();
+
+            System.out.println(warning);
+            e.printStackTrace();
+        }
+
         return usedLife;
     }
 
@@ -1288,17 +1505,12 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 "SELECT DEP_RATE FROM AM_AD_CATEGORY WHERE CATEGORY_ID = " +
                 categoryId;
         String depRate = "0.00";
-        Connection con = null;
+       
         //PreparedStatement ps = null;
         // ResultSet rs = null;
-        try {
-
-            con = dbConnect.getConnection("legendPlus");
-
-            //ps = con.prepareStatement(query);
-            //   rs = ps.executeQuery();
-
-            ResultSet rs = getStatement().executeQuery(query);
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
 
 
             while (rs.next()) {
@@ -1306,7 +1518,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 depRate = Double.toString(rs.getDouble(1));
 
             }
-            freeResource();
+           
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: getDepreciationRate(): Error reclassifying asset ->" +
                     e.getMessage();
@@ -1324,16 +1536,15 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         String query = "SELECT ASSET_GL FROM AM_AD_CATEGORY " +
                 "WHERE CATEGORY_ID = " + categoryId;
         String assetGL = "";
-        Connection con = null;
+       
         // PreparedStatement ps = null;
         // ResultSet rs = null;
 
-        try {
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
 
-            ResultSet rs = getStatement().executeQuery(query);
-
-            con = dbConnect.getConnection("legendPlus");
-
+          
             //ps = con.prepareStatement(query);
             //  rs = ps.executeQuery();
 
@@ -1343,16 +1554,14 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
 
             }
 
-            freeResource();
+          
 
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: getAssetLedger(): Error reclassifying asset ->" +
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            //dbConnect.closeConnection(con, ps,rs);
-        }
+        } 
 
         return assetGL;
 
@@ -1363,19 +1572,16 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         String query = "SELECT ACCUM_DEP_LEDGER FROM AM_AD_CATEGORY " +
                 "WHERE CATEGORY_ID = " + categoryId;
         String accumGL = "";
-        Connection con = null;
+       
         // PreparedStatement ps = null;
         //ResultSet rs = null;
 
 
-        try {
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
 
-            con = dbConnect.getConnection("legendPlus");
-
-            //ps = con.prepareStatement(query);
-            //   rs = ps.executeQuery();
-
-            ResultSet rs = getStatement().executeQuery(query);
+          
             while (rs.next()) {
 
                 accumGL = rs.getString(1);
@@ -1389,10 +1595,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            freeResource();
-            // dbConnect.closeConnection(con, ps,rs);
-        }
+        } 
 
         return accumGL;
 
@@ -1403,30 +1606,28 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         String query = "select ACCUM_DEP FROM AM_ASSET WHERE ASSET_ID = '" +
                 assetid + "'";
         double accum = 0.00d;
-        Connection con = null;
+       
         // PreparedStatement ps = null;
         //ResultSet rs = null;
 
-        try {
-            con = dbConnect.getConnection("legendPlus");
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
+         
 
-            //ps = con.prepareStatement(query);
-            //   rs = ps.executeQuery();
-            ResultSet rs = getStatement().executeQuery(query);
 
             while (rs.next()) {
                 accum = rs.getDouble(1);
             }
-            freeResource();
+           
 
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: getOldAccumDep(): Error reclassifying asset ->" +
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            //dbConnect.closeConnection(con, ps,rs);
-        }
+        } 
+        
         return accum;
 
     }
@@ -1438,16 +1639,14 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         double newr = Double.parseDouble(rate);
         double newacc = 0.00d;
 
-        Connection con = null;
+      
         //PreparedStatement ps = null;
         //ResultSet rs = null;
 
-        try {
-            con = dbConnect.getConnection("legendPlus");
-
-            //ps = con.prepareStatement(query);
-            //rs = ps.executeQuery();
-            ResultSet rs = getStatement().executeQuery(query);
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
+          
 
             while (rs.next()) {
                 double oldr = rs.getDouble("DEP_RATE");
@@ -1468,16 +1667,14 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 }
 
             }
-            freeResource();
+           
 
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: getNewAccumDep(): Error reclassifying asset ->" +
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            //dbConnect.closeConnection(con, ps,rs);
-        }
+        } 
 
         return newacc;
     }
@@ -1491,33 +1688,26 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 "FROM AM_ASSETRECLASSIFICATION R,AM_GB_COMPANY C   " +
                 "WHERE R.ASSET_ID = '" + assetId + "'";
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+       
 
-        try {
-            con = dbConnect.getConnection("legendPlus");
-
-            //ps = con.prepareStatement(query);
-            //   rs = ps.executeQuery();
-
-            rs = getStatement().executeQuery(query);
-
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
+          
             while (rs.next()) {
 
                 reclassDate = dbConnect.formatDate(rs.getDate(1));
                 processDate = dbConnect.formatDate(rs.getDate(2));
             }
-            freeResource();
+           
 
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: isReclassDateGreaterThanProcesing(): Error reclassifying asset ->" +
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-             dbConnect.closeConnection(con, ps,rs);
         }
+        
         isGreater = dateFormat.isDateExceedOther(reclassDate, processDate);
         return isGreater;
 
@@ -1530,16 +1720,12 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         String query = "SELECT raise_entry FROM am_assetReclassification " +
                 "WHERE asset_id='" + assetId + "'";
 
-        Connection con = null;
-        ResultSet rs = null;
-        PreparedStatement ps = null;
-        //ResultSet rsr = null;
-        //PreparedStatement psr = null;
-        try {
+       
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
 
-            con = dbConnect.getConnection("legendPlus");
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+           
             //psr = con.prepareStatement(query);
             // rsr = ps.executeQuery();
             while (rs.next()) {
@@ -1555,9 +1741,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
 
         } catch (Exception e) {
             System.out.println("WARN :Error isEntryRaised -> " + e);
-        } finally {
-            dbConnect.closeConnection(con, ps, rs);
-        }
+        } 
 
         return isRaised;
     }
@@ -1619,18 +1803,15 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 "SELECT NEW_CATEGORY_ID  FROM am_assetReclassification  " +
                 "WHERE asset_id = '" + assetid + "' ";
         String accumGL = "0";
-        Connection con = null;
+       
         //PreparedStatement ps = null;
         // ResultSet rs = null;
 
-        try {
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
 
-            con = dbConnect.getConnection("legendPlus");
-
-            //ps = con.prepareStatement(query);
-            //   rs = ps.executeQuery();
-
-            ResultSet rs = getStatement().executeQuery(query);
+           
             while (rs.next()) {
 
                 accumGL = rs.getString(1);
@@ -1642,10 +1823,7 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            freeResource();
-            //dbConnect.closeConnection(con, ps,rs);
-        }
+        } 
 
         return accumGL;
 
@@ -1657,17 +1835,13 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 "SELECT CATEGORY_CODE  FROM am_ad_category  " +
                 "WHERE category_id = '" + cateid + "' ";
         String catid = "0";
-        Connection con = null;
-        //PreparedStatement ps = null;
-        //ResultSet rs = null;
+       
+        
 
-        try {
-            con = dbConnect.getConnection("legendPlus");
-
-            //ps = con.prepareStatement(query);
-            //   rs = ps.executeQuery();
-
-            ResultSet rs = getStatement().executeQuery(query);
+        try (Connection c = dbConnect.getConnection("legendPlus");
+      	         PreparedStatement ps = c.prepareStatement(query);
+        		 ResultSet rs = ps.executeQuery()) {
+        	
             while (rs.next()) {
 
                 catid = rs.getString(1);
@@ -1679,16 +1853,13 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            freeResource();
-            // dbConnect.closeConnection(con, ps,rs);
         }
 
         return catid;
 
     }
 
-    public void updateBudget() {
+    public void updateBudgetOld() throws SQLException {
         String companyQuery = "SELECT financial_start_date" + ",financial_no_ofmonths,financial_end_date" + " FROM am_gb_company";
         String fisdate = "";
         int finomonth = 0;
@@ -1821,11 +1992,99 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
             "Rollback Failed");
             }*/
         } finally {
-            freeResource();
+           // freeResource();
             dbConnect.closeConnection(conn, stmt);
         }
         System.out.println(
                 "Exiting update of Aquicisition Budget due to Reclassification");
+    }
+    
+    
+    public void updateBudget() {
+
+        String companyQuery =
+                "SELECT financial_start_date, financial_no_ofmonths, financial_end_date " +
+                "FROM am_gb_company";
+
+        String fisdate = "";
+        int finomonth = 0;
+        String fiedate = "";
+
+        try (Connection conn = dbConnect.getConnection("legendPlus");
+             PreparedStatement psCompany = conn.prepareStatement(companyQuery);
+             ResultSet rs = psCompany.executeQuery()) {
+
+            if (rs.next()) {
+                fisdate = sdf.format(rs.getDate("financial_start_date"));
+                finomonth = rs.getInt("financial_no_ofmonths");
+                fiedate = sdf.format(rs.getDate("financial_end_date"));
+            }
+
+            System.out.println("pdate  " + date_of_purchase);
+            System.out.println("financial start " + fisdate);
+
+            double q1 = (double) finomonth / 4;
+
+            int month = (dateFormat.getDayDifference(date_of_purchase, fisdate)) / 30;
+
+            boolean btw = dateFormat.isDateBetween(fisdate, fiedate, date_of_purchase);
+
+            if (!btw) {
+                return;
+            }
+
+            System.out.println("Commencing update of Acquisition Budget due to Reclassification");
+
+            String old_category = getCatCode(category);
+            String new_category = getCatCode(this.new_category);
+            double amount = Double.parseDouble(vatable_cost.replaceAll(",", ""));
+
+            String quarterColumn;
+
+            if (month <= q1) {
+                quarterColumn = "Q1_ACTUAL";
+            } else if (month <= (q1 * 2)) {
+                quarterColumn = "Q2_ACTUAL";
+            } else if (month <= (q1 * 3)) {
+                quarterColumn = "Q3_ACTUAL";
+            } else {
+                quarterColumn = "Q4_ACTUAL";
+            }
+
+            String updateQuery =
+                    "UPDATE AM_ACQUISITION_BUDGET " +
+                    "SET " + quarterColumn + " = (" + quarterColumn + " + ?) " +
+                    "WHERE BRANCH_ID=? AND CATEGORY=?";
+
+            try (PreparedStatement psAdd = conn.prepareStatement(updateQuery);
+                 PreparedStatement psSub = conn.prepareStatement(updateQuery)) {
+
+                // subtract from old category
+                psSub.setDouble(1, -amount);
+                psSub.setString(2, getBranchCode());
+                psSub.setString(3, old_category);
+                psSub.executeUpdate();
+
+                // add to new category
+                psAdd.setDouble(1, amount);
+                psAdd.setString(2, getBranchCode());
+                psAdd.setString(3, new_category);
+                psAdd.executeUpdate();
+
+            }
+
+            System.out.println("Updated " + quarterColumn);
+
+        } catch (Exception ex) {
+
+            System.out.println(
+                    "ERROR_" + this.getClass().getName() + "---" +
+                    ex.getMessage() + "--Commencing Rollback");
+
+            ex.printStackTrace();
+        }
+
+        System.out.println("Exiting update of Acquisition Budget due to Reclassification");
     }
 
     public String getBranchCode() {
@@ -1835,18 +2094,10 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 "WHERE asset_id = '" + asset_id + "' ";
         String catid = "0";
 
-        Connection con = null;
-        //PreparedStatement ps = null;
-        //ResultSet rs = null;
-
-        try {
-
-            con = dbConnect.getConnection("legendPlus");
-
-            //ps = con.prepareStatement(query);
-            // rs = ps.executeQuery();
-
-            ResultSet rs = getStatement().executeQuery(query);
+        try (Connection c = dbConnect.getConnection("legendPlus");
+    	         PreparedStatement ps = c.prepareStatement(query);
+      		 ResultSet rs = ps.executeQuery()) {
+        	
             while (rs.next()) {
 
                 catid = rs.getString(1);
@@ -1858,10 +2109,8 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            freeResource();
-            //dbConnect.closeConnection(con, ps,rs);
         }
+        
 
         return catid;
 
@@ -1929,29 +2178,24 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
                 assetid + "'";
         System.out.println("<=======getTotalAndRemainLife query: "+query);
         int[] result = new int[2];
-        Connection con = null;
-        PreparedStatement ps = null;
-        //ResultSet rs = null;
-
-        try {   
-
-            ResultSet rs = getStatement().executeQuery(query);
-            con = dbConnect.getConnection("legendPlus");
+      
+        try (Connection c = dbConnect.getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(query);
+     		 ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 result[0] = rs.getInt(1);
                 result[1] = rs.getInt(2);
             }
-            freeResource();
+           
 
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: getTotalAndRemainLife():  ->" +
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            //dbConnect.closeConnection(con, ps,rs);
-        }
+        } 
+        
         return result;
     }
 
@@ -1960,33 +2204,28 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
         String query = "SELECT Residual_Value FROM AM_ASSET WHERE ASSET_ID = '" +
                 assetid + "'";
         double result = 0.0;
-        Connection con = null;
-        PreparedStatement ps = null;
-        //ResultSet rs = null;
+      
 
-        try {
-
-            ResultSet rs = getStatement().executeQuery(query);
-            con = dbConnect.getConnection("legendPlus");
-
+        try (Connection c = dbConnect.getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(query);
+     		 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 result = rs.getDouble(1);
 
             }
-            freeResource();
+           
 
         } catch (Exception e) {
             String warning = "WARNING:AssetReclassificationBean class: getResidualVal():  ->" +
                     e.getMessage();
             System.out.println(warning);
             e.printStackTrace();
-        } finally {
-            //dbConnect.closeConnection(con, ps,rs);
-        }
+        } 
+        
         return result;
     }
 
-    public void updateAssetReclassification(String id,Long tranId) {
+    public void updateAssetReclassificationOld(String id,Long tranId) {
 
         int new_category = 0;
         double new_depr_rate = 0;
@@ -2116,6 +2355,120 @@ public class AssetReclassificationBean extends legend.ConnectionClass {
             e.printStackTrace();
         } finally {
             dbConnect.closeConnection(con, ps, rs);
+        }
+    }
+    
+    
+    public void updateAssetReclassification(String id, Long tranId) {
+
+        int new_category = 0;
+        double new_depr_rate = 0;
+        double new_accum_dep = 0;
+        int total_life = 0;
+        int remaining_life = 0;
+        double recalc_difference = 0;
+        double new_monthly_dep = 0.0;
+        double netBookValue = 0.0;
+        java.sql.Date new_dep_end_date = null;
+
+        String query1 =
+                "SELECT NEW_CATEGORY_ID,NEW_DEPR_RATE,NEW_ACCUM_DEP,recalc_difference," +
+                "recalc_depr,raise_entry,new_total_life,new_remaining_life," +
+                "new_monthly_dep,NBV,new_dep_end_date " +
+                "FROM AM_ASSETRECLASSIFICATION WHERE asset_id=? AND Reclassify_ID=?";
+
+        String updateQuery =
+                "UPDATE AM_ASSET SET CATEGORY_ID=?, DEP_RATE=?, TOTAL_LIFE=?, " +
+                "REMAINING_LIFE=?, DEP_YTD=?, DEP_END_DATE=?, NBV=?, ACCUM_DEP=?, " +
+                "CATEGORY_CODE=?, Monthly_Dep=? WHERE ASSET_ID=?";
+
+        String updateQuery2 =
+                "UPDATE AM_ASSET SET CATEGORY_ID=?, DEP_RATE=?, CATEGORY_CODE=?, " +
+                "ASSET_STATUS=?, POST_REJECT_REASON=?, Monthly_Dep=?, " +
+                "REMAINING_LIFE=?, TOTAL_LIFE=? WHERE ASSET_ID=?";
+
+        String updateFleetMaster =
+                "UPDATE FT_FLEET_MASTER SET CATEGORY_ID=?, CATEGORY_CODE=? WHERE ASSET_ID=?";
+
+        try (Connection con = dbConnect.getConnection("legendPlus");
+             PreparedStatement ps1 = con.prepareStatement(query1)) {
+
+            ps1.setString(1, id);
+            ps1.setLong(2, tranId);
+
+            try (ResultSet rs = ps1.executeQuery()) {
+
+                if (rs.next()) {
+                    new_category = rs.getInt(1);
+                    new_depr_rate = rs.getDouble(2);
+                    new_accum_dep = rs.getDouble(3);
+                    recalc_difference = rs.getDouble(4);
+                    recalculate_depreciation = rs.getString(5);
+                    raise_entry = rs.getString(6);
+                    total_life = rs.getInt(7);
+                    remaining_life = rs.getInt(8);
+                    new_monthly_dep = rs.getDouble(9);
+                    netBookValue = rs.getDouble(10);
+                    new_dep_end_date = rs.getDate(11);
+                }
+            }
+
+            if ("Y".equalsIgnoreCase(recalculate_depreciation)) {
+
+                try (PreparedStatement ps2 = con.prepareStatement(updateQuery)) {
+
+                    ps2.setInt(1, new_category);
+                    ps2.setDouble(2, new_depr_rate);
+                    ps2.setInt(3, total_life);
+                    ps2.setInt(4, remaining_life);
+                    ps2.setDouble(5, recalc_difference);
+                    ps2.setDate(6, new_dep_end_date);
+                    ps2.setDouble(7, netBookValue);
+                    ps2.setDouble(8, new_accum_dep);
+                    ps2.setString(9, code.getCategoryCode(Integer.toString(new_category)));
+                    ps2.setDouble(10, new_monthly_dep);
+                    ps2.setString(11, id);
+
+                    //ps2.executeUpdate(); //currently disabled as in your code
+                }
+
+            } else {
+
+                try (PreparedStatement ps3 = con.prepareStatement(updateQuery2)) {
+
+                    ps3.setInt(1, new_category);
+                    ps3.setDouble(2, new_depr_rate);
+                    ps3.setString(3, code.getCategoryCode(Integer.toString(new_category)));
+                    ps3.setString(4, "ACTIVE");
+                    ps3.setString(5, "");
+                    ps3.setDouble(6, new_monthly_dep);
+                    ps3.setInt(7, remaining_life);
+                    ps3.setInt(8, total_life);
+                    ps3.setString(9, id);
+
+                    //ps3.executeUpdate(); //disabled as in your code
+                }
+            }
+
+            try (PreparedStatement ps4 = con.prepareStatement(updateFleetMaster)) {
+
+                ps4.setInt(1, new_category);
+                ps4.setString(2, code.getCategoryCode(Integer.toString(new_category)));
+                ps4.setString(3, id);
+
+                ps4.executeUpdate();
+            }
+
+            //updateBudget(); //if needed
+
+        } catch (Exception e) {
+
+            String warning =
+                    "WARNING: AssetReclassificationBean.updateAssetReclassification(): Error -> "
+                            + e.getMessage();
+
+            System.out.println(warning);
+            e.printStackTrace();
         }
     }
 

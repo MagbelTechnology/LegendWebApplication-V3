@@ -527,7 +527,7 @@ public class AuditTrailGen extends Bag{
     * @version 1.0
    */
 	
-  public boolean logAuditTrailOld(String TableName,  String BranchCode,  int Login_Id, String RowId,String hostName,String ipAddress,String macAddress) throws Exception 
+  public boolean logAuditTrail(String TableName,  String BranchCode,  int Login_Id, String RowId,String hostName,String ipAddress,String macAddress) throws Exception 
 	//updateAuditLog  IN  parameters  are  actPerf,  branchcode,  descriptio 
  
   {
@@ -535,9 +535,9 @@ public class AuditTrailGen extends Bag{
 //	  System.out.println("==================Enter audit=============");
 	    DatetimeFormat df = new DatetimeFormat();
           
-	   try {
+	   try(Connection con = connect()) {
 //		   System.out.println("==================Enter audit=============0");
-			con = connect();
+			
 //			System.out.println("==================Enter audit=============1");
           int loginId = 0;
 			String branchcode,   auditindex;
@@ -580,7 +580,7 @@ public class AuditTrailGen extends Bag{
 					String auditstr = "insert into AM_AD_UPDATE_AUDIT"
                       +"(TABLE_NAME,COLUMN_NAME,ROW_ID,PREV_VAL,NEW_VAL,EFF_DATE,LOGIN_ID,BRANCH_CODE,[DATE],ACT_PERFMD,MACHINE_NAME,IP_ADDRESS,MAC_ADDRESS)"
                       +" values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-					prepstmnt = con.prepareStatement(auditstr);
+				try(PreparedStatement prepstmnt = con.prepareStatement(auditstr)){
 			 
 					//prepstmnt.setLong(1,System.currentTimeMillis());
 					prepstmnt.setString(1, tablename);
@@ -618,6 +618,7 @@ public class AuditTrailGen extends Bag{
 				**/
 //				System.out.println("Number of rows updated in the database is:  "+ rowsupdated);
 				}
+              }
 			 }	
 			 } catch(SQLException ex) {//start catch block
 					System.out.println("\n--- SQLException caught ---\n");
@@ -645,7 +646,7 @@ public class AuditTrailGen extends Bag{
 	}//end method block
   
   
-  public boolean logAuditTrail(String tableName, String branchCode, int loginId,
+  public boolean logAuditTrail2(String tableName, String branchCode, int loginId,
           String rowId, String hostName, String ipAddress, String macAddress) throws Exception {
 
 boolean isUpdate = false;

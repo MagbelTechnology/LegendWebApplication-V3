@@ -186,6 +186,7 @@ public class UserAuditApprovalServlet extends HttpServlet {
 		int tranLevel = Integer.parseInt(request.getParameter("tranLevel"));
 //		int assetCode =Integer.parseInt(request.getParameter("assetCode"));
 		String recId = request.getParameter("recId");
+		 System.out.println("<<<<<<<<=======recId >>>>>>>>>>>: "+recId);
         String approvedBy = loginId;
         String RecordId  = request.getParameter("userName");
 		String userName = request.getParameter("userName");
@@ -200,8 +201,8 @@ public class UserAuditApprovalServlet extends HttpServlet {
 		String passwordMust = request.getParameter("passwordMust");
 		String expiry = String.valueOf(passexpiry);
 		String loginStatus = request.getParameter("loginStatus");
-		String userStatus = request.getParameter("userStatus");
-		System.out.println("<<<<<<<< userStatus : " + userStatus);
+		String userStatus = "";
+		//System.out.println("<<<<<<<< userStatus : " + userStatus);
 		String userid = (String) session.getAttribute("CurrentUser");
 		String email = request.getParameter("email");
 		String branchRestrict= request.getParameter("branchRestrict");
@@ -243,7 +244,12 @@ public class UserAuditApprovalServlet extends HttpServlet {
        //  String test = "select menuId from am_gb_UserTmp where TMPID='"+recId+"'";
 		//System.out.println("<<<<<<<<=======menuId: "+menuId+"   Test: "+test);
 //		System.out.println("<<<<<<<<=======regionCode: "+regionCode+"   zoneCode: "+zoneCode);
-         userStatus = aprecords.getCodeName("select USER_STATUS from am_gb_UserTmp where TMPID='"+recId+"'");
+//         userStatus = aprecords.getCodeName("select USER_STATUS from am_gb_UserTmp where TMPID= ? ", recId);
+         int tmpId = Integer.parseInt(recId);
+         userStatus = aprecords.getCodeName(
+             "SELECT USER_STATUS FROM am_gb_UserTmp WHERE TMPID=" + tmpId
+         );
+         System.out.println("<<<<<<<<=======userStatus: "+userStatus);
          approvedBy = aprecords.getCodeName("select USER_Name from am_gb_User where USER_ID='"+approvedBy+"'");
 		user.setUserName(userName);
 		user.setUserFullName(fullname);
@@ -358,6 +364,7 @@ public class UserAuditApprovalServlet extends HttpServlet {
 							"SELECT * FROM  AM_GB_USER  WHERE user_Id = '"
 									+ userId + "'");  
 					//boolean isupdt = security.updateUser(user);   before limit introduction
+					 System.out.println("<<<<<<<<=======getUserStatus: "+user.getUserStatus());
 					boolean isupdt = security.updateManageUser2(user,limit);
 					System.out.println("---------------1------------------------isupdt: "+isupdt);
 					audit.select(2,
