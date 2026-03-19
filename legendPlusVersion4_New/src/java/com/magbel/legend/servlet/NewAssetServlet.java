@@ -236,6 +236,8 @@ import magma.util.Codes;
 	        
 	        // Additional Fields
 	        bean.setFullyPAID(request.getParameter("fullyPAID"));
+	        bean.setPartPAY(request.getParameter("partPAY"));
+	        bean.setDeferPay(request.getParameter("deferPay"));
 	        bean.setProjectCode(request.getParameter("projectCode"));
 	        bean.setRequire_depreciation(request.getParameter("require_depreciation"));
 	        bean.setRequire_redistribution(request.getParameter("require_redistribution"));

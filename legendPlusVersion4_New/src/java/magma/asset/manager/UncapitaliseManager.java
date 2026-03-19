@@ -112,7 +112,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         ArrayList list = new ArrayList();
         Uncapitalized _obj = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(selectQuery);
             ResultSet rs = ps.executeQuery()) {
         	
@@ -202,7 +202,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
        // System.out.println("selOldDetails_qry >>>> " + selOldDetails_qry);
 
-         try(Connection con = dbConnection.getConnection("legendPlus");
+         try(Connection con = getConnection("legendPlus");
              PreparedStatement ps = con.prepareStatement(selOldDetails_qry);){
 
         	 
@@ -318,7 +318,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                 "UPDATE am_UncapitalizedDisposal SET DISPOSAL_REASON = ?,BUYER_ACCOUNT = ?," +
                 "USER_ID = ? WHERE ASSET_ID = ?";
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery)) {
         	
             ps.setString(1, reason);
@@ -352,7 +352,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                 "DISPOSAL_AMOUNT = ?,RAISE_ENTRY = ?,PROFIT_LOSS = ?, DISPOSAL_DATE = ?," +
                 "EFFECTIVE_DATE = ? WHERE ASSET_ID = ?";
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery)) {
         	
             ps.setInt(1, userId);
@@ -385,7 +385,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         //declare DTO object
         DisposeUncapitalise dispose = null;
         //DataConnect connect = new DataConnect();
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery()) {
         	
@@ -429,7 +429,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         //declare DTO object
         Disposal dispose = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery()) {
         	
@@ -478,7 +478,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         //declare DTO object
         Disposal dispose = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
            ResultSet rs = ps.executeQuery()) {
         	
@@ -539,7 +539,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         //declare DTO object
         UncapitaliseTransfer transfer = null;
 
-        try (	Connection con = dbConnection.getConnection("legendPlus");
+        try (	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery()){
         
@@ -591,7 +591,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
     public String getObjectName(String query) {
       
         String result = "";
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
            ResultSet rs = ps.executeQuery()) {    	
             while (rs.next()) {
@@ -621,7 +621,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         //declare DTO object
         UncapitaliseTransfer transfer = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query)) { 	
             ps.setString(1, id);
           try(  ResultSet rs = ps.executeQuery()){
@@ -717,7 +717,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              "OLD_BRANCH_CODE,OLD_SECTION_CODE,OLD_DEPT_CODE,NEW_BRANCH_CODE" +
                  ",NEW_SECTION_CODE,NEW_DEPT_CODE,TRANSFER_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery)) {  	
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
@@ -784,7 +784,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              "old_who_to_rem,old_email1,old_who_to_rem2,old_email2)" +
                              " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
        
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery)) {
         	
             ps.setString(1, assetId);
@@ -853,7 +853,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              "' WHERE ASSET_ID = '" + assetId + "'";
 
         
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery)){	
             i = ps.executeUpdate();
         } catch (Exception e) {
@@ -873,7 +873,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
     private void excuteSQLCode(String sqlCode) {
        
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(sqlCode)){ 	
             ps.execute();
         } catch (Exception ex) {
@@ -903,7 +903,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
        
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery)) {
         	
             ps.setInt(1, userId);
@@ -939,7 +939,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         //declare DTO object
         Revaluation revalue = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query)) { 	
             ps.setString(1, id);
         try(  ResultSet rs = ps.executeQuery()){
@@ -1004,7 +1004,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         //declare DTO object
         Revaluation revalue = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery()) {
         	
@@ -1085,7 +1085,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
                              "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
 
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setDate(2, dateConvert(stolenDate));
@@ -1151,7 +1151,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
        
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery);
 
             ps.setDate(1, dateConvert(stolenDate));
@@ -1206,7 +1206,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         Stolen stolen = null;
         //DataConnect connect = new DataConnect();
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
@@ -1263,7 +1263,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         Stolen stolen = null;
 
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
 
@@ -1330,7 +1330,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
         String status = "ACTIVE";
        
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(UPDATE_QUERY);
 
             ps.setString(1, status);
@@ -1361,7 +1361,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
        try
        {
-    	   Connection con = dbConnection.getConnection("legendPlus");
+    	   Connection con = getConnection("legendPlus");
            PreparedStatement ps = con.prepareStatement(query);
            ps.setString(1, id);
         ResultSet rs = ps.executeQuery();
@@ -1475,7 +1475,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
   		
 
-  		try(Connection con = dbConnection.getConnection("legendPlus");
+  		try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery)){
   			
   		 ps.setInt(1,userId);
@@ -1513,7 +1513,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
       boolean result = false;
       //boolean autoCommit = false;
 
-  		try(Connection con = dbConnection.getConnection("legendPlus");
+  		try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery)){
   			
   		 ps.setString(1,assetId);
@@ -1577,7 +1577,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
          //declare DTO object
          DepAdjustment adjust = null;
 
-         try( Connection con = dbConnection.getConnection("legendPlus");
+         try( Connection con = getConnection("legendPlus");
              PreparedStatement ps = con.prepareStatement(query);
           ResultSet rs = ps.executeQuery()) {
         	
@@ -1646,7 +1646,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
 
  
 
-  try ( Connection con = dbConnection.getConnection("legendPlus");
+  try ( Connection con = getConnection("legendPlus");
       PreparedStatement ps = con.prepareStatement(insertQuery)){
 	 
   ps.setString(1, assetId);
@@ -1710,7 +1710,7 @@ public class UncapitaliseManager extends MagmaDBConnection {
           //declare DTO object
           Revaluation revalue = null;
 
-          try(Connection con = dbConnection.getConnection("legendPlus");
+          try(Connection con = getConnection("legendPlus");
               PreparedStatement ps = con.prepareStatement(query);
               ResultSet rs = ps.executeQuery()) {
         	  
@@ -1786,7 +1786,7 @@ String updateQuery = "UPDATE am_asset_improvement SET USER_ID = ?," +
 
 
 
-try(Connection con = dbConnection.getConnection("legendPlus");
+try(Connection con = getConnection("legendPlus");
     PreparedStatement ps = con.prepareStatement(updateQuery)) {
 	
 ps.setInt(1, userId);
@@ -1821,7 +1821,7 @@ return i;
           //declare DTO object
           Revaluation revalue = null;
 
-          try(Connection con = dbConnection.getConnection("legendPlus");
+          try(Connection con = getConnection("legendPlus");
               PreparedStatement ps = con.prepareStatement(query)) {
         	  
               ps.setString(1, id);
@@ -1900,7 +1900,7 @@ public void updateAssetRevalueOld(String id){
         */
        
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
             ResultSet  rs = ps.executeQuery();
 
@@ -1999,7 +1999,7 @@ public void updateAssetRevalue(String assetId) {
     		+ "            ACCUM_DEP = ACCUM_DEP + ?\r\n"
     		+ "        WHERE ASSET_ID = ?";
 
-    try (Connection con = dbConnection.getConnection("legendPlus");
+    try (Connection con = getConnection("legendPlus");
          PreparedStatement psSelect = con.prepareStatement(selectQuery)) {
 
         psSelect.setString(1, assetId);
@@ -2109,7 +2109,7 @@ String updateQuery="update am_asset  set DEPT_ID=?, BRANCH_ID=?, section_id=?, a
 
        
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
             ResultSet  rs = ps.executeQuery();
 
@@ -2229,7 +2229,7 @@ public void updateAssetTransfer(String assetId) {
     		+ "        SET DEPT_ID = ?, BRANCH_ID = ?, BRANCH_CODE = ?, SECTION_CODE = ?, DEPT_CODE = ?\r\n"
     		+ "        WHERE ASSET_ID = ? ";
 
-    try (Connection con = dbConnection.getConnection("legendPlus");
+    try (Connection con = getConnection("legendPlus");
          PreparedStatement psSelect = con.prepareStatement(selectQuery)) {
 
         psSelect.setString(1, assetId);
@@ -2303,7 +2303,7 @@ public void updateAssetDepreciationOld(String id){
 
        
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
              ResultSet rs = ps.executeQuery();
 
@@ -2338,7 +2338,7 @@ public void updateAssetDepreciation(String assetId) {
     String selectQuery = "SELECT new_accum_dep, new_nbv FROM AM_ASSET_DEP_ADJUSTMENT WHERE asset_id = ?";
     String updateQuery = "UPDATE AM_ASSET SET ACCUM_DEP = ?, NBV = ?, DEP_YTD = ? WHERE ASSET_ID = ?";
 
-    try (Connection con = dbConnection.getConnection("legendPlus");
+    try (Connection con = getConnection("legendPlus");
          PreparedStatement psSelect = con.prepareStatement(selectQuery)) {
 
         psSelect.setString(1, assetId);
@@ -2405,7 +2405,7 @@ public void updateAssetDepreciation(String assetId) {
        
         try
         {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
             ResultSet rs = ps.executeQuery();
 
@@ -2489,7 +2489,7 @@ public void updateAssetDepreciation(String assetId) {
         		+ "                CATEGORY_ID = ?, CATEGORY_CODE = ?, Effective_Date = ?\r\n"
         		+ "            WHERE asset_id = ?";
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
              PreparedStatement psSelect = con.prepareStatement(selectQuery)) {
 
             psSelect.setString(1, assetId);
@@ -2589,7 +2589,7 @@ public void updateAssetDepreciation(String assetId) {
         
         try
         {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
             ResultSet rs = ps.executeQuery();
 
@@ -2674,7 +2674,7 @@ public void updateAssetDepreciation(String assetId) {
     	    		+ "    	            SECTION_CODE = ?, DEPT_CODE = ?, CATEGORY_ID = ?, CATEGORY_CODE = ?\r\n"
     	    		+ "    	        WHERE asset_id = ? ";
 
-    	    try (Connection con = dbConnection.getConnection("legendPlus");
+    	    try (Connection con = getConnection("legendPlus");
     	         PreparedStatement psSelect = con.prepareStatement(selectQuery)) {
 
     	        psSelect.setString(1, id);
@@ -2773,7 +2773,7 @@ public void updateAssetMaintenanceOld(String id){
         */
        
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
              ResultSet  rs = ps.executeQuery();
 
@@ -2872,7 +2872,7 @@ public void updateAssetMaintenance(String assetId) {
     		+ "            ACCUM_DEP = ACCUM_DEP + ?\r\n"
     		+ "        WHERE ASSET_ID = ?";
 
-    try (Connection con = dbConnection.getConnection("legendPlus");
+    try (Connection con = getConnection("legendPlus");
          PreparedStatement psSelect = con.prepareStatement(selectQuery)) {
 
         psSelect.setString(1, assetId);
@@ -2926,7 +2926,7 @@ public int[] getUsedSupervisors(int tranid){
 
 
         
-        try(	Connection con = dbConnection.getConnection("legendPlus");
+        try(	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
              ResultSet rs = ps.executeQuery()) {
         
@@ -3158,7 +3158,7 @@ public int[] getUsedSupervisors(int tranid){
                  ",NEW_SECTION_CODE,NEW_DEPT_CODE,TRANSFER_ID) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
@@ -3232,7 +3232,7 @@ String insertTransfer = "INSERT INTO am_UncapitalizedTransfer(\r\n"
 		+ "NEW_BRANCH_CODE, NEW_SECTION_CODE, NEW_DEPT_CODE, TRANSFER_ID\r\n"
 		+ ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-try (Connection con = dbConnection.getConnection("legendPlus")) {
+try (Connection con =  getConnection("legendPlus")) {
 
 // 1️⃣ Insert into am_UncapitalizedTransfer
 try (PreparedStatement psInsert = con.prepareStatement(insertTransfer)) {
@@ -3356,7 +3356,7 @@ return result;
                              " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
@@ -3444,7 +3444,7 @@ String updateFleetMaster = "UPDATE FT_FLEET_MASTER\r\n"
 		+ "SET DEPT_ID = ?, BRANCH_ID = ?, BRANCH_CODE = ?, SECTION_CODE = ?, DEPT_CODE = ?\r\n"
 		+ "WHERE ASSET_ID = ? ";
 
-try (Connection con = dbConnection.getConnection("legendPlus")) {
+try (Connection con =  getConnection("legendPlus")) {
 // 1️⃣ Insert into AM_WIP_RECLASSIFICATION
 try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
 psInsert.setString(1, assetId);
@@ -3536,7 +3536,7 @@ return result;
 
   		try
   		{
-  			Connection con = dbConnection.getConnection("legendPlus");
+  			Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery);
   		 ps.setString(1,assetId);
   		 ps.setDouble(2,accumDep);
@@ -3598,7 +3598,7 @@ String updateQuery = "UPDATE AM_ASSET\r\n"
 		+ "SET ACCUM_DEP = ACCUM_DEP + ?, NBV = ?, DEP_YTD = DEP_YTD + ?\r\n"
 		+ "WHERE ASSET_ID = ? ";
 
-try (Connection con = dbConnection.getConnection("legendPlus")) {
+try (Connection con =  getConnection("legendPlus")) {
 con.setAutoCommit(false); // start transaction
 
 // 1️⃣ Insert into adjustment table
@@ -3670,7 +3670,7 @@ return result;
 
  
   try {
-	  Connection con = dbConnection.getConnection("legendPlus");
+	  Connection con = getConnection("legendPlus");
       PreparedStatement ps = con.prepareStatement(insertQuery);
   ps.setString(1, assetId);
   ps.setDouble(2, costIncrease);
@@ -3751,7 +3751,7 @@ return result;
 	    		+ "	            ACCUM_DEP = ACCUM_DEP + ?\r\n"
 	    		+ "	        WHERE ASSET_ID = ?";
 
-	    try (Connection con = dbConnection.getConnection("legendPlus")) {
+	    try (Connection con =  getConnection("legendPlus")) {
 
 	        con.setAutoCommit(false); // 🔒 Start transaction
 
@@ -3829,7 +3829,7 @@ return result;
         //declare DTO object
         UncapitaliseTransfer transfer = null;
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query)){
             ps.setString(1, id);
            try( ResultSet rs = ps.executeQuery();){
@@ -3905,7 +3905,7 @@ return result;
         //declare DTO object
        Transfer transfer = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query)) {
             ps.setString(1, id);
           try( ResultSet rs = ps.executeQuery()){
@@ -3984,7 +3984,7 @@ return result;
         //declare DTO object
        Transfer transfer = null;
 
-        try(	Connection con = dbConnection.getConnection("legendPlus");
+        try(	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query)) {
         
             ps.setString(1, id);
@@ -4056,7 +4056,7 @@ return result;
 
        
               try {
-            	  Connection con = dbConnection.getConnection("legendPlus");
+            	  Connection con = getConnection("legendPlus");
                   PreparedStatement ps = con.prepareStatement(query);
                   ps.setString(1, assetID);
            ResultSet rs = ps.executeQuery();
@@ -4095,7 +4095,7 @@ return result;
         		+ "            SET old_section = ?\r\n"
         		+ "            WHERE asset_id = ?";
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
              PreparedStatement psSelect = con.prepareStatement(selectQuery)) {
 
             psSelect.setString(1, assetID);
@@ -4155,7 +4155,7 @@ return result;
         //declare DTO object
         Transfer transfer = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
            ResultSet rs = ps.executeQuery()) {
 
@@ -4239,7 +4239,7 @@ public ArrayList getTransferedAssetList3(String query_) {
         //declare DTO object
         Transfer transfer = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery()) {
         	
@@ -4308,7 +4308,7 @@ public ArrayList getTransferedAssetList3(String query_) {
         //ArrayList list = new ArrayList();
 
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(oldAssetQuery)) {
         	
             ps.setString(1, newAssetID);
@@ -4346,7 +4346,7 @@ public ArrayList getTransferedAssetList3(String query_) {
 
         String query = "select old_branch_id, old_dept_id, old_section, old_asset_user " +
                 "from am_assettransfer where asset_id = ? ";
-        try( Connection con = dbConnection.getConnection("legendPlus");
+        try( Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query)) {
            //String query = "select old_branch_id, dept_id, section_id, asset_user from am_asset where asset_id ='"+old_asset_id+"'";
            
@@ -4389,7 +4389,7 @@ public ArrayList getTransferedAssetList3(String query_) {
 
         String query = "select old_branch_id, old_dept_id, old_section, old_asset_user " +
                 "from am_wip_reclassification where asset_id ='"+old_asset_id+"'";
-        try( Connection con = dbConnection.getConnection("legendPlus");
+        try( Connection con = getConnection("legendPlus");
            PreparedStatement ps = con.prepareStatement(query)){    
            System.out.println("the query >>>> "+query );
           
@@ -4431,7 +4431,7 @@ public ArrayList getTransferedAssetList3(String query_) {
 
         String query = "select old_category_id, reclassify_reason,old_depr_rate,recalc_depr from am_assetReclassification where asset_id = ? ";
 
-        try( Connection con = dbConnection.getConnection("legendPlus");
+        try( Connection con = getConnection("legendPlus");
            PreparedStatement ps = con.prepareStatement(query);
            ResultSet rs = ps.executeQuery();) {
 
@@ -4476,7 +4476,7 @@ public ArrayList getTransferedAssetList3(String query_) {
 
         
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
             ResultSet rs = ps.executeQuery();
 
@@ -4518,7 +4518,7 @@ public ArrayList getTransferedAssetList3(String query_) {
 	    String updateQuery = "UPDATE AM_ASSET SET category_id = ?, dep_rate = ? " +
 	                         "WHERE asset_id = ?";
 
-	    try (Connection con = dbConnection.getConnection("legendPlus");
+	    try (Connection con = getConnection("legendPlus");
 	         PreparedStatement ps1 = con.prepareStatement(query1)) {
 
 	        // ✅ Prevent SQL Injection
@@ -4585,7 +4585,7 @@ public ArrayList getTransferedAssetList3(String query_) {
   " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
  
-  try(Connection con = dbConnection.getConnection("legendPlus");
+  try(Connection con = getConnection("legendPlus");
           PreparedStatement ps = con.prepareStatement(insertQuery)) {
  
   ps.setString(1, assetId);
@@ -4761,7 +4761,7 @@ public int insertAssetMaintananceNoSupervisorOld(double cost, double nbv, String
   
 
   try {
-	  Connection con = dbConnection.getConnection("legendPlus");
+	  Connection con = getConnection("legendPlus");
       PreparedStatement ps = con.prepareStatement(insertQuery);
   ps.setString(1, assetId);
   ps.setDouble(2, costIncrease);
@@ -4849,7 +4849,7 @@ public int insertAssetMaintananceNoSupervisor(
             "EFFDATE,REVALUE_ID,WH_TAX,WHT_PERCENT,SUBJECT_TO_VAT) " +
             "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    try (Connection con = dbConnection.getConnection("legendPlus")) {
+    try (Connection con =  getConnection("legendPlus")) {
 
         con.setAutoCommit(false); // ✅ Start transaction
 
@@ -4911,7 +4911,7 @@ public int insertAssetMaintananceNoSupervisor(
         // rollback safely
         try {
             if (dbConnection != null) {
-                Connection con = dbConnection.getConnection("legendPlus");
+                Connection con = getConnection("legendPlus");
                 if (con != null) con.rollback();
             }
         } catch (Exception ex) {
@@ -4931,7 +4931,7 @@ public Uncapitalized getAssetTransfer(String assetId) {
         
         Uncapitalized _obj = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery)) {
         	
          try(  ResultSet rs = ps.executeQuery();) {
@@ -5087,7 +5087,7 @@ public Uncapitalized getAssetTransfer(String assetId) {
           //declare DTO object
           Revaluation revalue = null;
           String  revalueId="";
-          try(Connection con = dbConnection.getConnection("legendPlus");
+          try(Connection con = getConnection("legendPlus");
               PreparedStatement ps = con.prepareStatement(query);
               ResultSet rs = ps.executeQuery()) {
         	  
@@ -5116,7 +5116,7 @@ public HashSet getUsedSupervisors2(int tranid){
 
 
        
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
              ResultSet rs = ps.executeQuery();) {
         	
@@ -5156,7 +5156,7 @@ public int findTranInitiator(int tranid){
 
         
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
             ResultSet  rs = ps.executeQuery();
 
@@ -5186,7 +5186,7 @@ public String findUserName(int userID){
 
 
         
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
              ResultSet rs = ps.executeQuery()) {
         	
@@ -5217,7 +5217,7 @@ public String getVendor(String assetId){
 
 
         
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
              ResultSet rs = ps.executeQuery();){
         	
@@ -5544,7 +5544,7 @@ public int insertAssetMaintanance(double cost, double nbv, String assetId,
           //declare DTO object
           Revaluation revalue = null;
 
-          try( Connection con = dbConnection.getConnection("legendPlus");
+          try( Connection con = getConnection("legendPlus");
               PreparedStatement ps = con.prepareStatement(query)) {
         	 
               ps.setString(1, id);
@@ -5663,7 +5663,7 @@ public void updateAssetMaintenanceOld(String id,int mtid){
         */
        
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
              ResultSet rs = ps.executeQuery();
 
@@ -5785,7 +5785,7 @@ public void updateAssetMaintenance(String id, int mtid) {
         "SUBJECT_TO_VAT = ?, SUPPLIER_NAME = ?, VENDOR_AC = ? " +
         "WHERE ASSET_ID = ?";
 
-    try (Connection con = dbConnection.getConnection("legendPlus")) {
+    try (Connection con =  getConnection("legendPlus")) {
 
         con.setAutoCommit(false); // ✅ Transaction start
 
@@ -5863,7 +5863,7 @@ public Revaluation getMaintenanceAssetRepost(String id) {
           //declare DTO object
           Revaluation revalue = null;
 
-          try(Connection con = dbConnection.getConnection("legendPlus");
+          try(Connection con = getConnection("legendPlus");
               PreparedStatement ps = con.prepareStatement(query)) {
         	  
               ps.setString(1, revalue_id);
@@ -5927,7 +5927,7 @@ public Revaluation getMaintenanceAssetRepost(String id) {
         String updateQuery =
                 "UPDATE AM_ASSET_APPROVAL SET PROCESS_STATUS ='RP'WHERE TRANSACTION_ID = ?";
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery)){  	
             ps.setInt(1, mtid);
             i = ps.executeUpdate();
@@ -5957,7 +5957,7 @@ public UncapitaliseTransfer getTransferedAsset2Repost(String id)
         //declare DTO object
        UncapitaliseTransfer transfer = null;
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query)){
         	
             ps.setString(1, id);
@@ -6037,7 +6037,7 @@ public int updateAssetAfterRepost(String assetId) {
         String updateQuery ="update am_asset set asset_status='Active',post_reject_reason='' where asset_id =?";
 
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery)) { 	
             ps.setString(1, assetId);
             i = ps.executeUpdate();
@@ -6128,7 +6128,7 @@ String updateQuery="update am_asset  set DEPT_ID=?, BRANCH_ID=?, section_id=?, a
 
       
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
             ps.setString(1, updateQuery);
             ResultSet  rs = ps.executeQuery();
@@ -6250,7 +6250,7 @@ public void updateAssetTransfer(String id, int tranId) {
         "BRANCH_CODE = ?, SECTION_CODE = ?, DEPT_CODE = ? " +
         "WHERE asset_id = ?";
 
-    try (Connection con = dbConnection.getConnection("legendPlus")) {
+    try (Connection con =  getConnection("legendPlus")) {
 
         con.setAutoCommit(false); // ✅ Transaction start
 
@@ -6365,7 +6365,7 @@ public void updateAssetTransfer(String id, int tranId) {
                  ",NEW_SECTION_CODE,NEW_DEPT_CODE,TRANSFER_ID,OLD_CATEGORY_CODE,DESCRIPTION,Cost_Price,NBV,Monthly_Dep,Accum_Dep,asset_code)VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
        
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery)) {
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
@@ -6467,7 +6467,7 @@ public int insertAssetTransferNoSupervisorOld(String assetId, int oldDept, int n
                  " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
        
         try {
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setInt(2, oldDept);
@@ -6555,7 +6555,7 @@ public int insertAssetTransferNoSupervisor(
         "BRANCH_CODE=?, SECTION_CODE=?, DEPT_CODE=? " +
         "WHERE ASSET_ID=?";
 
-    try (Connection con = dbConnection.getConnection("legendPlus")) {
+    try (Connection con =  getConnection("legendPlus")) {
 
         con.setAutoCommit(false); // ✅ start transaction
 
@@ -6669,7 +6669,7 @@ branchCode,String lpo,String invoiceNo, double newCP) {
  
 
   try {
-	  Connection con = dbConnection.getConnection("legendPlus");
+	  Connection con = getConnection("legendPlus");
       PreparedStatement ps = con.prepareStatement(insertQuery);
   ps.setString(1, assetId);
   ps.setDouble(2, costIncrease);
@@ -6780,7 +6780,7 @@ public int insertAssetMaintananceNoSupervisor(
         "SUPPLIER_NAME = ? " +
         "WHERE ASSET_ID = ?";
 
-    try (Connection con = dbConnection.getConnection("legendPlus")) {
+    try (Connection con =  getConnection("legendPlus")) {
 
         con.setAutoCommit(false); // ✅ START TRANSACTION
 
@@ -6889,7 +6889,7 @@ public int insertAssetMaintanance(double cost, double nbv, String assetId,
 
   
 
-  try(Connection con = dbConnection.getConnection("legendPlus");
+  try(Connection con = getConnection("legendPlus");
       PreparedStatement ps = con.prepareStatement(insertQuery)) {
 	  
   ps.setString(1, assetId);
@@ -6961,7 +6961,7 @@ public String effectiveDate(String  assetId){
         String query1= "select effDate from AM_WIP_RECLASSIFICATION where asset_id = '"+assetId+"'";
 
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(query1);
             ResultSet  rs = ps.executeQuery()){
         	
@@ -6992,7 +6992,7 @@ public String effectiveDate(String  assetId){
         String updateQuery =
                 "UPDATE AM_ASSET_APPROVAL SET PROCESS_STATUS ='RR'WHERE TRANSACTION_ID = ?";
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(updateQuery)){
         	
             ps.setInt(1, mtid);
@@ -7090,7 +7090,7 @@ public String effectiveDate(String  assetId){
         ArrayList list = new ArrayList();
         Uncapitalized _obj = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(selectQuery);
             ResultSet rs = ps.executeQuery()) {
         	
@@ -7286,7 +7286,7 @@ public String effectiveDate(String  assetId){
        
         Uncapitalized _obj = null;
 
-        try(Connection con = dbConnection.getConnection("legendPlus");
+        try(Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(selectQuery);
             ResultSet rs = ps.executeQuery()) {
         	
@@ -7404,7 +7404,7 @@ branchCode,String lpo,String invoiceNo, double newCP,int assetCode) {
   
 
   try {
-	  Connection con = dbConnection.getConnection("legendPlus");
+	  Connection con = getConnection("legendPlus");
       PreparedStatement ps = con.prepareStatement(insertQuery);
   ps.setString(1, assetId);
   ps.setDouble(2, costIncrease);
@@ -7518,7 +7518,7 @@ branchCode,String lpo,String invoiceNo, double newCP,int assetCode) {
 	        "SUPPLIER_NAME = ? " +
 	        "WHERE ASSET_ID = ?";
 
-	    try (Connection con = dbConnection.getConnection("legendPlus")) {
+	    try (Connection con =  getConnection("legendPlus")) {
 
 	        con.setAutoCommit(false); // ✅ Start transaction
 
@@ -7628,7 +7628,7 @@ branchCode,String lpo,String invoiceNo, double newCP,int assetCode) {
 
   
 
-  try( Connection con = dbConnection.getConnection("legendPlus");
+  try( Connection con = getConnection("legendPlus");
       PreparedStatement ps = con.prepareStatement(insertQuery)) {
 	 
   ps.setString(1, assetId);
@@ -7720,7 +7720,7 @@ branchCode,String lpo,String invoiceNo, double newCP,int assetCode) {
 
   
 
-  try( Connection con = dbConnection.getConnection("legendPlus");
+  try( Connection con = getConnection("legendPlus");
       PreparedStatement ps = con.prepareStatement(insertQuery)) {
 	 
   ps.setString(1, assetId);
@@ -7793,7 +7793,7 @@ branchCode,String lpo,String invoiceNo, double newCP,int assetCode) {
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
 
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setString(2, reason);
@@ -7853,7 +7853,7 @@ branchCode,String lpo,String invoiceNo, double newCP,int assetCode) {
     	    String updateFleetQuery =
     	        "UPDATE FT_FLEET_MASTER SET STATUS=? WHERE ASSET_ID=?";
 
-    	    try (Connection con = dbConnection.getConnection("legendPlus")) {
+    	    try (Connection con =  getConnection("legendPlus")) {
 
     	        con.setAutoCommit(false); // start transaction
 
@@ -7926,7 +7926,7 @@ branchCode,String lpo,String invoiceNo, double newCP,int assetCode) {
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
         	        	
-        	Connection con = dbConnection.getConnection("legendPlus");
+        	Connection con = getConnection("legendPlus");
             PreparedStatement ps = con.prepareStatement(insertQuery);
             ps.setString(1, assetId);
             ps.setString(2, reason);
@@ -7985,7 +7985,7 @@ String updateAssetQuery =
 String updateFleetQuery =
 "UPDATE FT_FLEET_MASTER SET STATUS=? WHERE ASSET_ID=?";
 
-try (Connection con = dbConnection.getConnection("legendPlus")) {
+try (Connection con =  getConnection("legendPlus")) {
 
 con.setAutoCommit(false); // Start transaction
 
@@ -8290,7 +8290,7 @@ public int insertAssetRevalue(double cost, double nbv, String assetId,
                 "new_email1,new_email2,old_branch_id,old_dept_id,old_section,old_asset_user " +
                 "from am_UncapitalizedTransfer where asset_id ='"+old_asset_id+"'";
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(query);
                 ResultSet rs = ps.executeQuery()){
            //String query = "select old_branch_id, dept_id, section_id, asset_user from am_asset where asset_id ='"+old_asset_id+"'";
@@ -8345,7 +8345,7 @@ public Transfer getTransferedAsset3(int assetCode) {
         //declare DTO object
         Transfer transfer = null;
 
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(query);
                 ResultSet rs = ps.executeQuery()){
            
@@ -8401,7 +8401,7 @@ public Uncapitalized getAssetByAssetCode(int asseCode) {
        
         Uncapitalized _obj = null;
 //System.out.println("selectQuery====> "+selectQuery);
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(selectQuery);
                 ResultSet rs = ps.executeQuery()){
 
@@ -8487,7 +8487,7 @@ ApprovalRecords app = new ApprovalRecords();
 String transactionId ="";
 String process_status ="";
       
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
                 PreparedStatement ps = con.prepareStatement(query);
                 ResultSet rs = ps.executeQuery()){
 
@@ -8563,7 +8563,7 @@ if(queryTest3.equalsIgnoreCase("000")){process_status="";}else {process_status="
    
      Asset _obj = null;
 
-     try (Connection con = dbConnection.getConnection("legendPlus");
+     try (Connection con = getConnection("legendPlus");
              PreparedStatement ps = con.prepareStatement(selectQuery);
              ResultSet rs = ps.executeQuery()){
 
@@ -8656,7 +8656,7 @@ System.out.println("getMaintenanceAssetRepost query:   "+query);
           //declare DTO object
           Improvement revalue = null;
 
-          try (Connection con = dbConnection.getConnection("legendPlus");
+          try (Connection con = getConnection("legendPlus");
                   PreparedStatement ps = con.prepareStatement(query);
                   ResultSet rs = ps.executeQuery()){
 
@@ -8745,7 +8745,7 @@ System.out.println("getMaintenanceAssetRepost query:   "+query);
      //declare DTO object
      Improvement improve = null;
 
-     try (Connection con = dbConnection.getConnection("legendPlus");
+     try (Connection con = getConnection("legendPlus");
              PreparedStatement ps = con.prepareStatement(query);
              ResultSet rs = ps.executeQuery()){
 
@@ -8810,7 +8810,7 @@ System.out.println("getMaintenanceAssetRepost query:   "+query);
           //declare DTO object
           Improvement revalue = null;
 
-          try (Connection con = dbConnection.getConnection("legendPlus");
+          try (Connection con = getConnection("legendPlus");
                   PreparedStatement ps = con.prepareStatement(query);
                   ResultSet rs = ps.executeQuery()){
 

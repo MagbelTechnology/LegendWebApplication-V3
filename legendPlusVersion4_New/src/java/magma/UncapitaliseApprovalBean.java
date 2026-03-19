@@ -33,7 +33,7 @@ public class UncapitaliseApprovalBean extends legend.ConnectionClass {
 
         //super();
         try {
-            freeResource();
+           
             sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
             dbConnection = new MagmaDBConnection();
             dateFormat = new DatetimeFormat();
@@ -67,15 +67,13 @@ public void getApprovalDetail(String levelCode){
 String query ="select Min_Amount,Max_Amount from approval_limit where level_Code = '"+levelCode+"'";
 
 
-  Connection con = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
+ 
 
-            try {
-                con = dbConnection.getConnection("fixedasset");
-                ps = con.prepareStatement(query);
-                rs = ps.executeQuery();
-
+            try(Connection con = dbConnection.getConnection("legendPlus");
+        	        PreparedStatement ps  = con.prepareStatement(query);
+                 ResultSet rs = ps.executeQuery())
+            {
+               
                 if (rs.next()) {
 
                     mini_approval = rs.getDouble(1);
@@ -86,9 +84,7 @@ String query ="select Min_Amount,Max_Amount from approval_limit where level_Code
 
             }catch (Exception ex) {
                 System.out.println("ApprovalBean Class: getApprovalDetaial(): WARN: Error fetching approval details ->" + ex);
-            } finally {
-                dbConnection.closeConnection(con, ps, rs);
-            }
+            } 
 
 
 
@@ -98,14 +94,10 @@ public String getApprovalLevel(String userId){
 String query ="select approval_level from am_gb_user where user_id = '"+userId+"'";
 
 
-  Connection con = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-
-            try {
-                con = dbConnection.getConnection("fixedasset");
-                ps = con.prepareStatement(query);
-                rs = ps.executeQuery();
+try(Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
+     ResultSet rs = ps.executeQuery())
+{
 
                 if (rs.next()) {
 
@@ -117,9 +109,7 @@ String query ="select approval_level from am_gb_user where user_id = '"+userId+"
 
             }catch (Exception ex) {
                 System.out.println("ApprovalBean Class: getApprovalLevel(): WARN: Error fetching approval details ->" + ex);
-            } finally {
-                dbConnection.closeConnection(con, ps, rs);
-            }
+            } 
 
 return levle_code;
 
@@ -132,14 +122,10 @@ public String getApprovalLimit(String userId){
 String query ="select approval_limit from am_gb_user where user_id = "+ApprovalLimit;
 
 
-  Connection con = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-
-            try {
-                con = dbConnection.getConnection("fixedasset");
-                ps = con.prepareStatement(query);
-                rs = ps.executeQuery();
+try(Connection con = dbConnection.getConnection("legendPlus");
+        PreparedStatement ps  = con.prepareStatement(query);
+     ResultSet rs = ps.executeQuery())
+{
 
                 if (rs.next()) {
 
@@ -151,9 +137,7 @@ String query ="select approval_limit from am_gb_user where user_id = "+ApprovalL
 
             }catch (Exception ex) {
                 System.out.println("ApprovalBean Class: getApprovalLimit(): WARN: Error fetching approval details ->" + ex);
-            } finally {
-                dbConnection.closeConnection(con, ps, rs);
-            }
+            } 
 
 return levle_code;
 

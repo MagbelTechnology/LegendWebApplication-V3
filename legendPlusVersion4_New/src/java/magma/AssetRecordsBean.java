@@ -12797,6 +12797,56 @@ return 	assetAcqusitionSuspense;
 	        ex.printStackTrace();
 	    }
 	}
+  
+  public void setPendingTransArchive(Connection con, String[] a, String code, long mtid, long assetCode) {
+	  System.out.println(">>> setPendingTransArchive: >>>>>>");
+	    int transactionLevel = 0;
+
+	    String tranLevelQuery = "SELECT level FROM approval_level_setup WHERE code = ?";
+	    String insertQuery = "INSERT INTO am_asset_approval_archive(" +
+	            "asset_id, user_id, super_id, amount, posting_date, description," +
+	            "effective_date, branchCode, asset_status, tran_type, process_status," +
+	            "tran_sent_time, transaction_id, batch_id, transaction_level, asset_code) " +
+	            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	    try (PreparedStatement psLevel = con.prepareStatement(tranLevelQuery)) {
+	    	 //psLevel.setQueryTimeout(30);
+	        psLevel.setString(1, code);
+	        try (ResultSet rs = psLevel.executeQuery()) {
+	            if (rs.next()) {
+	                transactionLevel = rs.getInt(1);
+	            }
+	        }
+
+	        try (PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+	            java.util.Date now = new java.util.Date();
+	            SimpleDateFormat timer = new SimpleDateFormat("kk:mm:ss");
+	            
+	            psInsert.setString(1, safeGet(a, 0));
+	            psInsert.setString(2, safeGet(a, 1));
+	            psInsert.setString(3, safeGet(a, 2));
+	            psInsert.setDouble(4, safeParseDouble(a, 3));
+	            psInsert.setTimestamp(5, dbConnection.getDateTime(now));
+	            psInsert.setString(6, safeGet(a, 5));
+	            psInsert.setDate(7, safeParseDate(a, 6));
+	            psInsert.setString(8, safeGet(a, 7));
+	            psInsert.setString(9, safeGet(a, 8));
+	            psInsert.setString(10, safeGet(a, 9));
+	            psInsert.setString(11, safeGet(a, 10));
+	            psInsert.setString(12, timer.format(new java.util.Date()));
+	            psInsert.setLong(13, mtid);
+	            psInsert.setString(14, String.valueOf(mtid)); // batch_id
+	            psInsert.setInt(15, transactionLevel);
+	            psInsert.setLong(16, assetCode);
+
+	            psInsert.executeUpdate();
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println(">>>AssetRecordBeans:setPendingTransArchive() ERROR>>>>>>" + ex);
+	        ex.printStackTrace();
+	    }
+	}
 	
   
 //  public void setPendingTransRepost(String[] a, String code,long mtid,int assetCode){
