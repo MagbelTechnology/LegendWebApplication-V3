@@ -186,6 +186,7 @@ import magma.util.Codes;
 	        bean.setWarrantyStartDate(request.getParameter("warrantyStartDate"));
 	        bean.setExpiryDate(request.getParameter("expiryDate"));
 	        bean.setNoOfMonths(request.getParameter("noOfMonths"));
+	        bean.setDepreciation_start_date(request.getParameter("depreciation_start_date"));
 	        
 	        // Financial Information
 	        bean.setCost_price(request.getParameter("cost_price"));
