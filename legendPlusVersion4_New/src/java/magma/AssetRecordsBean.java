@@ -8674,6 +8674,38 @@ public ArrayList findRaisedTransaction(String filter) {
 	    }
  
 
+ public String isoCheck(String assetId, String page1, String transactionId) {
+
+	    String iso = "1414"; 
+
+	    String query = "SELECT iso " +
+	                   "FROM am_raisentry_transaction " +
+	                   "WHERE transactionId = ? " +
+	                   "AND ASSET_ID = ? " +
+	                   "AND page1 = ? "; 
+
+	    try (Connection con = dbConnection.getConnection("legendPlus");
+	         PreparedStatement ps = con.prepareStatement(query)) {
+
+	        ps.setString(1, transactionId);
+	        ps.setString(2, assetId);
+	        ps.setString(3, page1);
+	       // ps.setString(4, tranId);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                iso = rs.getString("iso");
+	            }
+	        }
+
+	    } catch (Exception ex) {
+	        System.out.println("WARNING: cannot fetch am_raisentry_transaction -> " + ex.getMessage());
+	        ex.printStackTrace();
+	    }
+
+	    return iso;
+	}
+ 
  public String isoCheck(String assetId, String page1, String transactionId, String tranId) {
 
 	    String iso = "1414"; 

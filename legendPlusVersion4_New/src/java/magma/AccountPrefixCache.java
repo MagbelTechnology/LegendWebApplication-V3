@@ -1,17 +1,22 @@
 
 package magma;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import magma.net.dao.MagmaDBConnection;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 
 public class AccountPrefixCache {
 
-	 static MagmaDBConnection dbConnection = new MagmaDBConnection();
     private static final Map<String, String> prefixCache = new ConcurrentHashMap<>();
 
     
@@ -41,7 +46,7 @@ public class AccountPrefixCache {
     private static String fetchPrefixFromDB(String type) {
         String result = null;
         String query = "SELECT PREFIX FROM ACCOUNT_GLPREFIX_PARAM WHERE type = ?";
-        try (Connection con = dbConnection.getConnection("legendPlus");
+        try (Connection con = getConnection("legendPlus");
              PreparedStatement ps = con.prepareStatement(query)) {
 
             ps.setString(1, type);
@@ -62,5 +67,23 @@ public class AccountPrefixCache {
     
     public static void clear() {
         prefixCache.clear();
+    }
+    
+    public static Connection getConnection(String jndi) throws SQLException {
+        try {
+            Context initContext = new InitialContext();
+            DataSource ds = (DataSource) initContext.lookup("java:/legendPlus");
+           // System.out.println("Connection opened by getConnection in MagmaDBConnection: ");
+            return ds.getConnection();
+        } catch (SQLException e) {
+            System.out.println("SQL Error getting connection: " + e.getMessage());
+            throw e; // rethrow because method signature requires it
+        } catch (NamingException e) {
+            System.out.println("JNDI lookup failed: " + e.getMessage());
+            throw new SQLException("Failed to lookup datasource", e);
+        } catch (Exception e) {
+            System.out.println("Unknown error: " + e.getMessage());
+            throw new SQLException("Unexpected connection error", e);
+        }
     }
 }
