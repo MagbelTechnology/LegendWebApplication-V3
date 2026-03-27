@@ -6799,14 +6799,9 @@ Finder_qryOld = (new StringBuilder(String.valueOf(Finder_qryOld))).append(" ").a
 
     public ArrayList findApprovalInventory(String Filter, String ordering)
     {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
         ArrayList collection;
         String Finder_qry;
-        con = null;
-        ps = null;
-        rs = null;
         Approval app = null;
         collection = new ArrayList();
 Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_price,branch_id, " +
@@ -6837,11 +6832,10 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
 +" and p.id=a.asset_id "+Filter;
         Finder_qry = Finder_qry + " " + ordering;
 //        System.out.println("\n\n Finder_qry in findApprovalInventory():>>>>>  " + Finder_qry);
-        try
-        {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(Finder_qry);
-            rs = ps.executeQuery();
+        try (Connection c = dbConnection.getConnection("legendPlus");
+    	         PreparedStatement ps = c.prepareStatement(Finder_qry);
+      		 ResultSet rs = ps.executeQuery()) {
+          
 
             while (rs.next()) {
                 String id = rs.getString("Id");
@@ -6876,22 +6870,17 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
         } catch (Exception ex) {
             System.out.println("findApprovalInventory(): WARNING: cannot fetch [ApprovalRecords]->"
                     + ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }  
+        } 
+        
         return collection;
     }
 
     public ArrayList findApprovalInitiatorforFleet(String Filter, String ordering)
     {
-        Connection con;
-        PreparedStatement ps;
-        ResultSet rs;
+       
         ArrayList collection;
         String Finder_qry;
-        con = null;
-        ps = null;
-        rs = null;
+       
         Approval app = null;
         collection = new ArrayList();
         String Finder_qry_OLD = (new StringBuilder(" select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_price,branch_id, " +
@@ -6978,11 +6967,10 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
 
         Finder_qry = Finder_qry + " " + ordering;
 //        System.out.println("\n\n Finder_qry in findApprovalInitiatorforFleet():>>>>>  " + Finder_qry);
-        try
-        {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(Finder_qry);
-            rs = ps.executeQuery();
+        try (Connection c = dbConnection.getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(Finder_qry);
+     		 ResultSet rs = ps.executeQuery()) {
+           
 
             while (rs.next()) {
                 String id = rs.getString("Id");
@@ -7012,9 +7000,8 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
         } catch (Exception ex) {
             System.out.println("findApprovalInitiatorforFleet(): WARNING: cannot fetch [ApprovalRecords]->"
                     + ex.getMessage());
-        } finally {
-            closeConnection(con, ps, rs);
-        }  
+        } 
+        
         return collection;
     }
 
