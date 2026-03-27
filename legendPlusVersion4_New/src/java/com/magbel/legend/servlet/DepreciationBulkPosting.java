@@ -18,11 +18,11 @@ import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFCreationHelper;
 import com.jcraft.jsch.*;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.Connection;
 import java.text.DecimalFormat;
@@ -54,7 +54,7 @@ public class DepreciationBulkPosting extends HttpServlet {
             
             batchFolder = configProperties.getProperty("BatchFolder");
             bank = configProperties.getProperty("bank");
-            batchApiUrl = configProperties.getProperty("BatchApiUrl", "");
+            batchApiUrl = configProperties.getProperty("BatchApiUrl");
             
             emailService = new EmailSmsServiceBus();
             approvalRecords = new ApprovalRecords();
@@ -88,27 +88,34 @@ public class DepreciationBulkPosting extends HttpServlet {
     }
     
     private void processRequest(RequestContext context) throws Exception {
+
         UserInfo userInfo = extractUserInfo(context);
-        
+
         if (!userInfo.hasRequiredRights()) {
             showAlertAndRedirect(context, "User does not have right to post. Contact the Administrator for help.");
             return;
         }
-        
+
         String batchNo = generateBatchNumber();
+
+        if (batchNo == null || batchNo.isEmpty()) {
+            showAlertAndRedirect(context, "Unable to generate batch number. Please try again.");
+            return;
+        }
+
         PostingParameters params = extractPostingParameters(context, userInfo);
-        
+
         Report report = new Report();
         String narration = buildNarration(params.processingDate);
         String prefix = getAccountPrefix(params.type);
-        
+
         ArrayList<?> transactions = report.getDepreciationPostingRecords(prefix, narration);
-        
+
         if (transactions.isEmpty()) {
             showAlertAndRedirect(context, "No records found for processing");
             return;
         }
-        
+
         processTransactions(context, transactions, params, batchNo);
     }
     
@@ -234,17 +241,22 @@ public class DepreciationBulkPosting extends HttpServlet {
     }
     
     private String generateBatchNumber() {
-        if (batchApiUrl == null || batchApiUrl.isEmpty()) {
-            return "123456";
-        }
-        
+
         try {
             String status = ZenithTokenClass.validation();
+
+            if (status == null || status.trim().isEmpty()) {
+                LOGGER.error("Batch API returned empty response");
+                return null;
+            }
+
             JSONObject json = new JSONObject(status);
-            return json.getString("batchId");
+
+            return json.optString("batchId", null);
+
         } catch (Exception e) {
             LOGGER.error("Failed to generate batch number", e);
-            return "123456";
+            return null;
         }
     }
     

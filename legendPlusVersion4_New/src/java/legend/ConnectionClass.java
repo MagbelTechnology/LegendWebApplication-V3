@@ -262,7 +262,7 @@ public class ConnectionClass {
 	    return status;
 	}
     
-    public boolean populateFinacleTemp(int ps_status, String ThirdPartyLabel) throws Exception {
+    public boolean populateFinacleTempOld(int ps_status, String ThirdPartyLabel) throws Exception {
         boolean suc = false;
 
         String current_date = getCurrentDate();
@@ -335,6 +335,121 @@ public class ConnectionClass {
         }
 
         return suc;
+    }
+    
+    
+    public boolean populateFinacleTemp(int ps_status,String ThirdPartyLabel)throws Exception{
+
+        boolean suc = false;
+       
+    String current_date= getCurrentDate();
+    String narration = null;
+    Date processing_date =null;
+    PersistenceServiceDAO psdao = new PersistenceServiceDAO();
+    Connection conn = getConnection();
+    PreparedStatement statement = conn.prepareStatement("select processing_date from am_gb_company");
+     ResultSet re = statement.executeQuery();
+    //ResultSet re = getStatement().executeQuery("select processing_date from am_gb_company");
+
+    if(re.next()){
+    processing_date = re.getDate(1);//.getString(1);
+     }
+
+   
+    String describe = "DEPRECIATON FOR THE MONTH OF ";
+
+
+    //001**DEPTN NOVEMBER 2024**FAS
+
+     //System.out.println("the value of processing date is " + formatDate(processing_date) );
+    narration = describe + getMonthPartOfDate(formatDate(processing_date)).toUpperCase() + " " + getYearPartOfDate(formatDate(processing_date));
+    //System.out.println("i am herejjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj" + narration);
+//        System.out.println("the current date" + current_date);
+    if(ThirdPartyLabel.equals("ZENITH")) {describe = "DEPTN ";
+    String transCode = "**FAS";
+    narration = describe + getMonthPartOfDate(formatDate(processing_date)).toUpperCase() + " " + getYearPartOfDate(formatDate(processing_date)+transCode);
+    }
+
+    if(ps_status == 1){
+     
+      
+   
+    	AssetRecordsBean arb = new AssetRecordsBean();
+        getStatement().executeUpdate("Insert into finacle_temp(dr_acct,cr_acct,amount,value_date,narration,narration2) select dr_acct,cr_acct,amount,value_date,narration,narration2 from finacle_ext");
+//        System.out.println("i am herekkkkkkkkkkkkkkkkkk");
+    //getStatement().executeUpdate("TRUNCATE table finacle_ext insert into finacle_ext(type,dr_acct,cr_acct,amount,value_date) select c.category_name,d.country_prefix + d.dr_prefix + b.branch_code + c.Asset_Ledger,d.country_prefix + d.cr_prefix + b.branch_code + c.Dep_ledger,sum(a.monthly_dep),d.processing_date from am_ad_branch b,am_ad_category c,am_asset a,am_gb_company d where a.category_code = c.category_code And a.branch_code = b.branch_code and c.Asset_Ledger <> '" +" "+"' group by c.category_name,b.branch_code,c.Asset_Ledger,c.Dep_ledger,d.processing_date,d.country_prefix,d.dr_prefix,d.cr_prefix order by b.branch_code asc");
+        /*
+    getStatement().executeUpdate("TRUNCATE table finacle_ext insert into finacle_ext(type,dr_acct," +
+            "cr_acct,amount,value_date) select c.category_name,d.country_prefix + d.dr_prefix + b.branch_code +" +
+            " c.Asset_Ledger,d.country_prefix + d.cr_prefix + b.branch_code + c.Dep_ledger,sum(a.monthly_dep)," +
+            "d.processing_date from am_ad_branch b,am_ad_category c,am_asset a,am_gb_company d where " +
+            "a.category_code = c.category_code And a.branch_code = b.branch_code and a.asset_status ='active' " +
+            "and a.cost_price > d.cost_threshold and a.dep_rate > 0 and c.Asset_Ledger <> '" +" "+"' " +
+            "group by c.category_name,b.branch_code,c.Asset_Ledger,c.Dep_ledger,d.processing_date,d.country_prefix," +
+            "d.dr_prefix,d.cr_prefix order by b.branch_code asc");
+    */
+
+         String script = approv.getCodeName("select PREFIX from ACCOUNT_GLPREFIX_PARAM where THIRDPARTY = '"+ThirdPartyLabel+"' AND type = 'DEPRECIATION'");
+//        getStatement().executeUpdate(script);
+         arb.updateAssetStatusChange(script);
+
+    //if(ThirdPartyLabel.equalsIgnoreCase("K2")){  
+    //getStatement().executeUpdate("TRUNCATE table finacle_ext insert into finacle_ext(type,SBU_CODE,dr_acct,cr_acct,amount,value_date) " +
+//            "select c.category_name,a.SBU_CODE,substring(b.BRANCH_CODE,3,3)+d.country_prefix+c.Dep_ledger," +
+//            "substring(b.BRANCH_CODE,3,3)+d.country_prefix+c.Accum_Dep_ledger, " +
+//            "sum(a.monthly_dep)+SUM(coalesce(a.IMPROV_MONTHLYDEP,0)),d.processing_date from " +
+//            "am_ad_branch b,am_ad_category c,am_asset a,am_gb_company d where a.category_code = c.category_code " +
+//            "And a.branch_code = b.branch_code and a.asset_status ='active' and a.cost_price > d.cost_threshold and " +
+//            "a.dep_rate > 0 and c.Accum_Dep_ledger <> '" +" "+"' and a.Req_Redistribution = 'N' group by c.category_name,a.SBU_CODE,b.branch_code," +
+//            "c.Accum_Dep_ledger,c.Dep_ledger,d.processing_date,d.country_prefix,d.dr_prefix,d.cr_prefix " +
+//            "UNION " +        
+//    		"select c.category_name,a.SBU_CODE,substring(b.BRANCH_CODE,3,3)+d.country_prefix+e.DIST_EXP_ACCT, " +
+//    		"substring(b.BRANCH_CODE,3,3)+d.country_prefix+e.DIST_ACCUM_ACCT,sum(a.monthly_dep*e.VALUE_ASSIGNED/100)+SUM(coalesce(a.IMPROV_MONTHLYDEP,0)*e.VALUE_ASSIGNED/100),  " +
+//    		"d.processing_date from am_ad_branch b,am_ad_category c,am_asset a,am_gb_company d, AM_DEPR_DIST e " +
+//    		"where a.category_code = c.category_code And a.branch_code = b.branch_code and a.asset_status ='active' " +
+//    		"and a.cost_price > d.cost_threshold and a.dep_rate > 0 and c.Accum_Dep_ledger <> '" +" "+"' and a.Asset_id = e.ASSET_ID " +
+//    		" and a.Req_Redistribution = 'N' group by c.category_name,a.SBU_CODE,b.branch_code,e.DIST_EXP_ACCT,e.DIST_ACCUM_ACCT,d.processing_date,d.country_prefix, " +
+//    		"d.dr_prefix,d.cr_prefix ");
+    //}else{
+    //
+    //getStatement().executeUpdate("TRUNCATE table finacle_ext insert into finacle_ext(type,SBU_CODE,dr_acct,cr_acct,amount,value_date) " +
+//            "select c.category_name,a.SBU_CODE,d.country_prefix + d.dr_prefix + b.branch_code + c.Dep_ledger,d.country_prefix + " +
+//            "d.cr_prefix + b.branch_code + c.Accum_Dep_ledger,sum(a.monthly_dep)+SUM(coalesce(a.IMPROV_MONTHLYDEP,0)),d.processing_date from " +
+//            "am_ad_branch b,am_ad_category c,am_asset a,am_gb_company d where a.category_code = c.category_code " +
+//            "And a.branch_code = b.branch_code and a.asset_status ='active' and a.cost_price > d.cost_threshold and " +
+//            "a.dep_rate > 0 and c.Accum_Dep_ledger <> '" +" "+"' and a.Req_Redistribution = 'N' group by c.category_name,a.SBU_CODE,b.branch_code," +
+//            "c.Accum_Dep_ledger,c.Dep_ledger,d.processing_date,d.country_prefix,d.dr_prefix,d.cr_prefix " +
+//            "UNION " +        
+//    		"select c.category_name,a.SBU_CODE,d.country_prefix + d.dr_prefix + b.branch_code + e.DIST_EXP_ACCT,d.country_prefix + " +
+//    		"d.cr_prefix + b.branch_code + e.DIST_ACCUM_ACCT,sum(a.monthly_dep*e.VALUE_ASSIGNED/100)+SUM(coalesce(a.IMPROV_MONTHLYDEP,0)*e.VALUE_ASSIGNED/100), " +
+//    		"d.processing_date from am_ad_branch b,am_ad_category c,am_asset a,am_gb_company d, AM_DEPR_DIST e " +
+//    		"where a.category_code = c.category_code And a.branch_code = b.branch_code and a.asset_status ='active' " +
+//    		"and a.cost_price > d.cost_threshold and a.dep_rate > 0 and c.Accum_Dep_ledger <> '" +" "+"' and a.Asset_id = e.ASSET_ID " +
+//    		" and a.Req_Redistribution = 'N' group by c.category_name,a.SBU_CODE,b.branch_code,e.DIST_EXP_ACCT,e.DIST_ACCUM_ACCT,d.processing_date,d.country_prefix, " +
+//    		"d.dr_prefix,d.cr_prefix ");
+    //}
+
+
+    String query ="update finacle_ext set narration=?,system_date=?,narration2=?";
+    //System.out.println("THE UPDATE WAS SUCCESSFUL FOR query " + query);
+    try(   Connection con = getConnection();
+    PreparedStatement ps = con.prepareStatement(query)){
+     
+    ps.setString(1, narration);
+    ps.setDate(2, psdao.dateConvert(current_date));
+    ps.setString(3, narration);
+    int i =ps.executeUpdate();
+    if(i != -1){System.out.println("THE UPDATE WAS SUCCESSFUL");}
+    //getStatement().executeUpdate("update finacle_ext set narration='" + narration + "',system_date='"+current_date+"',narration2='" + narration + "'");
+    }catch(Exception e){e.getMessage();
+    }
+
+
+    suc = true;
+    
+    }else{suc = false;}//if
+
+    return suc;
     }
 
 
