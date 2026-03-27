@@ -208,7 +208,7 @@ public class ZenithTokenClass {
     }
 
    
-  public static String validation() throws JSONException, NoSuchAlgorithmException, KeyManagementException, IOException {
+  public static String validationOld() throws JSONException, NoSuchAlgorithmException, KeyManagementException, IOException {
 		String status = "";
 		Properties prop = new Properties();
       File file = new File("C:\\Property\\LegendPlus.properties");
@@ -320,6 +320,107 @@ public class ZenithTokenClass {
 		    System.out.println("There was an error creating the HTTP Call: " + exc.toString());
 		}
 		return status;
+	}
+  
+  
+  public static String validation() throws JSONException, NoSuchAlgorithmException, KeyManagementException, IOException {
+
+	    String status = "";
+
+	    Properties prop = new Properties();
+
+	    File file = new File("C:\\Property\\LegendPlus.properties");
+
+	    try (FileInputStream input = new FileInputStream(file)) {
+	        prop.load(input);
+	    }
+
+	    String apiUrl = prop.getProperty("BatchApiUrl");
+	    String channel = prop.getProperty("BatchChannel");
+
+	    System.out.println("<<<<< apiUrl: " + apiUrl);
+	    System.out.println("<<<<< channel: " + channel);
+	    
+	    // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+				@Override
+				public void checkClientTrusted(
+						java.security.cert.X509Certificate[] arg0,
+						String authType) throws CertificateException {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void checkServerTrusted(
+						java.security.cert.X509Certificate[] arg0,
+						String authType) throws CertificateException {
+					// TODO Auto-generated method stub
+					
+				}
+            }
+        };
+ 
+        // Install the all-trusting trust manager
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+ 
+        // Create all-trusting host name verifier
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+
+			
+        };
+
+        // Install the all-trusting host verifier
+        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+	    
+
+	    Map<String, String> parameters = new HashMap<>();
+	    parameters.put("channel", channel);
+
+	    URL url = new URL(apiUrl + "?" + ParameterStringBuilder.getParamsString(parameters));
+
+	    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+	    try {
+	        connection.setRequestMethod("GET");
+	        connection.setRequestProperty("Accept", "application/json");
+	        connection.setConnectTimeout(15000);
+	        connection.setReadTimeout(15000);
+
+	        int responseCode = connection.getResponseCode();
+
+	        InputStream responseStream = (responseCode >= 200 && responseCode < 300)
+	                ? connection.getInputStream()
+	                : connection.getErrorStream();
+
+	        if (responseStream == null) {
+	            return "{\"error\":\"No response from server\",\"code\":" + responseCode + "}";
+	        }
+
+	        try (BufferedReader br = new BufferedReader(new InputStreamReader(responseStream))) {
+	            StringBuilder sb = new StringBuilder();
+	            String line;
+
+	            while ((line = br.readLine()) != null) {
+	                sb.append(line);
+	            }
+
+	            status = sb.toString();
+	            System.out.println("<<<<< RESPONSE: " + status);
+	        }
+
+	    } finally {
+	        connection.disconnect();
+	    }
+
+	    return status;
 	}
   
   
