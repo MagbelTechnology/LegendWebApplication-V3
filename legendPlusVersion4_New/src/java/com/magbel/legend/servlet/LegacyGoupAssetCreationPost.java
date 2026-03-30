@@ -1,14 +1,11 @@
 package com.magbel.legend.servlet;
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-   
 import java.io.PrintWriter;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,18 +18,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-   
-
-import magma.AssetRecordsBean;
-import ng.com.magbel.token.ZenithTokenClass;
-
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.jasper.tagplugins.jstl.core.Url;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -51,6 +38,12 @@ import com.magbel.util.DataConnect;
 import com.magbel.util.DatetimeFormat;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import magma.AssetRecordsBean;
+import ng.com.magbel.token.ZenithTokenClass;
    
 public class LegacyGoupAssetCreationPost extends HttpServlet
 {
@@ -71,6 +64,7 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
 	 //  response.setContentType("text/html");
      //  response.setDateHeader("Expires", -1L);
 	   PrintWriter out = response.getWriter();
+	   RequestContext context = new RequestContext(request, response);
 	   String userId =(String) request.getSession().getAttribute("CurrentUser");
 	   String userClass = (String) request.getSession().getAttribute("UserClass");
 	   String userBranch =(String) request.getSession().getAttribute("UserCenter");
@@ -127,33 +121,56 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
         String MenuPage = request.getParameter("MenuPage"); 
         System.out.println("<<<<<<groupid: "+groupid+"     MenuPage: "+MenuPage+"   userId: "+userId);
         boolean uploadResponse = false;
-	   if(!BatchApiUrl.equals("")){
-	   try{ 
-	   String status = ZenithTokenClass.validation();
-	   System.out.println("status >>>> " + status);
-	   JSONObject json = new JSONObject(status);
-	   batchNo = json.getString("batchId");
-	   System.out.println("batchNo ====>>>> " + batchNo);
-//	   if(batchNo.equals("")) {
-//		   out.print("<script>alert('Unable to generate Batch No. Kindly Contact Administrator for assistance.');</script>");
-//		   out.println((new StringBuilder("<script> window.location ='DocumentHelp.jsp?np="+MenuPage+"&P=Y&id="+id+"&tranType="+tranType+"'</script>"))); 
-//	   }
-	   }catch(Exception e){
-		   e.getMessage();
-   		}
-	  }
-	   String branchId = request.getParameter("branch_id"); 
-	   branchId = "";
-	   String valueDate ="";
-	   try{ 
-	 	   String dateStatus = ZenithTokenClass.postingDateValidation(branchId);
-		   JSONObject jsonDate = new JSONObject(dateStatus);
-		   String postingDate = jsonDate.getJSONObject("data").getString("postingDate");
-		   System.out.println("postingDate >>>> " + postingDate);
-		   valueDate =postingDate;
-	   }catch(Exception e){
-		   e.getMessage();
-   		}
+        
+        String branchId = request.getParameter("branch_id"); 
+ 	   branchId = "";
+ 	   String valueDate ="";
+ 	   
+	   if (BatchApiUrl != null && !BatchApiUrl.trim().isEmpty()) {
+
+		    try {
+		        String status = ZenithTokenClass.validation();
+		        System.out.println("status >>>> " + status);
+
+		        if (status == null || status.trim().isEmpty()) {
+		            showAlertAndRedirect(context, "Unable to generate batch number from FLEXCUBE. Please contact IT Administrator.", MenuPage, id, groupPost, tranType);
+		            return;
+		        }
+
+		        JSONObject json = new JSONObject(status);
+
+		        String status_code = json.optString("code", "");
+		        batchNo = json.optString("batchId", "");
+
+		        System.out.println("status_code ====>>>> " + status_code);
+		        System.out.println("batchNo ====>>>> " + batchNo);
+
+		        // ❌ STOP execution here if invalid
+		        if ("404".equals(status_code) || batchNo == null || batchNo.trim().isEmpty()) {
+		            showAlertAndRedirect(context, "Unable to generate batch number from FLEXCUBE. Please contact IT Administrator.", MenuPage, id, groupPost, tranType);
+		            return;
+		        }
+
+		        // ✅ ONLY SUCCESS reaches here
+		       
+		        try { 
+		            String dateStatus = ZenithTokenClass.postingDateValidation(branchId);
+		            JSONObject jsonDate = new JSONObject(dateStatus);
+		            String postingDate = jsonDate.getJSONObject("data").getString("postingDate");
+
+		            System.out.println("postingDate >>>> " + postingDate);
+		            valueDate = postingDate;
+
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        showAlertAndRedirect(context, "Error: Batch API URL is Empty. Contact support.", MenuPage, id, groupPost, tranType);
+		        return;
+		    }
+		}
 	   
 //	   if(batchNo.equals("")){batchNo ="123456";} 
 //        String branchId = request.getParameter("branch_id");  
@@ -764,6 +781,8 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
 //      out.close();
         }
    }
+   
+   
    public void doGet(HttpServletRequest request, 
 		    HttpServletResponse response)
 		      throws ServletException, IOException
@@ -825,9 +844,9 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
 	        System.out.println("pass==== " +pass);
 	      
 	        ftpClient.connect(server, port);
-	        System.out.println("we are here..");
+	       // System.out.println("we are here..");
            ftpClient.login(user, pass);
-           System.out.println("we are here 2..");
+          // System.out.println("we are here 2..");
            ftpClient.enterLocalPassiveMode();
            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
            System.out.println("connected successfully..");
@@ -859,6 +878,13 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
         return response;
 	}
 
+   private void showAlertAndRedirect(RequestContext context, String message, String MenuPage, String id, String groupPost, String tranType) throws IOException {
+       PrintWriter out = context.response.getWriter();
+       out.println("<script type='text/javascript'>alert('" + message + "');</script>");
+       out.println((new StringBuilder("<script> window.location ='DocumentHelp.jsp?np="+MenuPage+"&P=Y&id="+id+"&groupPost="+groupPost+"&tranType="+tranType+"'</script>"))); 
+
+   }
+   
    public static boolean flexCubeFileUpload(String fullPath) {
 		boolean response = false;
 		 Session session = null;
@@ -1004,6 +1030,16 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
        }
 
        return con;
+   }
+   
+   private static class RequestContext {
+       final HttpServletRequest request;
+       final HttpServletResponse response;
+       
+       RequestContext(HttpServletRequest request, HttpServletResponse response) {
+           this.request = request;
+           this.response = response;
+       }
    }
 
   

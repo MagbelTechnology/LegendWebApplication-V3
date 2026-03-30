@@ -99,7 +99,7 @@ public class DepreciationBulkPosting extends HttpServlet {
         String batchNo = generateBatchNumber();
 
         if (batchNo == null || batchNo.isEmpty()) {
-            showAlertAndRedirect(context, "Unable to generate batch number. Please try again.");
+            showAlertAndRedirect(context, "Unable to generate batch number from FLEXCUBE. Please contact IT Administrator.");
             return;
         }
 
@@ -244,7 +244,8 @@ public class DepreciationBulkPosting extends HttpServlet {
 
         try {
             String status = ZenithTokenClass.validation();
-
+            System.out.println("status >>>> " + status);
+            
             if (status == null || status.trim().isEmpty()) {
                 LOGGER.error("Batch API returned empty response");
                 return null;
