@@ -121,13 +121,13 @@ public class AssetImprovementReportExport extends HttpServlet
 	     		+" and transactionId =26"
 //	     		+" and a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE > 0"
 	     		+" UNION ALL"
-	     		+" select p.new_nbv/NULLIF((a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE),0) AS calcMonthly_Depr,a.Asset_id,a.Description,p.revalue_Date AS transaction_Date,p.old_cost_price,p.cost_increase AS amount,p.new_cost_price,p.old_nbv,p.new_nbv,a.Monthly_Dep,p.revalue_reason,t.Page AS Page1,m.branch_name,b.category_name from am_Asset a,am_ad_category b,am_gb_company c,am_ad_category_class d, am_ad_branch m,am_raisentry_post t, AM_GROUP_IMPROVEMENT p"
+	     		+" select a.branch_code,p.new_nbv/NULLIF((a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE),0) AS calcMonthly_Depr,a.Asset_id,a.Description,p.revalue_Date AS transaction_Date,p.old_cost_price,p.cost_increase AS amount,p.new_cost_price,p.old_nbv,p.new_nbv,a.Monthly_Dep,p.revalue_reason,t.Page AS Page1,m.branch_name,b.category_name from am_Asset a,am_ad_category b,am_gb_company c,am_ad_category_class d, am_ad_branch m,am_raisentry_post t, AM_GROUP_IMPROVEMENT p"
 	     		+" where a.category_code = b.category_code"
 	     		+" and a.branch_code = m.branch_code"
 	     		+" and b.category_class = d.class_id "
 	     		+" and t.Id = CONVERT(varchar(30), p.Revalue_id)"
 	     		+" and d.class_status = 'Active'"
-	     		+" and p.cost_price > c.old_threshhold"
+//	     		+" and p.cost_price > c.old_threshhold"
 	     		+" and a.asset_status = 'ACTIVE'"
 	     		+" and p.status = 'IMPROVED'"
 	     		+" and a.asset_id = p.asset_id"
@@ -163,7 +163,7 @@ public class AssetImprovementReportExport extends HttpServlet
 	     		+" and b.category_class = d.class_id"
 	     		+" and t.Id = CONVERT(varchar, p.Revalue_id)"
 	     		+" and d.class_status = 'Active'"
-	     		+" and p.cost_price > c.old_threshhold"
+//	     		+" and p.cost_price > c.old_threshhold"
 	     		+" AND p.revalue_Date BETWEEN ? AND ?"
 	     		+" and a.asset_status = 'ACTIVE'"
 	     		+" and p.status = 'IMPROVED'"
@@ -199,7 +199,7 @@ public class AssetImprovementReportExport extends HttpServlet
 		     		+" and b.category_class = d.class_id"
 		     		+" and t.Id = CONVERT(varchar, p.Revalue_id)"
 		     		+" and d.class_status = 'Active'"
-		     		+" and p.cost_price > c.old_threshhold"
+//		     		+" and p.cost_price > c.old_threshhold"
 		     		+" AND b.category_id = ? AND p.revalue_Date BETWEEN ? AND ?"
 		     		+" and a.asset_status = 'ACTIVE'"
 		     		+" and p.status = 'IMPROVED'"
@@ -211,7 +211,7 @@ public class AssetImprovementReportExport extends HttpServlet
 //		     		+" and a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE > 0"
 		     		+" order by page1";
 	     }
-	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && !fromDate.equals("") && !endDate.equals("")){	   
+	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && fromDate.equals("") && endDate.equals("")){	   
 	   System.out.println("======>>>>>>>Branch and Date Selected: ");
 	     ColQuery ="select a.branch_code,p.new_nbv/NULLIF((a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE),0) AS calcMonthly_Depr,a.Asset_id,a.Description,p.revalue_Date AS transaction_Date,p.old_cost_price,p.cost_increase AS amount,p.new_cost_price,p.old_nbv,p.new_nbv,a.Monthly_Dep,p.revalue_reason,t.page1,m.branch_name,b.category_name from am_Asset a,am_ad_category b,am_gb_company c,am_ad_category_class d,am_raisentry_transaction_report_view t, am_ad_branch m, am_Asset_improvement p"
 		     		+" where a.category_code = b.category_code"
@@ -220,7 +220,7 @@ public class AssetImprovementReportExport extends HttpServlet
 		     		+" and t.trans_id = CONVERT(varchar, p.Revalue_id)"
 		     		+" and d.class_status = 'Active'"
 		     		+" and a.cost_price > c.old_threshhold"
-		     		+" AND m.branch_id = ? AND p.revalue_Date BETWEEN ? AND ?"
+		     		+" AND m.branch_id = ? "
 		     		+" and a.asset_status = 'ACTIVE'"
 		     		+" and p.status = 'IMPROVED'"
 		     		+" and a.asset_id = t.asset_id"
@@ -236,8 +236,8 @@ public class AssetImprovementReportExport extends HttpServlet
 		     		+" and b.category_class = d.class_id"
 		     		+" and t.Id = CONVERT(varchar, p.Revalue_id)"
 		     		+" and d.class_status = 'Active'"
-		     		+" and p.cost_price > c.old_threshhold"
-		     		+" AND m.branch_id = ? AND p.revalue_Date BETWEEN ? AND ?"
+//		     		+" and p.cost_price > c.old_threshhold"
+		     		+" AND m.branch_id = ? "
 		     		+" and a.asset_status = 'ACTIVE'"
 		     		+" and p.status = 'IMPROVED'"
 		     		+" and a.asset_id = p.asset_id"
@@ -248,6 +248,44 @@ public class AssetImprovementReportExport extends HttpServlet
 //		     		+" and a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE > 0"
 		     		+" order by page1";
 	     }
+	 
+	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && !fromDate.equals("") && !endDate.equals("")){	   
+		   System.out.println("======>>>>>>>Branch and Date Selected: ");
+		     ColQuery ="select a.branch_code,p.new_nbv/NULLIF((a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE),0) AS calcMonthly_Depr,a.Asset_id,a.Description,p.revalue_Date AS transaction_Date,p.old_cost_price,p.cost_increase AS amount,p.new_cost_price,p.old_nbv,p.new_nbv,a.Monthly_Dep,p.revalue_reason,t.page1,m.branch_name,b.category_name from am_Asset a,am_ad_category b,am_gb_company c,am_ad_category_class d,am_raisentry_transaction_report_view t, am_ad_branch m, am_Asset_improvement p"
+			     		+" where a.category_code = b.category_code"
+			     		+" and a.branch_code = m.branch_code"
+			     		+" and b.category_class = d.class_id"
+			     		+" and t.trans_id = CONVERT(varchar, p.Revalue_id)"
+			     		+" and d.class_status = 'Active'"
+			     		+" and a.cost_price > c.old_threshhold"
+			     		+" AND m.branch_id = ? AND p.revalue_Date BETWEEN ? AND ?"
+			     		+" and a.asset_status = 'ACTIVE'"
+			     		+" and p.status = 'IMPROVED'"
+			     		+" and a.asset_id = t.asset_id"
+//			     		+" and a.category_code != '025'"
+			     		+" and t.page1 = 'ASSET IMPROVEMENT RAISE ENTRY'"
+			     		+" and t.iso ='000'"
+			     		+" and transactionId =26"
+//			     		+" and a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE > 0"
+			     		+" UNION ALL"
+			     		+" select a.branch_code,p.new_nbv/NULLIF((a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE),0) AS calcMonthly_Depr,a.Asset_id,a.Description,p.revalue_Date AS transaction_Date,p.old_cost_price,p.cost_increase AS amount,p.new_cost_price,p.old_nbv,p.new_nbv,a.Monthly_Dep,p.revalue_reason,t.Page AS Page1,m.branch_name,b.category_name from am_Asset a,am_ad_category b,am_gb_company c,am_ad_category_class d, am_ad_branch m,am_raisentry_post t, AM_GROUP_IMPROVEMENT p"
+			     		+" where a.category_code = b.category_code"
+			     		+" and a.branch_code = m.branch_code"
+			     		+" and b.category_class = d.class_id"
+			     		+" and t.Id = CONVERT(varchar, p.Revalue_id)"
+			     		+" and d.class_status = 'Active'"
+//			     		+" and p.cost_price > c.old_threshhold"
+			     		+" AND m.branch_id = ? AND p.revalue_Date BETWEEN ? AND ?"
+			     		+" and a.asset_status = 'ACTIVE'"
+			     		+" and p.status = 'IMPROVED'"
+			     		+" and a.asset_id = p.asset_id"
+//			     		+" and a.category_code != '025'"
+			     		+" and t.Page = 'ASSET IMPROVEMENT UPLOAD RAISE ENTRY'"
+			     		+" and t.entryPostFlag = 'Y'"
+			     		+" and t.GroupIdStatus = 'Y'"
+//			     		+" and a.Remaining_Life+a.IMPROV_REMAINLIFE+p.IMPROV_USEFULLIFE > 0"
+			     		+" order by page1";
+		     }
 
    if(!branch_Id.equals("0")  && !categoryCode.equals("0") && !fromDate.equals("") && !endDate.equals("")){
 	   System.out.println("======>>>>>>>Branch,Category and Date Selected: ");
@@ -274,7 +312,7 @@ public class AssetImprovementReportExport extends HttpServlet
 		     		+" and b.category_class = d.class_id"
 		     		+" and t.Id = CONVERT(varchar, p.Revalue_id)"
 		     		+" and d.class_status = 'Active'"
-		     		+" and p.cost_price > c.old_threshhold"
+//		     		+" and p.cost_price > c.old_threshhold"
 		     		+" AND b.category_id = ? AND m.branch_id = ? AND p.revalue_Date BETWEEN ? AND ?"
 		     		+" and a.asset_status = 'ACTIVE'"
 		     		+" and p.status = 'IMPROVED'"

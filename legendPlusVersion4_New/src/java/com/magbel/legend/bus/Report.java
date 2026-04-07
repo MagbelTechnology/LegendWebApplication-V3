@@ -3955,7 +3955,7 @@ public java.util.ArrayList getLegacyExceptionpPostRecords(String query)
 }
 
 
-public java.util.ArrayList getAssetDisposalReportRecords(String query,String branch_Id,String categoryCode,String disposalReason,String fromDate,String endDate)
+public java.util.ArrayList getAssetDisposalReportRecordsOld(String query,String branch_Id,String categoryCode,String disposalReason,String fromDate,String endDate)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -4095,6 +4095,90 @@ try (Connection c = getLegendConnection();
 	return _list;
 }
 
+
+public java.util.ArrayList getAssetDisposalReportRecords(
+        String query,
+        String branch_Id,
+        String categoryCode,
+        String disposalReason,
+        String fromDate,
+        String endDate) {
+
+    java.util.ArrayList list = new java.util.ArrayList();
+
+    System.out.println("query in getAssetDisposalReportRecords: branch_Id=" + branch_Id +
+            ", categoryCode=" + categoryCode +
+            ", fromDate=" + fromDate +
+            ", endDate=" + endDate +
+            ", disposalReason=" + disposalReason);
+
+    try (Connection c = getLegendConnection();
+         PreparedStatement s = c.prepareStatement(query)) {
+
+        int paramIndex = 1;
+
+        // ✅ Dynamic parameter setting (based on your query order)
+        if (fromDate != null && !fromDate.isEmpty() &&
+            endDate != null && !endDate.isEmpty()) {
+
+            s.setString(paramIndex++, fromDate);
+            s.setString(paramIndex++, endDate);
+        }
+
+        if (branch_Id != null && !branch_Id.equals("0")) {
+            s.setString(paramIndex++, branch_Id);
+        }
+
+        if (categoryCode != null && !categoryCode.equals("0")) {
+            s.setString(paramIndex++, categoryCode);
+        }
+
+        if (disposalReason != null && !disposalReason.equals("0")) {
+            s.setString(paramIndex++, disposalReason);
+        }
+        
+        
+     //   System.out.println("Query: " + query);
+
+        try (ResultSet rs = s.executeQuery()) {
+
+            while (rs.next()) {
+
+                newAssetTransaction newTransaction = new newAssetTransaction();
+
+                newTransaction.setAssetId(rs.getString("ASSET_ID"));
+                newTransaction.setBranchCode(rs.getString("BRANCH_CODE"));
+                newTransaction.setBranchName(rs.getString("BRANCH_NAME"));
+                newTransaction.setCategoryName(rs.getString("category_name"));
+                newTransaction.setDescription(rs.getString("Description"));
+
+                newTransaction.setCostPrice(rs.getDouble("COST_PRICE"));
+                newTransaction.setAccumDep(rs.getDouble("ACCUMULATED_DEPRECIATION"));
+                newTransaction.setDeprChargeToDate(rs.getDouble("DEPRECIATION_CHARGES"));
+                newTransaction.setLifeSpan(rs.getDouble("LIFE_SPAN"));
+                newTransaction.setNbv(rs.getDouble("NET_BOOK_VALUE"));
+
+                newTransaction.setDisposalDate(rs.getString("DISPOSAL_DATE"));
+                newTransaction.setDisposeReason(rs.getString("Disposal_Reason"));
+                newTransaction.setDisposalAmount(rs.getDouble("DISPOSAL_AMOUNT"));
+                newTransaction.setDisposalProceed(rs.getDouble("DISPOSAL_PROCEEDS"));
+                newTransaction.setProfitAmount(rs.getDouble("PROFIT_AMOUNT"));
+
+                newTransaction.setDatepurchased(rs.getString("PURCHASE_DATE"));
+
+                String qr = rs.getString("BarCode_VehicleNo");
+                newTransaction.setQrCode(qr != null && !qr.isEmpty() ? qr : "");
+
+                list.add(newTransaction);
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
 
 public java.util.ArrayList getAuditLogRecords(String query,String branch_Id,String user,String FromDate, String ToDate, String assetId)
 {

@@ -110,17 +110,17 @@ public class AssetDisposalReportExport extends HttpServlet
      if(branch_Id.equals("0")  && categoryCode.equals("0") && fromDate.equals("") && endDate.equals("") && disposalReason.equals("0")){
   	   System.out.println("======>>>>>>>No Selection: ");
   	     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-  	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+  	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
   	     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
   	     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
   	     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
-  	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed'";
+  	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' ";
      }  
      
 	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && fromDate.equals("") && endDate.equals("") && disposalReason.equals("0")){	   
 		   System.out.println("======>>>>>>>Branch Selected: ");
 		     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-		     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+		     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
 		     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
 		     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
 		     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
@@ -130,17 +130,17 @@ public class AssetDisposalReportExport extends HttpServlet
      if(branch_Id.equals("0")  && categoryCode.equals("0") && !fromDate.equals("") && !endDate.equals("") && disposalReason.equals("0")){
     	 System.out.println("======>>>>>>>Date Selected: ");
 	     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
 	     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
 	     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
 	     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
-	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.transaction_date BETWEEN  ? AND  ?";
+	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.Disposal_Date BETWEEN  ? AND  ?";
 	} 
      
      if(branch_Id.equals("0")  && !categoryCode.equals("0") && fromDate.equals("") && endDate.equals("") && disposalReason.equals("0")){	   
   	   System.out.println("======>>>>>>>Category Selected: ");
 	     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
 	     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
 	     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
 	     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
@@ -150,34 +150,34 @@ public class AssetDisposalReportExport extends HttpServlet
 	 if(branch_Id.equals("0")  && !categoryCode.equals("0") && !fromDate.equals("") && !endDate.equals("") && disposalReason.equals("0")){	   
 	   System.out.println("======>>>>>>>Category and Date Selected: ");
 	     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
 	     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
 	     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
 	     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
-	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.transaction_date BETWEEN  ? AND  ? AND b.CATEGORY_CODE = ? ";   
+	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.Disposal_Date BETWEEN  ? AND  ? AND b.CATEGORY_CODE = ? ";   
 	     }
 	 if(!branch_Id.equals("0")  && categoryCode.equals("0") && !fromDate.equals("") && !endDate.equals("") && disposalReason.equals("0")){	   
 	   System.out.println("======>>>>>>>Branch and Date Selected: ");
 	     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
 	     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
 	     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
 	     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
-	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.transaction_date BETWEEN  ? AND  ? AND b.BRANCH_CODE = ?";
+	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.Disposal_Date BETWEEN  ? AND  ? AND b.BRANCH_CODE = ?";
 	     }
 	 if(branch_Id.equals("0")  && categoryCode.equals("0")  && !disposalReason.equals("0") && !fromDate.equals("") && !endDate.equals("")){	   
 		   System.out.println("======>>>>>>>Disposal Reason and Date Selected: ");
 		     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-		     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+		     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
 		     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
 		     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
 		     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
-		     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.transaction_date BETWEEN  ? AND  ? AND a.Disposal_reason = ? ";	
+		     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.Disposal_Date BETWEEN  ? AND  ? AND a.Disposal_reason = ? ";	
 		     }	 
 	 if(branch_Id.equals("0")  && categoryCode.equals("0")  && !disposalReason.equals("0") && fromDate.equals("") && endDate.equals("")){	   
 		   System.out.println("======>>>>>>>Disposal Reason Selected: ");
 		     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-		     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+		     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
 		     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
 		     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
 		     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
@@ -186,14 +186,15 @@ public class AssetDisposalReportExport extends HttpServlet
    if(!branch_Id.equals("0")  && !categoryCode.equals("0") && !fromDate.equals("") && !endDate.equals("") && disposalReason.equals("0")){
 	   System.out.println("======>>>>>>>Branch, Category and Date Selection: ");
 	     ColQuery ="SELECT  c.category_name AS category_name,b.BRANCH_CODE AS BRANCH_CODE,b.Asset_id AS Asset_id,b.Description AS Description,b.TOTAL_LIFE AS LIFE_SPAN,d.BRANCH_NAME AS BRANCH_NAME,"
-	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.transaction_date AS DISPOSAL_DATE,"
+	     		+ "b.Cost_Price AS COST_PRICE,b.monthly_dep AS DEPRECIATION_CHARGES,b.Accum_dep AS ACCUMULATED_DEPRECIATION,b.NBV AS NET_BOOK_VALUE,a.Disposal_Date AS DISPOSAL_DATE,"
 	     		+ "b.Date_purchased AS PURCHASE_DATE,a.Disposal_Amount AS DISPOSAL_PROCEEDS,a.Disposal_Amount AS DISPOSAL_AMOUNT,a.Profit_Loss AS PROFIT_AMOUNT,a.Disposal_reason AS Disposal_Reason,"
 	     		+ "b.Asset_User AS ASSET_USER,b.BAR_CODE AS BarCode_VehicleNo "
 	     		+ "FROM Disposal_view a, am_Asset b, am_ad_category c, am_ad_branch d, am_gb_company comp "
-	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.transaction_date BETWEEN  ? AND  ? AND b.BRANCH_CODE = ? AND b.CATEGORY_CODE = ?";
+	     		+ "WHERE a.Asset_id = b.Asset_id and b.CATEGORY_CODE = c.category_code and b.BRANCH_CODE = d.BRANCH_CODE and b.Asset_Status = 'Disposed' AND a.Disposal_Date BETWEEN  ? AND  ? AND b.BRANCH_CODE = ? AND b.CATEGORY_CODE = ?";
 	     }   
   // System.out.println("======>>>>>>>ColQuery: "+ColQuery);
      java.util.ArrayList list =rep.getAssetDisposalReportRecords(ColQuery,branch_Id,categoryCode,disposalReason,fromDate,endDate);
+     //System.out.println("<<<<<<list.size(): "+list.size());
      if(list.size()!=0){
 	 
     	 SXSSFWorkbook workbook = new SXSSFWorkbook();
@@ -252,18 +253,36 @@ public class AssetDisposalReportExport extends HttpServlet
 //			disposalReason = records.getCodeName("select description from am_ad_disposalReasons where reason_code = "+disposalReason+"");
 //			String vendorName = records.getCodeName("select VENDOR_NAME from am_ad_vendor where VENDOR_ID = "+vendorId+"");
 //			System.out.println("======>depr_startDate====: "+depr_startDate);
-			String yyyy = disposalDate.substring(0, 4);
-//			System.out.println("======>yyyy: "+yyyy);
-			String mm = disposalDate.substring(5, 7);
-//			System.out.println("======>mm: "+mm);
-			String dd = disposalDate.substring(8, 10);
-			disposalDate = dd+"/"+mm+"/"+yyyy;
-			String puryyyy = purchaseDate.substring(0, 4);
-//			System.out.println("======>puryyyy: "+puryyyy);
-			String purmm = purchaseDate.substring(5, 7);
-//			System.out.println("======>purmm: "+purmm);
-			String purdd = purchaseDate.substring(8, 10);
-			purchaseDate = purdd+"/"+purmm+"/"+puryyyy;
+//			String yyyy = disposalDate.substring(0, 4);
+////			System.out.println("======>yyyy: "+yyyy);
+//			String mm = disposalDate.substring(5, 7);
+////			System.out.println("======>mm: "+mm);
+//			String dd = disposalDate.substring(8, 10);
+//			disposalDate = dd+"/"+mm+"/"+yyyy;
+			
+			if (disposalDate != null && disposalDate.length() >= 10) {
+			    String yyyy = disposalDate.substring(0, 4);
+			    String mm = disposalDate.substring(5, 7);
+			    String dd = disposalDate.substring(8, 10);
+			    disposalDate = dd + "/" + mm + "/" + yyyy;
+			} else {
+			    disposalDate = ""; // or "N/A"
+			}
+//			String puryyyy = purchaseDate.substring(0, 4);
+////			System.out.println("======>puryyyy: "+puryyyy);
+//			String purmm = purchaseDate.substring(5, 7);
+////			System.out.println("======>purmm: "+purmm);
+//			String purdd = purchaseDate.substring(8, 10);
+//			purchaseDate = purdd+"/"+purmm+"/"+puryyyy;
+			
+			if (purchaseDate != null && purchaseDate.length() >= 10) {
+			    String yyyy = purchaseDate.substring(0, 4);
+			    String mm = purchaseDate.substring(5, 7);
+			    String dd = purchaseDate.substring(8, 10);
+			    purchaseDate = dd + "/" + mm + "/" + yyyy;
+			} else {
+				purchaseDate = ""; // or "N/A"
+			}
 //			System.out.println("======>disposalDate: "+disposalDate);
 
 			Row row = sheet.createRow((int) i);

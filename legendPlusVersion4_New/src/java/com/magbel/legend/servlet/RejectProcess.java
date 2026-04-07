@@ -145,6 +145,8 @@ public class RejectProcess extends HttpServlet {
                 service.updateAssetStatus3(tranId, "R", "Rejected",reject_reason);
                 //service.updateAssetStatus2(tranIdRepost, "RP", "Rejected");
                 
+               
+                
                 if (page1 != null && page1.equalsIgnoreCase("ASSET RECLASSIFICATION RAISE ENTRY")){
                 
                 String oldAssetId=service.getCodeName("select old_asset_id from am_asset where asset_id ='"+id+"'");
@@ -249,6 +251,14 @@ public class RejectProcess extends HttpServlet {
               	assetRecordBeans.updateAssetStatusChange("update am_asset_approval  set process_status='R',asset_status ='Rejected',DATE_APPROVED = '"+dateApproved+"' where transaction_id =" +tranIdRepost);
 //              	 System.out.println("update AM_ASSET set asset_status ='ACTIVE' where asset_ID ='"+id +"'");
                }
+               
+               
+               System.out.println("page1: " + page1 + " ID: " + id);
+               if(page1 != null && page1.equalsIgnoreCase("ASSET CLOSE RAISE ENTRY")){
+            	  // System.out.println("We are here: ");              
+                   assetRecordBeans.updateAssetStatusChange("update AM_ASSET set Asset_Status ='ACTIVE' where ASSET_ID = '"+id +"'") ;
+                  // System.out.println("We are here 2: ");
+                 }
                 out.println("<script>alert('Entry Asset successfully Rejected  !')</script>");
                 out.println("<script>");
                 out.println("window.close('updateAsset.jsp');");
@@ -289,6 +299,9 @@ public class RejectProcess extends HttpServlet {
         if(trantype.equalsIgnoreCase("Asset Reclassification")){
         	assetRecordBeans.updateAssetStatusChange("update am_assetReclassification set STATUS = 'REJECTED' where Reclassify_ID='"+tranId+"'");}
         }
+        
+      //  System.out.println("trantype: " + trantype + " asset_id: " + asset_id);
+     
  //       System.out.println("<<<<<lpo======: "+lpo+"     trantype======: "+trantype+"     thirdPartyLabel======: "+thirdPartyLabel);
         if(lpo!="" && thirdPartyLabel.equalsIgnoreCase("Y")){boolean querydel = service.deleteQuery("DELETE FROM  AM_INVOICE_NO WHERE LPO = '"+lpo+"' AND TRANS_TYPE = '"+trantype+"'");}
 //        System.out.println("<<<<<lpo: "+lpo+"     trantype: "+trantype);
