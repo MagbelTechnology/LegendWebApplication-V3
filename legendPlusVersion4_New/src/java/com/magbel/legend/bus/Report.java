@@ -7599,7 +7599,7 @@ public java.util.ArrayList getCloseAssetRecords(String query,String assetId,Stri
 	return _list;
 }
 
-public java.util.ArrayList getPostedBatchTransactionExportRecords(String query,String userName,String startDate,String endDate)
+public java.util.ArrayList getPostedBatchTransactionExportRecordsOld(String query,String userName,String startDate,String endDate)
 {
 	java.util.ArrayList _list = new java.util.ArrayList();
 	String date = String.valueOf(dateConvert(new java.util.Date()));
@@ -7660,6 +7660,62 @@ public java.util.ArrayList getPostedBatchTransactionExportRecords(String query,S
 					}
 					
 	return _list;
+}
+
+public java.util.ArrayList<newAssetTransaction> getPostedBatchTransactionExportRecords(
+        String query,
+        String userName,
+        String startDate,
+        String endDate) {
+
+    java.util.ArrayList<newAssetTransaction> list = new java.util.ArrayList<>();
+
+    try (Connection c = getLegendConnection();
+         PreparedStatement s = c.prepareStatement(query)) {
+
+        int index = 1;
+
+        // =========================
+        // Bind parameters safely
+        // =========================
+
+        if (userName != null && !userName.equals("***")) {
+            s.setString(index++, userName);
+        }
+
+        if (startDate != null && !startDate.isEmpty()
+                && endDate != null && !endDate.isEmpty()) {
+            s.setString(index++, startDate);
+            s.setString(index++, endDate);
+        }
+
+        try (ResultSet rs = s.executeQuery()) {
+
+            while (rs.next()) {
+
+                newAssetTransaction trans = new newAssetTransaction();
+
+                trans.setAssetId(rs.getString("ASSET_ID"));
+                trans.setBranchCode(rs.getString("BRANCH_CODE"));
+                trans.setBranchName(rs.getString("BRANCH_NAME"));
+                trans.setDescription(rs.getString("DESCRIPTION"));
+                trans.setAmount(rs.getDouble("AMOUNT"));
+                trans.setDebitAccount(rs.getString("ACCOUNT_NO"));
+                trans.setTranType(rs.getString("TRANSTYPE"));
+                trans.setBarCode(rs.getString("BATCH_NO"));
+                trans.setOldassetId(rs.getString("GROUP_ID"));
+                trans.setPostedBy(rs.getString("FULL_NAME"));
+                trans.setTransDate(rs.getString("TRANSACTION_DATE"));
+
+                list.add(trans);
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
 }
 
 
