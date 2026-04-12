@@ -1,8 +1,21 @@
 package com.magbel.legend.servlet;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -203,113 +216,152 @@ try {
 
  response.setContentType("application/vnd.ms-excel");
  response.setHeader("Content-Disposition",
-         "attachment; filename=" + fileName);
+         "attachment; filename=" + fileName );
 
- // =========================
- // BUILD QUERY (CLEAN)
- // =========================
- StringBuilder query = new StringBuilder();
+//=========================
+//BUILD QUERY (OPTIMIZED)
+//=========================
+StringBuilder query = new StringBuilder(); 
 
- query.append("SELECT c.full_name AS initiatorName, ")
-      .append("d.full_name AS supervisorName, ")
-      .append("b.BRANCH_NAME, ")
-      .append("PARSENAME(REPLACE(description, '**', '.'), 3) AS Asset_Id, ")
-      .append("COST_PRICE AS AMOUNT, ")
-      .append("DATE_FIELD AS TRANSACTION_DATE, * ")
-      .append("FROM AM_GB_BATCH_POSTING a ")
-      .append("JOIN am_gb_User c ON a.User_id = c.User_id ")
-      .append("JOIN am_gb_User d ON a.User_id = d.User_id ")
-      .append("JOIN am_ad_branch b ON a.BRANCH_CODE = b.BRANCH_CODE ")
-      .append("WHERE 1=1 ");
+query.append("SELECT ")
+   .append("a.GROUP_ID, a.BATCH_NO, a.BRANCH_CODE, b.BRANCH_NAME, ")
+   .append("PARSENAME(REPLACE(a.description, '**', '.'), 3) AS ASSET_ID, ")
+   .append("a.DESCRIPTION AS RAW_DESCRIPTION, a.ACCOUNT_NO, ")
+   .append("ISNULL(v.VENDOR_NAME, '') AS ACCOUNT_NAME, ")
+   .append("a.TRANSTYPE, a.COST_PRICE AS AMOUNT, ")
+   .append("c.FULL_NAME AS POSTED_BY, ")
+   .append("a.DATE_FIELD AS TRANSACTION_DATE ")
+   .append("FROM AM_GB_BATCH_POSTING a ")
+   .append("JOIN am_gb_User c ON a.User_id = c.User_id ")
+   .append("JOIN am_ad_branch b ON a.BRANCH_CODE = b.BRANCH_CODE ")
+   .append("LEFT JOIN am_ad_vendor v ON v.account_number = a.ACCOUNT_NO ")
+   .append("AND v.VENDOR_CODE = a.BRANCH_CODE ")
+   .append("WHERE 1=1 ");
 
- // User filter
- if (!"***".equals(userName)) {
-     query.append("AND a.user_Id = ? ");
- }
+//User filter
+if (!"***".equals(userName)) {
+  query.append("AND a.user_Id = ? ");
+}
 
- // Date filter
- if (isNotEmpty(startDate) && isNotEmpty(endDate)) {
-     query.append("AND (SUBSTRING(DATE_FIELD,7,4)+'-'+SUBSTRING(DATE_FIELD,4,2)+'-'+SUBSTRING(DATE_FIELD,0,3)) ")
-          .append("BETWEEN ? AND ? ");
- }
+//Date filter (FIXED - NO STRING MANIPULATION)
+if (isNotEmpty(startDate) && isNotEmpty(endDate)) {
+  query.append("AND a.DATE_FIELD BETWEEN ? AND ? ");
+}
 
- query.append("ORDER BY BATCH_NO, GROUP_ID, PARSENAME(REPLACE(description, '**', '.'), 3) ASC");
+query.append("ORDER BY a.BATCH_NO, a.GROUP_ID, ASSET_ID ASC");
 
- System.out.println("======>>>>>>>ColQuery: " + query);
+System.out.println("======>>>>>>>ColQuery: " + query);
 
- // =========================
- // FETCH DATA
- // =========================
- ArrayList list = rep.getPostedBatchTransactionExportRecords(
-         query.toString(), userName, startDate, endDate
- );
+//=========================
+//DB FETCH (STREAMING)
+//=========================
+try (Connection conn = getLegendConnection("legendPlus");
+   PreparedStatement ps = conn.prepareStatement(query.toString())) {
 
- if (list == null || list.isEmpty()) {
-     return;
- }
+  int paramIndex = 1;
 
- // =========================
- // CREATE EXCEL
- // =========================
- SXSSFWorkbook workbook = new SXSSFWorkbook();
- Sheet sheet = workbook.createSheet("Posted Transaction Export");
+  if (!"***".equals(userName)) {
+      ps.setString(paramIndex++, userName);
+  }
 
- // =========================
- // HEADER
- // =========================
- Row header = sheet.createRow(0);
+  if (isNotEmpty(startDate) && isNotEmpty(endDate)) {
+      ps.setString(paramIndex++, startDate);
+      ps.setString(paramIndex++, endDate);
+  }
 
- header.createCell(0).setCellValue("Group Id");
- header.createCell(1).setCellValue("Batch No");
- header.createCell(2).setCellValue("Branch Code");
- header.createCell(3).setCellValue("Branch Name");
- header.createCell(4).setCellValue("Asset Id");
- header.createCell(5).setCellValue("Transaction Description");
- header.createCell(6).setCellValue("Account");
- header.createCell(7).setCellValue("Account Name");
- header.createCell(8).setCellValue("Transaction Type");
- header.createCell(9).setCellValue("Amount");
- header.createCell(10).setCellValue("Posted By");
- header.createCell(11).setCellValue("Transaction Date");
+  // 🚀 VERY IMPORTANT
+  ps.setFetchSize(1000);
 
- // =========================
- // POPULATE DATA
- // =========================
- int rowIndex = 1;
+  try (ResultSet rs = ps.executeQuery()) {
 
- for (Object obj : list) {
+	    // =========================
+	    // CREATE EXCEL (STREAMING)
+	    // =========================
+	    SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+	    Sheet sheet = workbook.createSheet("Posted Transaction Export");
 
-     com.magbel.legend.vao.newAssetTransaction trans =
-             (com.magbel.legend.vao.newAssetTransaction) obj;
+	    // =========================
+	    // CREATE STYLE (ONLY ONCE 🔥)
+	    // =========================
+	    CellStyle textStyle = workbook.createCellStyle();
+	    DataFormat format = workbook.createDataFormat();
+	    textStyle.setDataFormat(format.getFormat("@"));
 
-     String accountName = resolveAccountName(
-             trans.getDebitAccount(),
-             trans.getBranchCode(),
-             trans.getBranchName()
-     );
+	    // =========================
+	    // HEADER
+	    // =========================
+	    Row header = sheet.createRow(0);
+	    header.createCell(0).setCellValue("Group Id");
+	    header.createCell(1).setCellValue("Batch No");
+	    header.createCell(2).setCellValue("Branch Code");
+	    header.createCell(3).setCellValue("Branch Name");
+	    header.createCell(4).setCellValue("Asset Id");
+	    header.createCell(5).setCellValue("Transaction Description");
+	    header.createCell(6).setCellValue("Account");
+	    header.createCell(7).setCellValue("Account Name");
+	    header.createCell(8).setCellValue("Transaction Type");
+	    header.createCell(9).setCellValue("Amount");
+	    header.createCell(10).setCellValue("Posted By");
+	    header.createCell(11).setCellValue("Transaction Date");
 
-     Row row = sheet.createRow(rowIndex++);
+	    // =========================
+	    // POPULATE DATA
+	    // =========================
+	    int rowIndex = 1;
 
-     row.createCell(0).setCellValue(trans.getOldassetId());
-     row.createCell(1).setCellValue(trans.getBarCode());
-     row.createCell(2).setCellValue(trans.getBranchCode());
-     row.createCell(3).setCellValue(trans.getBranchName());
-     row.createCell(4).setCellValue(trans.getAssetId());
-     row.createCell(5).setCellValue(trans.getDescription());
-     row.createCell(6).setCellValue(trans.getDebitAccount());
-     row.createCell(7).setCellValue(accountName);
-     row.createCell(8).setCellValue(trans.getTranType());
-     row.createCell(9).setCellValue(trans.getAmount());
-     row.createCell(10).setCellValue(trans.getPostedBy());
-     row.createCell(11).setCellValue(trans.getTransDate());
- }
- // =========================
- // WRITE FILE
- // =========================
- stream = response.getOutputStream();
- workbook.write(stream);
+	    while (rs.next()) {
 
- System.out.println("Data is saved in excel file.");
+	        Row row = sheet.createRow(rowIndex++);
+
+	        // Clean description
+	        String desc = rs.getString("RAW_DESCRIPTION");
+	        if (desc == null) desc = "";
+
+	        desc = desc.replaceAll("[\\r\\n]+", " ")
+	                   .replaceAll("\\t", " ")
+	                   .trim();
+
+	        // Write cells
+	        row.createCell(0).setCellValue(rs.getString("GROUP_ID"));
+	        row.createCell(1).setCellValue(rs.getString("BATCH_NO"));
+	        row.createCell(2).setCellValue(rs.getString("BRANCH_CODE"));
+	        row.createCell(3).setCellValue(rs.getString("BRANCH_NAME"));
+	        row.createCell(4).setCellValue(rs.getString("ASSET_ID"));
+
+	        // ✅ Description with reused style
+//	        Cell descCell = row.createCell(5);
+//	        descCell.setCellValue(desc);
+//	        descCell.setCellStyle(textStyle);
+	        
+	        row.createCell(5).setCellValue(rs.getString("RAW_DESCRIPTION"));
+	        row.createCell(6).setCellValue(rs.getString("ACCOUNT_NO"));
+	        row.createCell(7).setCellValue(rs.getString("ACCOUNT_NAME"));
+	        row.createCell(8).setCellValue(rs.getString("TRANSTYPE"));
+	        row.createCell(9).setCellValue(rs.getDouble("AMOUNT"));
+	        row.createCell(10).setCellValue(rs.getString("POSTED_BY"));
+	        row.createCell(11).setCellValue(rs.getString("TRANSACTION_DATE"));
+	    }
+
+	    // =========================
+	    // WRITE RESPONSE
+	    // =========================
+	    response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition",
+	            "attachment; filename=PostedTransactionBy" + userName + ".xlsx");
+
+	    try (BufferedOutputStream bos =
+	                 new BufferedOutputStream(response.getOutputStream())) {
+
+	        workbook.write(bos);
+	        bos.flush();
+	    }
+	    
+
+	    workbook.dispose(); // 🔥 VERY IMPORTANT
+
+	    System.out.println("Excel generated successfully.");
+	}
+}
 
 } catch (Exception e) {
  throw new ServletException("Exception in Excel Sample Servlet", e);
@@ -382,7 +434,7 @@ try {
 
 	    if (isEmpty(accountName)) {
 	        accountName = records.getCodeName(
-	            "SELECT VENDOR_NAME FROM am_ad_vendor WHERE VENDOR_CODE = '00001' AND account_number = ?",
+	            "SELECT VENDOR_NAME FROM am_ad_vendor WHERE VENDOR_CODE = '00001' AND account_number = ? ",
 	            accountNo
 	        );
 	    }
@@ -390,21 +442,21 @@ try {
 	    // 3. Fallback to category tables
 	    if (isEmpty(accountName)) {
 	        accountName = records.getCodeName(
-	            "SELECT category_name FROM am_ad_category WHERE Asset_Ledger = ?",
+	            "SELECT category_name FROM am_ad_category WHERE Asset_Ledger = ? ",
 	            accountNo
 	        );
 	    }
 
 	    if (isEmpty(accountName)) {
 	        accountName = records.getCodeName(
-	            "SELECT category_name FROM am_ad_category WHERE Dep_ledger = ?",
+	            "SELECT category_name FROM am_ad_category WHERE Dep_ledger = ? ",
 	            accountNo
 	        );
 	    }
 
 	    if (isEmpty(accountName)) {
 	        accountName = records.getCodeName(
-	            "SELECT category_name FROM am_ad_category WHERE Accum_Dep_ledger = ?",
+	            "SELECT category_name FROM am_ad_category WHERE Accum_Dep_ledger = ? ",
 	            accountNo
 	        );
 	    }
@@ -424,5 +476,23 @@ try {
 	private boolean isNotEmpty(String val) {
 	    return !isEmpty(val);
 	}
+	
+	 public Connection getLegendConnection(String jndi) throws SQLException {
+	        try {
+	            Context initContext = new InitialContext();
+	            DataSource ds = (DataSource) initContext.lookup("java:/legendPlus");
+	           // System.out.println("Connection opened by getConnection in MagmaDBConnection: ");
+	            return ds.getConnection();
+	        } catch (SQLException e) {
+	            System.out.println("SQL Error getting connection: " + e.getMessage());
+	            throw e; // rethrow because method signature requires it
+	        } catch (NamingException e) {
+	            System.out.println("JNDI lookup failed: " + e.getMessage());
+	            throw new SQLException("Failed to lookup datasource", e);
+	        } catch (Exception e) {
+	            System.out.println("Unknown error: " + e.getMessage());
+	            throw new SQLException("Unexpected connection error", e);
+	        }
+	    }
 }
 
