@@ -12512,6 +12512,7 @@ return i;
        
        CurrentDateTime cdt = new CurrentDateTime();
        int i = 0;
+       int result = 0;
  //      String updateQuery =
 //               "UPDATE AM_ASSET SET Accum_Dep='"+accumdep+"',NBV = '"+nbv+"',Useful_Life = '"+usefullife+"',Remaining_Life = '"+remainlife+"' WHERE ASSET_ID = '"+assetId+"'";
 
@@ -12548,6 +12549,7 @@ return i;
            ps.setInt(20, Integer.parseInt(mtid));
 
            i = ps.executeUpdate();
+           if(i > 0) {result = Integer.parseInt(mtid);}
            
 //           if (i > 0) {   
  //              ps = con.prepareStatement(updateQuery);
@@ -12559,7 +12561,7 @@ return i;
                               e.getMessage());
        } 
        
-       return i;
+       return result;
    }
  
  public AssetRecordsBean getbulkAssetTransfer(String assetId) {

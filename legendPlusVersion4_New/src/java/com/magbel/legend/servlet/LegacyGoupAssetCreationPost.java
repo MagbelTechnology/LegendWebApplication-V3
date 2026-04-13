@@ -126,11 +126,12 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
  	   branchId = "";
  	   String valueDate ="";
  	   
+ 	  System.out.println("BatchApiUrl >>>> " + BatchApiUrl);
 	   if (BatchApiUrl != null && !BatchApiUrl.trim().isEmpty()) {
 
 		    try {
 		        String status = ZenithTokenClass.validation();
-		        System.out.println("status >>>> " + status);
+		        System.out.println("status{} >>>> " + status);
 
 		        if (status == null || status.trim().isEmpty()) {
 		            showAlertAndRedirect(context, "Unable to generate batch number from FLEXCUBE. Please contact IT Administrator.", MenuPage, id, groupPost, tranType);
@@ -153,21 +154,21 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
 
 		        // ✅ ONLY SUCCESS reaches here
 		       
-		        try { 
-		            String dateStatus = ZenithTokenClass.postingDateValidation(branchId);
-		            JSONObject jsonDate = new JSONObject(dateStatus);
-		            String postingDate = jsonDate.getJSONObject("data").getString("postingDate");
-
-		            System.out.println("postingDate >>>> " + postingDate);
-		            valueDate = postingDate;
-
-		        } catch (Exception e) {
-		            e.printStackTrace();
-		        }
+//		        try { 
+//		            String dateStatus = ZenithTokenClass.postingDateValidation(branchId);
+//		            JSONObject jsonDate = new JSONObject(dateStatus);
+//		            String postingDate = jsonDate.getJSONObject("data").getString("postingDate");
+//
+//		            System.out.println("postingDate >>>> " + postingDate);
+//		            valueDate = postingDate;
+//
+//		        } catch (Exception e) {
+//		            e.printStackTrace();
+//		        }
 
 		    } catch (Exception e) {
 		        e.printStackTrace();
-		        showAlertAndRedirect(context, "Error: Batch API URL is Empty. Contact support.", MenuPage, id, groupPost, tranType);
+		        showAlertAndRedirect(context, "Error: Unable to generate batch number from FLEXCUBE. Please contact IT Administrator.", MenuPage, id, groupPost, tranType);
 		        return;
 		    }
 		}

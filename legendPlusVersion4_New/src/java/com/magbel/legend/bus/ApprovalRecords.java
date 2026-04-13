@@ -7009,20 +7009,16 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
             String subjectToVat, String whTax, String url, long transID, int assetCode)
     {
         boolean done;
-        Connection con;
-        PreparedStatement ps;
         String query;
         done = true;
         flag = "Y";
-        con = null;
-        ps = null;
+       
         query = "INSERT INTO [am_raisentry_post](Id,Description,Page,Flag,partPay,UserId,Branch,s" +
 "ubjectToVat,whTax,url,trans_id,asset_code,entryPostFlag,GroupIdStatus,Posting_Date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 ;
-        try
-        {
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
+        try (Connection c = getConnection("legendPlus");
+   	         PreparedStatement ps = c.prepareStatement(query)) {
+          
             ps.setString(1, id);
             ps.setString(2, description);
             ps.setString(3, page);
@@ -7049,13 +7045,11 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
             System.out.println(
                     "WARNING:cannot insert am_raisentry_post for FT->"
                     + ex.getMessage());
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
         return done;
     }
     
-    public boolean databasebackup(String backupfile,String databaseName,String userId,String deprecYear, String deprecMonth)
+    public boolean databasebackupOld(String backupfile,String databaseName,String userId,String deprecYear, String deprecMonth)
     {
         Connection con;
         PreparedStatement ps;
@@ -7103,33 +7097,85 @@ Finder_qry = " select Id,p.Description,Page,Flag,partPay,UserId,Branch, cost_pri
         return done2;
     }    
     
+    
+    public boolean databasebackup(String backupFile, String databaseName,
+            String userId, String deprecYear, String deprecMonth) {
+
+boolean isBackupLogged = false;
+Timestamp backupDate = dbConnection.getDateTime(new java.util.Date());
+
+// ⚠️ Validate critical inputs (VERY IMPORTANT)
+if (!isValidName(databaseName) || !isValidFilePath(backupFile)) {
+throw new IllegalArgumentException("Invalid database name or file path");
+}
+
+String backupQuery =
+"BACKUP DATABASE " + databaseName +
+" TO DISK = ? WITH FORMAT, NAME = ?";
+
+String insertQuery =
+"INSERT INTO DATABASE_BACKUP_HISTORY " +
+"(BACKUP_DONE, DONE_BY, MONTH, YEAR, CREATE_DATE) " +
+"VALUES (?, ?, ?, ?, ?)";
+
+try (Connection con = getConnection("legendPlus");
+PreparedStatement psBackup = con.prepareStatement(backupQuery);
+PreparedStatement psInsert = con.prepareStatement(insertQuery)) {
+
+// 🔹 Backup execution
+psBackup.setString(1, backupFile);
+psBackup.setString(2, "Full Backup of " + databaseName);
+
+psBackup.execute(); // BACKUP doesn't behave like normal update
+
+// 🔹 Log backup
+psInsert.setString(1, "Y");
+psInsert.setString(2, userId);
+psInsert.setString(3, deprecMonth);
+psInsert.setString(4, deprecYear);
+psInsert.setTimestamp(5, backupDate);
+
+isBackupLogged = psInsert.executeUpdate() > 0;
+
+} catch (Exception e) {
+System.err.println(getClass().getName() +
+" ERROR: Error backing up database -> " + e.getMessage());
+e.printStackTrace();
+}
+
+return isBackupLogged;
+}
+    
+    private boolean isValidName(String input) {
+        return input != null && input.matches("^[a-zA-Z0-9_]+$");
+    }
+
+    private boolean isValidFilePath(String path) {
+        return path != null && path.matches("^[a-zA-Z0-9_:\\\\/. -]+$");
+    }
+    
     public String getCodeDelete(String query)
     {
         String result;
-        Connection con;
-        PreparedStatement ps;
         result = "";
-        con = null;
         int rs = 0;
-        ps = null;
-        try
-        {
+        try (Connection con = getConnection("legendPlus");
+                PreparedStatement ps = con.prepareStatement(query)) {
  //       	System.out.println("====getCodeDelete query=====  "+query);
-            con = getConnection("legendPlus");
-            ps = con.prepareStatement(query);
             rs = ps.executeUpdate();
 
   //          System.out.println("====getCodeDelete query=====  "+query);
         } catch (Exception er) {
             System.out.println("Error in Query- getCodeDelete()... ->" + er);
             er.printStackTrace();
-        } finally {
-            closeConnection(con, ps);
-        }
+        } 
   //      System.out.println("====getCodeName result=====  "+result);
         return result;
     }
+    
+  
 
+    
 
     public String retrieveArray(String query,String Id)
     {

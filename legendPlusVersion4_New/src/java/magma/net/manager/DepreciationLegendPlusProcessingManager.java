@@ -3204,6 +3204,10 @@ public boolean pendingTrancations(){
     String query15= "update a set a.status = 'REJECTED-SYSTEM' from am_gb_bulkTransfer a, am_asset_approval b where a.Batch_id = b.Asset_id and a.Transfer_Date between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
     		+ "and b.asset_status = 'PENDING' and process_status = 'R' and tran_type = 'Bulk Asset Transfer' ";
     updateAssetStatusChange(query15);
+    
+    String query17= "update a set a.Asset_Status = 'REJECT-SYSTEM',process_status = 'R' from am_asset_approval a, am_AcceleratedDepreciation b where a.asset_id = b.Asset_id and b.ACCELERATED_DATE between (SELECT DATEADD(DAY,1,EOMONTH((SELECT GETDATE()),-3))) and (SELECT CONVERT(DATE,DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,GETDATE())+1,0)))) "
+    		+ "and a.asset_status = 'PENDING' and process_status = 'P' and tran_type = 'Accelerated Depreciation' ";
+    updateAssetStatusChange(query17);
     exists = true;
     return exists;
 }

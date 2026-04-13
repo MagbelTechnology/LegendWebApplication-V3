@@ -152,21 +152,21 @@ public class LegacyGoupUncapCreationPost extends HttpServlet
 		       
 		        String valueDate = "";
 
-		        try { 
-		            String dateStatus = ZenithTokenClass.postingDateValidation(branchId);
-		            JSONObject jsonDate = new JSONObject(dateStatus);
-		            String postingDate = jsonDate.getJSONObject("data").getString("postingDate");
-
-		            System.out.println("postingDate >>>> " + postingDate);
-		            valueDate = postingDate;
-
-		        } catch (Exception e) {
-		            e.printStackTrace();
-		        }
+//		        try { 
+//		            String dateStatus = ZenithTokenClass.postingDateValidation(branchId);
+//		            JSONObject jsonDate = new JSONObject(dateStatus);
+//		            String postingDate = jsonDate.getJSONObject("data").getString("postingDate");
+//
+//		            System.out.println("postingDate >>>> " + postingDate);
+//		            valueDate = postingDate;
+//
+//		        } catch (Exception e) {
+//		            e.printStackTrace();
+//		        }
 
 		    } catch (Exception e) {
 		        e.printStackTrace();
-		        showAlertAndRedirect(context, "Error: Batch API Url is Empty. Contact support.", MenuPage, id, groupPost, tranType);
+		        showAlertAndRedirect(context, "Error: Unable to generate batch number from FLEXCUBE. Please contact IT Administrator.", MenuPage, id, groupPost, tranType);
 		        return;
 		    }
 		}
