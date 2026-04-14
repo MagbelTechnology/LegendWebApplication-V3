@@ -613,7 +613,8 @@ public class GroupAssetServlet extends HttpServlet {
         params.category = request.getParameter("category_id");
         params.payType = getParameterOrDefault(request.getParameter("payType"), "N");
         params.payCode = getParameterOrDefault(request.getParameter("category_id"), "0");
-        params.partPay = getParameterOrDefault(request.getParameter("partPay"), "");
+        params.partPay = getParameterOrDefault(request.getParameter("partPay"), "N");
+        params.fullyPaid = getParameterOrDefault(request.getParameter("fullyPAID"), "N");
         params.acronym = getParameterOrDefault(request.getParameter("acronym"), "");
        
         
@@ -680,7 +681,6 @@ public class GroupAssetServlet extends HttpServlet {
         params.projectCode = getParameterOrDefault(request.getParameter("projectCode"), "");
         params.requireDepreciation = getParameterOrDefault(request.getParameter("require_depreciation"), "");
         params.requireRedistribution = getParameterOrDefault(request.getParameter("require_redistribution"), "");
-        params.fullyPaid = request.getParameter("fullyPAID");
         params.registrationNo = request.getParameter("registration_no");
 
         return params;
