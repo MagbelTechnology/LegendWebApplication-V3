@@ -101,13 +101,12 @@ public ArrayList getArrayList(){
 ArrayList al = new ArrayList();
 // ExportComponentBean ecb = new ExportComponentBean();
 String query = "SELECT unique_id,BRANCH_CODE,SBU_CODE,dr_acct, cr_acct, amount, narration, narration2,record_processed,value_date FROM finacle_ext where amount > 0" ;
-Connection con = null;
-PreparedStatement ps = null;
-ResultSet rs = null;
-try{ 
-    con = dbConnection.getConnection("legendPlus");
-    ps = con.prepareStatement(query);
-    rs = ps.executeQuery();
+
+try(Connection con = dbConnection.getConnection("legendPlus");
+	PreparedStatement ps = con.prepareStatement(query);
+	ResultSet rs = ps.executeQuery())
+{ 
+	
 //ResultSet rs = getStatement().executeQuery(query);
 int i = 0;
 while(rs.next()){
@@ -138,7 +137,7 @@ dbConnection.closeConnection(con, ps, rs);
 
 catch(Exception e){
 e.printStackTrace();
-dbConnection.closeConnection(con, ps, rs);
+
 }//catch
 
 // System.out.println("the size of arraylist is ======="+ al.size() );
@@ -194,13 +193,16 @@ return al;
 //     System.out.print("The value of x is ------------==================............." +x);
 
         String query3 = "insert into custom.fxd_asset(sbu_code,dr_acct,cr_acct,amount,narration,narration2,value_date,processed_flg) values(?,?,?,?,?,?,?,?)";
-
-        try{
-        	Connection conn = null;
         ConnectionClass connection = new ConnectionClass();
-        	conn = connection.getOracleConnection();
+        try(	
+        		Connection conn = connection.getOracleConnection();
+        		PreparedStatement ps = conn.prepareStatement(query3))
+        {
+        	
+        
+        	
         //PreparedStatement ps = conn.getPreparedStatementOracle(query3);
-        	 PreparedStatement ps = conn.prepareStatement(query3);
+        	 
         System.out.print("The value of sbuCode is ----======....." +sbuCode);
         ps.setString(1,sbuCode);
         System.out.print("The value of dr_acct is ----======....." +dr_acct);
@@ -232,36 +234,31 @@ return al;
     String r = "Y";
     System.out.print("The value of id in updateRecordProcessed is ------------==================............." + id);
     //ConnectionClass con= null;
-    PreparedStatement ps = null;
-    Connection con= null;
-    try{
+
+    try(Connection con = getConnection();
+    		PreparedStatement	 ps = con.prepareStatement("update finacle_ext set record_processed = '"+ r +"' where unique_id = '" + id + "'")
+)
+    {
      //con = new ConnectionClass();
-    	 con = getConnection();
-    	 ps = con.prepareStatement("update finacle_ext set record_processed = '"+ r +"' where unique_id = '" + id + "'");
+    	 
     //int i = con.getStatement().executeUpdate("update finacle_ext set record_processed = '"+ r +"' where unique_id = '" + id + "'" );
     	 int i = ps.executeUpdate();
     }catch(Exception e){
     e.getMessage();
-    }finally{
-    	//con.freeResource();
-    	con.close();
-    	}
+    }
 
     }//updateRecordProcessed
     public void updateCompanySetup(String status) throws SQLException{
-        PreparedStatement ps = null;
-        Connection con= null;
-        try{
-         con = getConnection();
-         ps = con.prepareStatement("update am_gb_company set processing_status = '"+status+"'" );
+
+        try(Connection con = getConnection();
+        	PreparedStatement ps = con.prepareStatement("update am_gb_company set processing_status = '"+status+"'" ))
+        {
+        	
 //        int i = con.getStatement().executeUpdate("update am_gb_company set processing_status = '"+status+"'" );
          int i = ps.executeUpdate();
         }catch(Exception e){
         e.getMessage();
-        }finally{
-//        	con.freeResource();
-        	con.close();
-        	}
+        }
 
         }//updateRecordProcessed
     

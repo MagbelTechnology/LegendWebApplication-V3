@@ -139,7 +139,6 @@ public class LegacyGoupAssetCreationPost extends HttpServlet
 		        }
 
 		        JSONObject json = new JSONObject(status);
-
 		        String status_code = json.optString("code", "");
 		        batchNo = json.optString("batchId", "");
 
