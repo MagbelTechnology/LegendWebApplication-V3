@@ -235,7 +235,7 @@ import com.magbel.util.HtmlUtility;
 	        data.setAmountPTD(request.getParameter("amountPTD"));
 	        data.setTransportCost(request.getParameter("transport_cost"));
 	        data.setOtherCost(request.getParameter("other_cost"));
-	        data.setDepreciationRate(request.getParameter("depreciation_rate"));
+	        data.setDepreciationRate(request.getParameter("depreciation_rate") == null || request.getParameter("depreciation_rate").equals("") ? "" : request.getParameter("depreciation_rate"));
 	        data.setAccumDep(request.getParameter("accum_dep"));
 	        data.setNbv(request.getParameter("nbv"));
 	        

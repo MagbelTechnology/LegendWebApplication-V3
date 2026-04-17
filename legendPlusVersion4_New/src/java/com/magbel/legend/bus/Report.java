@@ -9060,5 +9060,77 @@ public java.util.ArrayList getUnDepreciatedAssetRecords(String query,String bran
 }
 
 
+public ArrayList<newAssetTransaction> getAcceleratedDepreciationRecords(
+	    String baseQuery, String branch_Id,String FromDate, String ToDate) {
+
+	 StringBuilder sqlQuery = new StringBuilder(baseQuery);
+	 List<String> params = new ArrayList<>();
+	 ArrayList<newAssetTransaction> _list = new ArrayList<>();
+	 
+
+
+	    if (!branch_Id.equals("0")) {
+	        sqlQuery.append(" and a.Branch_ID= ?");
+	        params.add(branch_Id);
+	       // System.out.println("Branch selected");
+	    }
+	    
+
+	    if (!FromDate.isEmpty() && !ToDate.isEmpty()) {
+	        sqlQuery.append(" and t.Accelerated_Date >= ? and t.Accelerated_Date <= ?");
+	        params.add(FromDate);
+	        params.add(ToDate);
+	       // System.out.println("Date selected");
+	    }
+	    
+	    
+	
+
+	    try (Connection c = getLegendConnection();
+		         PreparedStatement ps = c.prepareStatement(sqlQuery.toString())) {
+
+  
+    for (int i = 0; i < params.size(); i++) {
+        ps.setString(i + 1, params.get(i));
+    }
+    try (ResultSet rs = ps.executeQuery()) {
+	        while (rs.next()) {
+	        	
+	        	   newAssetTransaction newTransaction = new newAssetTransaction();
+
+	        	   
+	        	   
+	        	   newTransaction.setOldassetId(rs.getString("Accelerated_ID"));
+	        	   newTransaction.setAssetId(rs.getString("Transaction_Id"));
+	        	   newTransaction.setNewAssetId(rs.getString("Asset_id"));
+	        	   newTransaction.setPurchaseReason(rs.getString("Accelerated_reason"));
+	        	   newTransaction.setDebitAccount(rs.getString("DR_DEPACCOUNT"));
+	        	   newTransaction.setCreditAccount(rs.getString("CR_DEPACCOUNT"));
+	        	   newTransaction.setNoofitems(rs.getInt("Accelerated_Months"));
+	        	   newTransaction.setRemainLife(rs.getInt("Useful_life"));
+	        	   newTransaction.setImproveRemainLife(rs.getInt("Remaining_life"));
+	        	   newTransaction.setDependDate(rs.getString("Accelerated_Date"));
+	        	   newTransaction.setAccumDep(rs.getDouble("Accum_Dep"));
+	        	   newTransaction.setMonthlyDep(rs.getDouble("Monthly_Dep"));
+	        	   newTransaction.setAmount(rs.getDouble("ACCELERATED_AMOUNT"));
+	        	   newTransaction.setAssetStatus(rs.getString("ACCELERATED_STATUS"));
+	        	   
+            
+
+
+	        	   
+	            _list.add(newTransaction);
+	        }
+    }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } 
+	    
+	    return _list;
+	}
+
+
+
 
 }
