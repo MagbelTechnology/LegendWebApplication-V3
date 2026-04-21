@@ -14,7 +14,7 @@ import com.magbel.util.DatetimeFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.*; 
- 
+
 public class Jobs4
     implements Job
 {  
@@ -38,9 +38,9 @@ public class Jobs4
 //	  df.getDateTime().substring(10);
   	String sessionTimeOut = comp.getCodeName("select session_timeout from am_gb_company");
 //	String query = "update gb_user_login set time_out = '"+df.getDateTime().substring(10)+"' where time_out is null and datediff(minute, time_in, '"+df.getDateTime().substring(10)+"') / 60.0 > "+sessionTimeOut+"";
-		
+  		sessionTimeOut = "1";
 	     java.util.ArrayList list =comp.getUsernotSignOutRecords(sessionTimeOut);
-	     System.out.println("-->size in Job 4 Asset >--> "+list.size());
+//	     System.out.println("-->size in Job 4 Asset >--> "+list.size());
 	     //Iso Starts	
 
 	     for(int i=0;i<list.size();i++)
@@ -49,7 +49,10 @@ public class Jobs4
 //	    	 System.out.println("======> userId in Jbos4: "+userId);
 	    	 if(!userId.equals(null)){
 //	    		 System.out.println("======> userId in Jbos4: "+userId);
-	    		 comp.updateUsernotSignOutRecords(userId);
+//	    		 comp.updateUsernotSignOutRecords(userId);
+	    		 String mtid = comp.getCodeName("SELECT MAX(mtid) FROM  gb_user_login where USER_ID = " + userId + " ");
+//	    		 System.out.println("======> mtid in Jbos4: "+mtid);
+	    		 comp.updateUsernotSignOutRecords(userId,mtid);	    		 
 	    	 }
 	     }	
 

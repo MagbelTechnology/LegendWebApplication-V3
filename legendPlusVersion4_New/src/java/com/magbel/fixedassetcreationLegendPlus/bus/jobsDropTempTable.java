@@ -1,5 +1,6 @@
 package com.magbel.fixedassetcreationLegendPlus.bus;
  
+ 
 import java.io.File;
 import java.io.PrintStream;
 import java.sql.Connection;
@@ -21,11 +22,12 @@ import org.quartz.*;
 
 import com.magbel.legend.vao.newAssetTransaction;
  
+@DisallowConcurrentExecution
 public class jobsDropTempTable
     implements Job
 {  
         
-    private static Log _log = LogFactory.getLog(Jobs6.class);
+    private static Log _log = LogFactory.getLog(jobsDropTempTable.class);
     CompanyHandler comp = new CompanyHandler();
 
     public jobsDropTempTable()
@@ -40,14 +42,14 @@ public class jobsDropTempTable
 //		int statuk = 0;
   try
         {
-	     System.out.println("<<<<<<<<====Delete Asset Verification Mobile Temporary tables=====>> ");
+//	     System.out.println("<<<<<<<<====Delete Asset Verification Mobile Temporary tables=====>> ");
 
 	     String dropRecord = "INSERT INTO DROP_TABLE(RECORD) SELECT 'DROP TABLE ' + NAME from sys.tables "
 	     		+ "WHERE NAME LIKE '%Temp%' and substring(name,1,4) = 'Temp' GROUP BY NAME";
 			boolean result = comp.dropObject(dropRecord);
 			
 		     java.util.ArrayList malilist =comp.getDropTableRecords();
-		     System.out.println("<<<<<<<< Select Records for Executions>> "+malilist.size() );
+//		     System.out.println("<<<<<<<< Select Records for Executions>> "+malilist.size() );
 //		     boolean duplicate = comp.raisentry_postDuplicate();
 //		     boolean duplicate2 = comp.asset_approvalDuplicate();
 		      //================================
@@ -67,14 +69,14 @@ public class jobsDropTempTable
 		     //======================================
 	     
 			
-			if(result){comp.insertStockTotalRecords();}
+//			if(result){comp.insertStockTotalRecords();}
 			
 			File f1 = new File("\\*.xls");
-			System.out.print("Absolute Path:>>> "+f1.getAbsolutePath());
+//			System.out.print("Absolute Path:>>> "+f1.getAbsolutePath());
 			if (f1.delete()) {
-			    System.out.println("File " + f1.getName() + " is deleted.");
+//			    System.out.println("File " + f1.getName() + " is deleted.");
 			} else {
-			    System.out.println("File " + f1.getName() + " not found.");
+//			    System.out.println("File " + f1.getName() + " not found.");
 			}
 
      }
@@ -85,4 +87,3 @@ public class jobsDropTempTable
     }
 
 }
-

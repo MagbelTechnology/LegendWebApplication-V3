@@ -310,6 +310,7 @@ import com.magbel.util.HtmlUtility;
 	        return data;
 	    }
 	    
+	    
 	    private void populateGroupAssetBean(GroupAssetData data, UserSession userSession) {
 	        groupAssetBean.setNo_of_items(data.getNoOfItems());
 	        groupAssetBean.setDepreciation_start_date(data.getDepreciationStartDate());

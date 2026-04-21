@@ -21,6 +21,8 @@ import org.quartz.*;
 import com.magbel.legend.vao.newAssetTransaction;
 import com.magbel.util.DatetimeFormat;
  
+
+@DisallowConcurrentExecution
 public class Jobs14
     implements Job
 {  

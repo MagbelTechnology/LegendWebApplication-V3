@@ -17282,9 +17282,9 @@ public boolean InsertNewVendorOld(String branchCode, String branchName, String b
 			throw new RuntimeException("Error inserting vendor for branch: " + branchCode, e);
 		}
 	}
-	public List<Branch> getNewBranchRecordsFromFinacleLegacySystem() {
+	public ArrayList getNewBranchRecordsFromFinacleLegacySystem() {
 
-		List<Branch> list = new ArrayList<>();
+		ArrayList list = new ArrayList<>();
 
 		String query = "SELECT * FROM CUSTOM.NEW_BRANCH_DETAILS";
 
@@ -17428,9 +17428,9 @@ public boolean InsertNewVendorOld(String branchCode, String branchName, String b
 	}
 
 
-	public List<Section> getNewSectionRecordsFromFinacleLegacySystem() {
+	public ArrayList getNewSectionRecordsFromFinacleLegacySystem() {
 
-		final List<Section> sections = new ArrayList<>();
+		final ArrayList sections = new ArrayList<>();
 
 		final String sql =
 				"SELECT SECTORCODE, SECTORDESC " +

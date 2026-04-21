@@ -17,6 +17,8 @@ import org.quartz.*;
 
 import com.magbel.legend.vao.newAssetTransaction;
  
+
+@DisallowConcurrentExecution
 public class Jobs7
     implements Job
 {  

@@ -18,16 +18,19 @@ import legend.admin.handlers.CompanyHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.*; 
+import org.quartz.*;
 
+import com.magbel.legend.mail.EmailSmsServiceBus;
 import com.magbel.legend.vao.newAssetTransaction;
  
+@DisallowConcurrentExecution
 public class Jobs6
     implements Job
 {  
         
     private static Log _log = LogFactory.getLog(Jobs6.class);
     CompanyHandler comp = new CompanyHandler();
+    EmailSmsServiceBus email = new EmailSmsServiceBus();
 
     public Jobs6()
     {
@@ -43,7 +46,7 @@ public class Jobs6
         {
 	  
 	     java.util.ArrayList malilist =comp.getSendMailSqlRecords();
-	     System.out.println("<<<<<<<< Mail To send List Number>> "+malilist.size() );
+//	     System.out.println("<<<<<<<< Mail To send List Number>> "+malilist.size() );
 //	     boolean duplicate = comp.raisentry_postDuplicate();
 //	     boolean duplicate2 = comp.asset_approvalDuplicate();
 	      //================================
@@ -57,7 +60,8 @@ public class Jobs6
 			String status = sendmail.getStatus();
 	//	System.out.println("<<<<<<<<<<<<body: "+body);	
 		if(!address.equals("")){
-			boolean sent = comp.sendRecordMail(address, header, body);	
+			//boolean sent = comp.sendRecordMail(address, header, body);	
+			boolean sent = email.sendRecordMail(address, header, body);	
 			if(sent==true){comp.updateSendMailRecords(id);}
 	     }
 	     }   

@@ -13,7 +13,8 @@ import com.magbel.util.DatetimeFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.*; 
- 
+
+@DisallowConcurrentExecution
 public class Jobs15
     implements Job
 {  

@@ -26,7 +26,8 @@ import com.magbel.util.DatetimeFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.*; 
- 
+
+@DisallowConcurrentExecution
 public class Jobs5
     implements Job
 {  
@@ -92,7 +93,7 @@ public class Jobs5
 			String msgText12 = "Good day,\n"
 			         + "Please be informed that Facilities under the category of - "+description+"\n"
 			         + "are due for maintenance.\n"
-			         + "Kindly go to Menu Facility Requisition List to continue with the You can liaise with Procurement Unit for the replacement or HR – Compensation & Benefit Unit the requisition\n"
+			         + "Kindly go to Menu Facility Requisition List to continue with the You can liaise with Procurement Unit for the replacement or HR ï¿½ Compensation & Benefit Unit the requisition\n"
 			         + "Thank you.\n"
 			         + "Note: This is an auto notification from Admin - Facility Management unit.";
 			String transIdExist =comp.getCodeName("select count(*) from FM_PPM_AWAIT_REQUISITION where TRANSID = '"+transId+"'");
